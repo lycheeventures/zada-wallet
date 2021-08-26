@@ -36,6 +36,10 @@ import useCredentials from '../hooks/useCredentials';
 import RNExitApp from 'react-native-exit-app';
 import http_client from '../gateways/http_client';
 
+// Socket
+import { io } from 'socket.io-client';
+
+
 const DIMENSIONS = Dimensions.get('screen');
 
 function ActionsScreen({ navigation }) {
@@ -75,6 +79,11 @@ function ActionsScreen({ navigation }) {
       />
     ),
   };
+
+  // Effect to connect with socket
+  useEffect(()=>{
+    const socket = io();
+  },[])
 
   useEffect(() => {
     NetInfo.fetch().then((networkState) => {
