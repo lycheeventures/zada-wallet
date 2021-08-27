@@ -14,6 +14,7 @@ import {
   WHITE_COLOR,
   SECONDARY_COLOR,
 } from '../theme/Colors';
+
 import TextComponent from '../components/TextComponent';
 import HeadingComponent from '../components/HeadingComponent';
 
