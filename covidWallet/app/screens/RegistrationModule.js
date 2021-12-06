@@ -382,23 +382,6 @@ function RegistrationModule({ navigation }) {
 
       await addVerificationToActionList();
     }
-    // else{
-    //   // Reauthenticate user and create wallet
-    //   const authResult = await AuthenticateUser(true);
-    //   if(authResult.success){
-    //     // Create Wallet again
-    //     http_client.post(`/api/wallet/create`,{},
-    //     {
-    //       headers:{
-    //         'Authorization': `Bearer ${authResult.token}`
-    //       },
-    //     })
-    //   }
-    //   else{
-    //     _showAlert('Zada Wallet', authResult.message);
-    //   }
-    // }
-
   }
 
   function renderPhoneNumberInput() {
@@ -435,6 +418,11 @@ function RegistrationModule({ navigation }) {
 
   }
 
+  // KEYBOARD AVOIDING VIEW
+  const keyboardVerticalOffset = Platform.OS == 'ios' ? 100 : 0;
+  const keyboardBehaviour = Platform.OS == 'ios' ? 'padding' : null
+
+
   return (
     <View
       pointerEvents={progress ? "none" : "auto"}
@@ -444,6 +432,8 @@ function RegistrationModule({ navigation }) {
         backgroundColor: PRIMARY_COLOR,
       }}>
       <KeyboardAwareScrollView
+        behavior={keyboardBehaviour}
+        keyboardVerticalOffset={keyboardVerticalOffset}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
         <View
@@ -541,215 +531,115 @@ function RegistrationModule({ navigation }) {
           </View>
           {activeOption == 'register' && (
             <View>
-              <ScrollView showsVerticalScrollIndicator={true}>
-                <View>
-                  <InputComponent
-                    placeholderText="Full Name (Official Name)"
-                    errorMessage={nameError}
-                    value={name}
-                    isSecureText={false}
-                    inputContainerStyle={styles.inputView}
-                    setStateValue={(text) => setName(text)}
-                  />
-                </View>
-                {/* <View>
-                  <InputComponent
-                    placeholderText="Email"
-                    errorMessage={emailError}
-                    value={email}
-                    keyboardType="email-address"
-                    isSecureText={false}
-                    autoCapitalize={'none'}
-                    inputContainerStyle={styles.inputView}
-                    setStateValue={(text) => {
-                      setEmail(text);
-
-                      let domain = text.split('@');
-                      if(domain.length == 2){
-
-                        let domainName = domain[1].toLowerCase();
-
-                        if(domainName !== 'gmail.com' && domainName !== 'yahoo.com' && domainName !== 'outlook.com'){
-                          setEmailWarning(true);
-                          return
-                        }
-                        setEmailWarning(false);
-                        return
-
-                      }
-                      else
-                        setEmailWarning(false);
-                    }}
-                  />
-                </View> */}
-                {/* {
-                  emailWarning &&
-                  <Text style={{
-                    color: '#CCCC00',
-                    fontSize: 10,
-                    marginLeft: 24,
-                    marginRight: 24,
-                    marginTop: 5,
-                  }}>May be your email is incorrect, please check it carefully. If you know it is correct then proceed.</Text>
-                } */}
-                {renderPhoneNumberInput()}
-                <Text style={styles.secretMessage}>
-                  Password (please save in safe place)
-                </Text>
-                <View>
-                  <InputComponent
-                    type={'secret'}
-                    toggleSecureEntry={_toggleSecureSecretEntry}
-                    placeholderText="Password"
-                    errorMessage={secretError}
-                    value={secret}
-                    keyboardType="default"
-                    isSecureText={secureSecret}
-                    autoCapitalize={'none'}
-                    inputContainerStyle={{ width: '80%' }}
-                    inputContainerStyle={styles.inputView}
-                    setStateValue={(text) => {
-                      setSecret(text.replace(',', ''))
-                      if (text.length < 1) {
-                        setSecretError('Password is required.')
-                      } else {
-                        setSecretError('')
-                      }
-                    }}
-                  />
-                </View>
-
-                <Text
-                  style={{
-                    color: GRAY_COLOR,
-                    fontFamily: 'Poppins-Regular',
-                    marginLeft: 20,
-                    fontSize: 12,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    marginTop: 10,
-                    marginRight: 20,
-                  }}>
-                  We need your details as your ZADA WALLET will be based on it.
-                  We are not going to send you ads or spam email, or sell your
-                  information to a 3rd party.
-                </Text>
-                <SimpleButton
-                  loaderColor={WHITE_COLOR}
-                  isLoading={progress}
-                  onPress={submit}
-                  width={250}
-                  title='Continue'
-                  titleColor={WHITE_COLOR}
-                  buttonColor={GREEN_COLOR}
-                  style={{ marginVertical: 20, alignSelf: 'center' }}
+              <View>
+                <InputComponent
+                  placeholderText="Full Name (Official Name)"
+                  errorMessage={nameError}
+                  value={name}
+                  isSecureText={false}
+                  inputContainerStyle={styles.inputView}
+                  setStateValue={(text) => setName(text)}
                 />
-                {/* {progress ? (
-                  <ActivityIndicator
-                    style={styles.primaryButton}
-                    size="small"
-                    color={WHITE_COLOR}
-                  />
-                ) : (
-                  <TouchableOpacity
-                    style={styles.primaryButton}
-                    onPress={submit}>
-                    <Text style={styles.text}>CONTINUE</Text>
-                  </TouchableOpacity>
-                )} */}
-              </ScrollView>
+              </View>
+              {renderPhoneNumberInput()}
+              <Text style={styles.secretMessage}>
+                Password (please save in safe place)
+              </Text>
+              <View>
+                <InputComponent
+                  type={'secret'}
+                  toggleSecureEntry={_toggleSecureSecretEntry}
+                  placeholderText="Password"
+                  errorMessage={secretError}
+                  value={secret}
+                  keyboardType="default"
+                  isSecureText={secureSecret}
+                  autoCapitalize={'none'}
+                  inputContainerStyle={{ width: '80%' }}
+                  inputContainerStyle={styles.inputView}
+                  setStateValue={(text) => {
+                    setSecret(text.replace(',', ''))
+                    if (text.length < 1) {
+                      setSecretError('Password is required.')
+                    } else {
+                      setSecretError('')
+                    }
+                  }}
+                />
+              </View>
+
+              <Text
+                style={{
+                  color: GRAY_COLOR,
+                  fontFamily: 'Poppins-Regular',
+                  marginLeft: 20,
+                  fontSize: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  marginTop: 10,
+                  marginRight: 20,
+                }}>
+                We need your details as your ZADA WALLET will be based on it.
+                We are not going to send you ads or spam email, or sell your
+                information to a 3rd party.
+              </Text>
+              <SimpleButton
+                loaderColor={WHITE_COLOR}
+                isLoading={progress}
+                onPress={submit}
+                width={250}
+                title='Continue'
+                titleColor={WHITE_COLOR}
+                buttonColor={GREEN_COLOR}
+                style={{ marginVertical: 20, alignSelf: 'center' }}
+              />
             </View>
           )}
           {activeOption == 'login' && (
             <View>
-              <ScrollView showsVerticalScrollIndicator={true}>
-                {/* <View>
-                  <InputComponent
-                    placeholderText="Email"
-                    errorMessage={emailError}
-                    value={email}
-                    autoCapitalize={'none'}
-                    keyboardType="email-address"
-                    isSecureText={false}
-                    inputContainerStyle={styles.inputView}
-                    setStateValue={(text) => {
-                      
-                      setEmail(text);
+              {renderPhoneNumberInput()}
 
-                      let domain = text.split('@');
-                      if(domain.length == 2){
-
-                        let domainName = domain[1].toLowerCase();
-
-                        if(domainName !== 'gmail.com' && domainName !== 'yahoo.com' && domainName !== 'outlook.com'){
-                          setEmailWarning(true);
-                          return
-                        }
-
-                        setEmailWarning(false);
-                        return
-
-                      }
-                      else
-                        setEmailWarning(false);
-
-                    }}
-                  />
-                </View>
-                {
-                  emailWarning &&
-                  <Text style={{
-                    color: '#CCCC00',
-                    fontSize: 10,
-                    marginLeft: 24,
-                    marginRight: 24,
-                    marginTop: 5,
-                  }}>May be your email is incorrect, please check it carefully. If you know it is correct then proceed.</Text>
-                } */}
-                {renderPhoneNumberInput()}
-
-                <View>
-                  <InputComponent
-                    type={'secret'}
-                    toggleSecureEntry={_toggleSecureSecretEntry}
-                    placeholderText="Password"
-                    errorMessage={secretError}
-                    value={secret}
-                    keyboardType="default"
-                    isSecureText={secureSecret}
-                    autoCapitalize={'none'}
-                    inputContainerStyle={styles.inputView}
-                    setStateValue={(text) => {
-                      setSecret(text.replace(',', ''))
-                      if (text.length < 1) {
-                        setSecretError('Password is required.')
-                      } else {
-                        setSecretError('')
-                      }
-                    }}
-                  />
-                </View>
-                <Text
-                  onPress={() => {
-                    navigation.navigate('ForgotPasswordScreen');
+              <View>
+                <InputComponent
+                  type={'secret'}
+                  toggleSecureEntry={_toggleSecureSecretEntry}
+                  placeholderText="Password"
+                  errorMessage={secretError}
+                  value={secret}
+                  keyboardType="default"
+                  isSecureText={secureSecret}
+                  autoCapitalize={'none'}
+                  inputContainerStyle={styles.inputView}
+                  setStateValue={(text) => {
+                    setSecret(text.replace(',', ''))
+                    if (text.length < 1) {
+                      setSecretError('Password is required.')
+                    } else {
+                      setSecretError('')
+                    }
                   }}
-                  style={styles._forgotText}
-                >
-                  Forgot password?
-                </Text>
-
-                <SimpleButton
-                  loaderColor={WHITE_COLOR}
-                  isLoading={progress}
-                  onPress={submit}
-                  width={250}
-                  title='Continue'
-                  titleColor={WHITE_COLOR}
-                  buttonColor={GREEN_COLOR}
-                  style={{ marginVertical: 20, alignSelf: 'center' }}
                 />
-              </ScrollView>
+              </View>
+              <Text
+                onPress={() => {
+                  navigation.navigate('ForgotPasswordScreen');
+                }}
+                style={styles._forgotText}
+              >
+                Forgot password?
+              </Text>
+
+              <SimpleButton
+                loaderColor={WHITE_COLOR}
+                isLoading={progress}
+                onPress={submit}
+                width={250}
+                title='Continue'
+                titleColor={WHITE_COLOR}
+                buttonColor={GREEN_COLOR}
+                style={{ marginVertical: 20, alignSelf: 'center' }}
+              />
             </View>
           )}
         </View>
