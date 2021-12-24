@@ -27,6 +27,7 @@ import { validateOTP, _resendOTPAPI } from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import useNetwork from '../hooks/useNetwork';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
+import ZignSecModal from '../components/ZignSecModal';
 
 const { width } = Dimensions.get('window');
 
@@ -43,6 +44,7 @@ function MultiFactorScreen({ navigation }) {
   const [phoneMins, setPhoneMins] = useState(1);
   const [phoneSecs, setPhoneSecs] = useState(59);
   const [phoneTimeout, setPhoneTimeout] = useState(false);
+  const [showZignSecModal, setShowZignSecModal] = useState(false);
 
   const [phoneCodeLoading, setPhoneCodeLoading] = useState(false);
 
@@ -110,7 +112,8 @@ function MultiFactorScreen({ navigation }) {
         // Put User isFirsTime Logic here as well
         await AsyncStorage.setItem('isfirstTime', 'false');
 
-        navigation.replace('SecurityScreen');
+
+        setShowZignSecModal(true);
         setProgress(false);
       } else {
         showMessage('ZADA Wallet', resp.message);
@@ -217,6 +220,14 @@ function MultiFactorScreen({ navigation }) {
         alignItems: 'center',
         backgroundColor: PRIMARY_COLOR,
       }}>
+      <ZignSecModal
+        isVisible={showZignSecModal}
+        onLaterClick={() => { setShowZignSecModal(false); navigation.replace('SecurityScreen') }}
+        onContinueClick={() => {
+          setShowZignSecModal(false);
+          navigation.navigate('ScanningDocScreen', { screen: 'onboard' });
+        }}
+      />
       <KeyboardAwareScrollView
         behavior={keyboardBehaviour}
         keyboardVerticalOffset={keyboardVerticalOffset}

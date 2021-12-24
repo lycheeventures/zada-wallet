@@ -28,6 +28,7 @@ import useBiometric from './hooks/useBiometric';
 import { analytics_log_logout } from './helpers/analytics';
 import { _fetchingAppData } from './helpers/AppData';
 import NetInfo from "@react-native-community/netinfo";
+import ScanningDocument from './screens/ScanningDocument';
 
 const Stack = createStackNavigator();
 
@@ -117,7 +118,11 @@ function NavigationComponent() {
       <RefreshContextProvider>
         <NavigationContainer linking={linking}>
           {isLoading ? (
-            <Stack.Navigator>
+            <Stack.Navigator
+              screenOptions={{
+                gestureEnabled: false,
+              }}
+            >
               <Stack.Screen
                 options={{ headerShown: false }}
                 name="LoadingScreen"
@@ -126,7 +131,13 @@ function NavigationComponent() {
             </Stack.Navigator>
           ) : isFirstTime === 'true' ? (
             <Stack.Navigator
-              screenOptions={{ ...navigationAnimation }}
+              screenOptions={{
+                ...navigationAnimation,
+                gestureEnabled: false,
+                headerTitleAlign: 'center',
+                headerBackTitleVisible: false,
+                headerTintColor: BLACK_COLOR,
+              }}
             >
               <Stack.Screen
                 options={{ headerShown: false }}
@@ -168,9 +179,31 @@ function NavigationComponent() {
                 name="NotifyMeScreen"
                 component={NotifyMeScreen}
               />
+              <Stack.Screen
+                options={({ navigation }) => ({
+                  headerTitleAlign: 'center',
+                  title: 'Get ZADA ID',
+                  headerStyle: {
+                    backgroundColor: BACKGROUND_COLOR,
+                  }
+                })}
+                name="ScanningDocScreen"
+                component={ScanningDocument}
+              />
             </Stack.Navigator>
           ) : (
-            <Stack.Navigator screenOptions={{ ...navigationAnimation }}>
+            <Stack.Navigator
+              screenOptions={{
+                ...navigationAnimation,
+                gestureEnabled: false,
+                headerTitleAlign: 'center',
+                headerBackTitleVisible: false,
+                headerTintColor: BLACK_COLOR,
+                headerTitleStyle: {
+                  fontSize: 18,
+                }
+              }}
+            >
               <Stack.Screen
                 name="MainScreen"
                 options={({ navigation }) => ({
@@ -198,6 +231,7 @@ function NavigationComponent() {
               <Stack.Screen
                 name="SettingsScreen"
                 options={({ navigation }) => ({
+                  title: 'Settings',
                   headerTitle: 'Settings',
                   headerLeft: () => (
                     <MaterialIcons
@@ -205,7 +239,7 @@ function NavigationComponent() {
                         navigation.goBack();
                       }}
                       style={styles.headerRightIcon}
-                      size={30}
+                      size={26}
                       name="arrow-back"
                       padding={30}
                     />
@@ -223,7 +257,7 @@ function NavigationComponent() {
                         navigation.goBack();
                       }}
                       style={styles.headerRightIcon}
-                      size={30}
+                      size={26}
                       name="arrow-back"
                       padding={30}
                     />
@@ -236,35 +270,39 @@ function NavigationComponent() {
                 name="DetailsScreen"
                 component={DetailsScreen}
                 options={({ navigation }) => ({
-                  headerTintColor: "black",
+                  headerTitle: 'Details',
+                  title: 'Details',
                   headerStyle: {
-                    backgroundColor: BACKGROUND_COLOR,
+                    backgroundColor: BACKGROUND_COLOR
                   },
-                  headerTitle: () => (
-                    <Text style={{
-                      fontSize: 24,
-                      color: BLACK_COLOR,
-                      textAlign: "center",
-                    }}>Details</Text>
-                  ),
-                  // headerLeft: () => (
-                  //   <MaterialIcons
-                  //     onPress={() => {
-                  //       navigation.goBack();
-                  //     }}
-                  //     style={styles.headerRightIcon}
-                  //     size={30}
-                  //     name="arrow-back"
-                  //     padding={30}
-                  //   />
-                  // ),
-
+                  headerLeft: () => (
+                    <MaterialIcons
+                      onPress={() => {
+                        navigation.goBack();
+                      }}
+                      style={styles.headerRightIcon}
+                      size={26}
+                      name="arrow-back"
+                      padding={30}
+                    />
+                  )
                 })}
               />
               <Stack.Screen
                 options={{ headerShown: false }}
                 name="RegistrationScreen"
                 component={RegistrationModule}
+              />
+              <Stack.Screen
+                options={({ navigation }) => ({
+                  headerTitleAlign: 'center',
+                  title: 'Get ZADA ID',
+                  headerStyle: {
+                    backgroundColor: BACKGROUND_COLOR,
+                  }
+                })}
+                name="ScanningDocScreen"
+                component={ScanningDocument}
               />
               <Stack.Screen
                 options={{ headerShown: false }}
@@ -281,7 +319,7 @@ function NavigationComponent() {
           )}
         </NavigationContainer>
       </RefreshContextProvider>
-    </AuthContext.Provider>
+    </AuthContext.Provider >
   );
 }
 

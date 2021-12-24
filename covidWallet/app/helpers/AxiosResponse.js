@@ -4,6 +4,7 @@ export const _handleAxiosError = (error, ownMessage, showAlert) => {
     if (showAlert == undefined || showAlert == true)
         showAlert = true;
 
+    console.log(error.response.data);
     if (error.response) {
         _showAlert('ZADA Wallet', error.response.data.error);
     } else {

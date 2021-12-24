@@ -19,8 +19,6 @@ const ZignSecModal = ({ isVisible, onContinueClick, onLaterClick }) => {
             animationInTiming={700}
             animationOut={'zoomOut'}
             animationOutTiming={700}
-            onBackButtonPress={onLaterClick}
-            onBackdropPress={onLaterClick}
             isVisible={isVisible}
         >
             <View style={styles._mainContainer}>

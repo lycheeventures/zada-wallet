@@ -6,10 +6,9 @@ import { PRIMARY_COLOR } from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
 import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
 import useBiometric from '../hooks/useBiometric';
-import { showMessage } from '../helpers/Toast';
+import { showMessage, _showAlert } from '../helpers/Toast';
 import { AuthContext } from '../context/AuthContext';
 import ConstantsList from '../helpers/ConfigApp';
-import ZignSecModal from '../components/ZignSecModal';
 
 var settingLocalData = {
   GENERAL: {
@@ -61,9 +60,9 @@ var settingLocalData = {
     },
     key: '3',
   },
-  ZIGNSEC: {
+  'ZADA ID': {
     key: '4',
-    'Scan Document': {
+    'Get ZADA ID': {
       value: 'None',
       type: 'Text',
       key: '40',
@@ -141,21 +140,43 @@ export default function SettingsScreen(props) {
     props.navigation.navigate('ProfileScreen');
   }
 
-  // on Scan Document click
-  const _onScanDocumentClick = () => {
-    setZignSecModal(true)
+  const _checkZignSecCoolDown = async () => {
+    try {
+      let nowUnixEpoch = Math.round(Date.now() / 1000);
+      let ZignSecAuth = await getItem(ConstantsList.ZIGN_SEC_TIME);
+      if (ZignSecAuth !== null && ZignSecAuth !== undefined && ZignSecAuth.length != 0) {
+        ZignSecAuth = Number(ZignSecAuth);
+        if ((nowUnixEpoch - ZignSecAuth) <= 180) {
+          return { success: true, timeLeft: (180 - (nowUnixEpoch - ZignSecAuth)) };
+        } else {
+          await saveItem(ConstantsList.ZIGN_SEC_TIME, '');
+          return { success: false };
+        }
+      } else {
+        await saveItem(ConstantsList.ZIGN_SEC_TIME, '');
+        return { success: false };
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 
-  const [showZignSecModal, setZignSecModal] = useState(false);
+  // on Scan Document click
+  const _onScanDocumentClick = async () => {
+    // const coolDownResult = await _checkZignSecCoolDown();
+    // if (coolDownResult.success) {
+    //   _showAlert('ZADA Wallet', `You recently requested for ZADA ID, kindly try again after ${coolDownResult.timeLeft} seconds`);
+    // }
+    // else {
+
+    // }
+    props.navigation.navigate('ScanningDocScreen', { screen: 'settings' });
+    //setShowZadaIDModal(true);
+  }
+
 
   return (
     <View style={styles.container}>
-
-      <ZignSecModal
-        isVisible={showZignSecModal}
-        onContinueClick={() => { setZignSecModal(false) }}
-        onLaterClick={() => { setZignSecModal(false) }}
-      />
 
       <FlatList
         data={Object.keys(settingsData)}
@@ -249,7 +270,7 @@ export default function SettingsScreen(props) {
                         );
                       } else {
 
-                        if (item != 'Logout' && item != "Edit Profile" && item != "Scan Document") {
+                        if (item != 'Logout' && item != "Edit Profile" && item != "Get ZADA ID") {
                           return (
                             <TextTypeView
                               startValue={item}
@@ -268,7 +289,7 @@ export default function SettingsScreen(props) {
                               endValue="Edit"
                               endIcon="right"
                               onHandlePress={() => {
-                                item == 'Logout' ? onLogoutPressed() : item == 'Scan Document' ? _onScanDocumentClick() : _onEditProfileClick()
+                                item == 'Logout' ? onLogoutPressed() : item == 'Get ZADA ID' ? _onScanDocumentClick() : _onEditProfileClick()
                               }}
                             />
                           );
