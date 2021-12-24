@@ -21,8 +21,9 @@ import EmailWarning from '../components/EmailWarning';
 import PincodeModal from '../components/PincodeModal';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ route, navigation }) => {
 
+    const { isVerified } = route.params;
     const [isLoading, setLoading] = useState(false);
     const [profileLoading, setProfileLoading] = useState(false);
 
@@ -379,6 +380,16 @@ const ProfileScreen = () => {
         }
 
     }
+
+    useEffect(() => {
+        if (isVerified) {
+            navigation.setOptions({
+                headerRight: () => (
+                    <Text style={styles._verified}>Verified</Text>
+                )
+            })
+        }
+    }, [])
 
     return (
         <KeyboardAvoidingView
@@ -782,6 +793,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         color: SECONDARY_COLOR,
         marginBottom: 10,
+    },
+    _verified: {
+        fontSize: 16,
+        fontFamily: 'Poppins-Regular',
+        fontWeight: 'bold',
+        marginRight: 15,
+        color: GREEN_COLOR
     },
 });
 

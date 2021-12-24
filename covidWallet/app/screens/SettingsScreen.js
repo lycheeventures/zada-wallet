@@ -9,8 +9,10 @@ import useBiometric from '../hooks/useBiometric';
 import { showMessage, _showAlert } from '../helpers/Toast';
 import { AuthContext } from '../context/AuthContext';
 import ConstantsList from '../helpers/ConfigApp';
+import { get_kyc_status } from '../gateways/kyc';
+import OverlayLoader from '../components/OverlayLoader';
 
-var settingLocalData = {
+var notVerifiedData = {
   GENERAL: {
     // Agent: {
     //   value: 'Phone',
@@ -69,11 +71,64 @@ var settingLocalData = {
     }
   }
 };
+var isVerifiedData = {
+  GENERAL: {
+    // Agent: {
+    //   value: 'Phone',
+    //   type: 'Text',
+    //   key: '11',
+    // },
+    // Network: {
+    //   value: 'Sovrin Network',
+    //   type: 'Radio',
+    //   key: '12',
+    //   options: ['Soverin', 'non-soverin'],
+    // },
+    Biometric: {
+      value: false,
+      type: 'Boolean'
+    },
+    'Edit Profile': {
+      value: 'None',
+      type: 'Text',
+      key: '36',
+    },
+    'Logout': {
+      value: 'None',
+      type: 'Text',
+      key: '34',
+    },
+    key: '1',
+  },
+  SUPPORT: {
+    'Contact us': {
+      value: 'None',
+      type: 'Link',
+      key: '31',
+      to: 'mailto:support@zada.com',
+    },
+    'License and agreements': {
+      value: 'None',
+      type: 'Link',
+      key: '32',
+      to: 'https://zada.io/privacy-policy/',
+    },
+    'About us': {
+      value: 'None',
+      type: 'Text',
+      key: '33',
+      to: 'https://zada.io/',
+    },
+    key: '3',
+  }
+};
 
 export default function SettingsScreen(props) {
 
-  const [settingsData, setSettingsData] = useState(settingLocalData);
+  const [settingsData, setSettingsData] = useState(notVerifiedData);
   const { logout } = React.useContext(AuthContext);
+  const [isVerified, setVerified] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const updatevalues = async () => {
@@ -137,183 +192,181 @@ export default function SettingsScreen(props) {
 
   // when user will click on edit profile screen
   const _onEditProfileClick = () => {
-    props.navigation.navigate('ProfileScreen');
-  }
-
-  const _checkZignSecCoolDown = async () => {
-    try {
-      let nowUnixEpoch = Math.round(Date.now() / 1000);
-      let ZignSecAuth = await getItem(ConstantsList.ZIGN_SEC_TIME);
-      if (ZignSecAuth !== null && ZignSecAuth !== undefined && ZignSecAuth.length != 0) {
-        ZignSecAuth = Number(ZignSecAuth);
-        if ((nowUnixEpoch - ZignSecAuth) <= 180) {
-          return { success: true, timeLeft: (180 - (nowUnixEpoch - ZignSecAuth)) };
-        } else {
-          await saveItem(ConstantsList.ZIGN_SEC_TIME, '');
-          return { success: false };
-        }
-      } else {
-        await saveItem(ConstantsList.ZIGN_SEC_TIME, '');
-        return { success: false };
-      }
-    } catch (error) {
-      throw error;
-    }
+    props.navigation.navigate('ProfileScreen', { isVerified });
   }
 
   // on Scan Document click
   const _onScanDocumentClick = async () => {
-    // const coolDownResult = await _checkZignSecCoolDown();
-    // if (coolDownResult.success) {
-    //   _showAlert('ZADA Wallet', `You recently requested for ZADA ID, kindly try again after ${coolDownResult.timeLeft} seconds`);
-    // }
-    // else {
-
-    // }
     props.navigation.navigate('ScanningDocScreen', { screen: 'settings' });
-    //setShowZadaIDModal(true);
   }
 
+  useEffect(() => {
+    const _getKycStatus = async () => {
+      try {
+        setLoading(true);
+        const userId = await getItem(ConstantsList.USER_ID);
+        const result = await get_kyc_status(userId);
+        if (result.data.success) {
+          setVerified(true);
+          setSettingsData(isVerifiedData);
+        }
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+      }
+    }
+    _getKycStatus();
+  }, [])
 
   return (
     <View style={styles.container}>
-
-      <FlatList
-        data={Object.keys(settingsData)}
-        keyExtractor={(item, index) => settingsData[item].key}
-        renderItem={({ item }) => {
-          const parent = item;
-          const parentData = settingsData[parent];
-          return (
-            <View>
-              <Text style={styles.parentItem}>{parent}</Text>
-              <FlatList
-                data={Object.keys(parentData)}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => {
-                  const childData = settingsData[parent][item];
-                  if (item !== 'key' && item !== '') {
-                    if (childData.value !== 'None') {
-                      if (childData.type === 'Text') {
-                        return (
-                          <TextTypeView
-                            startValue={item + ':  ' + childData.value}
-                            endValue="Edit"
-                            endIcon=""
-                          />
-                        );
-                      }
-                      else if (childData.type === 'Radio') {
-                        return (
-                          <TextTypeView
-                            startValue={item + ':  ' + childData.value}
-                            endIcon="right"
-                          />
-                        );
-                      } else if (childData.type === 'Boolean') {
-                        return (
-                          <BooleanTypeView
-                            parentValue={parent}
-                            startValue={item}
-                            endValue={childData.value}
-                            toChangeValue={childData.value}
-                            valueHandler={toggleSwitch}
-                          />
-                        );
-                      } else {
-                        return (
-                          <TextTypeView
-                            startValue={item + ':  ' + childData.value}
-                            endIcon="right"
-                          />
-                        );
-                      }
-                    } else {
-                      if (childData.to === 'reset') {
-                        return (
-                          <TextTypeView
-                            startValue={item}
-                            endValue="Edit"
-                            endIcon="right"
-                            onHandlePress={() => {
-                              Alert.alert(
-                                'Vaccify',
-                                'Are you sure you want to reset your app wallet?',
-                                [
-                                  {
-                                    text: 'Yes', onPress: () => {
-                                      AsyncStorage.removeItem('wallet_secret');
-                                      AsyncStorage.removeItem('wallet_name');
-                                      AsyncStorage.removeItem('connection_credential');
-                                      AsyncStorage.removeItem('connection_proof');
-                                      AsyncStorage.removeItem('connections');
-                                      AsyncStorage.removeItem('credentials');
-                                      AsyncStorage.removeItem('isfirstTime').then((value) => {
-                                        Alert.alert(
-                                          'Vaccify',
-                                          'Wallet Reset Successful, Please close the app!',
-                                          [
-                                            { text: 'OK', onPress: () => { } }
-                                          ],
-                                          { cancelable: false }
-                                        )
-                                      })
-                                    }
-                                  },
-                                  { text: 'No', onPress: () => { } }
-                                ],
-                                { cancelable: true }
-
+      {
+        !loading ? (
+          <>
+            <FlatList
+              data={Object.keys(settingsData)}
+              keyExtractor={(item, index) => settingsData[item].key}
+              renderItem={({ item }) => {
+                const parent = item;
+                const parentData = settingsData[parent];
+                return (
+                  <View>
+                    <Text style={styles.parentItem}>{parent}</Text>
+                    <FlatList
+                      data={Object.keys(parentData)}
+                      keyExtractor={(item, index) => index.toString()}
+                      renderItem={({ item }) => {
+                        const childData = settingsData[parent][item];
+                        if (item !== 'key' && item !== '') {
+                          if (childData.value !== 'None') {
+                            if (childData.type === 'Text') {
+                              return (
+                                <TextTypeView
+                                  startValue={item + ':  ' + childData.value}
+                                  endValue="Edit"
+                                  endIcon=""
+                                />
                               );
-                            }}
-                          />
-                        );
-                      } else {
+                            }
+                            else if (childData.type === 'Radio') {
+                              return (
+                                <TextTypeView
+                                  startValue={item + ':  ' + childData.value}
+                                  endIcon="right"
+                                />
+                              );
+                            } else if (childData.type === 'Boolean') {
+                              return (
+                                <BooleanTypeView
+                                  parentValue={parent}
+                                  startValue={item}
+                                  endValue={childData.value}
+                                  toChangeValue={childData.value}
+                                  valueHandler={toggleSwitch}
+                                />
+                              );
+                            } else {
+                              return (
+                                <TextTypeView
+                                  startValue={item + ':  ' + childData.value}
+                                  endIcon="right"
+                                />
+                              );
+                            }
+                          } else {
+                            if (childData.to === 'reset') {
+                              return (
+                                <TextTypeView
+                                  startValue={item}
+                                  endValue="Edit"
+                                  endIcon="right"
+                                  onHandlePress={() => {
+                                    Alert.alert(
+                                      'Vaccify',
+                                      'Are you sure you want to reset your app wallet?',
+                                      [
+                                        {
+                                          text: 'Yes', onPress: () => {
+                                            AsyncStorage.removeItem('wallet_secret');
+                                            AsyncStorage.removeItem('wallet_name');
+                                            AsyncStorage.removeItem('connection_credential');
+                                            AsyncStorage.removeItem('connection_proof');
+                                            AsyncStorage.removeItem('connections');
+                                            AsyncStorage.removeItem('credentials');
+                                            AsyncStorage.removeItem('isfirstTime').then((value) => {
+                                              Alert.alert(
+                                                'Vaccify',
+                                                'Wallet Reset Successful, Please close the app!',
+                                                [
+                                                  { text: 'OK', onPress: () => { } }
+                                                ],
+                                                { cancelable: false }
+                                              )
+                                            })
+                                          }
+                                        },
+                                        { text: 'No', onPress: () => { } }
+                                      ],
+                                      { cancelable: true }
 
-                        if (item != 'Logout' && item != "Edit Profile" && item != "Get ZADA ID") {
-                          return (
-                            <TextTypeView
-                              startValue={item}
-                              endValue="Edit"
-                              endIcon="right"
-                              onHandlePress={() => {
-                                childData.to && Linking.openURL(childData.to);
-                              }}
-                            />
-                          );
+                                    );
+                                  }}
+                                />
+                              );
+                            } else {
+
+                              if (item != 'Logout' && item != "Edit Profile" && item != "Get ZADA ID") {
+                                return (
+                                  <TextTypeView
+                                    startValue={item}
+                                    endValue="Edit"
+                                    endIcon="right"
+                                    onHandlePress={() => {
+                                      childData.to && Linking.openURL(childData.to);
+                                    }}
+                                  />
+                                );
+                              }
+                              else {
+                                return (
+                                  <TextTypeView
+                                    startValue={item}
+                                    endValue="Edit"
+                                    endIcon="right"
+                                    onHandlePress={() => {
+                                      item == 'Logout' ? onLogoutPressed() : item == 'Get ZADA ID' ? _onScanDocumentClick() : _onEditProfileClick()
+                                    }}
+                                  />
+                                );
+                              }
+                            }
+                          }
                         }
-                        else {
-                          return (
-                            <TextTypeView
-                              startValue={item}
-                              endValue="Edit"
-                              endIcon="right"
-                              onHandlePress={() => {
-                                item == 'Logout' ? onLogoutPressed() : item == 'Get ZADA ID' ? _onScanDocumentClick() : _onEditProfileClick()
-                              }}
-                            />
-                          );
-                        }
-                      }
-                    }
-                  }
-                }}
-              />
+                      }}
+                    />
+                  </View>
+                );
+              }}
+            />
+            <View style={styles.footer}>
+              <Text style={styles.footerText} >In Collaboration with&nbsp;
+                <Text
+                  style={{ color: PRIMARY_COLOR, }}
+                  onPress={() => { Linking.openURL('https://trust.net.pk/') }}
+                >
+                  TrustNet Pakistan
+                </Text>
+
+              </Text>
             </View>
-          );
-        }}
-      />
-      <View style={styles.footer}>
-        <Text style={styles.footerText} >In Collaboration with&nbsp;
-          <Text
-            style={{ color: PRIMARY_COLOR, }}
-            onPress={() => { Linking.openURL('https://trust.net.pk/') }}
-          >
-            TrustNet Pakistan
-          </Text>
+          </>
+        ) : (
+          <OverlayLoader
+            text='Fetching Settings...'
+          />
+        )
+      }
 
-        </Text>
-      </View>
     </View>
   );
 }
