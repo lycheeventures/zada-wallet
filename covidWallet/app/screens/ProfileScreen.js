@@ -13,17 +13,21 @@ import OverlayLoader from '../components/OverlayLoader';
 import { _fetchProfileAPI, _updateProfileAPI } from '../gateways/auth';
 import { showMessage, _showAlert } from '../helpers/Toast';
 import { emailRegex, nameRegex, pincodeRegex, validateIfLowerCased } from '../helpers/validation';
-import { BLACK_COLOR, GREEN_COLOR, SECONDARY_COLOR, WHITE_COLOR } from '../theme/Colors';
+import { BLACK_COLOR, GREEN_COLOR, RED_COLOR, SECONDARY_COLOR, WHITE_COLOR } from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import EmailWarning from '../components/EmailWarning';
 import PincodeModal from '../components/PincodeModal';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
+import MatComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const ProfileScreen = ({ route, navigation }) => {
+const ProfileScreen = ({ navigation, route }) => {
 
-    const { isVerified } = route.params;
+    const {
+        isVerified
+    } = route.params;
+
     const [isLoading, setLoading] = useState(false);
     const [profileLoading, setProfileLoading] = useState(false);
 
@@ -382,14 +386,27 @@ const ProfileScreen = ({ route, navigation }) => {
     }
 
     useEffect(() => {
-        if (isVerified) {
-            navigation.setOptions({
-                headerRight: () => (
-                    <Text style={styles._verified}>Verified</Text>
-                )
-            })
-        }
-    }, [])
+        navigation.setOptions({
+            headerRight: () => (
+                <MatComIcon
+                    name={isVerified ? 'shield-check' : 'shield-remove'}
+                    color={isVerified ? GREEN_COLOR : RED_COLOR}
+                    size={28}
+                    style={{
+                        marginRight: 15
+                    }}
+                    onPress={() => {
+                        if (isVerified) {
+                            _showAlert('ZADA Wallet', 'You are a verified user.');
+                        }
+                        else {
+                            _showAlert('ZADA Wallet', 'You are not a verified user, Kindly go to settings screen and complete Get ZADA ID process to be a verified user');
+                        }
+                    }}
+                />
+            ),
+        })
+    }, []);
 
     return (
         <KeyboardAvoidingView

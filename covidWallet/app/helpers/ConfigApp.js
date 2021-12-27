@@ -1,12 +1,12 @@
 module.exports = Object.freeze({
-  BASE_URL: 'http://470a-39-33-145-14.ngrok.io',
+  BASE_URL: 'http://89aa-182-191-80-60.ngrok.io',
   //BASE_URL: 'http://test-agency.zadanetwork.com',
   //BASE_URL: 'https://agency.zadanetwork.com',
   ZADA_AUTH_URL: 'https://auth-test.zadanetwork.com',
   //ZADA_AUTH_URL: 'http://0876-182-191-89-195.ngrok.io',
   ZADA_AUTH_SECRET: 'doingtestinginzadaauth',
   ZIGNSEC_TEST_URL: 'https://test.zignsec.com/v3',
-  ZIGNSEC_WEBHOOK: 'http://470a-39-33-145-14.ngrok.io/webhook',
+  ZIGNSEC_WEBHOOK: 'http://89aa-182-191-80-60.ngrok.io/api/kyc_webhook',
   ZIGNSEC_TEST_AUTH: 'fd0b1bac-5707-4f32-8132-e8c9168941ea',
   ZADA_S3_BASE_URL: 'https://zada-wallet-cred-bg.s3.ap-southeast-1.amazonaws.com',
   ZADA_AUTH: 'zada_auth',
@@ -35,4 +35,5 @@ module.exports = Object.freeze({
   QR_URL: "https://api.qrserver.com/v1/create-qr-code/?size=512x512&data=",
   VER_KEY: 'verkey',
   ZIGN_SEC_TIME: 'zignsectime',
+  KYC_STATUS: 'kyc_status',
 });

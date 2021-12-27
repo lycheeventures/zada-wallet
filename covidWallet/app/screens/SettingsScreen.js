@@ -11,6 +11,7 @@ import { AuthContext } from '../context/AuthContext';
 import ConstantsList from '../helpers/ConfigApp';
 import { get_kyc_status } from '../gateways/kyc';
 import OverlayLoader from '../components/OverlayLoader';
+import { useFocusEffect } from '@react-navigation/native';
 
 var notVerifiedData = {
   GENERAL: {
@@ -200,23 +201,35 @@ export default function SettingsScreen(props) {
     props.navigation.navigate('ScanningDocScreen', { screen: 'settings' });
   }
 
-  useEffect(() => {
-    const _getKycStatus = async () => {
-      try {
-        setLoading(true);
-        const userId = await getItem(ConstantsList.USER_ID);
-        const result = await get_kyc_status(userId);
-        if (result.data.success) {
-          setVerified(true);
-          setSettingsData(isVerifiedData);
+  useFocusEffect(
+    React.useCallback(() => {
+      const _getKycStatus = async () => {
+        try {
+          setLoading(true);
+
+          const kyc_status = await getItem(ConstantsList.KYC_STATUS);
+
+          if (kyc_status == undefined || kyc_status == null || kyc_status.length == 0 || kyc_status == 'false') {
+            const userId = await getItem(ConstantsList.USER_ID);
+            const result = await get_kyc_status(userId);
+            if (result.data.success) {
+              setVerified(true);
+              setSettingsData(isVerifiedData);
+              await saveItem(ConstantsList.KYC_STATUS, 'true');
+            }
+          }
+          else {
+            setVerified(true);
+            setSettingsData(isVerifiedData);
+          }
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
         }
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
       }
-    }
-    _getKycStatus();
-  }, [])
+      _getKycStatus();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
