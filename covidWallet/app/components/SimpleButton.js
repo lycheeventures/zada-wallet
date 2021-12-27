@@ -45,7 +45,8 @@ const styles = StyleSheet.create({
     },
     _title: {
         fontSize: THEME_CONFIG.FONT_SIZES.size_14,
-        fontFamily: THEME_CONFIG.FONT_FAMILIES.Poppins.Regular,
+        fontFamily: THEME_CONFIG.FONT_FAMILIES.Poppins.SemiBold,
+        textTransform: 'uppercase',
     },
 })
 

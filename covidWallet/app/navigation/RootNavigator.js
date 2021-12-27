@@ -10,7 +10,7 @@ import AuthNavigator from './AuthNavigator';
 
 const Stack = createStackNavigator();
 
-const Root = () => {
+const RootNavigator = () => {
     return (
         <Stack.Navigator
             initialRouteName={ROUTES.AUTH}
@@ -30,4 +30,4 @@ const Root = () => {
     );
 }
 
-export default Root;
+export default RootNavigator;

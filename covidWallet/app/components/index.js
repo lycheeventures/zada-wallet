@@ -1,11 +1,14 @@
 import ErrorFallback from "./ErrorFallback";
 import Bar from "./Bar";
-import Heading from './Heading';
-import InfoText from "./InfoText";
+import SimpleButton from "./SimpleButton";
+import CustomText from "./CustomText";
+import AlertModal from "./AlertModal";
 
 export {
     ErrorFallback,
     Bar,
-    Heading,
-    InfoText,
+    CustomText,
+    SimpleButton,
+    AlertModal,
+
 }

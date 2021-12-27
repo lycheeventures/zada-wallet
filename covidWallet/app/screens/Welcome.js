@@ -3,25 +3,31 @@ import {
     View,
     Text,
     Linking,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
+    StyleSheet
 } from 'react-native';
 
-import TextComponent from '../components/TextComponent';
-import HeadingComponent from '../components/HeadingComponent';
-import { useTheme } from '../hooks';
+import { useAlert, useTheme } from '../hooks';
 import { THEME_CONFIG } from '../config/theme-config';
-import { Bar, Heading, InfoText } from '../components';
+import { Bar, CustomText } from '../components';
 import SimpleButton from '../components/SimpleButton';
+import { TEXT_TYPES } from '../components/CustomText';
 
 const Welcome = ({ navigation }) => {
 
+    const { _showErrorAlert } = useAlert();
     const { colors } = useTheme();
 
     const nextHandler = () => {
         navigation.navigate('RegistrationScreen');
     };
+
+    const _openLink = async () => {
+        try {
+            Linking.openURL('https://zada.io/privacy-policy/');
+        } catch (error) {
+            _showErrorAlert('Unable to open link', 'Okay')
+        }
+    }
 
     return (
         <View style={[styles._mainContainer, { backgroundColor: colors.primary }]}>
@@ -30,24 +36,31 @@ const Welcome = ({ navigation }) => {
                 type={'light'}
             />
             <View style={[styles._contentContainer, { backgroundColor: colors.primaryBackground }]}>
-                <Heading
+                <CustomText
+                    type={TEXT_TYPES.HEADING}
+                    textAlign='center'
                     text={`ZADA is your\nDigital ID Wallet!`}
                 />
-                <InfoText
+                <CustomText
                     text={`Securely prove who you are and only share the information you want.`}
+                    type={TEXT_TYPES.INFO}
+                    textAlign='center'
                     style={{
                         marginTop: THEME_CONFIG.SPACINGS.spacing_10
                     }}
                 />
-                <InfoText
+                <CustomText
                     text={`All certificates and IDs safely stored on your phone, where only you can access them.`}
+                    type={TEXT_TYPES.INFO}
+                    textAlign='center'
                     style={{
                         marginVertical: THEME_CONFIG.SPACINGS.spacing_10
                     }}
                 />
-                <Heading
-                    fontSize={THEME_CONFIG.FONT_SIZES.size_12}
+                <CustomText
                     text={`We protect your privacy and data.`}
+                    type={TEXT_TYPES.SUB_HEADING}
+                    textAlign='center'
                     style={{
                         marginTop: THEME_CONFIG.SPACINGS.spacing_20,
                     }}
@@ -55,11 +68,14 @@ const Welcome = ({ navigation }) => {
 
                 <Text style={[styles._linkText, { color: colors.secondaryTextColor }]}>
                     {`By continuing below you confirm that you have read and agree to `}
-                    <Text style={{ color: colors.primary }}>{`ZADA General Terms and Conditions `}</Text>
-                    <Text style={{ color: colors.primary }}>{`Privacy Policy`}</Text>
+                    <Text onPress={_openLink} style={{ color: colors.primary }}>{`ZADA General Terms and Conditions `}</Text>
+                    <Text onPress={_openLink} style={{ color: colors.primary }}>{`Privacy Policy`}</Text>
                 </Text>
 
                 <SimpleButton
+                    onPress={() => {
+
+                    }}
                     title={'Continue'}
                     titleColor={colors.whiteColor}
                     buttonColor={colors.secondary}
@@ -69,117 +85,7 @@ const Welcome = ({ navigation }) => {
                 />
             </View>
         </View>
-    );
-
-    return (
-        <View
-            style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: PRIMARY_COLOR,
-            }}>
-            <ScrollView
-                bounces={false}
-                showsVerticalScrollIndicator={false}
-                style={{
-                    flexGrow: 0,
-                }}
-                contentContainerStyle={{
-                    // flex: 1,
-                    backgroundColor: BACKGROUND_COLOR,
-                    alignContent: 'center',
-                    // margin: 30,
-                    marginLeft: 25,
-                    marginRight: 25,
-                    // marginTop: 150,
-                    // marginBottom: 150,
-                    borderRadius: 10,
-                }}>
-
-                <View
-                    style={{
-                        // height: 400,
-                        paddingBottom: 8,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center',
-                    }}>
-                    <View style={{ marginTop: 20, marginLeft: 25, marginRight: 25 }}>
-                        <HeadingComponent text="ZADA is your Digital ID Wallet!" />
-                    </View>
-                    <TextComponent
-                        onboarding={true}
-                        text="Securely prove who you are and only share the information you want."
-                    />
-                    <View style={{ paddingTop: 10 }} />
-                    <TextComponent
-                        onboarding={true}
-                        text="All certificates and IDs safely stored on your phone, where only you can access them."
-                    />
-                    <View
-                        style={{
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            textAlign: 'center',
-                        }}>
-                        <Text
-                            style={{
-                                color: 'black',
-                                fontFamily: 'Merriweather-Bold',
-                                paddingTop: 30,
-                            }}>
-                            We protect your privacy and data.
-                        </Text>
-                        <Text
-                            style={{
-                                color: 'black',
-                                fontFamily: 'Poppins-Regular',
-                                marginLeft: 20,
-                                fontSize: 12,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                textAlign: 'center',
-                                marginRight: 20,
-                            }}>
-                            By continuing below you confirm that you have read and agree to
-                            &nbsp;
-                            <Text
-                                style={{ color: PRIMARY_COLOR }}
-                                onPress={() => {
-                                    Linking.openURL('https://zada.io/privacy-policy/');
-                                }}>
-                                ZADA General Terms and Conditions
-                            </Text>
-                            &nbsp;and&nbsp;
-                            <Text
-                                style={{ color: PRIMARY_COLOR }}
-                                onPress={() => {
-                                    Linking.openURL('https://zada.io/privacy-policy/');
-                                }}>
-                                Privacy Policy.
-                            </Text>
-                        </Text>
-                    </View>
-                </View>
-
-                <View
-                    style={{
-                        alignSelf: 'stretch',
-                        justifyContent: 'center',
-                        alignItems: "center",
-                        borderRadius: 20,
-                        paddingTop: 20,
-                        paddingBottom: 20,
-                    }}>
-                    <TouchableOpacity style={styles.primaryButton} onPress={nextHandler}>
-                        <Text style={styles.text}>CONTINUE</Text>
-                    </TouchableOpacity>
-                </View>
-
-            </ScrollView>
-        </View>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
@@ -201,57 +107,5 @@ const styles = StyleSheet.create({
         marginTop: THEME_CONFIG.SPACINGS.spacing_5,
     },
 })
-
-// const styles = StyleSheet.create({
-//   TextContainerHead: {
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     color: 'black',
-//     fontSize: 32,
-//   },
-//   ErrorBox: {
-//     color: 'red',
-//     fontSize: 13,
-//   },
-//   checkboxContainer: {
-//     flexDirection: 'row',
-//     alignSelf: 'center',
-//     textAlign: 'center',
-//     paddingLeft: 0,
-//     paddingRight: 0,
-//     color: PRIMARY_COLOR,
-//   },
-//   checkbox: {
-//     paddingTop: '2%',
-//     color: PRIMARY_COLOR,
-//   },
-//   linkText: {
-//     color: PRIMARY_COLOR,
-//     fontSize: 14,
-//     fontStyle: 'italic',
-//     margin: 5,
-//   },
-//   link: {
-//     color: 'black',
-//     fontSize: 14,
-//     marginBottom: 20,
-//   },
-//   primaryButton: {
-//     borderColor: GREEN_COLOR,
-//     borderWidth: 2,
-//     borderRadius: 20,
-//     backgroundColor: GREEN_COLOR,
-//     paddingTop: 10,
-//     paddingLeft: 20,
-//     paddingBottom: 10,
-//     paddingRight: 20,
-//     width: 250,
-//   },
-//   text: {
-//     color: WHITE_COLOR,
-//     alignSelf: 'center',
-//     fontFamily: 'Merriweather-Bold',
-//   },
-// });
 
 export default Welcome;
