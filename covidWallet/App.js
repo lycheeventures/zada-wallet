@@ -1,12 +1,11 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import { StatusBar } from 'react-native';
-import NetworkContext from './app/context/NetworkContext';
-import NavigationComponent from './app/Navigation';
-import { PRIMARY_COLOR } from './app/theme/Colors';
 import ErrorBoundary from 'react-native-error-boundary'
 import { analytics_log_app_error } from './app/helpers/analytics';
-import ErrorFallback from './app/components/ErrorFallback';
+import { ErrorFallback } from './app/components';
+import { ThemeContext, NetworkContext } from './app/contexts';
+import Root from './app/navigation/Root';
+import { NavigationContainer } from '@react-navigation/native';
 
 const App = () => {
 
@@ -15,12 +14,15 @@ const App = () => {
   }
 
   return (
-    <NetworkContext>
-      <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
-        <StatusBar barStyle="light-content" backgroundColor={PRIMARY_COLOR} />
-        <NavigationComponent />
-      </ErrorBoundary>
-    </NetworkContext>
+    <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
+      <NetworkContext>
+        <ThemeContext>
+          <NavigationContainer>
+            <Root />
+          </NavigationContainer>
+        </ThemeContext>
+      </NetworkContext>
+    </ErrorBoundary >
   );
 };
 

@@ -7,7 +7,7 @@ import { getItem, saveItem } from '../helpers/Storage';
 import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
 import useBiometric from '../hooks/useBiometric';
 import { showMessage, _showAlert } from '../helpers/Toast';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../contexts/AuthContext';
 import ConstantsList from '../helpers/ConfigApp';
 import { get_kyc_status } from '../gateways/kyc';
 import OverlayLoader from '../components/OverlayLoader';

@@ -9,7 +9,6 @@
 #import <UMReactNativeAdapter/UMNativeModulesProxy.h>
 #import <UMReactNativeAdapter/UMModuleRegistryAdapter.h>
 
-#import "RNSplashScreen.h"
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
 #import <React/RCTLinkingManager.h>
@@ -87,7 +86,6 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   [super application:application didFinishLaunchingWithOptions:launchOptions];
-  [RNSplashScreen show];
   if (@available(iOS 13.0, *)) {
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDarkContent animated:YES];
   } else {

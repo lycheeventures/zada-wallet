@@ -24,6 +24,8 @@
 		D61395702153D7A6DF9FB510 /* libPods-ZADA-ZADATests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CAFDE34C3F16589C600EB7A /* libPods-ZADA-ZADATests.a */; };
 		F473F3095AE64D8AA326B6EE /* Merriweather-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 092EF3C6D0DC4D618DC6462C /* Merriweather-Bold.ttf */; };
 		F904B7E85FEB7797123227A9 /* libPods-ZADA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECB72F7E3D6414BBB7C2AD78 /* libPods-ZADA.a */; };
+		8B3951E1C8C446059AFC6735 /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AA9033DC839743E2B429A447 /* Poppins-Medium.ttf */; };
+		2F221E7471F94802941C28BD /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2A49AD1372404CB4B5ACA4CE /* Poppins-SemiBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +90,8 @@
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		F0559A579A3847D4BE077EA3 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
 		F4A838C7731946BF862EB4BC /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
+		AA9033DC839743E2B429A447 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; name = "Poppins-Medium.ttf"; path = "../app/assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		2A49AD1372404CB4B5ACA4CE /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; name = "Poppins-SemiBold.ttf"; path = "../app/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -247,6 +251,8 @@
 				092EF3C6D0DC4D618DC6462C /* Merriweather-Bold.ttf */,
 				4D069A740F95423C838CD4CE /* Poppins-Regular.ttf */,
 				CF924E663F2747058B1A324C /* Poppins-Bold.ttf */,
+				AA9033DC839743E2B429A447 /* Poppins-Medium.ttf */,
+				2A49AD1372404CB4B5ACA4CE /* Poppins-SemiBold.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -402,6 +408,8 @@
 				330E119450E848CA9CF6B0C1 /* Poppins-Regular.ttf in Resources */,
 				6A059EFFC038403EB8221FC1 /* Poppins-Bold.ttf in Resources */,
 				043C979626B805FA006295AC /* GoogleService-Info.plist in Resources */,
+				8B3951E1C8C446059AFC6735 /* Poppins-Medium.ttf in Resources */,
+				2F221E7471F94802941C28BD /* Poppins-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

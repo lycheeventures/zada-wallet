@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Network } from "../context/NetworkContext";
+import { Network } from "../contexts/NetworkContext";
 
 const useNetwork = () => {
 
