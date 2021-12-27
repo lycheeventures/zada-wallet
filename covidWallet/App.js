@@ -3,7 +3,7 @@ import React from 'react';
 import ErrorBoundary from 'react-native-error-boundary'
 import { analytics_log_app_error } from './app/helpers/analytics';
 import { ErrorFallback } from './app/components';
-import { ThemeContext, NetworkContext } from './app/contexts';
+import { ThemeContext, NetworkContext, LoadingContext } from './app/contexts';
 import RootNavigator from './app/navigation/RootNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 import AlertContext from './app/contexts/AlertContext';
@@ -16,16 +16,18 @@ const App = () => {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
-      <AlertContext>
-        <NetworkContext>
-          <ThemeContext>
-            <NavigationContainer>
-              <RootNavigator />
-            </NavigationContainer>
-          </ThemeContext>
-        </NetworkContext>
-      </AlertContext>
-    </ErrorBoundary >
+      <LoadingContext>
+        <AlertContext>
+          <NetworkContext>
+            <ThemeContext>
+              <NavigationContainer>
+                <RootNavigator />
+              </NavigationContainer>
+            </ThemeContext>
+          </NetworkContext>
+        </AlertContext>
+      </LoadingContext>
+    </ErrorBoundary>
   );
 };
 

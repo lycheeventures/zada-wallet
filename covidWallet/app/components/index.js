@@ -3,6 +3,7 @@ import Bar from "./Bar";
 import SimpleButton from "./SimpleButton";
 import CustomText from "./CustomText";
 import AlertModal from "./AlertModal";
+import AppLoader from './AppLoader';
 
 export {
     ErrorFallback,
@@ -10,5 +11,6 @@ export {
     CustomText,
     SimpleButton,
     AlertModal,
+    AppLoader,
 
 }
