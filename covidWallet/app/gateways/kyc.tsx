@@ -5,7 +5,7 @@ export const add_kyc_session = async (sessionId: string, userId: string) => {
   try {
     const token = await getToken();
     const result = http_client({
-      url: '/api/kyc/add_kyc_session',
+      url: '/api/kyc/save_kyc_session',
       method: 'POST',
       data: {
         sessionId,
@@ -25,7 +25,7 @@ export const get_kyc_status = async (userId: string) => {
   try {
     const token = await getToken();
     const result = http_client({
-      url: '/api/kyc/get_kyc_status',
+      url: '/api/kyc/get_kyc_status_by_user',
       method: 'GET',
       params: {
         userId,

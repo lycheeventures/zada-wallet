@@ -227,7 +227,7 @@ export default function SettingsScreen(props) {
           setLoading(false);
         }
       }
-      _getKycStatus();
+      //_getKycStatus();
     }, [])
   );
 
