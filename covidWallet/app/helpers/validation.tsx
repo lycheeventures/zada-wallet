@@ -14,7 +14,7 @@ export const pincodeRegex = RegExp('^([0-9]{6})$');
 export const emailRegex = RegExp(
   '^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$',
 );
-
+ 
 export const validateIfLowerCased = (text: string) => {
   const reg = RegExp('([a-zA-Z])');
   let i = 0;
