@@ -1,85 +1,136 @@
-import {useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useRef, useState } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
-import {getItem} from '../helpers/Storage';
-import {BIOMETRIC_ENABLED} from '../helpers/ConfigApp';
-import {showMessage} from '../helpers/Toast';
-
-import useAppState from 'react-native-appstate-hook';
+import { AppState } from 'react-native';
+import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
+import { getItem, saveItem } from '../helpers/Storage';
+import { showMessage } from '../helpers/Toast';
 
 const useBiometric = () => {
-  const [authStatus, setAuthStatus] = useState(false);
-  const [authVisible, setAuthVisible] = useState(false);
 
-  const [oneTime, setOneTime] = useState(false);
+    // Refs
+    const appState = useRef(AppState.currentState);
+    const appStarted = useRef(true);
 
-  const oneTimeAuthentication = async (callback: Function) => {
-    setOneTime(true);
-    setTimeout(async () => {
-      let result = await authenticateUser();
-      setAuthStatus(true);
-      return callback(result);
-    }, 500);
-  };
+    // States
+    const [authStatus, setAuthStatus] = useState(false);
 
-  // Authenticate function
-  const authenticateUser = async () => {
-    // Check if sensor is available.
-    let available = await LocalAuthentication.hasHardwareAsync();
 
-    if (available) {
-      // Check if fingerprint is enrolled.
-      let isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      if (isEnrolled) {
-        // Authenticate User
-        let resp = await LocalAuthentication.authenticateAsync();
-        return resp.success;
-      } else {
-        showMessage(
-          'ZADA Wallet',
-          'Please enable biometric verification from mobile.',
-        );
-      }
+    // UseEffects
+    useEffect(() => {
+        const subscription = AppState.addEventListener("change", nextAppState => {
+            if (
+                appState.current.match(/inactive|background/) &&
+                nextAppState === "active"
+            ) {
+                checkIfAuthIsRequired();
+            } else {
+                setAuthStatus(false);
+            }
+            appState.current = nextAppState;
+        });
+
+        // On app start
+        if (appStarted.current) {
+            checkIfAuthIsRequired();
+        }
+
+        return () => {
+            subscription.remove();
+        };
+    }, [])
+
+
+    // Functions
+    // Authenticate function
+    const authenticateUser = async () => {
+        // Check if sensor is available.
+        let available = await LocalAuthentication.hasHardwareAsync();
+
+        if (available) {
+            // Check if fingerprint is enrolled.
+            let isEnrolled = await LocalAuthentication.isEnrolledAsync();
+            if (isEnrolled) {
+                // Authenticate User
+                let resp = await LocalAuthentication.authenticateAsync();
+                if (resp.success) {
+                    return resp.success;
+                } else {
+                    throw resp.success;
+                }
+
+            } else {
+                showMessage(
+                    'ZADA Wallet',
+                    'Please enable biometric verification from mobile.',
+                );
+            }
+        }
+        return false;
+    };
+
+    // Checking if auth is required.
+    const checkIfAuthIsRequired = async () => {
+        let temporarilyMovedToBackground = await AsyncStorage.getItem("temporarilyMovedToBackground");
+
+        let biometricEnabled = await getItem(BIOMETRIC_ENABLED);
+        biometricEnabled = JSON.parse(biometricEnabled || 'false');
+
+        // Return if biometric is disabled
+        if (!biometricEnabled) return;
+
+        // Return if authStatus is false
+        if (!authStatus) {
+            // Check if Authorization is not in process.
+            if (temporarilyMovedToBackground == 'true') return false
+
+            // Start Authorize flow
+            if (appStarted.current) {
+                // adding timeout to resolve multiple calls to authenticateNow()
+                setTimeout(() => {
+                    authenticateNow();
+                }, 1000);
+                appStarted.current = false;
+            } else {
+                authenticateNow();
+            }
+        }
     }
-    return false;
-  };
 
-  const getBiometricStatus = async () => {
-    let biometricEnabled = await getItem(BIOMETRIC_ENABLED);
-    biometricEnabled = JSON.parse(biometricEnabled || 'false');
-    return biometricEnabled;
-  };
+    const authenticateNow = async (singleAuth?: boolean) => {
+        try {
+            await saveItem('temporarilyMovedToBackground', "true");
 
-  const {appState} = useAppState({
-    onChange: (newAppState) => {
-      if (newAppState == 'background') {
-        setAuthStatus(false);
-      }
-    },
-    onForeground: async () => {
-      if (oneTime) {
-        setOneTime(false);
-        return;
-      }
+            let result = await authenticateUser();
 
-      let biometricEnabled = await getBiometricStatus();
+            setAuthStatus(true);
 
-      if (!biometricEnabled) return;
+            setTimeout(async () => {
+                await saveItem('temporarilyMovedToBackground', "false");
+            }, 1000)
 
-      if (!authStatus && !authVisible) {
-        setAuthVisible(true);
+            return result;
+        } catch (e) {
+            if (!singleAuth)
+                authenticateNow();
+        }
+    }
 
-        // Timeout for setAuthStatus
-        setTimeout(async () => {
-          let result = await authenticateUser();
-          setAuthStatus(result);
-        }, 500);
 
-        setAuthVisible(false);
-      }
-    },
-    onBackground: () => {},
-  });
+    // For single authentications
+    const oneTimeAuthentication = async (callback: Function) => {
+        try {
+            let result = await authenticateNow(true)
+            return callback(result);
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
-  return {authStatus, oneTimeAuthentication};
+
+    return {
+        oneTimeAuthentication,
+        authStatus,
+    };
 };
 export default useBiometric;
