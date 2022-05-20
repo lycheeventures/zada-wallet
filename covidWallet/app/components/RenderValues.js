@@ -28,8 +28,6 @@ const RenderValues = ({
     Object.keys(values).map((key, index) => {
       let value = values[key];
 
-      console.log('key', key);
-
       if (key.match(/Issue Time/)) {
         value = get_local_issue_time(value);
       }

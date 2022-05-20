@@ -325,6 +325,7 @@ function QRScreen({route, navigation}) {
   };
 
   const onSuccess = (e) => {
+    console.log('e', e);
     try {
       if (isConnected) {
         let unEscapedStr = e.data;

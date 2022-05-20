@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -14,26 +14,30 @@ import {
   WHITE_COLOR,
   BACKGROUND_COLOR,
 } from '../theme/Colors';
-import { themeStyles } from '../theme/Styles';
+import {themeStyles} from '../theme/Styles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
   delete_credential,
   generate_credential_qr,
 } from '../gateways/credentials';
-import { showMessage, showAskDialog, _showAlert } from '../helpers/Toast';
-import { deleteCredentialByCredId, getItem, saveItem } from '../helpers/Storage';
+import {showMessage, showAskDialog, _showAlert} from '../helpers/Toast';
+import {deleteCredentialByCredId, getItem, saveItem} from '../helpers/Storage';
 import OverlayLoader from '../components/OverlayLoader';
 import SimpleButton from '../components/Buttons/SimpleButton';
-import { analytics_log_show_cred_qr } from '../helpers/analytics';
-import { PreventScreenshots } from 'react-native-prevent-screenshots';
+import {analytics_log_show_cred_qr} from '../helpers/analytics';
+import {PreventScreenshots} from 'react-native-prevent-screenshots';
 import CredQRModal from '../components/CredQRModal';
 import RenderValues from '../components/RenderValues';
 import ConstantsList from '../helpers/ConfigApp';
-import { Buffer } from 'buffer';
-import { _handleAxiosError } from '../helpers/AxiosResponse';
+import {Buffer} from 'buffer';
+import {_handleAxiosError} from '../helpers/AxiosResponse';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
-import { changeDateFormat, get_local_issue_time, get_local_date_time } from '../helpers/time';
+import {
+  changeDateFormat,
+  get_local_issue_time,
+  get_local_date_time,
+} from '../helpers/time';
 
 function DetailsScreen(props) {
   // Credential
@@ -49,7 +53,7 @@ function DetailsScreen(props) {
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{flexDirection: 'row'}}>
           <MaterialIcons
             onPress={() => generateAndSharePDF()}
             style={styles.headerRightIcon}
@@ -92,6 +96,7 @@ function DetailsScreen(props) {
 
   async function ReaderString(jsonData) {
     let values = JSON.parse(jsonData.qrCode);
+
     values = {
       ...values,
       issuer: 'zada',
@@ -114,21 +119,45 @@ function DetailsScreen(props) {
     });
   }
 
+  async function ReadertestString() {
+    let values = {
+      issuer: 'zada',
+    };
+
+    const res = await fetch(
+      `https://api.qrserver.com/v1/create-qr-code/?data=${values}`,
+    );
+
+    let blob = await res.blob();
+
+    return new Promise((resolve, reject) => {
+      let reader = new FileReader();
+      reader.onload = (event) => {
+        let base64String = event.target.result;
+        resolve(base64String);
+      };
+      reader.readAsDataURL(blob);
+    });
+  }
+
   async function generateHTML(jsonData) {
     let url = await ReaderString(jsonData);
+
+    let urltest = await ReadertestString();
+
+    console.log('url', url);
 
     if (!jsonData) {
       return '<div>Record Not Found</div>';
     }
 
     // Ordering data
-    const orderedData = Object.keys(jsonData.values).sort().reduce(
-      (obj, key) => {
+    const orderedData = Object.keys(jsonData.values)
+      .sort()
+      .reduce((obj, key) => {
         obj[key] = jsonData.values[key];
         return obj;
-      },
-      {}
-    );
+      }, {});
 
     let credentialDetails = Object.keys(orderedData).map((key, index) => {
       let value = orderedData[key];
@@ -137,7 +166,7 @@ function DetailsScreen(props) {
         value = get_local_issue_time(value);
       }
       if (key.match(/Administered Date|Birth Date/)) {
-        value = changeDateFormat(value)
+        value = changeDateFormat(value);
       }
 
       return `<div class="pair-items">
@@ -151,7 +180,7 @@ function DetailsScreen(props) {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-     <style>
+    <style>
       * {
         box-sizing: border-box;
       }
@@ -220,8 +249,11 @@ function DetailsScreen(props) {
       #imcyy {
         margin: 10px 0 0;
         color: black;
-        width: 150px;
-        height: 150px;
+        width: 200px;
+        height: 200px;
+         filter: brightness(120%);
+        filter: contrast(120%);
+        transform: scale(1);
       }
       .title-wrap {
         display: flex;
@@ -320,9 +352,6 @@ function DetailsScreen(props) {
         display: block;
       }
 
-      #i0o3v {
-       
-      }
       .box-relative {
         position: relative;
       }
@@ -346,25 +375,24 @@ function DetailsScreen(props) {
     <div class="row up-items">
       <div class="cell" id="i5lto">
         <div id="ibk3g">
-         <div class="title-wrap">
+          <div class="title-wrap">
             <p>Credential Details</p>
             <div class="cell" id="ir6hs">
               <div id="iutjp">
-                <span id="iizaq"
-                  >Date: ${get_local_date_time(new Date())}</span
-                >
+                <span id="iizaq">Date: ${get_local_date_time(new Date())}</span>
               </div>
             </div>
           </div>
           <div class="i0xih">${credentialDetails.join('')}</div>
         </div>
       </div>
-     
     </div>
 
     <div class="row" id="id7t6">
-      <div class="cell" id="ig8t8">     
-         <img id="imcyy" src="${url}" />
+      <div class="cell" id="ig8t8">
+        <img id="imcyy" src="${url}" />
+
+         <img id="imcyy" src="${urltest}" />
         <div id="ijmqg">
           <span id="iizaq">Scan with ZADA Wallet to verify.</span>
         </div>
@@ -372,27 +400,11 @@ function DetailsScreen(props) {
     </div>
     <div class="row">
       <div class="cell" id="inj3u">
-        <img
-          id="ibugt"
-          src="https://zada-assets.s3.ap-southeast-1.amazonaws.com/zada-process-pdf-image.png"
-        />
+        
       </div>
     </div>
-    <div class="row box-relative">
-      <div class="cell" id="i0o3v">
-        <div id="ijmqg">
-          <span id="iizaq"
-            >© 2022 All Rights Reserved. ZADA Solutions Pte Ltd.</span
-          >
-        </div>
-      </div>
-    </div>
-
-    
   </body>
 </html>
-
-
 `;
   }
 
@@ -437,7 +449,7 @@ function DetailsScreen(props) {
       'Are you sure?',
       'Are you sure you want to delete this certificate?',
       onSuccess,
-      () => { },
+      () => {},
     );
   }
 
@@ -537,7 +549,7 @@ function DetailsScreen(props) {
             />
           </View>
         ) : (
-          <View style={{ margin: 15 }}>
+          <View style={{margin: 15}}>
             <Text style={styles._noQr}>
               You do not have QR of your credential.
             </Text>
