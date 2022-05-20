@@ -40,7 +40,7 @@ function IntroScreen({navigation}) {
           showsPagination={true}>
           {Slides.map((item, index) => {
             return (
-              <View style={styles.slide1}>
+              <View key={index} style={styles.slide1}>
                 <Image
                   resizeMode="contain"
                   style={styles.swiperImage}

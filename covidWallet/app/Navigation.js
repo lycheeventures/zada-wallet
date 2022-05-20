@@ -65,29 +65,58 @@ function NavigationComponent() {
   };
 
   const retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('isfirstTime').then(
-        async (value) => {
-          setLoading(false);
-          if (value == null) {
-            SplashScreen.hide();
-            getisFirstTime('true');
-          } else if (value == 'true') {
-            SplashScreen.hide();
-            getisFirstTime('true');
-          } else if (value == 'false') {
-            getisFirstTime('false');
-            NetInfo.fetch().then(async (state) => {
-              await _fetchingAppData(state.isConnected);
-              SplashScreen.hide();
-            });
-          }
-        },
-      );
-    } catch (error) {
-      // Error retrieving data
-    }
+    const value = await AsyncStorage.getItem('isfirstTime');
+
+    console.log('value', value);
+    setLoading(false);
+    getisFirstTime(value == null ? 'true' : value);
+
     await AsyncStorage.setItem('temporarilyMovedToBackground', 'false');
+
+    NetInfo.fetch()
+      .then((state) => {
+        _fetchingAppData(state.isConnected);
+        SplashScreen.hide();
+      })
+      .catch(() => {
+        SplashScreen.hide();
+      });
+
+    // setTimeout(() => {
+    //   SplashScreen.hide();
+    // }, 3000);
+
+    //SplashScreen.hide();
+
+    // try {
+    //   const value = await AsyncStorage.getItem('isfirstTime').then(
+    //     async (value) => {
+    //       console.log('value', value);
+    //       setLoading(false);
+    //       if (value == null) {
+    //         console.log('value', value);
+
+    //         SplashScreen.hide();
+    //         getisFirstTime('true');
+    //       } else if (value == 'true') {
+    //         console.log('value', value);
+
+    //         SplashScreen.hide();
+    //         getisFirstTime('true');
+    //       } else if (value == 'false') {
+    //         console.log('value', value);
+
+    //         getisFirstTime('false');
+    //         NetInfo.fetch().then(async (state) => {
+    //           await _fetchingAppData(state.isConnected);
+    //           SplashScreen.hide();
+    //         });
+    //       }
+    //     },
+    //   );
+    // } catch (error) {
+    //   // Error retrieving data
+    // }
   };
 
   // Checking auth status
