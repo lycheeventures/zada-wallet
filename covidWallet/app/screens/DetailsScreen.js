@@ -248,12 +248,9 @@ function DetailsScreen(props) {
       }
       #imcyy {
         margin: 10px 0 0;
-        color: black;
-        width: 200px;
-        height: 200px;
-         filter: brightness(120%);
-        filter: contrast(120%);
-        transform: scale(1);
+        width: 256px;
+        height: 256px;
+        
       }
       .title-wrap {
         display: flex;
@@ -392,7 +389,6 @@ function DetailsScreen(props) {
       <div class="cell" id="ig8t8">
         <img id="imcyy" src="${url}" />
 
-         <img id="imcyy" src="${urltest}" />
         <div id="ijmqg">
           <span id="iizaq">Scan with ZADA Wallet to verify.</span>
         </div>
