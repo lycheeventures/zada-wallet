@@ -22,6 +22,8 @@
 		6A059EFFC038403EB8221FC1 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CF924E663F2747058B1A324C /* Poppins-Bold.ttf */; };
 		C147D1A6282B90E40080C82F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = C147D1A5282B90E30080C82F /* assets */; };
 		C186A484282A43CA00A8F262 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
+		C19D6BB1283E0C8300A99471 /* loader.gif in Resources */ = {isa = PBXBuildFile; fileRef = C19D6BB0283E0C8300A99471 /* loader.gif */; };
+		C19D6BB2283E0C8300A99471 /* loader.gif in Resources */ = {isa = PBXBuildFile; fileRef = C19D6BB0283E0C8300A99471 /* loader.gif */; };
 		D28FBECF67394B063DA4565D /* libPods-ZADA-ZADATests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A6F09E88AFF2C2E44173F7D2 /* libPods-ZADA-ZADATests.a */; };
 		EF9D462162F6EFB6396C5397 /* libPods-ZADA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F04713D5DBCCC0A4814B473 /* libPods-ZADA.a */; };
 		F473F3095AE64D8AA326B6EE /* Merriweather-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 092EF3C6D0DC4D618DC6462C /* Merriweather-Bold.ttf */; };
@@ -79,6 +81,7 @@
 		A6F09E88AFF2C2E44173F7D2 /* libPods-ZADA-ZADATests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZADA-ZADATests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA249A13BD394F56A87D8062 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		C147D1A5282B90E30080C82F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
+		C19D6BB0283E0C8300A99471 /* loader.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = loader.gif; path = ../../../../../Downloads/loader.gif; sourceTree = "<group>"; };
 		C5C6189A2A6A775B7327B2C4 /* Pods-ZADA.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZADA.debug.xcconfig"; path = "Target Support Files/Pods-ZADA/Pods-ZADA.debug.xcconfig"; sourceTree = "<group>"; };
 		CF924E663F2747058B1A324C /* Poppins-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Bold.ttf"; path = "../app/assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; };
 		DF580947DE084C51955DA5BE /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
@@ -159,6 +162,7 @@
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
+				C19D6BB0283E0C8300A99471 /* loader.gif */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
@@ -396,6 +400,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C19D6BB1283E0C8300A99471 /* loader.gif in Resources */,
 				C147D1A6282B90E40080C82F /* assets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
@@ -412,6 +417,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */,
+				C19D6BB2283E0C8300A99471 /* loader.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
