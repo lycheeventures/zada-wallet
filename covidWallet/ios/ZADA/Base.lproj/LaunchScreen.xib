@@ -26,14 +26,6 @@
                     </constraints>
                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="default"/>
                 </imageView>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" image="loader.gif" translatesAutoresizingMaskIntoConstraints="NO" id="jiR-WX-9WL">
-                    <rect key="frame" x="173" y="350" width="135" height="103"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="160" id="ZHE-UA-XtV"/>
-                        <constraint firstAttribute="width" constant="160" id="xGe-bJ-5RV"/>
-                    </constraints>
-                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="default"/>
-                </imageView>
             </subviews>
             <color key="backgroundColor" red="0.86654400320154745" green="0.97307495087362983" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
@@ -53,7 +45,6 @@
     </objects>
     <resources>
         <image name="SplashBackground" width="341" height="341"/>
-        <image name="loader.gif" width="256" height="256"/>
         <image name="splashIcon" width="170.5" height="170.5"/>
     </resources>
 </document>
