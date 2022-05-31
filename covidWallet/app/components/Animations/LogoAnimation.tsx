@@ -35,7 +35,6 @@ const LogoAnimation = () => {
   }
 
   const memoizedAnimation = useMemo(() => {
-    console.log('RNNING...')
     return (
       <Animated.Image
         source={require('../../assets/gifs/launch_screen_logo.gif')}
