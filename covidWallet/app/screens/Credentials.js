@@ -14,7 +14,7 @@ import FeatureVideo from '../components/FeatureVideo';
 import {PRIMARY_COLOR, WHITE_COLOR} from '../theme/Colors';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import {_handleAxiosError} from '../helpers/AxiosResponse';
-import {formatDateWithHyphen, get_local_issue_date} from '../helpers/time';
+import {get_local_issue_date} from '../helpers/time';
 import CardBackground from '../components/CardBackground';
 import CertificateCard from '../components/CertificateCard';
 const _ = require('lodash');
