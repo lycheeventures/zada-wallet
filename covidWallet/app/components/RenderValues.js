@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
-import {formatDateWithHyphen, get_local_issue_time} from '../helpers/time';
+import {parse_date_time} from '../helpers/time';
 import {GRAY_COLOR} from '../theme/Colors';
 
 const RenderValues = ({
@@ -27,15 +27,7 @@ const RenderValues = ({
     values != undefined &&
     Object.keys(values).map((key, index) => {
       let value = values[key];
-
-      console.log('key', key);
-
-      if (key.match(/Issue Time/)) {
-        value = get_local_issue_time(value);
-      }
-      if (key.match(/Date Of Birth|Birth Date|Administered Date/)) {
-        value = formatDateWithHyphen(value);
-      }
+      value = parse_date_time(value);
 
       return (
         <View

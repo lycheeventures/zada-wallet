@@ -31,7 +31,7 @@ import moment from 'moment';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import EditGroupModal from '../components/EditGroupModal';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
-import { get_local_issue_date } from '../helpers/time';
+import { get_local_issue_date, parse_date_time } from '../helpers/time';
 
 const CredentialGroups = (props) => {
 
@@ -380,7 +380,7 @@ const CredentialGroups = (props) => {
                                                     >
                                                         <View style={{ width: '90%' }}>
                                                             <Text style={styles._groupName}>{group.group_name}</Text>
-                                                            <Text style={styles._groupDate}>Created At: {moment(group.createdAt).format('DD/MM/YYYY HH:MM A')}</Text>
+                                                            <Text style={styles._groupDate}>Created At: {parse_date_time(group.createdAt)}</Text>
                                                         </View>
                                                         <FeatherIcon
                                                             name={index === currentIndex ? 'chevron-down' : 'chevron-right'}
@@ -473,7 +473,7 @@ const CredentialGroups = (props) => {
                                                     >
                                                         <View style={{ width: '90%' }}>
                                                             <Text style={styles._groupName}>{group.group_name}</Text>
-                                                            <Text style={styles._groupDate}>Created At: {moment(group.createdAt).format('DD/MM/YYYY HH:MM A')}</Text>
+                                                            <Text style={styles._groupDate}>Created At: {parse_date_time(group.createdAt)}</Text>
                                                         </View>
                                                         <FeatherIcon
                                                             name={index === currentIndex ? 'chevron-down' : 'chevron-right'}

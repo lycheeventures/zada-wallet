@@ -33,7 +33,7 @@ import { Buffer } from 'buffer';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
-import { changeDateFormat, get_local_issue_time, get_local_date_time } from '../helpers/time';
+import { get_local_date_time, parse_date_time } from '../helpers/time';
 
 function DetailsScreen(props) {
   // Credential
@@ -132,13 +132,7 @@ function DetailsScreen(props) {
 
     let credentialDetails = Object.keys(orderedData).map((key, index) => {
       let value = orderedData[key];
-
-      if (key.match(/Issue Time/)) {
-        value = get_local_issue_time(value);
-      }
-      if (key.match(/Administered Date|Birth Date/)) {
-        value = changeDateFormat(value)
-      }
+      value = parse_date_time(value)
 
       return `<div class="pair-items">
               <b class="text-space" id="iizaq">${key}:</b>
