@@ -72,7 +72,6 @@ export const parse_date_time = (val) => {
   }
 
   if (is_date_time(val)) {
-    console.log('its date _time')
     return get_local_issue_time(val);
   }
 
