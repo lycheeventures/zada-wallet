@@ -199,7 +199,7 @@ function Credentials(props) {
             contentContainerStyle={{
               width: '100%',
             }}
-            keyExtractor={(_, index) => index.toString()}
+            keyExtractor={(item, index) => item.credentialId + ':' + index.toString()}
             renderItem={renderItem}
           />
         </>
