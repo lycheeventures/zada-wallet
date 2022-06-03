@@ -1,11 +1,10 @@
 import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, RefreshControl, FlatList} from 'react-native';
-import CredentialsCard from '../components/CredentialsCard';
 import {themeStyles} from '../theme/Styles';
 import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
 import {getItem, saveItem} from '../helpers/Storage';
-import ConstantsList, {ZADA_S3_BASE_URL} from '../helpers/ConfigApp';
+import ConstantsList from '../helpers/ConfigApp';
 import useNetwork from '../hooks/useNetwork';
 import {get_all_qr_credentials} from '../gateways/credentials';
 import PullToRefresh from '../components/PullToRefresh';
@@ -17,6 +16,7 @@ import {_handleAxiosError} from '../helpers/AxiosResponse';
 import {get_local_issue_date} from '../helpers/time';
 import CardBackground from '../components/CardBackground';
 import CertificateCard from '../components/CertificateCard';
+const _ = require('lodash');
 
 function Credentials(props) {
   const {isConnected} = useNetwork();
@@ -30,7 +30,6 @@ function Credentials(props) {
     if (searchText != null && searchText.length != 0) {
       let searchCreds = [];
       credentials.forEach((item) => {
-        console.log(item);
         if (
           (item.type != undefined &&
             item.type != undefined &&
@@ -59,7 +58,6 @@ function Credentials(props) {
       let connectionsList = JSON.parse(connections) || [];
       let credentialsList = JSON.parse(local_credentials) || [];
 
-      // If arr is empty, return
       if (connectionsList.length === 0 || credentialsList.length === 0) {
         setCredentials([]);
         return;
@@ -72,8 +70,6 @@ function Credentials(props) {
         credentials.every(function (element, index) {
           return element.credentialId === credentialsList[index].credentialId;
         });
-
-      console.log('is_same', is_same);
 
       if (!is_same) {
         setCredentials([]);
@@ -160,6 +156,13 @@ function Credentials(props) {
     );
   };
 
+  const data = search ? filteredCreds : credentials;
+
+  //Sort array from descending order
+  const sortedData = data.sort(
+    (a, b) => new Date(b.issuedAtUtc) - new Date(a.issuedAtUtc),
+  );
+
   return (
     <View style={themeStyles.mainContainer}>
       <FeatureVideo
@@ -192,11 +195,11 @@ function Credentials(props) {
             style={{
               flexGrow: 1,
             }}
-            data={search ? filteredCreds : credentials}
+            data={sortedData}
             contentContainerStyle={{
               width: '100%',
             }}
-            keyExtractor={(_, index) => index.toString()}
+            keyExtractor={(item, index) => item.credentialId + ':' + index.toString()}
             renderItem={renderItem}
           />
         </>

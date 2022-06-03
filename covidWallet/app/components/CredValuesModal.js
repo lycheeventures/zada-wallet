@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Modal from 'react-native-modal';
 import {
   BACKGROUND_COLOR,
@@ -11,9 +11,9 @@ import {
 } from '../theme/Colors';
 import SimpleButton from './Buttons/SimpleButton';
 import HeadingComponent from './HeadingComponent';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import LottieView from 'lottie-react-native';
-import {get_local_issue_date, get_local_issue_time} from '../helpers/time';
+import { parse_date_time } from '../helpers/time';
 const CredValuesModal = ({
   isVisible,
   heading,
@@ -24,66 +24,34 @@ const CredValuesModal = ({
 }) => {
   function renderTitleInput(title, index) {
     let value = values[title];
-
-    if (title == 'Issue Time') {
-      return (
+    return (
+      < View
+        key={index}
+        style={{
+          marginLeft: 16,
+          marginRight: 16,
+          marginTop: 4,
+          marginBottom: 4,
+        }
+        }>
+        <Text style={{ color: BLACK_COLOR, marginLeft: 8, marginBottom: 8 }}>
+          {title}
+        </Text>
         <View
-          key={index}
           style={{
-            marginLeft: 16,
-            marginRight: 16,
-            marginTop: 4,
+            paddingLeft: 16,
+            paddingRight: 16,
+            backgroundColor: WHITE_COLOR,
+            color: BLACK_COLOR,
+            height: 40,
             marginBottom: 4,
+            borderRadius: 16,
+            justifyContent: 'center',
           }}>
-          <Text style={{color: BLACK_COLOR, marginLeft: 8, marginBottom: 8}}>
-            {title}
-          </Text>
-          <View
-            style={{
-              paddingLeft: 16,
-              paddingRight: 16,
-              backgroundColor: WHITE_COLOR,
-              color: BLACK_COLOR,
-              height: 40,
-              marginBottom: 4,
-              borderRadius: 16,
-              justifyContent: 'center',
-            }}>
-            <Text style={{color: BLACK_COLOR}}>
-              {get_local_issue_time(value)}
-            </Text>
-          </View>
+          <Text style={{ color: BLACK_COLOR }}>{parse_date_time(value)}</Text>
         </View>
-      );
-    } else {
-      return (
-        <View
-          key={index}
-          style={{
-            marginLeft: 16,
-            marginRight: 16,
-            marginTop: 4,
-            marginBottom: 4,
-          }}>
-          <Text style={{color: BLACK_COLOR, marginLeft: 8, marginBottom: 8}}>
-            {title}
-          </Text>
-          <View
-            style={{
-              paddingLeft: 16,
-              paddingRight: 16,
-              backgroundColor: WHITE_COLOR,
-              color: BLACK_COLOR,
-              height: 40,
-              marginBottom: 4,
-              borderRadius: 16,
-              justifyContent: 'center',
-            }}>
-            <Text style={{color: BLACK_COLOR}}>{value}</Text>
-          </View>
-        </View>
-      );
-    }
+      </View >
+    )
   }
 
   return (
