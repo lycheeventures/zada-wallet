@@ -31,7 +31,7 @@ import NetInfo from '@react-native-community/netinfo';
 import {checkVersion} from 'react-native-check-version';
 import VersionModal from './components/VersionModal';
 import {saveItem} from './helpers/Storage';
-import ContantList from './helpers/ConfigApp';
+import ConstantList from './helpers/ConfigApp';
 import useNetwork from './hooks/useNetwork';
 import AboutUs from './screens/AboutUs';
 import ContactUs from './screens/ContactUs';
@@ -119,6 +119,7 @@ function NavigationComponent() {
     () => ({
       isFirstTimeFunction: () => {
         storeData();
+        saveItem(ConstantList.AUTO_ACCEPT_CONNECTION, JSON.stringify(true));
         getisFirstTime('false');
       },
       logout: () => {
@@ -145,7 +146,7 @@ function NavigationComponent() {
         if (version.needsUpdate) {
           setIsNewVersion(true);
           setVersionDetails(version);
-          await saveItem(ContantList.APP_VERSION, JSON.stringify(version));
+          await saveItem(ConstantList.APP_VERSION, JSON.stringify(version));
         } else {
           _checkAuthStatus();
         }
