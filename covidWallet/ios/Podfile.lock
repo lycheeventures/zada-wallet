@@ -579,7 +579,6 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
-  - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -700,8 +699,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
-  react-native-slider:
-    :path: "../node_modules/@react-native-community/slider"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
   react-native-webview:
@@ -823,7 +820,6 @@ SPEC CHECKSUMS:
   react-native-netinfo: 877946c7b4eb85a639cf1ea31333dadc2be999a1
   react-native-pager-view: 15ae71c52a8a40bd8a10505b5c64fb129fc437e2
   react-native-safe-area-context: 8260e5157617df4b72865f44006797f895b2ada7
-  react-native-slider: 94ea7daf58b09bb385e4c3320e2929430d759570
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-webview: ba5a82f852bdd2564241a921c31dffdd696f88be
   React-perflogger: 25373e382fed75ce768a443822f07098a15ab737
