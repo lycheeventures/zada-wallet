@@ -1,16 +1,16 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 
-import {StyleSheet, View, Text, Alert, TouchableOpacity} from 'react-native';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import { StyleSheet, View, Text, Alert, TouchableOpacity } from 'react-native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import queryString from 'query-string';
-import {getItem, ls_addConnection, saveItem} from '../helpers/Storage';
-import ConstantsList, {CONNLESS_VER_REQ, ZADA_AUTH_CONNECTION_ID} from '../helpers/ConfigApp';
-import {Buffer} from 'buffer';
+import { getItem, ls_addConnection, saveItem } from '../helpers/Storage';
+import ConstantsList, { AUTO_ACCEPT_CONNECTION, CONNLESS_VER_REQ, ZADA_AUTH_CONNECTION_ID } from '../helpers/ConfigApp';
+import { Buffer } from 'buffer';
 import CustomProgressBar from '../components/CustomProgressBar';
-import {showMessage, showNetworkMessage, _showAlert} from '../helpers/Toast';
-import {AuthenticateUser} from '../helpers/Authenticate';
-import {addImageAndNameFromConnectionList} from '../helpers/ActionList';
+import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
+import { AuthenticateUser } from '../helpers/Authenticate';
+import { addImageAndNameFromConnectionList } from '../helpers/ActionList';
 import {
   accept_connection,
   add_session,
@@ -26,14 +26,14 @@ import {
   analytics_log_verified_credential,
   analytics_log_verify_cred_qr,
 } from '../helpers/analytics';
-import {submit_cold_verification} from '../gateways/credentials';
+import { submit_cold_verification } from '../gateways/credentials';
 import useNetwork from '../hooks/useNetwork';
-import {_handleAxiosError} from '../helpers/AxiosResponse';
+import { _handleAxiosError } from '../helpers/AxiosResponse';
 import ActionDialog from '../components/Dialogs/ActionDialog';
 import { submit_verification_connectionless } from '../gateways/verifications';
 
-function QRScreen({route, navigation}) {
-  const {isConnected} = useNetwork();
+function QRScreen({ route, navigation }) {
+  const { isConnected } = useNetwork();
 
   const [scan, setScan] = useState(true);
   const [connection_request, setConnectionRequest] = useState('');
@@ -73,7 +73,7 @@ function QRScreen({route, navigation}) {
           setConnectionRequest(JSON.stringify(cr_arr));
           if (route.params != undefined) {
             setScan(false);
-            const {request} = route.params;
+            const { request } = route.params;
             const qrJSON = JSON.parse(JSON.stringify(request));
             if (request.type == 'connection_request') {
               setProgress(true);
@@ -99,7 +99,7 @@ function QRScreen({route, navigation}) {
           setCredentialRequest(JSON.stringify(cred_arr));
           if (route.params != undefined) {
             setScan(false);
-            const {request} = route.params;
+            const { request } = route.params;
             const qrJSON = JSON.parse(JSON.stringify(request));
             if (request.type == 'credential_offer') {
               setProgress(true);
@@ -139,51 +139,64 @@ function QRScreen({route, navigation}) {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
       },
-    }).then((response) => {
+    }).then(async (response) => {
       const parsed = queryString.parse(response.url, true);
       let urlData = Object.values(parsed)[0];
       var data = JSON.parse(Buffer.from(urlData, 'base64').toString());
+
       qrJSON.organizationName = data.label;
       qrJSON.imageUrl = data.imageUrl;
       qrJSON.connectionId = data['@id'];
 
-      getItem(ConstantsList.CONNECTIONS).then((connectionList) => {
-        let QRConnList = JSON.parse(connectionList);
-        let connectionExists = false;
-        if (QRConnList != null) {
-          for (let j = 0; j < QRConnList.length; j++) {
-            //Connection Request Found in Connection List
-            if (QRConnList[j].name === data.label) {
-              connectionExists = true;
-              break;
-            } else connectionExists = false;
-          } // for Loop Ends
-        }
-        if (connectionExists) {
+      let connectionList = await getItem(ConstantsList.CONNECTIONS);
+
+      let QRConnList = JSON.parse(connectionList);
+      let connectionExists = false;
+      if (QRConnList != null) {
+        for (let j = 0; j < QRConnList.length; j++) {
+          //Connection Request Found in Connection List
+          if (QRConnList[j].name === data.label) {
+            connectionExists = true;
+            break;
+          } else connectionExists = false;
+        } // for Loop Ends
+      }
+      if (connectionExists) {
+        setProgress(false);
+        Alert.alert(
+          'ZADA',
+          'Connection with ' + data.label + ' has already been created',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('MainScreen'),
+            },
+          ],
+          { cancelable: false },
+        );
+      } else {
+        try {
+          // Check auto_acceptance from local storage
+          let auto_accept_connection = JSON.parse((await getItem(AUTO_ACCEPT_CONNECTION)) || 'false');
+
+          if (auto_accept_connection) {
+            setDialogTitle('Accepting Connection...');
+
+            // Accept Connection
+            await accept_connection(qrJSON.metadata);
+          }else{
+            cr_arr.push(qrJSON);
+            await saveItem(ConstantsList.CONN_REQ, JSON.stringify(cr_arr))
+          }
+
+          setDialogTitle('');
           setProgress(false);
-          Alert.alert(
-            'ZADA',
-            'Connection with ' + data.label + ' has already been created',
-            [
-              {
-                text: 'OK',
-                onPress: () => navigation.navigate('MainScreen'),
-              },
-            ],
-            {cancelable: false},
-          );
-        } else {
-          cr_arr.push(qrJSON);
-          saveItem(ConstantsList.CONN_REQ, JSON.stringify(cr_arr))
-            .then(() => {
-              setProgress(false);
-              navigation.navigate('MainScreen');
-            })
-            .catch((e) => {
-              setProgress(false);
-            });
+          navigation.navigate('MainScreen');
+        } catch (e) {
+          setProgress(false);
+          console.log(e)
         }
-      });
+      }
     });
   };
 
@@ -193,8 +206,8 @@ function QRScreen({route, navigation}) {
       if (resp.success) {
         await fetch(
           ConstantsList.BASE_URL +
-            '/api/credential/get_credential' +
-            `?credentialId=${credID}`,
+          '/api/credential/get_credential' +
+          `?credentialId=${credID}`,
           {
             method: 'GET',
             headers: {
@@ -215,7 +228,7 @@ function QRScreen({route, navigation}) {
                     onPress: () => navigation.navigate('MainScreen'),
                   },
                 ],
-                {cancelable: false},
+                { cancelable: false },
               );
             } else if (data.success == true) {
               let qrJSON = data.credential;
@@ -238,7 +251,7 @@ function QRScreen({route, navigation}) {
                         onPress: () => navigation.navigate('MainScreen'),
                       },
                     ],
-                    {cancelable: false},
+                    { cancelable: false },
                   );
                 });
             } else {
@@ -252,7 +265,7 @@ function QRScreen({route, navigation}) {
                     onPress: () => navigation.navigate('MainScreen'),
                   },
                 ],
-                {cancelable: false},
+                { cancelable: false },
               );
             }
           }),
@@ -335,7 +348,7 @@ function QRScreen({route, navigation}) {
         unEscapedStr = unEscapedStr.replace(/\\/g, '');
         unEscapedStr = unEscapedStr.replace(/“/g, '"');
         try {
-          if(JSON.parse(unEscapedStr).type == 'connectionless_verification'){
+          if (JSON.parse(unEscapedStr).type == 'connectionless_verification') {
             handle_QR_login(JSON.parse(unEscapedStr));
             return;
           }
@@ -374,8 +387,8 @@ function QRScreen({route, navigation}) {
                 title = 'Digital Proof Request Added';
                 arr2.push(qrJSON);
                 saveItem(ConstantsList.PROOF_REQ, JSON.stringify(arr2))
-                  .then(() => {})
-                  .catch((e) => {});
+                  .then(() => { })
+                  .catch((e) => { });
               } else {
                 title = 'Invalid QR Code';
               }
@@ -392,7 +405,7 @@ function QRScreen({route, navigation}) {
                     onPress: () => navigation.navigate('MainScreen'),
                   },
                 ],
-                {cancelable: false},
+                { cancelable: false },
               );
             }
           }
@@ -493,8 +506,8 @@ function QRScreen({route, navigation}) {
       let availableCredentials = {
         metadata: loginQRData.metadata,
         type: loginQRData.type,
-        imageUrl:require('../assets/images/qr-code.png'),
-        organizationName:"ZADA Verification"
+        imageUrl: require('../assets/images/qr-code.png'),
+        organizationName: "ZADA Verification"
       }
       setVerificationModalData(availableCredentials);
       setTimeout(() => {
@@ -523,13 +536,13 @@ function QRScreen({route, navigation}) {
     }, 500);
     setDialogTitle('Submitting Verification...')
 
-    try{
+    try {
       // Submitting verification
       await submit_verification_connectionless(e.metadata, e.policyName, e.credentialId);
       setProgress(false)
       alert('Submitted Successfully!')
       navigation.goBack();
-    }catch(e) {
+    } catch (e) {
       console.log(e);
       setErrMsg('Unable to verify credential')
       setScanning(false);

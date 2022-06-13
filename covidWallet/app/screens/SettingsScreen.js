@@ -18,7 +18,7 @@ import {
   WHITE_COLOR,
 } from '../theme/Colors';
 import {getItem, saveItem} from '../helpers/Storage';
-import {BIOMETRIC_ENABLED} from '../helpers/ConfigApp';
+import {AUTO_ACCEPT_CONNECTION, BIOMETRIC_ENABLED} from '../helpers/ConfigApp';
 import {showMessage} from '../helpers/Toast';
 import {AuthContext} from '../context/AuthContext';
 import ConstantsList from '../helpers/ConfigApp';
@@ -30,6 +30,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 export default function SettingsScreen(props) {
   const {logout} = React.useContext(AuthContext);
   const [isBioEnable, setBioEnable] = useState(false);
+  const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(false);
   const [version, setVersion] = useState(null);
 
   const [isEnabled, setIsEnabled] = useState(false);
@@ -41,10 +42,12 @@ export default function SettingsScreen(props) {
         (await getItem(ConstantsList.APP_VERSION)) || null,
       );
 
-      console.log('BIOMETRIC_ENABLED', BIOMETRIC_ENABLED);
       let biometric = JSON.parse((await getItem(BIOMETRIC_ENABLED)) || 'false');
 
+      let auto_accept_connection = JSON.parse((await getItem(AUTO_ACCEPT_CONNECTION)) || 'false');
+
       setBioEnable(biometric);
+      setIsAcceptConnectionEnabled(auto_accept_connection);
       setVersion(appVersion);
     };
     updatevalues();
@@ -77,6 +80,11 @@ export default function SettingsScreen(props) {
         setBioEnable(false);
     }
   };
+
+  const _toggleAcceptConnection = (value) => {
+    saveItem(ConstantsList.AUTO_ACCEPT_CONNECTION, JSON.stringify(value));
+    setIsAcceptConnectionEnabled(value)
+  }
 
   const onLogoutPressed = async () => {
     const pCode = await getItem(ConstantsList.PIN_CODE);
@@ -124,6 +132,19 @@ export default function SettingsScreen(props) {
             ios_backgroundColor="#ffffff"
             onValueChange={_toggleBio}
             value={isBioEnable}
+          />
+        </View>
+
+        <View style={styles._row}>
+          <Text style={styles._rowLabel}>Accept Connections</Text>
+          <Switch
+            trackColor={{
+              false: '#81b0ff',
+              true: '#3ab6ae',
+            }}
+            ios_backgroundColor="#ffffff"
+            onValueChange={_toggleAcceptConnection}
+            value={isAcceptConnectionEnabled}
           />
         </View>
 

@@ -43,4 +43,5 @@ module.exports = Object.freeze({
   STRONG: 'Strong',
   MEDIUM: 'Medium',
   WEAK: 'Weak',
+  AUTO_ACCEPT_CONNECTION: 'auto_accept_connection'
 });
