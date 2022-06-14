@@ -21,20 +21,14 @@ import {
 } from '../theme/Colors';
 import HeadingComponent from '../components/HeadingComponent';
 import ConstantsList from '../helpers/ConfigApp';
-import NetInfo from '@react-native-community/netinfo';
 import {saveItem,getItem, removeItem} from '../helpers/Storage';
 import {showMessage, showNetworkMessage, _showAlert} from '../helpers/Toast';
 import {AuthenticateUser} from '../helpers/Authenticate';
 import {InputComponent} from '../components/Input/inputComponent';
 import {
   nameRegex,
-  validateAtLeastOneSpecialLetter,
-  validateAtLeastOneUpperCaseLetter,
-  validateIfLowerCased,
   validateLength,
-  validateMediumPassword,
   validatePasswordStrength,
-  validateStrongPassword,
 } from '../helpers/validation';
 import {_resgiterUserAPI} from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
