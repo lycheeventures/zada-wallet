@@ -1,9 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import { parse_date_time } from '../helpers/time';
-import { capitalizeFirstLetter } from '../helpers/utils';
-import { GRAY_COLOR } from '../theme/Colors';
+import {StyleSheet, Text, View} from 'react-native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
+import {parse_date_time} from '../helpers/time';
+import {GRAY_COLOR} from '../theme/Colors';
 
 const RenderValues = ({
   values,
@@ -17,7 +16,6 @@ const RenderValues = ({
   inputTextWeight,
   inputTextSize,
 }) => {
-
   values = Object.keys(values)
     .sort()
     .reduce((obj, key) => {
@@ -34,16 +32,12 @@ const RenderValues = ({
       return (
         <View
           key={index}
-          style={[styles._mainContainer]}>
-          <Text style={[styles._labelStyle, {
-            color: labelColor,
-            fontWeight: inputTextWeight ? inputTextWeight : null,
-            fontSize: inputTextSize ? inputTextSize : null,
-          }]}>{capitalizeFirstLetter(key)}</Text>
-
+          style={[styles._mainContainer, mainStyle, {width: width}]}>
+          <Text style={[styles._labelStyle, {color: labelColor}]}>{key}</Text>
           <View
             style={[
               styles._inputContainer,
+              {backgroundColor: inputBackground},
             ]}>
             <Text
               style={[
@@ -57,12 +51,6 @@ const RenderValues = ({
               {value}
             </Text>
           </View>
-          <View
-            style={{
-              height: 1,
-              backgroundColor: "#00000020"
-            }}
-          />
         </View>
       );
     });
@@ -83,14 +71,13 @@ const styles = StyleSheet.create({
   },
   _labelStyle: {
     color: GRAY_COLOR,
-    marginLeft: 16,
+    marginLeft: 10,
     marginBottom: 5,
   },
   _inputContainer: {
     borderRadius: 25,
-    marginLeft: 16,
-    paddingBottom: 10,
-    paddingVertical: 2,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     justifyContent: 'center',
   },
   _inputText: {},
