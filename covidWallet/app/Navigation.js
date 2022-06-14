@@ -49,7 +49,7 @@ function NavigationComponent() {
   };
 
   // Hooks
-  const {isConnected, getNetworkInfo} = useNetwork();
+  const { isConnected } = useNetwork();
 
   // States
   const [isLoading, setLoading] = useState(true);
@@ -81,12 +81,11 @@ function NavigationComponent() {
         getisFirstTime('false');
         
         // Getting Network info
-        let state = await getNetworkInfo();
-        if(state.isConnected){
+        if(isConnected){
           setMessageIndex(1);
           
           // Fetching data
-          await _fetchingAppData(state.isConnected);
+          await _fetchingAppData(isConnected);
           
           setMessageIndex(3)
 
@@ -94,10 +93,13 @@ function NavigationComponent() {
           setTimeout(() => {
             setLoading(false);
           }, 1500);
+        }else{
+          setLoading(false);
         }
       }
     } catch (error) {
       // Error retrieving data
+      setLoading(false);
     }
   };
 
@@ -139,9 +141,8 @@ function NavigationComponent() {
   useEffect(() => {
     const _checkVersion = async () => {
       setMessageIndex(0);
-      let netState = await getNetworkInfo(); 
       SplashScreen.hide();
-      if (netState.isConnected) {
+      if (isConnected) {
         const version = await checkVersion();
         if (version.needsUpdate) {
           setIsNewVersion(true);
@@ -152,6 +153,7 @@ function NavigationComponent() {
         }
       } else {
         _checkAuthStatus();
+        setLoading(false);
       }
     };
     _checkVersion();
