@@ -11,7 +11,7 @@ const NetworkContext = ({ children }) => {
 
     useEffect(() => {
         const subscription = NetInfo.addEventListener(state => {
-            setConnected(state.isConnected || state.isInternetReachable);
+            setConnected(state.isConnected && state.isInternetReachable);
         });
         return (() => {
             subscription;
