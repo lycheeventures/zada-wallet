@@ -63,7 +63,6 @@ function RegistrationModule({navigation}) {
 
   const [progress, setProgress] = useState(false);
   const [authCount, setAuthCount] = useState(0);
-  const [recaptchaVisible, setRecaptchaVisible] = useState(false);
 
   // Hooks
   const {isConnected} = useNetwork();
