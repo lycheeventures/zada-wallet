@@ -121,7 +121,7 @@ function ActionDialog(props) {
 
         // If value is empty
         if (val == undefined) return
-        if (props.data.type == VER_REQ ||  props.data.type == CONNLESS_VER_REQ) {
+        if (props.data.type == VER_REQ || props.data.type == CONNLESS_VER_REQ) {
             val = selectedCred;
             props.data.credentialId = selectedCred.credentialId;
             props.data.policyName = policyName
@@ -301,14 +301,17 @@ function ActionDialog(props) {
                                                     values != undefined && Object.keys(values).length > 0 ? (
                                                         <RenderValues
                                                             values={values}
-                                                            inputBackground={BACKGROUND_COLOR}
-                                                            inputTextColor={BLACK_COLOR}
-                                                            labelColor={BLACK_COLOR}
+                                                            // inputTextColor={BLACK_COLOR}
+                                                            // labelColor={BLACK_COLOR}
                                                             listStyle={{ flexGrow: 1 }}
                                                             listContainerStyle={{
                                                                 flexGrow: 1,
                                                                 paddingHorizontal: 15,
                                                             }}
+                                                            inputTextColor={GRAY_COLOR}
+                                                            inputTextWeight={'normal'}
+                                                            inputTextSize={14}
+                                                            labelColor={BLACK_COLOR}
                                                         />
                                                     ) : (
                                                         null
