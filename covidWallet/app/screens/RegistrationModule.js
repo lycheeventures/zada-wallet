@@ -17,23 +17,18 @@ import {
   GREEN_COLOR,
   WHITE_COLOR,
   GRAY_COLOR,
+  RED_COLOR,
 } from '../theme/Colors';
 import HeadingComponent from '../components/HeadingComponent';
 import ConstantsList from '../helpers/ConfigApp';
-import NetInfo from '@react-native-community/netinfo';
-import {saveItem} from '../helpers/Storage';
+import {saveItem,getItem, removeItem} from '../helpers/Storage';
 import {showMessage, showNetworkMessage, _showAlert} from '../helpers/Toast';
 import {AuthenticateUser} from '../helpers/Authenticate';
 import {InputComponent} from '../components/Input/inputComponent';
 import {
   nameRegex,
-  validateAtLeastOneSpecialLetter,
-  validateAtLeastOneUpperCaseLetter,
-  validateIfLowerCased,
   validateLength,
-  validateMediumPassword,
   validatePasswordStrength,
-  validateStrongPassword,
 } from '../helpers/validation';
 import {_resgiterUserAPI} from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
@@ -41,17 +36,15 @@ import jwt_decode from 'jwt-decode';
 import {_fetchingAppData} from '../helpers/AppData';
 import useNetwork from '../hooks/useNetwork';
 import {_handleAxiosError} from '../helpers/AxiosResponse';
+import Recaptcha from 'react-native-recaptcha-that-works';
 
 const {width} = Dimensions.get('window');
 
 function RegistrationModule({navigation}) {
-  const {isConnected} = useNetwork();
+  // States
   const [activeOption, updateActiveOption] = useState('register');
-
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('');
-
-  const phoneInput = useRef(null);
   const [phone, setPhone] = useState('');
   const [phoneText, setPhoneText] = useState('');
 
@@ -63,6 +56,14 @@ function RegistrationModule({navigation}) {
   const [strengthMessage, setStrengthMessage] = useState(undefined);
 
   const [progress, setProgress] = useState(false);
+  const [authCount, setAuthCount] = useState(0);
+
+  // Hooks
+  const {isConnected} = useNetwork();
+
+  // Refs
+  const phoneInput = useRef(null);
+  const recaptcha = useRef();
 
   // Toggling for password
   const _toggleSecureSecretEntry = () => {
@@ -74,6 +75,19 @@ function RegistrationModule({navigation}) {
   };
 
   React.useEffect(() => {
+    const getCount = async () => {
+        const authCount = JSON.parse(await getItem(ConstantsList.AUTH_COUNT) | 0);
+        setAuthCount(authCount)
+    }
+    const clearAuthAsync = async () => {
+      removeItem(ConstantsList.REGISTRATION_DATA);
+      removeItem(ConstantsList.LOGIN_DATA);
+    }
+    getCount();
+    clearAuthAsync();
+  },[])
+
+  React.useEffect(() => {
     if (activeOption == 'register') {
       setPhone('');
       // setSecret(randomString(24))
@@ -83,7 +97,7 @@ function RegistrationModule({navigation}) {
     }
   }, [activeOption]);
 
-  const submit = () => {
+  const submit = async () => {
     // Check if name is valid.
     if (!nameRegex.test(name) && activeOption == 'register') {
       setNameError(
@@ -129,6 +143,11 @@ function RegistrationModule({navigation}) {
     setSecretError('');
 
     setProgress(true);
+
+    // Increament authentication count.
+    await saveItem(ConstantsList.AUTH_COUNT, JSON.stringify(authCount + 1));
+    setAuthCount((authCount) => authCount + 1);
+
     if (activeOption == 'register') register();
     else if (activeOption == 'login') login();
     else setProgress(false);
@@ -382,6 +401,10 @@ function RegistrationModule({navigation}) {
     );
   }
 
+  const onVerify = () => {
+    submit();
+  }
+ 
   // KEYBOARD AVOIDING VIEW
   const keyboardVerticalOffset = Platform.OS == 'ios' ? 100 : 0;
   const keyboardBehaviour = Platform.OS == 'ios' ? 'padding' : null;
@@ -558,7 +581,7 @@ function RegistrationModule({navigation}) {
               <SimpleButton
                 loaderColor={WHITE_COLOR}
                 isLoading={progress}
-                onPress={submit}
+                onPress={authCount >= 3 ? recaptcha.current.open : submit}
                 width={250}
                 title="Continue"
                 titleColor={WHITE_COLOR}
@@ -599,11 +622,10 @@ function RegistrationModule({navigation}) {
                 style={styles._forgotText}>
                 Forgot password?
               </Text>
-
               <SimpleButton
                 loaderColor={WHITE_COLOR}
                 isLoading={progress}
-                onPress={submit}
+                onPress={authCount >= 3 ? recaptcha.current.open : submit}
                 width={250}
                 title="Continue"
                 titleColor={WHITE_COLOR}
@@ -613,6 +635,26 @@ function RegistrationModule({navigation}) {
             </View>
           )}
         </View>
+
+        {/* Google Recaptcha */}
+        <Recaptcha
+          ref={recaptcha}
+          siteKey={ConstantsList.GOOGLE_RECAPTCHA_KEY}
+          baseUrl={ConstantsList.RECAPTCHA_BASE_URL}
+          onVerify={onVerify}
+          footerComponent={
+            <View style={{ alignItems: "center", backgroundColor:"#000000" }}>
+              <SimpleButton
+                onPress={() => recaptcha.current.close()}
+                width={250}
+                title="Close"
+                titleColor={WHITE_COLOR}
+                buttonColor={RED_COLOR}
+                style={{ marginBottom:16 }}
+              />
+            </View>
+          }
+        />
       </KeyboardAwareScrollView>
     </View>
   );

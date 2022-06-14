@@ -27,6 +27,10 @@ export const getItem = async (key) => {
   return (value = await AsyncStorage.getItem(key));
 };
 
+export const removeItem = async (key) => {
+  return await AsyncStorage.removeItem(key);
+}
+
 // Add Connection
 export const ls_addConnection = async (new_conn) => {
   let conns = [];

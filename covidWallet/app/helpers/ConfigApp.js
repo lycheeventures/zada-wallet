@@ -43,5 +43,8 @@ module.exports = Object.freeze({
   STRONG: 'Strong',
   MEDIUM: 'Medium',
   WEAK: 'Weak',
-  AUTO_ACCEPT_CONNECTION: 'auto_accept_connection'
+  AUTO_ACCEPT_CONNECTION: 'auto_accept_connection',
+  GOOGLE_RECAPTCHA_KEY: "6LcNdGwgAAAAAKMkAtQKe24pMFQOCFHouS2x5j0m",
+  RECAPTCHA_BASE_URL: "https://zadanetwork.com",
+  AUTH_COUNT: 'auth_count',
 });
