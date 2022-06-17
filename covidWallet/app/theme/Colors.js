@@ -14,6 +14,5 @@ export const BACKGROUND_COLOR = '#e4e2de';
 export const AppColors = {
     PRIMARY: "#001871",
     BLUE: "#2870da",
-    LIGHT_BLUE: "#559af4",
     GRAY: "#708090"
 } 
