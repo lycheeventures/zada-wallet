@@ -25,6 +25,8 @@ const RenderValues = ({
       return obj;
     }, {});
 
+  let size_values = Object.keys(values).length;
+
   let credentialDetails =
     values != undefined &&
     Object.keys(values).map((key, index) => {
@@ -57,12 +59,16 @@ const RenderValues = ({
               {value}
             </Text>
           </View>
-          <View
-            style={{
-              height: 1,
-              backgroundColor: "#00000020"
-            }}
-          />
+          {
+            index != size_values - 1 &&
+            <View
+              style={{
+                height: 1,
+                backgroundColor: "#00000020"
+              }}
+            />
+
+          }
         </View>
       );
     });
