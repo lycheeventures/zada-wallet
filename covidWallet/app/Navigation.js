@@ -31,7 +31,7 @@ import NetInfo from '@react-native-community/netinfo';
 import {checkVersion} from 'react-native-check-version';
 import VersionModal from './components/VersionModal';
 import {saveItem} from './helpers/Storage';
-import ContantList from './helpers/ConfigApp';
+import ConstantList from './helpers/ConfigApp';
 import useNetwork from './hooks/useNetwork';
 import AboutUs from './screens/AboutUs';
 import ContactUs from './screens/ContactUs';
@@ -49,7 +49,7 @@ function NavigationComponent() {
   };
 
   // Hooks
-  const {isConnected, getNetworkInfo} = useNetwork();
+  const { isConnected } = useNetwork();
 
   // States
   const [isLoading, setLoading] = useState(true);
@@ -81,12 +81,11 @@ function NavigationComponent() {
         getisFirstTime('false');
         
         // Getting Network info
-        let state = await getNetworkInfo();
-        if(state.isConnected){
+        if(isConnected){
           setMessageIndex(1);
           
           // Fetching data
-          await _fetchingAppData(state.isConnected);
+          await _fetchingAppData(isConnected);
           
           setMessageIndex(3)
 
@@ -94,10 +93,13 @@ function NavigationComponent() {
           setTimeout(() => {
             setLoading(false);
           }, 1500);
+        }else{
+          setLoading(false);
         }
       }
     } catch (error) {
       // Error retrieving data
+      setLoading(false);
     }
   };
 
@@ -119,6 +121,7 @@ function NavigationComponent() {
     () => ({
       isFirstTimeFunction: () => {
         storeData();
+        saveItem(ConstantList.AUTO_ACCEPT_CONNECTION, JSON.stringify(true));
         getisFirstTime('false');
       },
       logout: () => {
@@ -138,19 +141,19 @@ function NavigationComponent() {
   useEffect(() => {
     const _checkVersion = async () => {
       setMessageIndex(0);
-      let netState = await getNetworkInfo(); 
       SplashScreen.hide();
-      if (netState.isConnected) {
+      if (isConnected) {
         const version = await checkVersion();
         if (version.needsUpdate) {
           setIsNewVersion(true);
           setVersionDetails(version);
-          await saveItem(ContantList.APP_VERSION, JSON.stringify(version));
+          await saveItem(ConstantList.APP_VERSION, JSON.stringify(version));
         } else {
           _checkAuthStatus();
         }
       } else {
         _checkAuthStatus();
+        setLoading(false);
       }
     };
     _checkVersion();

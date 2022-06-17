@@ -50,6 +50,11 @@ export const get_local_issue_date = (issueTime) => {
   }
 };
 
+export const get_local_date = (dateTime) => {
+  return moment
+    .utc(dateTime).format('DD/MM/YYYY').toString();
+}
+
 export const get_local_date_time = (date) => {
   return moment(date).format('DD/MM/YYYY hh:mm A');
 };
@@ -76,4 +81,9 @@ export const parse_date_time = (val) => {
   }
 
   return val
+}
+
+export const check_if_today = (date) => {
+  if (!date) return false
+  return moment("17-06-2022").local().format('YYYY-MM-DD') == moment(date).local().format('YYYY-MM-DD');
 }
