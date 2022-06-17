@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, ImageBackground } from 'react-native';
 import { analytics_log_show_cred_qr } from '../../helpers/analytics';
 import { check_if_today, get_local_date, get_local_issue_date } from '../../helpers/time';
 import { capitalizeFirstLetter } from '../../helpers/utils';
 import { AppColors } from '../../theme/Colors';
 import TouchableComponent from '../Buttons/TouchableComponent';
+import CardBackground from '../CardBackground';
 
-const DetailCard = ({ issue_date, organizationName, setShowQRModal }) => {
+const DetailCard = ({ schemaId, imageUrl, issue_date, organizationName, setShowQRModal }) => {
 
     // Today Check
     const date = check_if_today(issue_date) ? "today" : `on ${get_local_date(issue_date)}`
@@ -17,50 +18,54 @@ const DetailCard = ({ issue_date, organizationName, setShowQRModal }) => {
         setShowQRModal(true)
     }
 
-    // Alphabetic LOGO
-    const alphabetLogo = () => {
+    // Issuer LOGO
+    const issuerImage = () => {
         return (
-            <View style={styles.alphabetContainer}>
-                <Text style={styles.alphabetTextStyle}>
-                    {capitalizeFirstLetter(organizationName.charAt(0))}
-                </Text>
+            <View style={styles.issuerImageContainer}>
+                <Image
+                    resizeMode="contain"
+                    source={{ uri: imageUrl }}
+                    style={{
+                        width: '100%',
+                        height: '100%'
+                    }}
+                />
             </View>
         )
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.issueTextContainerStyle}>
-                <Text style={styles.issueTextStyle}>issued {date}</Text>
-            </View>
+        <TouchableComponent onPress={handleQRPress}>
+            <CardBackground schemeId={schemaId}>
+                <View style={styles.issueTextContainerStyle}>
+                    <Text style={styles.issueTextStyle}>issued {date}</Text>
+                </View>
 
-            <View style={styles._bottomContainer}>
-                {alphabetLogo()}
-                <View></View>
-                <View style={styles._cardInfoContainer}>
-                    <View
-                        style={{
-                            width: '60%',
-                        }}>
-                        <Text style={styles.card_small_text}>Issued by</Text>
-                        <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>
-                            {organizationName}
-                        </Text>
+                <View style={styles._bottomContainer}>
+                    <View style={styles._bottomInsideContainer}>
+                        {issuerImage()}
+                        <View style={styles._cardInfoContainer}>
+                            <View>
+                                <Text style={styles.card_small_text}>Issued by</Text>
+                                <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>
+                                    {organizationName}
+                                </Text>
+                            </View>
+                        </View>
                     </View>
                     <View>
-                        <TouchableComponent
-                            onPress={handleQRPress}
-                            style={styles.touchableStyle}
-                        >
-                            <Image
-                                source={require('../../assets/images/qr-code.png')}
-                                style={styles.topContainerImage}
-                            />
-                        </TouchableComponent>
+                        <View style={styles.touchableStyle}>
+                            <View style={styles.touchableContainerStyle}>
+                                <Image
+                                    source={require('../../assets/images/qr-code.png')}
+                                    style={styles.topContainerImage}
+                                />
+                            </View>
+                        </View>
                     </View>
                 </View>
-            </View>
-        </View>
+            </CardBackground>
+        </TouchableComponent>
     );
 }
 
@@ -69,27 +74,30 @@ const styles = StyleSheet.create({
         height: '100%',
         width: "100%",
         borderRadius: 8,
-        backgroundColor: AppColors.BLUE
     },
     issueTextContainerStyle: {
         marginTop: 8,
         height: 30,
         width: "100%",
-        backgroundColor: AppColors.LIGHT_BLUE,
         justifyContent: "center",
     },
     issueTextStyle: {
         alignSelf: "flex-end",
         color: "white",
-        marginRight: 8,
+        marginRight: 16,
     },
     _bottomContainer: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: "space-between",
         position: 'absolute',
-        bottom: 20,
-        left: 20,
+        bottom: 16,
+        paddingLeft: 16,
+        paddingRight: 8,
+    },
+    _bottomInsideContainer: {
+        flexDirection: 'row',
     },
     _cardLogo: {
         width: 60,
@@ -97,37 +105,29 @@ const styles = StyleSheet.create({
         borderRadius: 4,
     },
     _cardInfoContainer: {
-        width: '75%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginLeft: 10,
+        marginLeft: 8,
     },
     card_small_text: {
         color: 'white',
     },
-    alphabetContainer: {
-        backgroundColor: AppColors.GRAY,
-        height: 60,
-        width: 60,
-        borderRadius: 8,
+    issuerImageContainer: {
+        height: 50,
+        width: 50,
         alignItems: "center",
         justifyContent: "center"
     },
-    alphabetTextStyle: {
-        color: "white",
-        fontSize: 24
-    },
     topContainerImage: {
-        width: '90%',
-        height: '90%',
+        height: 30,
+        width: 30,
         tintColor: '#000000',
-        position: 'absolute',
     },
     touchableStyle: {
         height: 45,
         width: 45,
-        marginRight: 16,
+        marginRight: 8,
         backgroundColor: "white",
         borderRadius: 8,
         alignItems: "center",
@@ -141,6 +141,13 @@ const styles = StyleSheet.create({
         shadowRadius: 1.41,
 
         elevation: 2,
+    },
+    touchableContainerStyle: {
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+    clickMeTextStyle: {
+        fontSize: 10,
     }
 })
 

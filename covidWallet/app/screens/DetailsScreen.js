@@ -517,6 +517,8 @@ function DetailsScreen(props) {
         {data.qrCode != undefined ? (
           <View style={styles.topContainer}>
             <DetailCard
+              schemaId={data.schemaId}
+              imageUrl={data.imageUrl}
               issue_date={data.issuedAtUtc}
               organizationName={data.organizationName}
               setShowQRModal={setShowQRModal}
@@ -561,12 +563,7 @@ function DetailsScreen(props) {
 
 const styles = StyleSheet.create({
   topContainer: {
-    width: '95%',
-    height: 200,
-    margin: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'center',
+    margin: 8,
   },
   innerContainer: {
     borderRadius: 10,
