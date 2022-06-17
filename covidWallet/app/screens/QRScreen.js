@@ -184,7 +184,20 @@ function QRScreen({ route, navigation }) {
 
             // Accept Connection
             await accept_connection(qrJSON.metadata);
-          }else{
+
+            // Alert
+            Alert.alert(
+              'ZADA',
+              'Your connection is created successfully.',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => navigation.navigate('MainScreen'),
+                },
+              ],
+              { cancelable: false },
+            );
+          } else {
             cr_arr.push(qrJSON);
             await saveItem(ConstantsList.CONN_REQ, JSON.stringify(cr_arr))
           }
