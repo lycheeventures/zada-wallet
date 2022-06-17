@@ -136,7 +136,7 @@ export default function SettingsScreen(props) {
         </View>
 
         <View style={styles._row}>
-          <Text style={styles._rowLabel}>Accept Connections</Text>
+          <Text style={styles._rowLabel}>Auto Accept Connections</Text>
           <Switch
             trackColor={{
               false: '#81b0ff',
