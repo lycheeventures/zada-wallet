@@ -42,7 +42,6 @@ export const get_local_issue_date = (issueTime) => {
       .format('DD/MM/YYYY')
       .toString();
   } else {
-    console.log('if => ', issueTime)
     let formattedDate = moment(issueTime).format('DD/MM/YYYY');
     if (formattedDate !== 'Invalid date') {
       return formattedDate;
@@ -85,5 +84,6 @@ export const parse_date_time = (val) => {
 }
 
 export const check_if_today = (date) => {
-  return moment().local().format('YYYY-MM-DD') == moment(date).local().format('YYYY-MM-DD');
+  if (!date) return false
+  return moment("17-06-2022").local().format('YYYY-MM-DD') == moment(date).local().format('YYYY-MM-DD');
 }

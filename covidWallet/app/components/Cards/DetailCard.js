@@ -1,16 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { analytics_log_show_cred_qr } from '../../helpers/analytics';
-import { check_if_today, get_local_date, get_local_issue_date } from '../../helpers/time';
-import { capitalizeFirstLetter } from '../../helpers/utils';
 import { AppColors } from '../../theme/Colors';
 import TouchableComponent from '../Buttons/TouchableComponent';
 import CardBackground from '../CardBackground';
 
 const DetailCard = ({ schemaId, imageUrl, issue_date, organizationName, setShowQRModal }) => {
 
-    // Today Check
-    const date = check_if_today(issue_date) ? "today" : `on ${get_local_date(issue_date)}`
+    // Date
+    let date = issue_date ? `Issued on ` + issue_date : '';
 
     // Functions
     const handleQRPress = () => {
@@ -38,7 +36,7 @@ const DetailCard = ({ schemaId, imageUrl, issue_date, organizationName, setShowQ
         <TouchableComponent onPress={handleQRPress}>
             <CardBackground schemeId={schemaId}>
                 <View style={styles.issueTextContainerStyle}>
-                    <Text style={styles.issueTextStyle}>issued {date}</Text>
+                    <Text style={styles.issueTextStyle}>{date}</Text>
                 </View>
 
                 <View style={styles._bottomContainer}>

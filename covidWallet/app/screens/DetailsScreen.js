@@ -32,7 +32,7 @@ import { Buffer } from 'buffer';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
-import { get_local_date_time, parse_date_time } from '../helpers/time';
+import { get_local_date_time, get_local_issue_date, parse_date_time } from '../helpers/time';
 import DetailCard from '../components/Cards/DetailCard';
 
 function DetailsScreen(props) {
@@ -519,7 +519,9 @@ function DetailsScreen(props) {
             <DetailCard
               schemaId={data.schemaId}
               imageUrl={data.imageUrl}
-              issue_date={data.issuedAtUtc}
+              issue_date={data.values['Issue Time']
+                ? get_local_issue_date(data.values['Issue Time'])
+                : undefined}
               organizationName={data.organizationName}
               setShowQRModal={setShowQRModal}
             />
