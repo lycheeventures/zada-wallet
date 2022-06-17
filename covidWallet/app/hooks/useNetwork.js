@@ -7,12 +7,7 @@ const useNetwork = () => {
 
     const { isConnected } = useContext(Network);
 
-    const getNetworkInfo = async () => {
-        let info = await NetInfo.fetch();
-        return info;
-    }
-
-    return { isConnected, getNetworkInfo };
+    return { isConnected };
 }
 
 export default useNetwork;

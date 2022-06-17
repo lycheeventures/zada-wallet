@@ -24,7 +24,6 @@ import { showMessage, showAskDialog, _showAlert } from '../helpers/Toast';
 import { deleteCredentialByCredId, getItem, saveItem } from '../helpers/Storage';
 import OverlayLoader from '../components/OverlayLoader';
 import SimpleButton from '../components/Buttons/SimpleButton';
-import { analytics_log_show_cred_qr } from '../helpers/analytics';
 import { PreventScreenshots } from 'react-native-prevent-screenshots';
 import CredQRModal from '../components/CredQRModal';
 import RenderValues from '../components/RenderValues';
@@ -33,7 +32,8 @@ import { Buffer } from 'buffer';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
-import { get_local_date_time, parse_date_time } from '../helpers/time';
+import { get_local_date_time, get_local_issue_date, parse_date_time } from '../helpers/time';
+import DetailCard from '../components/Cards/DetailCard';
 
 function DetailsScreen(props) {
   // Credential
@@ -516,18 +516,14 @@ function DetailsScreen(props) {
 
         {data.qrCode != undefined ? (
           <View style={styles.topContainer}>
-            <Image
-              source={require('../assets/images/qr-code.png')}
-              style={styles.topContainerImage}
-            />
-            <SimpleButton
-              onPress={() => {
-                setShowQRModal(true);
-                analytics_log_show_cred_qr();
-              }}
-              title="Show QR"
-              titleColor="white"
-              buttonColor={GREEN_COLOR}
+            <DetailCard
+              schemaId={data.schemaId}
+              imageUrl={data.imageUrl}
+              issue_date={data.values['Issue Time']
+                ? get_local_issue_date(data.values['Issue Time'])
+                : undefined}
+              organizationName={data.organizationName}
+              setShowQRModal={setShowQRModal}
             />
           </View>
         ) : (
@@ -555,13 +551,11 @@ function DetailsScreen(props) {
           }}
           listContainerStyle={{
             paddingBottom: '10%',
-            paddingHorizontal: 15,
           }}
-          inputBackground={WHITE_COLOR}
-          inputTextColor={BLACK_COLOR}
-          inputTextWeight={'bold'}
+          inputTextColor={GRAY_COLOR}
+          inputTextWeight={'normal'}
           inputTextSize={16}
-          labelColor={GRAY_COLOR}
+          labelColor={BLACK_COLOR}
           values={data.values}
         />
       </View>
@@ -571,26 +565,14 @@ function DetailsScreen(props) {
 
 const styles = StyleSheet.create({
   topContainer: {
-    width: 200,
-    height: 200,
-    margin: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'center',
+    margin: 8,
   },
   innerContainer: {
-    padding: 20,
     borderRadius: 10,
     borderColor: BACKGROUND_COLOR,
     borderWidth: 1,
     backgroundColor: WHITE_COLOR,
     height: '100%',
-  },
-  topContainerImage: {
-    width: '100%',
-    height: '100%',
-    tintColor: '#C1C1C1',
-    position: 'absolute',
   },
   headerRightIcon: {
     paddingRight: 15,

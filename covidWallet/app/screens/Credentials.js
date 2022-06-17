@@ -114,23 +114,21 @@ function Credentials(props) {
 
   // For Youtube Video
   const [showVideo, setShowVideo] = useState(false);
-  useFocusEffect(
-    React.useCallback(() => {
-      const _checkForFeatureVideo = async () => {
-        const playFeatureVideo = await getItem('feature_video');
-        if (
-          (playFeatureVideo == undefined ||
-            playFeatureVideo == null ||
-            playFeatureVideo == '') &&
-          isConnected
-        ) {
-          setShowVideo(true);
-          await saveItem('feature_video', 'false');
-        }
-      };
-      _checkForFeatureVideo();
-    }, []),
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const _checkForFeatureVideo = async () => {
+  //       const playFeatureVideo = await getItem('feature_video');
+  //       if (
+  //         (true) &&
+  //         isConnected
+  //       ) {
+  //         setShowVideo(true);
+  //         await saveItem('feature_video', 'false');
+  //       }
+  //     };
+  //     _checkForFeatureVideo();
+  //   }, []),
+  // );
 
   const renderItem = ({item, index}) => {
     return (
@@ -165,12 +163,12 @@ function Credentials(props) {
 
   return (
     <View style={themeStyles.mainContainer}>
-      <FeatureVideo
+      {/* <FeatureVideo
         isVisible={showVideo}
         onCloseClick={() => {
           setShowVideo((prev) => !prev);
         }}
-      />
+      /> */}
       <PullToRefresh />
       {credentials.length > 0 ? (
         <>

@@ -86,6 +86,9 @@ function MultiFactorScreen(props) {
         let result = await validateOTP(phoneConfirmationCode, userData.userId);
 
         if (result.data.success) {
+          // Setting auth count to zero for disabling recaptcha.
+          await saveItem(ConstantsList.AUTH_COUNT, JSON.stringify(0));
+          
           await saveItem(ConstantsList.USER_ID, result.data.userId);
           if (fromScreen == 'Register') {
             await authenticateUser();
