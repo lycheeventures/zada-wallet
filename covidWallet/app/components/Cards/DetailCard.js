@@ -74,10 +74,11 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     issueTextContainerStyle: {
-        marginTop: 8,
+        marginTop: 16,
         height: 30,
         width: "100%",
         justifyContent: "center",
+        backgroundColor: "#ffffff20"
     },
     issueTextStyle: {
         alignSelf: "flex-end",
