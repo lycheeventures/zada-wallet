@@ -30,7 +30,7 @@ export const get_local_issue_time = (issueTime) => {
   return moment
     .utc(issueTime, timeFormats)
     .local()
-    .format('DD/MM/YYYY HH:mm')
+    .format('YYYY-MM-DD HH:mm (G[M]T Z)')
     .toString();
 };
 
@@ -39,10 +39,10 @@ export const get_local_issue_date = (issueTime) => {
     return moment
       .utc(issueTime, 'MM/DD/YYYY hh:mm:ss')
       .local()
-      .format('DD/MM/YYYY')
+      .format('YYYY-MM-DD')
       .toString();
   } else {
-    let formattedDate = moment(issueTime).format('DD/MM/YYYY');
+    let formattedDate = moment(issueTime).format('YYYY-MM-DD');
     if (formattedDate !== 'Invalid date') {
       return formattedDate;
     }
@@ -52,11 +52,11 @@ export const get_local_issue_date = (issueTime) => {
 
 export const get_local_date = (dateTime) => {
   return moment
-    .utc(dateTime).format('DD/MM/YYYY').toString();
+    .utc(dateTime).format('YYYY-MM-DD').toString();
 }
 
 export const get_local_date_time = (date) => {
-  return moment(date).format('DD/MM/YYYY hh:mm A');
+  return moment(date).format('YYYY-MM-DD HH:mm (G[M]T Z)');
 };
 
 export const is_date_time = (val) => {
@@ -73,7 +73,7 @@ export const is_date = (val) => {
 
 export const parse_date_time = (val) => {
   if (is_date(val)) {
-    return moment(val).format('DD/MM/YYYY');
+    return moment(val).format('YYYY-MM-DD');
   }
 
   if (is_date_time(val)) {
@@ -81,9 +81,4 @@ export const parse_date_time = (val) => {
   }
 
   return val
-}
-
-export const check_if_today = (date) => {
-  if (!date) return false
-  return moment("17-06-2022").local().format('YYYY-MM-DD') == moment(date).local().format('YYYY-MM-DD');
 }

@@ -121,7 +121,6 @@ function NavigationComponent() {
     () => ({
       isFirstTimeFunction: () => {
         storeData();
-        saveItem(ConstantList.AUTO_ACCEPT_CONNECTION, JSON.stringify(true));
         getisFirstTime('false');
       },
       logout: () => {
