@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, Platform} from 'react-native';
 import {BLACK_COLOR} from '../theme/Colors';
 
 function CertificateCard(props) {
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 23,
     lineHeight: 22,
-    fontWeight: '100',
+    fontWeight: Platform.OS === 'ios' ? '300' : 'bold',
   },
   _bottomContainer: {
     width: '100%',

@@ -14,6 +14,7 @@ const CredQRModal = ({isVisible, onCloseClick, qrCode}) => {
   return (
     <Modal
       isVisible={isVisible}
+      useNativeDriver={true}
       onBackdropPress={onCloseClick}
       onBackButtonPress={onCloseClick}>
       <View style={styles._qrContainer}>

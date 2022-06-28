@@ -18,7 +18,6 @@ function CardBackground(props) {
   }, []);
 
   const _checkForImageInS3 = () => {
-    console.log('_checkForImageInS3');
     try {
       if (!isConnected) {
         setLoading(false);
@@ -80,7 +79,7 @@ const styles = StyleSheet.create({
   _mainContainer: {
     width: '100%',
     height: 170,
-    borderRadius: 20,
+    borderRadius: 16,
     backgroundColor: BLACK_COLOR,
   },
   _frontLayer: {
@@ -88,7 +87,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     opacity: 0.8,
-    borderRadius: 15,
+    borderRadius: 16,
   },
   _detailsView: {
     padding: 20,

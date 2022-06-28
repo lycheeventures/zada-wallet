@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState,useEffect} from 'react';
 import {StyleSheet, Platform, Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
@@ -31,10 +31,11 @@ import NetInfo from '@react-native-community/netinfo';
 import {checkVersion} from 'react-native-check-version';
 import VersionModal from './components/VersionModal';
 import {saveItem} from './helpers/Storage';
-import ContantList from './helpers/ConfigApp';
+import ConstantList from './helpers/ConfigApp';
 import useNetwork from './hooks/useNetwork';
 import AboutUs from './screens/AboutUs';
 import ContactUs from './screens/ContactUs';
+import IntroScreen from './screens/IntroScreen';
 const Stack = createStackNavigator();
 
 const navigationAnimation =
@@ -47,46 +48,59 @@ function NavigationComponent() {
     prefixes: ['https://zadanetwork.com', 'zada://'], //npx uri-scheme open https://zadanetwork.com/connection_request/abcd --android
   };
 
-  const {isConnected} = useNetwork();
-  // Biometric Hook
+  // Hooks
+  const { isConnected } = useNetwork();
+
+  // States
+  const [isLoading, setLoading] = useState(true);
+  const [messageIndex, setMessageIndex] = useState(2);
   const [isNewVersion, setIsNewVersion] = useState(false);
   const [versionDetails, setVersionDetails] = useState(null);
   const {authStatus, oneTimeAuthentication} = useBiometric();
   const [isFirstTime, getisFirstTime] = React.useState('true');
-  const [isLoading, setLoading] = useState(true);
 
   const storeData = async () => {
     try {
-      await AsyncStorage.setItem('isfirstTime', 'false');
+      AsyncStorage.setItem('isfirstTime', 'false');
     } catch (error) {
       // Error saving data
     }
   };
 
   const retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('isfirstTime').then(
-        async (value) => {
+    try { 
+      const value  = await AsyncStorage.getItem('isfirstTime');
+
+      if (value == null || value == 'true'){
+        getisFirstTime('true');
+        setLoading(false);
+        return
+      }
+
+      if(value == 'false'){
+        getisFirstTime('false');
+        
+        // Getting Network info
+        if(isConnected){
+          setMessageIndex(1);
+          
+          // Fetching data
+          await _fetchingAppData(isConnected);
+          
+          setMessageIndex(3)
+
+          // Setting Timeout just so it looks good for now.
+          setTimeout(() => {
+            setLoading(false);
+          }, 1500);
+        }else{
           setLoading(false);
-          if (value == null) {
-            SplashScreen.hide();
-            getisFirstTime('true');
-          } else if (value == 'true') {
-            SplashScreen.hide();
-            getisFirstTime('true');
-          } else if (value == 'false') {
-            getisFirstTime('false');
-            NetInfo.fetch().then(async (state) => {
-              await _fetchingAppData(state.isConnected);
-              SplashScreen.hide();
-            });
-          }
-        },
-      );
+        }
+      }
     } catch (error) {
       // Error retrieving data
+      setLoading(false);
     }
-    await AsyncStorage.setItem('temporarilyMovedToBackground', 'false');
   };
 
   // Checking auth status
@@ -117,19 +131,28 @@ function NavigationComponent() {
     [],
   );
 
-  React.useEffect(() => {
+
+  // UseEffects
+  useEffect(() => {
+    AsyncStorage.setItem('temporarilyMovedToBackground', 'false');
+  },[])
+
+  useEffect(() => {
     const _checkVersion = async () => {
+      setMessageIndex(0);
+      SplashScreen.hide();
       if (isConnected) {
         const version = await checkVersion();
         if (version.needsUpdate) {
           setIsNewVersion(true);
           setVersionDetails(version);
-          await saveItem(ContantList.APP_VERSION, JSON.stringify(version));
+          await saveItem(ConstantList.APP_VERSION, JSON.stringify(version));
         } else {
           _checkAuthStatus();
         }
       } else {
         _checkAuthStatus();
+        setLoading(false);
       }
     };
     _checkVersion();
@@ -157,11 +180,17 @@ function NavigationComponent() {
               <Stack.Screen
                 options={{headerShown: false}}
                 name="LoadingScreen"
-                component={LoadingScreen}
+                children={() => <LoadingScreen messageIndex={messageIndex}/>}
               />
             </Stack.Navigator>
           ) : isFirstTime === 'true' ? (
             <Stack.Navigator screenOptions={{...navigationAnimation}}>
+              {/* <Stack.Screen
+                options={{headerShown: false}}
+                name="IntroScreen"
+                component={IntroScreen}
+              /> */}
+
               <Stack.Screen
                 options={{headerShown: false}}
                 name="WelcomeScreen"
