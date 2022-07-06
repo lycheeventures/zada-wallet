@@ -8,6 +8,7 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
+import Config from 'react-native-config';
 import {
   PRIMARY_COLOR,
   BACKGROUND_COLOR,
@@ -154,7 +155,7 @@ function MultiFactorScreen(props) {
 
   const createWallet = async (userToken) => {
     if (isConnected) {
-      await fetch(ConstantsList.BASE_URL + `/api/wallet/create`, {
+      await fetch(Config.API_URL + `/api/wallet/create`, {
         method: 'POST',
         headers: {
           Authorization: 'Bearer ' + userToken,

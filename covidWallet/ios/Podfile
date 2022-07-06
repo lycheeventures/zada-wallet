@@ -9,6 +9,8 @@ target 'ZADA' do
   config = use_native_modules!
 
   pod 'Permission-Camera', :path => "../node_modules/react-native-permissions/ios/Camera/Permission-Camera.podspec"
+  pod 'react-native-config/Extension', :path => '../node_modules/react-native-config'
+
 
   # Pods for ZADA
   use_react_native!(
@@ -17,6 +19,7 @@ target 'ZADA' do
     :hermes_enabled => false
   )
   
+
   target 'ZADATests' do
     inherit! :complete
     # Pods for testing
