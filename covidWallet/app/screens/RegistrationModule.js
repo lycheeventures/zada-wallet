@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import Config from 'react-native-config';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 import PhoneInput from 'react-native-phone-number-input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -226,7 +227,7 @@ function RegistrationModule({navigation}) {
 
   const login = async () => {
     if (isConnected) {
-      await fetch(ConstantsList.BASE_URL + `/api/login`, {
+      await fetch(Config.API_URL + `/api/login`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -275,7 +276,7 @@ function RegistrationModule({navigation}) {
   };
 
   const createWallet = async (userToken) => {
-    await fetch(ConstantsList.BASE_URL + `/api/wallet/create`, {
+    await fetch(Config.API_URL + `/api/wallet/create`, {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + userToken,

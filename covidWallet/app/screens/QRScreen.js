@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { StyleSheet, View, Text, Alert, TouchableOpacity } from 'react-native';
+import Config from 'react-native-config';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import queryString from 'query-string';
@@ -218,7 +219,7 @@ function QRScreen({ route, navigation }) {
       let resp = await AuthenticateUser();
       if (resp.success) {
         await fetch(
-          ConstantsList.BASE_URL +
+          Config.API_URL +
           '/api/credential/get_credential' +
           `?credentialId=${credID}`,
           {

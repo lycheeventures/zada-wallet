@@ -3,13 +3,17 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
+    "ios:dev": "npx react-native run-ios --scheme \"reactNativeMultiEnvDev\"",
+    "clean:ios": "pushd ios && xcodebuild clean && ios",
+    "prep:ios": "pushd ios && pod install && popd",
+
+    "android:dev": "npx react-native run-android --variant Debug",
+    "android:prod": "npx react-native run-android --variant Release",
+    "clean:android": "pushd android && ./gradlew clean && popd && npm-run-all -l android:dev",
+
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
-    "clean:android": "cd android && gradlew clean && npx react-native run-android",
-    "clean:ios": "cd ios && xcodebuild clean && npx react-native run-ios",
     "postinstall": "patch-package"
   },
   "dependencies": {
@@ -42,6 +46,7 @@
     "react-native-camera": "^3.43.6",
     "react-native-check-version": "^1.0.11",
     "react-native-collapsible": "^1.6.0",
+    "react-native-config": "^1.4.6",
     "react-native-country-picker-modal": "^2.0.0",
     "react-native-device-info": "^8.4.8",
     "react-native-elements": "^3.4.2",
