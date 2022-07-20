@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -14,12 +14,14 @@ import {
   WHITE_COLOR,
   BACKGROUND_COLOR,
 } from '../theme/Colors';
+import ViewShot from "react-native-view-shot";
 import { themeStyles } from '../theme/Styles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
   delete_credential,
   generate_credential_qr,
 } from '../gateways/credentials';
+import QRCode from 'react-native-qrcode-svg';
 import { showMessage, showAskDialog, _showAlert } from '../helpers/Toast';
 import { deleteCredentialByCredId, getItem, saveItem } from '../helpers/Storage';
 import OverlayLoader from '../components/OverlayLoader';
@@ -38,6 +40,9 @@ import DetailCard from '../components/Cards/DetailCard';
 function DetailsScreen(props) {
   // Credential
   const data = props.route.params.data;
+
+  // Refs
+  const viewShotRef = useRef(null);
 
   // States
   const [isLoading, setIsLoading] = useState(false);
@@ -98,20 +103,7 @@ function DetailsScreen(props) {
     };
     values = JSON.stringify(values);
 
-    const res = await fetch(
-      `https://api.qrserver.com/v1/create-qr-code/?data=${values}`,
-    );
-
-    let blob = await res.blob();
-
-    return new Promise((resolve, reject) => {
-      let reader = new FileReader();
-      reader.onload = (event) => {
-        let base64String = event.target.result;
-        resolve(base64String);
-      };
-      reader.readAsDataURL(blob);
-    });
+    return await viewShotRef.current.capture();
   }
 
   async function generateHTML(jsonData) {
@@ -394,7 +386,6 @@ function DetailsScreen(props) {
 
   async function generateAndSharePDF() {
     setGeneratingPDF(true);
-    console.log('html', generateHTML(data));
 
     let options = {
       html: await generateHTML(data),
@@ -403,9 +394,6 @@ function DetailsScreen(props) {
     };
 
     let file = await RNHTMLtoPDF.convert(options);
-    console.log('file,', file.filePath);
-
-    //setPDFurl(file.filePath);
 
     const shareOptions = {
       title: 'Certificate',
@@ -413,7 +401,6 @@ function DetailsScreen(props) {
         Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath,
     };
 
-    console.log('shareOptions', shareOptions);
     try {
       setGeneratingPDF(false);
 
@@ -495,6 +482,17 @@ function DetailsScreen(props) {
 
   return (
     <View style={[themeStyles.mainContainer]}>
+      {/* hidden QRCODE */}
+      <View style={{ position: "absolute", top: '5%', left: '5%' }}>
+        <ViewShot ref={viewShotRef} options={{ fileName: "QRCode", format: "png", quality: 0.9 }}>
+          <QRCode
+            value={data.qrCode}
+            backgroundColor={BACKGROUND_COLOR}
+            size={Dimensions.get('window').width * 0.7}
+            ecl="L"
+          />
+        </ViewShot>
+      </View>
       <View style={styles.innerContainer}>
         {isLoading && <OverlayLoader text="Deleting credential..." />}
 

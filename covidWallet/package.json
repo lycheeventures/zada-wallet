@@ -6,11 +6,9 @@
     "ios:dev": "npx react-native run-ios --scheme \"reactNativeMultiEnvDev\"",
     "clean:ios": "pushd ios && xcodebuild clean && ios",
     "prep:ios": "pushd ios && pod install && popd",
-
     "android:dev": "npx react-native run-android --variant Debug",
     "android:prod": "npx react-native run-android --variant Release",
     "clean:android": "pushd android && ./gradlew clean && popd && npm-run-all -l android:dev",
-
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
@@ -78,6 +76,7 @@
     "react-native-tab-view": "^3.1.1",
     "react-native-unimodules": "^0.14.6",
     "react-native-vector-icons": "6.6.0",
+    "react-native-view-shot": "^3.3.0",
     "react-native-webview": "^11.22.2"
   },
   "devDependencies": {
