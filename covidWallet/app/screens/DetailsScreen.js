@@ -104,23 +104,6 @@ function DetailsScreen(props) {
     values = JSON.stringify(values);
 
     return await viewShotRef.current.capture();
-
-    // const res = await fetch(
-    //   `https://api.qrserver.com/v1/create-qr-code/?data=${values}`,
-    // );
-
-
-    // let blob = await res.blob();
-
-    // console.log(values)
-    // return new Promise((resolve, reject) => {
-    //   let reader = new FileReader();
-    //   reader.onload = (event) => {
-    //     let base64String = event.target.result;
-    //     resolve(base64String);
-    //   };
-    //   reader.readAsDataURL(blob);
-    // });
   }
 
   async function generateHTML(jsonData) {
