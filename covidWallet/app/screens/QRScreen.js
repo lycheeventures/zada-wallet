@@ -183,7 +183,9 @@ function QRScreen({ route, navigation }) {
             setDialogTitle('Accepting Connection...');
 
             // Accept Connection
-            await accept_connection(qrJSON.metadata);
+            let result = await accept_connection(qrJSON.metadata);
+
+            await ls_addConnection(result.data.connection);
 
             // Alert
             Alert.alert(
