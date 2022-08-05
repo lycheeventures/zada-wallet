@@ -6,9 +6,12 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import queryString from 'query-string';
 import { getItem, ls_addConnection, saveItem } from '../helpers/Storage';
-import ConstantsList, { AUTO_ACCEPT_CONNECTION, CONNLESS_VER_REQ, ZADA_AUTH_CONNECTION_ID } from '../helpers/ConfigApp';
+import ConstantsList, {
+  AUTO_ACCEPT_CONNECTION,
+  ZADA_AUTH_CONNECTION_ID,
+} from '../helpers/ConfigApp';
 import { Buffer } from 'buffer';
-import CustomProgressBar from '../components/CustomProgressBar';
+import CustomProgressBar from './qr/components/CustomProgressBar';
 import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
 import { AuthenticateUser } from '../helpers/Authenticate';
 import { addImageAndNameFromConnectionList } from '../helpers/ActionList';
@@ -19,9 +22,9 @@ import {
   save_did,
   send_zada_auth_verification_request,
 } from '../gateways/connections';
-import SuccessModal from '../components/SuccessModal';
-import FailureModal from '../components/FailureModal';
-import CredValuesModal from '../components/CredValuesModal';
+import SuccessModal from './qr/components/SuccessModal';
+import FailureModal from './qr/components/FailureModal';
+import CredValuesModal from './qr/components/CredValuesModal';
 import {
   analytics_log_unverified_credential,
   analytics_log_verified_credential,
@@ -32,10 +35,21 @@ import useNetwork from '../hooks/useNetwork';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
 import ActionDialog from '../components/Dialogs/ActionDialog';
 import { submit_verification_connectionless } from '../gateways/verifications';
+import { useAppDispatch, useAppSelector } from '../store';
+import { selectConnections } from '../store/connections/selectors';
+import { addAction } from '../store/actions';
 
 function QRScreen({ route, navigation }) {
+  // Constants
+  const dispatch = useAppDispatch();
+
+  // Selectors
+  const connections = useAppSelector(selectConnections.selectAll);
+
+  // Hooks
   const { isConnected } = useNetwork();
 
+  // States
   const [scan, setScan] = useState(true);
   const [connection_request, setConnectionRequest] = useState('');
   const [credential_request, setCredentialRequest] = useState('');
@@ -72,7 +86,7 @@ function QRScreen({ route, navigation }) {
             }
           }
           setConnectionRequest(JSON.stringify(cr_arr));
-          if (route.params != undefined) {
+          if (route.params !== undefined) {
             setScan(false);
             const { request } = route.params;
             const qrJSON = JSON.parse(JSON.stringify(request));
@@ -133,6 +147,93 @@ function QRScreen({ route, navigation }) {
     }
   }, []);
 
+  // const getResponseUrl = async (inviteID, qrJSON) => {
+  //   console.log('Getting response url => ');
+  //   let baseURL = 'https://trinsic.studio/url/';
+  //   await fetch(baseURL + inviteID, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json; charset=utf-8',
+  //     },
+  //   }).then(async (response) => {
+  //     const parsed = queryString.parse(response.url, true);
+  //     let urlData = Object.values(parsed)[0];
+  //     var data = JSON.parse(Buffer.from(urlData, 'base64').toString());
+
+  //     console.log(parsed);
+
+  //     qrJSON.organizationName = data.label;
+  //     qrJSON.imageUrl = data.imageUrl;
+  //     qrJSON.connectionId = data['@id'];
+
+  //     let connectionList = await getItem(ConstantsList.CONNECTIONS);
+
+  //     let QRConnList = JSON.parse(connectionList);
+  //     let connectionExists = false;
+  //     if (QRConnList != null) {
+  //       for (let j = 0; j < QRConnList.length; j++) {
+  //         //Connection Request Found in Connection List
+  //         if (QRConnList[j].name === data.label) {
+  //           connectionExists = true;
+  //           break;
+  //         } else {
+  //           connectionExists = false;
+  //         }
+  //       } // for Loop Ends
+  //     }
+  //     if (connectionExists) {
+  //       setProgress(false);
+  //       Alert.alert(
+  //         'ZADA',
+  //         'Connection with ' + data.label + ' has already been created',
+  //         [
+  //           {
+  //             text: 'OK',
+  //             onPress: () => navigation.navigate('MainScreen'),
+  //           },
+  //         ],
+  //         { cancelable: false }
+  //       );
+  //     } else {
+  //       try {
+  //         // Check auto_acceptance from local storage
+  //         let auto_accept_connection = JSON.parse(
+  //           (await getItem(AUTO_ACCEPT_CONNECTION)) || 'false'
+  //         );
+
+  //         if (auto_accept_connection) {
+  //           setDialogTitle('Accepting Connection...');
+
+  //           // Accept Connection
+  //           await accept_connection(qrJSON.metadata);
+
+  //           // Alert
+  //           Alert.alert(
+  //             'ZADA',
+  //             'Your connection is created successfully.',
+  //             [
+  //               {
+  //                 text: 'OK',
+  //                 onPress: () => navigation.navigate('MainScreen'),
+  //               },
+  //             ],
+  //             { cancelable: false }
+  //           );
+  //         } else {
+  //           cr_arr.push(qrJSON);
+  //           await saveItem(ConstantsList.CONN_REQ, JSON.stringify(cr_arr));
+  //         }
+
+  //         setDialogTitle('');
+  //         setProgress(false);
+  //         navigation.navigate('MainScreen');
+  //       } catch (e) {
+  //         setProgress(false);
+  //         console.log(e);
+  //       }
+  //     }
+  //   });
+  // };
   const getResponseUrl = async (inviteID, qrJSON) => {
     let baseURL = 'https://trinsic.studio/url/';
     await fetch(baseURL + inviteID, {
@@ -149,17 +250,19 @@ function QRScreen({ route, navigation }) {
       qrJSON.imageUrl = data.imageUrl;
       qrJSON.connectionId = data['@id'];
 
-      let connectionList = await getItem(ConstantsList.CONNECTIONS);
+      // let connectionList = await getItem(ConstantsList.CONNECTIONS);
 
-      let QRConnList = JSON.parse(connectionList);
+      // let QRConnList = JSON.parse(connectionList);
       let connectionExists = false;
-      if (QRConnList != null) {
-        for (let j = 0; j < QRConnList.length; j++) {
+      if (connections.length > 0) {
+        for (let j = 0; j < connections.length; j++) {
           //Connection Request Found in Connection List
-          if (QRConnList[j].name === data.label) {
+          if (connections[j].name === data.label) {
             connectionExists = true;
             break;
-          } else connectionExists = false;
+          } else {
+            connectionExists = false;
+          }
         } // for Loop Ends
       }
       if (connectionExists) {
@@ -173,12 +276,14 @@ function QRScreen({ route, navigation }) {
               onPress: () => navigation.navigate('MainScreen'),
             },
           ],
-          { cancelable: false },
+          { cancelable: false }
         );
       } else {
         try {
           // Check auto_acceptance from local storage
-          let auto_accept_connection = JSON.parse((await getItem(AUTO_ACCEPT_CONNECTION)) || 'false');
+          let auto_accept_connection = JSON.parse(
+            (await getItem(AUTO_ACCEPT_CONNECTION)) || 'false'
+          );
 
           if (auto_accept_connection) {
             setDialogTitle('Accepting Connection...');
@@ -196,11 +301,13 @@ function QRScreen({ route, navigation }) {
                   onPress: () => navigation.navigate('MainScreen'),
                 },
               ],
-              { cancelable: false },
+              { cancelable: false }
             );
           } else {
             cr_arr.push(qrJSON);
-            await saveItem(ConstantsList.CONN_REQ, JSON.stringify(cr_arr))
+            console.log(qrJSON);
+            dispatch(addAction(qrJSON));
+            // await saveItem(ConstantsList.CONN_REQ, JSON.stringify(cr_arr));
           }
 
           setDialogTitle('');
@@ -208,7 +315,7 @@ function QRScreen({ route, navigation }) {
           navigation.navigate('MainScreen');
         } catch (e) {
           setProgress(false);
-          console.log(e)
+          console.log(e);
         }
       }
     });
@@ -219,16 +326,14 @@ function QRScreen({ route, navigation }) {
       let resp = await AuthenticateUser();
       if (resp.success) {
         await fetch(
-          Config.API_URL +
-          '/api/credential/get_credential' +
-          `?credentialId=${credID}`,
+          Config.API_URL + '/api/credential/get_credential' + `?credentialId=${credID}`,
           {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
               Authorization: 'Bearer ' + resp.token,
             },
-          },
+          }
         ).then((credential) =>
           credential.json().then(async (data) => {
             if (data.success == false) {
@@ -242,7 +347,7 @@ function QRScreen({ route, navigation }) {
                     onPress: () => navigation.navigate('MainScreen'),
                   },
                 ],
-                { cancelable: false },
+                { cancelable: false }
               );
             } else if (data.success == true) {
               let qrJSON = data.credential;
@@ -265,7 +370,7 @@ function QRScreen({ route, navigation }) {
                         onPress: () => navigation.navigate('MainScreen'),
                       },
                     ],
-                    { cancelable: false },
+                    { cancelable: false }
                   );
                 });
             } else {
@@ -279,10 +384,10 @@ function QRScreen({ route, navigation }) {
                     onPress: () => navigation.navigate('MainScreen'),
                   },
                 ],
-                { cancelable: false },
+                { cancelable: false }
               );
             }
-          }),
+          })
         );
       } else {
         showMessage('ZADA Wallet', resp.message);
@@ -309,7 +414,7 @@ function QRScreen({ route, navigation }) {
         const response = await find_auth_connection(userId, data.tenantId);
         if (response.data.success) {
           const sendResult = await send_zada_auth_verification_request(
-            response.data.data.did,
+            response.data.data.did
           );
 
           if (sendResult.data.success) {
@@ -330,8 +435,9 @@ function QRScreen({ route, navigation }) {
             const didResult = await save_did(
               userId,
               data.tenantId,
-              result.data.connection.myDid,
+              result.data.connection.myDid
             );
+
             if (didResult.data.success) {
               navigation.navigate('MainScreen');
               //_showAlert('Zada Wallet', 'Connection is accepted successfully');
@@ -401,8 +507,8 @@ function QRScreen({ route, navigation }) {
                 title = 'Digital Proof Request Added';
                 arr2.push(qrJSON);
                 saveItem(ConstantsList.PROOF_REQ, JSON.stringify(arr2))
-                  .then(() => { })
-                  .catch((e) => { });
+                  .then(() => {})
+                  .catch((e) => {});
               } else {
                 title = 'Invalid QR Code';
               }
@@ -419,7 +525,7 @@ function QRScreen({ route, navigation }) {
                     onPress: () => navigation.navigate('MainScreen'),
                   },
                 ],
-                { cancelable: false },
+                { cancelable: false }
               );
             }
           }
@@ -479,7 +585,7 @@ function QRScreen({ route, navigation }) {
           credentialData.data,
           credentialData.signature,
           credentialData.tenantId,
-          credentialData.keyVersion,
+          credentialData.keyVersion
         );
 
         if (result.data.success) {
@@ -514,15 +620,15 @@ function QRScreen({ route, navigation }) {
 
   // Function to handle QR based login
   const handle_QR_login = async (loginQRData) => {
-    console.log('Inside Handler QE')
-    console.log(loginQRData)
+    console.log('Inside Handler QE');
+    console.log(loginQRData);
     try {
       let availableCredentials = {
         metadata: loginQRData.metadata,
         type: loginQRData.type,
         imageUrl: require('../assets/images/qr-code.png'),
-        organizationName: "ZADA Verification"
-      }
+        organizationName: 'ZADA Verification',
+      };
       setVerificationModalData(availableCredentials);
       setTimeout(() => {
         setVerificationModalVisibility(true);
@@ -531,34 +637,34 @@ function QRScreen({ route, navigation }) {
     } catch (error) {
       _showAlert('ZADA Wallet', error.message);
     }
-  }
+  };
 
   // Modal Functions
   const rejectModal = () => {
     navigation.goBack();
     setVerificationModalVisibility(false);
-  }
+  };
   const dismissModal = () => {
     setScan(true);
     setVerificationModalVisibility(false);
-  }
+  };
   const acceptModal = async (e) => {
     setVerificationModalVisibility(false);
     setTimeout(() => {
-      setProgress(true)
+      setProgress(true);
       setScan(false);
     }, 500);
-    setDialogTitle('Submitting Verification...')
+    setDialogTitle('Submitting Verification...');
 
     try {
       // Submitting verification
       await submit_verification_connectionless(e.metadata, e.policyName, e.credentialId);
-      setProgress(false)
-      alert('Submitted Successfully!')
+      setProgress(false);
+      alert('Submitted Successfully!');
       navigation.goBack();
     } catch (e) {
       console.log(e);
-      setErrMsg('Unable to verify credential')
+      setErrMsg('Unable to verify credential');
       setScanning(false);
       setProgress(false);
       setShowVerifyModal(false);
@@ -567,7 +673,7 @@ function QRScreen({ route, navigation }) {
       }, 500);
       analytics_log_unverified_credential();
     }
-  }
+  };
 
   return (
     <View style={styles.MainContainer}>
@@ -652,9 +758,7 @@ function QRScreen({ route, navigation }) {
           }}
           onRead={onSuccess}
           topContent={
-            <Text style={styles.textBold}>
-              Point your camera to a QR code to scan
-            </Text>
+            <Text style={styles.textBold}>Point your camera to a QR code to scan</Text>
           }
           bottomContent={
             <TouchableOpacity

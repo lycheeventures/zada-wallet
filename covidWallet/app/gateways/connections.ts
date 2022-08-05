@@ -7,15 +7,7 @@ import {AuthenticateUser, authenticateZadaAuth} from '../helpers/Authenticate';
 import {getItem, saveItem} from '../helpers/Storage';
 import http_client from './http_client';
 import ConstantsList, {ZADA_AUTH_URL} from '../helpers/ConfigApp';
-
-async function getToken() {
-  let resp = await AuthenticateUser();
-  if (resp.success) {
-    return resp.token;
-  } else {
-    return '';
-  }
-}
+import { getToken } from './auth';
 
 // Get All Connections
 export async function get_all_connections() {

@@ -34,10 +34,17 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
 import { get_local_date_time, get_local_issue_date, parse_date_time } from '../helpers/time';
 import DetailCard from '../components/Cards/DetailCard';
+import { useAppDispatch, useAppSelector } from '../store';
+import { selectCredentialsStatus } from '../store/credentials/selectors';
+import { removeCredentials } from '../store/credentials/thunk';
 
 function DetailsScreen(props) {
-  // Credential
-  const data = props.route.params.data;
+  // Constants
+  const data = props.route.params.data; // Credential
+  const dispatch = useAppDispatch();
+
+  // Selectors
+  const credentialStatus = useAppSelector(selectCredentialsStatus);
 
   // States
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +65,7 @@ function DetailsScreen(props) {
             padding={30}
           />
           <MaterialIcons
-            onPress={() => (!isLoading ? showAlert() : {})}
+            onPress={() => (credentialStatus === 'idle' ? showAlert() : {})}
             style={styles.headerRightIcon}
             size={25}
             name="delete"
@@ -69,24 +76,18 @@ function DetailsScreen(props) {
     });
   });
 
+  useEffect(() => {
+    if (credentialStatus === 'succeeded') {
+      showMessage('ZADA Wallet', 'Credential is deleted successfully');
+      props.navigation.goBack();
+    }
+  }, [credentialStatus, props.navigation]);
+
   async function onSuccess() {
     try {
-      setIsLoading(true);
-
-      // Delete credentials Api
-      let result = await delete_credential(data.credentialId);
-      if (result.data.success) {
-        deleteCredentialByCredId(data.credentialId);
-        showMessage('ZADA Wallet', 'Credential is deleted successfully');
-        props.navigation.goBack();
-      } else {
-        showMessage('ZADA Wallet', result.data.message);
-      }
-
-      setIsLoading(false);
+      dispatch(removeCredentials(data.credentialId));
     } catch (e) {
       _handleAxiosError(e);
-      setIsLoading(false);
     }
   }
 
@@ -394,7 +395,6 @@ function DetailsScreen(props) {
 
   async function generateAndSharePDF() {
     setGeneratingPDF(true);
-    console.log('html', generateHTML(data));
 
     let options = {
       html: await generateHTML(data),
@@ -403,7 +403,6 @@ function DetailsScreen(props) {
     };
 
     let file = await RNHTMLtoPDF.convert(options);
-    console.log('file,', file.filePath);
 
     //setPDFurl(file.filePath);
 
@@ -413,12 +412,10 @@ function DetailsScreen(props) {
         Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath,
     };
 
-    console.log('shareOptions', shareOptions);
     try {
       setGeneratingPDF(false);
 
       const ShareResponse = await Share.open(shareOptions);
-      console.log('ShareResponse', JSON.stringify(ShareResponse, null, 2));
     } catch (error) {
       setGeneratingPDF(false);
 
@@ -496,7 +493,9 @@ function DetailsScreen(props) {
   return (
     <View style={[themeStyles.mainContainer]}>
       <View style={styles.innerContainer}>
-        {isLoading && <OverlayLoader text="Deleting credential..." />}
+        {credentialStatus === 'pending' && (
+          <OverlayLoader text="Deleting credential..." />
+        )}
 
         {isGenerating && <OverlayLoader text="Generating credential QR..." />}
 

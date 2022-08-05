@@ -18,10 +18,15 @@ import {pincodeRegex} from '../helpers/validation';
 import {showMessage} from '../helpers/Toast';
 import {saveItem} from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
+import { useAppDispatch } from '../store';
+import { fetchToken } from '../store/auth/thunk';
 
 const img = require('../assets/images/security.png');
 
 function SecurityScreen({navigation}) {
+  // Constants
+  const dispatch = useAppDispatch();
+
   const [isSensorAvailable, checkSensor] = useState(false);
   const [isSuccessful, checkSecureIDAuth] = useState(false);
 
@@ -35,10 +40,10 @@ function SecurityScreen({navigation}) {
 
   useEffect(() => {
     isSecureIDAvailable();
+    dispatch(fetchToken());
   }, []);
 
   function enableSecureID() {
-    console.log('isSensorAvailable', isSensorAvailable);
 
     if (isSensorAvailable) {
       if (Platform.OS === 'ios') {

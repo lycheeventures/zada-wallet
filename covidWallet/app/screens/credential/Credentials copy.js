@@ -1,25 +1,25 @@
-import {useFocusEffect, useIsFocused} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, RefreshControl, FlatList} from 'react-native';
-import {themeStyles} from '../theme/Styles';
-import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
-import {getItem, saveItem} from '../helpers/Storage';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, RefreshControl, FlatList } from 'react-native';
+import { themeStyles } from '../theme/Styles';
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { getItem, saveItem } from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
 import useNetwork from '../hooks/useNetwork';
-import {get_all_qr_credentials} from '../gateways/credentials';
+import { get_all_qr_credentials } from '../gateways/credentials';
 import PullToRefresh from '../components/PullToRefresh';
 import EmptyList from '../components/EmptyList';
 import FeatureVideo from '../components/FeatureVideo';
-import {PRIMARY_COLOR, WHITE_COLOR} from '../theme/Colors';
+import { PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import {_handleAxiosError} from '../helpers/AxiosResponse';
-import {get_local_issue_date} from '../helpers/time';
+import { _handleAxiosError } from '../helpers/AxiosResponse';
+import { get_local_issue_date } from '../helpers/time';
 import CardBackground from '../components/CardBackground';
 import CertificateCard from '../components/CertificateCard';
 const _ = require('lodash');
 
 function Credentials(props) {
-  const {isConnected} = useNetwork();
+  const { isConnected } = useNetwork();
   const [credentials, setCredentials] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
@@ -36,9 +36,7 @@ function Credentials(props) {
             item.type.toLowerCase().includes(searchText.toLowerCase())) ||
           (item.organizationName != undefined &&
             item.organizationName != undefined &&
-            item.organizationName
-              .toLowerCase()
-              .includes(searchText.toLowerCase()))
+            item.organizationName.toLowerCase().includes(searchText.toLowerCase()))
         )
           searchCreds.push(item);
       });
@@ -130,7 +128,7 @@ function Credentials(props) {
   //   }, []),
   // );
 
-  const renderItem = ({item, index}) => {
+  const renderItem = ({ item, index }) => {
     return (
       <TouchableOpacity onPress={() => toggleModal(item)} activeOpacity={0.9}>
         <View style={styles.CredentialsCardContainer}>
@@ -146,7 +144,7 @@ function Credentials(props) {
                   ? get_local_issue_date(item.values['Issue Time'])
                   : undefined
               }
-              card_logo={{uri: item.imageUrl}}
+              card_logo={{ uri: item.imageUrl }}
             />
           </CardBackground>
         </View>
@@ -158,7 +156,7 @@ function Credentials(props) {
 
   //Sort array from descending order
   const sortedData = data.sort(
-    (a, b) => new Date(b.issuedAtUtc) - new Date(a.issuedAtUtc),
+    (a, b) => new Date(b.issuedAtUtc) - new Date(a.issuedAtUtc)
   );
 
   return (
@@ -227,7 +225,7 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE_COLOR,
     paddingHorizontal: 20,
     shadowColor: 'black',
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5,
