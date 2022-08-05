@@ -1,12 +1,12 @@
 import http_client from './http_client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthenticateUser} from '../helpers/Authenticate';
+import { AuthenticateUser } from '../helpers/Authenticate';
 import {
   analytics_log_register_success,
   analytics_log_verifies_otp,
 } from '../helpers/analytics';
 
-async function getToken() {
+export async function getToken() {
   let resp = await AuthenticateUser();
   if (resp.success) {
     return resp.token;
@@ -103,13 +103,11 @@ export const _updateProfileAPI = async (data: Object) => {
 // Validate OTP
 export async function validateOTP(
   phoneConfirmationCode: string,
-  //emailConfirmationCode: string,
-  userId: string,
+  userId: string
 ) {
   try {
     let obj = {
       otpsms: phoneConfirmationCode,
-      //otpmail: emailConfirmationCode,
       userId: userId,
     };
 
@@ -136,7 +134,7 @@ export async function validateOTP(
 // Register device token.
 export async function registerDeviceToken(
   devicePlatform: string,
-  devicePushToken: string,
+  devicePushToken: string
 ) {
   try {
     let obj = {

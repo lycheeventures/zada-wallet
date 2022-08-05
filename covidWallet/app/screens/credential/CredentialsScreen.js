@@ -1,18 +1,13 @@
-import React, {useState} from 'react';
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-import {BACKGROUND_COLOR, PRIMARY_COLOR} from '../theme/Colors';
-import {TabView, SceneMap} from 'react-native-tab-view';
-import Credentials from './Credentials';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import CredentialGroups from './CredentialGroups';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { BACKGROUND_COLOR, PRIMARY_COLOR } from '../../theme/Colors';
+import { TabView, SceneMap } from 'react-native-tab-view';
+import Credentials from './components/Credentials';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import CredentialGroups from './components/CredentialGroups';
 
 const CredentialsScreen = (props) => {
+  // Constants
   const layout = useWindowDimensions();
 
   const renderScene = SceneMap({
@@ -22,8 +17,8 @@ const CredentialsScreen = (props) => {
 
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    {key: 'certificates', title: 'All Certificates'},
-    {key: 'groups', title: 'Groups'},
+    { key: 'certificates', title: 'All Certificates' },
+    { key: 'groups', title: 'Groups' },
   ]);
 
   const CustomTabbAr = (props) => {
@@ -53,10 +48,10 @@ const CredentialsScreen = (props) => {
     <View style={styles._mainContainer}>
       <TabView
         renderTabBar={(props) => <CustomTabbAr {...props} />}
-        navigationState={{index, routes}}
+        navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
-        initialLayout={{width: layout.width}}
+        initialLayout={{ width: layout.width }}
         swipeEnabled={false}
       />
     </View>

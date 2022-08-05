@@ -9,7 +9,7 @@ const CARD_BG = require('../assets/images/card-bg.png');
 
 function CredentialsCard(props) {
   const {isConnected} = useNetwork();
-  const [backgroundImage, setBakcgroundImage] = React.useState(CARD_BG);
+  const [backgroundImage, setBackgroundImage] = React.useState(CARD_BG);
   const [loading, setLoading] = React.useState(true);
   const [isUrl, setUrl] = React.useState(false);
 
@@ -21,7 +21,7 @@ function CredentialsCard(props) {
     try {
       if (!isConnected) {
         setLoading(false);
-        setBakcgroundImage(CARD_BG);
+        setBackgroundImage(CARD_BG);
         setUrl(false);
         return;
       }
@@ -33,7 +33,7 @@ function CredentialsCard(props) {
         .get(`${ZADA_S3_BASE_URL}/${schemeId}.png`)
         .then((res) => {
           if (res.status === 200) {
-            setBakcgroundImage(`${ZADA_S3_BASE_URL}/${schemeId}.png`);
+            setBackgroundImage(`${ZADA_S3_BASE_URL}/${schemeId}.png`);
             setUrl(true);
             setLoading(false);
           }
@@ -41,11 +41,11 @@ function CredentialsCard(props) {
         .catch((error) => {
           setUrl(false);
           setLoading(false);
-          //setBakcgroundImage(`${ZADA_S3_BASE_URL}/default.png`);
+          //setBackgroundImage(`${ZADA_S3_BASE_URL}/default.png`);
         });
     } catch (error) {
       setUrl(false);
-      setBakcgroundImage(CARD_BG);
+      setBackgroundImage(CARD_BG);
       setLoading(false);
     }
   };

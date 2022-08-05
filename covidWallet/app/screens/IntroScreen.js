@@ -1,51 +1,60 @@
 import * as React from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
-import {GRAY_COLOR, GREEN_COLOR, WHITE_COLOR} from '../theme/Colors';
-const img = require('../assets/images/t&c.png');
-const action = require('../assets/images/action2.gif');
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { BLACK_COLOR, GREEN_COLOR, WHITE_COLOR } from '../theme/Colors';
+
+const img1 = require('../assets/images/walkthrough1.png');
+const img2 = require('../assets/images/walkthrough2.png');
+const img3 = require('../assets/images/walkthrough3.png');
+const img4 = require('../assets/images/walkthrough4.png');
 
 import Swiper from 'react-native-swiper';
 
 const Slides = [
   {
-    image: img,
-    text: 'You are about to take control of your own identity. Swipe through these slides fora run-down of this app,or click "Get Started" to dive right in.',
+    image: img1,
+    title:
+      'Introducing the ZADA Wallet and the ZADA Network, here to make your digital life more secure and convenient!',
+    text: 'You have now taken the first step to being in control of your personal data and identities \n \n Here are a few slides to introduce the ZADA Wallet and help you get started with connections and your first credentials!',
   },
   {
-    image: img,
-    text: 'Connect with other organizations and users to begin exchanging information. Scan their QR code to connect.',
+    image: img2,
+    title: 'Creating a connection',
+    text: 'Connect with organisations to receive and share credentials. \n \n You can only receive credentials from organisations that you have a connection with to ensure the data being shared is secure.',
   },
   {
-    image: action,
-    text: 'Collect credentials issued by different organizations.These are pieces of information that prove your identity.',
+    image: img3,
+    title: 'Credential Offers',
+    text: 'You will be notified of new credentials sent to you. All offers will listed under Actions where you need to click and Accept them so they are stored in your ZADA wallet.',
   },
   {
-    image: img,
-    text: 'Once you have a few credentials under your belt, others can request information from you through a proof request. You control the information you share and with whom.',
+    image: img4,
+    title: 'Verification Request',
+    text: "When an organisation want you to share your data they will send a Verification request. You will be notified and find all Verification Requests under Actions. Click on one and you will decide what credential you want to share and what data. Press accept to share the data. \n \n That's all for now. Start exploring the ZADA Ecosystem and its network of organisations with whom you can exchange credentials.",
   },
 ];
 
-function IntroScreen({navigation}) {
+function IntroScreen({ navigation }) {
   const nextHandler = () => {
     navigation.navigate('WelcomeScreen');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.welcomeText}> Welcome! </Text>
+      {/* <Text style={styles.welcomeText}> Welcome! </Text> */}
       <View style={styles.containerSwiper}>
-        <Swiper
-          style={styles.wrapper}
-          showsButtons={true}
-          showsPagination={true}>
+        <Swiper style={styles.wrapper} showsButtons={false} showsPagination={true}>
           {Slides.map((item, index) => {
+            let imageStyle = styles.swiperImage;
+            if (index === 1) {
+              imageStyle = { ...imageStyle, height: 120, width: 250 };
+            }
+            if (index === 2) {
+              imageStyle = { ...imageStyle, height: 240, width: 300 };
+            }
             return (
               <View style={styles.slide1}>
-                <Image
-                  resizeMode="contain"
-                  style={styles.swiperImage}
-                  source={item.image}
-                />
+                <Image resizeMode="cover" style={imageStyle} source={item.image} />
+                <Text style={styles.swiperTitle}>{item.title}</Text>
                 <Text style={styles.swiperText}>{item.text}</Text>
               </View>
             );
@@ -100,12 +109,22 @@ const styles = StyleSheet.create({
   },
 
   swiperImage: {
-    width: '40%',
-    height: '40%',
+    width: 200,
+    height: 150,
+    backgroundColor: 'white',
+  },
+  swiperTitle: {
+    marginHorizontal: 16,
+    textAlign: 'center',
+    color: BLACK_COLOR,
+    fontSize: 16,
+    fontFamily: 'Poppins-bold',
   },
   swiperText: {
+    marginTop: 8,
     marginHorizontal: 40,
-    color: GRAY_COLOR,
+    textAlign: 'center',
+    color: BLACK_COLOR,
     fontSize: 15,
     fontFamily: 'Poppins-Regular',
   },
@@ -123,7 +142,7 @@ const styles = StyleSheet.create({
   },
 
   containerSwiper: {
-    height: '60%',
+    height: '70%',
   },
 
   buttonView: {
