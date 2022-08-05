@@ -7,7 +7,10 @@ function FlatCard(props) {
   return (
     <View style={{ paddingLeft: 4, paddingRight: 4 }}>
       <View style={styles.card}>
-        <TouchableComponent android_ripple={{ borderless: false }} style={styles.touchableStyle} onPress={() => props.onPress()}>
+        <TouchableComponent
+          android_ripple={{ borderless: false }}
+          style={styles.touchableStyle}
+          onPress={() => props.onPress()}>
           <View style={styles.container}>
             <View style={styles.row1}>
               <Image
@@ -24,7 +27,6 @@ function FlatCard(props) {
           </View>
         </TouchableComponent>
       </View>
-
     </View>
   );
 }
@@ -59,7 +61,7 @@ const styles = StyleSheet.create({
 
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 16,
     shadowColor: SECONDARY_COLOR,
     shadowOffset: { width: 0, height: 0 },
@@ -90,7 +92,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 12,
     borderRadius: 16,
-  }
+  },
 });
 
 export default FlatCard;

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -14,14 +14,16 @@ import {
   PRIMARY_COLOR,
   GREEN_COLOR,
   GRAY_COLOR,
-} from '../theme/Colors';
-import HeadingComponent from './HeadingComponent';
+} from '../../../theme/Colors';
+import HeadingComponent from '../../../components/HeadingComponent';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import {InputComponent} from './Input/inputComponent';
-import SimpleButton from './Buttons/SimpleButton';
-import CredentialsCard from './CredentialsCard';
-import EmptyList from './EmptyList';
-import {get_local_issue_date} from '../helpers/time';
+import { InputComponent } from '../../../components/Input/inputComponent';
+import SimpleButton from '../../../components/Buttons/SimpleButton';
+import CredentialsCard from '../../../components/CredentialsCard';
+import EmptyList from '../../../components/EmptyList';
+import { get_local_issue_date } from '../../../helpers/time';
+import { useAppSelector } from '../../../store';
+import { selectSearchedCredentials } from '../../../store/credentials/selectors';
 
 const AddGroupModal = ({
   isVisible,
@@ -35,8 +37,11 @@ const AddGroupModal = ({
   refreshing,
 }) => {
   const [search, setSearch] = useState('');
-  const [filteredCreds, setFilteredCreds] = useState([]);
   const [creds, setCreds] = useState([]);
+
+  const filteredCreds = useAppSelector((state) =>
+    selectSearchedCredentials(state, search)
+  );
 
   useEffect(() => {
     const _changeCreds = () => {
@@ -51,30 +56,48 @@ const AddGroupModal = ({
       setCreds(temp);
     };
     _changeCreds();
-  }, [isVisible]);
+  }, [credentials, isVisible]);
 
   const _searchInputHandler = (searchText) => {
     setSearch(searchText);
-    if (searchText != null && searchText.length != 0) {
-      let searchCreds = [];
-      creds.forEach((item) => {
-        if (
-          (item.type != undefined &&
-            item.type != undefined &&
-            item.type.toLowerCase().includes(searchText.toLowerCase())) ||
-          (item.organizationName != undefined &&
-            item.organizationName != undefined &&
-            item.organizationName
-              .toLowerCase()
-              .includes(searchText.toLowerCase()))
-        )
-          searchCreds.push(item);
-      });
-      setFilteredCreds(searchCreds);
-    } else {
-      setFilteredCreds([]);
-    }
   };
+
+  const renderItem = ({ item, index }) => (
+    <Pressable
+      style={{ marginBottom: 5 }}
+      onPress={() => {
+        let credIndex = creds.findIndex((c) => c.credentialId === item.credentialId);
+        creds[credIndex].selected = !creds[credIndex].selected;
+        setSearch('');
+        setCreds([...creds]);
+      }}>
+      <CredentialsCard
+        schemeId={item['schemaId']}
+        card_title={item.name}
+        card_type={item.type}
+        issuer={item.organizationName}
+        card_user=""
+        date={
+          item.values['Issue Time']
+            ? get_local_issue_date(item.values['Issue Time'])
+            : undefined
+        }
+        card_logo={{ uri: item.imageUrl }}
+      />
+      {item.selected && (
+        <FeatherIcon
+          name="check"
+          size={30}
+          color={GREEN_COLOR}
+          style={{
+            position: 'absolute',
+            top: -5,
+            right: -5,
+          }}
+        />
+      )}
+    </Pressable>
+  );
 
   return (
     <Modal
@@ -121,14 +144,14 @@ const AddGroupModal = ({
             height={45}
             placeholderText="Search Credential"
             value={search}
-            inputContainerStyle={[styles._inputView, {marginTop: 10}]}
+            inputContainerStyle={[styles._inputView, { marginTop: 10 }]}
             setStateValue={_searchInputHandler}
             rightIcon={() => (
               <FeatherIcon
                 name="search"
                 size={24}
                 color={PRIMARY_COLOR}
-                style={{marginHorizontal: 15}}
+                style={{ marginHorizontal: 15 }}
               />
             )}
           />
@@ -149,53 +172,15 @@ const AddGroupModal = ({
               width: '90%',
               alignSelf: 'center',
             }}
-            keyExtractor={(item) => item.crendetialId}
-            renderItem={({item, index}) => (
-              <Pressable
-                style={{marginBottom: 5}}
-                onPress={() => {
-                  console.log();
-                  if (creds[index].selected) {
-                    creds[index].selected = false;
-                  } else {
-                    creds[index].selected = true;
-                  }
-                  setCreds([...creds]);
-                }}>
-                <CredentialsCard
-                  schemeId={item['schemaId']}
-                  card_title={item.name}
-                  card_type={item.type}
-                  issuer={item.organizationName}
-                  card_user=""
-                  date={
-                    item.values['Issue Time']
-                      ? get_local_issue_date(item.values['Issue Time'])
-                      : undefined
-                  }
-                  card_logo={{uri: item.imageUrl}}
-                />
-                {item.selected && (
-                  <FeatherIcon
-                    name="check"
-                    size={30}
-                    color={GREEN_COLOR}
-                    style={{
-                      position: 'absolute',
-                      top: -5,
-                      right: -5,
-                    }}
-                  />
-                )}
-              </Pressable>
-            )}
+            keyExtractor={(item, index) => item.credentialId + ':' + index.toString()}
+            renderItem={renderItem}
           />
         ) : (
           <EmptyList
             onRefresh={onRefresh}
             refreshing={refreshing}
             text="There are no certificates in your wallet. Once you receive a certificate, it will show up here."
-            image={require('../assets/images/credentialsempty.png')}
+            image={require('../../../assets/images/credentialsempty.png')}
             style={{
               marginTop: 20,
             }}
@@ -209,7 +194,7 @@ const AddGroupModal = ({
           title="Create Group"
           titleColor={WHITE_COLOR}
           buttonColor={GREEN_COLOR}
-          style={{marginTop: 20}}
+          style={{ marginTop: 20 }}
         />
         <SimpleButton
           width={250}
@@ -217,7 +202,7 @@ const AddGroupModal = ({
           title="Close"
           titleColor={WHITE_COLOR}
           buttonColor={GRAY_COLOR}
-          style={{marginTop: 5}}
+          style={{ marginTop: 5 }}
         />
       </SafeAreaView>
     </Modal>
@@ -241,7 +226,7 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE_COLOR,
     paddingHorizontal: 20,
     shadowColor: 'black',
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5,

@@ -9,15 +9,7 @@ import {
 } from '../helpers/analytics';
 import {getItem, saveItem} from '../helpers/Storage';
 import {get_all_connections} from './connections';
-
-export async function getToken() {
-  let resp = await AuthenticateUser();
-  if (resp.success) {
-    return resp.token;
-  } else {
-    return '';
-  }
-}
+import { getToken } from './auth';
 
 // Get Specific Credential
 export async function get_credential(credentialID: string) {
@@ -206,6 +198,7 @@ export async function generate_credential_qr(credentialId: string) {
     });
     return result;
   } catch (error) {
+    console.log('error => ', error)
     throw error;
   }
 }

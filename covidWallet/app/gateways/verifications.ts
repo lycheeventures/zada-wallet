@@ -6,15 +6,7 @@ import {
   analytics_log_submit_connectionless_verification_request,
 } from '../helpers/analytics';
 import { ZADA_AUTH_TEST } from '../helpers/ConfigApp';
-
-async function getToken() {
-  let resp = await AuthenticateUser();
-  if (resp.success) {
-    return resp.token;
-  } else {
-    return '';
-  }
-}
+import { getToken } from './auth';
 
 // Get All Verification Proposals API
 export async function get_all_verification_proposals() {
