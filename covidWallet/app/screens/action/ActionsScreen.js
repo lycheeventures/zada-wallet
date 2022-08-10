@@ -101,8 +101,7 @@ function ActionsScreen({ navigation }) {
   const [verifyPincodeError, setVerifyPincodeError] = useState('');
 
   // Notification hook
-  const { notificationReceived, isZadaAuth, authData, setZadaAuth, setAuthData } =
-    useNotification();
+  const { isZadaAuth, authData } = useNotification();
 
   var requestArray = [];
 
@@ -173,12 +172,13 @@ function ActionsScreen({ navigation }) {
     return;
   }, []);
 
-  // Update Actionlist if notificationReceived is true.
-  useEffect(() => {
-    if (notificationReceived) {
-      // updateActionsList();
-    }
-  }, [notificationReceived]);
+  // // Update Actionlist if notificationReceived is true.
+  // useEffect(() => {
+  //   if (notificationReceived) {
+  //     dispatch(fetchActions());
+  //     // updateActionsList();
+  //   }
+  // }, [dispatch, notificationReceived]);
 
   // useFocusEffect(
   //   React.useCallback(() => {

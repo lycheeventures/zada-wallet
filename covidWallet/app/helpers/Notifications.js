@@ -63,38 +63,35 @@ function getAllDeliveredNotifications() {
 //Android: Automatically triggered on notification arrival for android
 //IOS: Triggered on clicking notification from notification center
 async function receiveNotificationEventListener(notification) {
-  let verData = null;
-  let result = null;
-  switch (notification.data.type) {
-    case CRED_OFFER:
-      result = await addCredentialToActionList(notification.data.metadata);
-      break;
+  // let verData = null;
+  // let result = null;
+  // switch (notification.data.type) {
+  //   case CRED_OFFER:
+  //     result = await addCredentialToActionList(notification.data.metadata);
+  //     break;
 
-    case VER_REQ:
-      result = await addVerificationToActionList(notification.data.metadata);
-      verData = result;
-      break;
+  //   case VER_REQ:
+  //     result = await addVerificationToActionList(notification.data.metadata);
+  //     break;
 
-    default:
-      break;
-  }
+  //   default:
+  //     break;
+  // }
+
 
   if (Platform.OS === 'ios') {
     notification.finish(PushNotificationIOS.FetchResult.NoData);
   } else {
+    PushNotification.invokeApp(notification);
     //TODO: Process Android notification here
     showLocalNotification(
       notification.data.title,
       notification.data.body,
       DROID_CHANNEL_ID,
       true,
-      true,
+      true
     );
   }
-  if (notification.data.type == VER_REQ && verData.isZadaAuth)
-    return { auth_verification: true, data: verData.data };
-  else
-    return { auth_verification: false, data: null };
 }
 
 async function onRegisterEventListener(token) {
@@ -131,6 +128,7 @@ function initNotifications(localReceiveNotificationEventListener) {
   // }
 
   if (Platform.OS === 'android') {
+    console.log('its android.');
     PushNotification.getChannels(function (channel_ids) {
     });
 
