@@ -195,11 +195,11 @@ function NavigationComponent() {
             </Stack.Navigator>
           ) : isFirstTime === 'true' ? (
             <Stack.Navigator screenOptions={{...navigationAnimation}}>
-              {/* <Stack.Screen
+              <Stack.Screen
                 options={{headerShown: false}}
                 name="IntroScreen"
                 component={IntroScreen}
-              /> */}
+              />
 
               <Stack.Screen
                 options={{headerShown: false}}
