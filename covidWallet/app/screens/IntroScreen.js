@@ -40,17 +40,10 @@ function IntroScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.welcomeText}> Welcome! </Text> */}
       <View style={styles.containerSwiper}>
         <Swiper style={styles.wrapper} showsButtons={false} showsPagination={true}>
           {Slides.map((item, index) => {
             let imageStyle = styles.swiperImage;
-            // if (index === 1) {
-            //   imageStyle = { ...imageStyle, height: 120, width: 250 };
-            // }
-            // if (index === 2) {
-            //   imageStyle = { ...imageStyle, height: 240, width: 300 };
-            // }
             return (
               <View style={styles.slide1}>
                 <View style={styles.imageViewStyle}>
