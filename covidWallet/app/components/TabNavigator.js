@@ -6,11 +6,16 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import ActionsScreen from '../screens/action/ActionsScreen';
 import ConnectionsScreen from '../screens/ConnectionsScreen';
 import CredentialsScreen from '../screens/credential/CredentialsScreen';
-import { PRIMARY_COLOR, SECONDARY_COLOR, BLACK_COLOR } from '../theme/Colors';
+import { PRIMARY_COLOR, SECONDARY_COLOR } from '../theme/Colors';
+import { useAppSelector } from '../store';
+import { selectActionCount } from '../store/actions/selectors';
 
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
+  // Constants
+  const actionCount = useAppSelector(selectActionCount);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -34,7 +39,11 @@ function TabNavigator() {
         activeTintColor: PRIMARY_COLOR,
         inactiveTintColor: SECONDARY_COLOR,
       }}>
-      <Tab.Screen name="Actions" component={ActionsScreen} />
+      <Tab.Screen
+        name="Actions"
+        component={ActionsScreen}
+        options={{ tabBarBadge: actionCount === 0 ? undefined : actionCount }}
+      />
       <Tab.Screen name="Certificates" component={CredentialsScreen} />
       <Tab.Screen name="Connections" component={ConnectionsScreen} />
     </Tab.Navigator>
