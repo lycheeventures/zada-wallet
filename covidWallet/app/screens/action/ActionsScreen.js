@@ -193,12 +193,6 @@ function ActionsScreen({ navigation }) {
     }, [])
   );
 
-  useEffect(() => {
-    if (actionStatus === 'succeeded') {
-      dispatch(changeActionStatus('idle'));
-    }
-  }, [actionStatus, dispatch]);
-
   React.useLayoutEffect(() => {
     navigation.dangerouslyGetParent().setOptions(headerOptions);
   }, [isAction, navigation]);
