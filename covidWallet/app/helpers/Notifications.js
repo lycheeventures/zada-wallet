@@ -63,22 +63,6 @@ function getAllDeliveredNotifications() {
 //Android: Automatically triggered on notification arrival for android
 //IOS: Triggered on clicking notification from notification center
 async function receiveNotificationEventListener(notification) {
-  // let verData = null;
-  // let result = null;
-  // switch (notification.data.type) {
-  //   case CRED_OFFER:
-  //     result = await addCredentialToActionList(notification.data.metadata);
-  //     break;
-
-  //   case VER_REQ:
-  //     result = await addVerificationToActionList(notification.data.metadata);
-  //     break;
-
-  //   default:
-  //     break;
-  // }
-
-
   if (Platform.OS === 'ios') {
     notification.finish(PushNotificationIOS.FetchResult.NoData);
   } else {
@@ -119,13 +103,6 @@ function onRegistrationErrorEventListener(err) {
 
 function initNotifications(localReceiveNotificationEventListener) {
   // NOTIFICATION START
-
-  // //Run every 5 seconds
-  // if (Platform.OS === 'ios') {
-  //   setInterval(() => {
-  //     checkNotificationIOS();
-  //   }, 5000)
-  // }
 
   if (Platform.OS === 'android') {
     console.log('its android.');
@@ -196,7 +173,6 @@ module.exports = {
   onRegisterEventListener: onRegisterEventListener,
   onActionEventListener: onActionEventListener,
   onRegistrationErrorEventListener: onRegistrationErrorEventListener,
-  getAllDeliveredNotifications: getAllDeliveredNotifications,
   // iOSforegroundTrigger: iOSforegroundTrigger,
   initNotifications: initNotifications,
   DROID_CHANNEL_ID: DROID_CHANNEL_ID,

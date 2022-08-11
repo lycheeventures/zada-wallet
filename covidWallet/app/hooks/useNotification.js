@@ -44,7 +44,7 @@ const useNotification = () => {
   }
 
   async function localReceiveNotificationEventListener(notification) {
-    console.log('local notification');
+    receiveNotificationEventListener(notification);
     // let notiObj = {
     //   data: {
     //     body: 'You have received a credential offer',
