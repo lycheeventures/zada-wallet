@@ -105,7 +105,6 @@ function initNotifications(localReceiveNotificationEventListener) {
   // NOTIFICATION START
 
   if (Platform.OS === 'android') {
-    console.log('its android.');
     PushNotification.getChannels(function (channel_ids) {
     });
 
