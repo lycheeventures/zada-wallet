@@ -106,13 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE_COLOR,
   },
 
-  wrapper: {
-    // flex: 1,
-    borderWidth: 2,
-  },
-
   imageViewStyle: {
-    // borderWidth: 2,
     flex: 1,
     justifyContent: 'flex-end',
   },
@@ -142,6 +136,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
   },
   swiperText2: {
+    marginTop: 8,
     marginHorizontal: 16,
     textAlign: 'center',
     color: BLACK_COLOR,
