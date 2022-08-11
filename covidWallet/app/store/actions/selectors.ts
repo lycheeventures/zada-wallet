@@ -37,6 +37,9 @@ export const selectActions = ActionAdapter.getSelectors(
   (state: RootState) => state.actions
 );
 
+// Total Actions
+export const selectActionCount = selectActions.selectTotal;
+
 // Connection Selector
 export const selectConnectionActions = createSelector(
   selectActions.selectAll,
