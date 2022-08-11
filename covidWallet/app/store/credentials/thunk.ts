@@ -65,7 +65,7 @@ export const fetchCredentials = createAsyncThunk(
 
       return credObj;
     } catch (e: any) {
-      return e.message;
+      throw e;
     }
   }
 );
@@ -74,22 +74,26 @@ export const fetchCredentials = createAsyncThunk(
 export const removeCredentials = createAsyncThunk(
   'credential/removeCredentials',
   async (credentialId: string, { getState, dispatch }) => {
-    // Current State
-    let { credential } = getState() as RootState;
-    let credObj = credential.entities;
+    try {
+      // Current State
+      let { credential } = getState() as RootState;
+      let credObj = credential.entities;
 
-    // Delete credentials API call
-    await CredentialAPI.delete_credential(credentialId);
+      // Delete credentials API call
+      await CredentialAPI.delete_credential(credentialId);
 
-    // Removing Credentials from local storage
-    let cred = Object.values(credObj).find((x) => x?.credentialId == credentialId);
-    if (cred?.credentialId) {
-      dispatch(deleteCredential(cred?.credentialId));
+      // Removing Credentials from local storage
+      let cred = Object.values(credObj).find((x) => x?.credentialId == credentialId);
+      if (cred?.credentialId) {
+        dispatch(deleteCredential(cred?.credentialId));
 
-      // Removing Credentials Group from Async storage
-      delete_credential_from_groups(cred?.credentialId);
+        // Removing Credentials Group from Async storage
+        delete_credential_from_groups(cred?.credentialId);
+      }
+      return { success: true };
+    } catch (e) {
+      throw e;
     }
-    return { success: true };
   }
 );
 

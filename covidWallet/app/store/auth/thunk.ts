@@ -20,6 +20,6 @@ export const fetchToken = () => async (dispatch: any) => {
     }
     dispatch(updateToken(response));
   } catch (e) {
-    return console.error(e);
+    throw e;
   }
 };

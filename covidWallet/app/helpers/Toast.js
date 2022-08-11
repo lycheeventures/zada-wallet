@@ -12,6 +12,11 @@ export function _showAlert(title, message) {
   if (typeof message === 'object') {
     message = JSON.stringify(message);
   }
+
+  if (typeof message === 'string' && message.startsWith('<!DOCTYPE')) {
+    Alert.alert(title, 'Something went Wrong');
+  }
+
   Alert.alert(title, message);
 }
 
