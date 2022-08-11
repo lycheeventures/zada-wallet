@@ -38,10 +38,8 @@ export const slice = createSlice({
     });
     builder.addCase(fetchActions.rejected, (state, action) => {
       // Handle the rejected result
-      if (action.error) {
-        state.status = 'failed';
-        state.error = action.error.message;
-      }
+      state.status = 'failed';
+      state.error = action?.error?.message;
     });
   },
 });

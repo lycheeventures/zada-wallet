@@ -35,7 +35,7 @@ export const fetchActions = createAsyncThunk(
 
       return actions;
     } catch (e: any) {
-      return e.message;
+      throw e;
     }
   }
 );

@@ -25,7 +25,6 @@ export const slice = createSlice({
   extraReducers: (builder) => {
     // Fetch connection.
     builder.addCase(fetchConnections.pending, (state, action) => {
-      // Handle the fetch result pending
       if (state.status === 'idle') {
         state.status = 'loading';
       }
@@ -37,15 +36,12 @@ export const slice = createSlice({
       }
     });
     builder.addCase(fetchConnections.rejected, (state, action) => {
-      if (action.payload) {
-        state.status = 'failed';
-        state.error = action.error.message;
-      }
+      state.status = 'failed';
+      state.error = action?.error?.message;
     });
 
     // Accept Connection
     builder.addCase(acceptConnection.pending, (state, action) => {
-      // Handle the accept connection result by inserting the connection.
       state.status = 'pending';
     });
     builder.addCase(acceptConnection.fulfilled, (state, action) => {
@@ -54,10 +50,8 @@ export const slice = createSlice({
       }
     });
     builder.addCase(acceptConnection.rejected, (state, action) => {
-      if (action.payload) {
-        state.status = 'failed';
-        state.error = action.error.message;
-      }
+      state.status = 'failed';
+      state.error = action?.error?.message;
     });
 
     // Delete connection.
@@ -70,10 +64,8 @@ export const slice = createSlice({
       }
     });
     builder.addCase(removeConnection.rejected, (state, action) => {
-      if (action.error) {
-        state.status = 'failed';
-        state.error = action.error.message;
-      }
+      state.status = 'failed';
+      state.error = action?.error?.message;
     });
   },
 });

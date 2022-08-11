@@ -34,10 +34,8 @@ export const slice = createSlice({
       }
     });
     builder.addCase(fetchCredentials.rejected, (state, action) => {
-      if (action.error) {
-        state.status = 'failed';
-        state.error = action.error.message;
-      }
+      state.status = 'failed';
+      state.error = action?.error?.message;
     });
 
     // Remove Credentials
@@ -50,10 +48,8 @@ export const slice = createSlice({
       }
     });
     builder.addCase(removeCredentials.rejected, (state, action) => {
-      if (action.error) {
-        state.status = 'failed';
-        state.error = action.error.message;
-      }
+      state.status = 'failed';
+      state.error = action?.error?.message;
     });
   },
 });
