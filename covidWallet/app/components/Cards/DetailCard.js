@@ -33,7 +33,7 @@ const DetailCard = ({ schemaId, imageUrl, issue_date, organizationName, setShowQ
     }
 
     return (
-        <TouchableComponent onPress={handleQRPress}>
+        <TouchableComponent style={{ overflow: 'hidden' }} onPress={handleQRPress}>
             <CardBackground schemeId={schemaId}>
                 <View style={styles.issueTextContainerStyle}>
                     <Text style={styles.issueTextStyle}>{date}</Text>

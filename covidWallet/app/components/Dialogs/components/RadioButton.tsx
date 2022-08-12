@@ -19,7 +19,7 @@ const RadioButton = (props: INProps) => {
   return (
     <TouchableComponent
       onPress={toggleCheck}
-      style={{flexDirection: 'row', height: 40, alignItems: 'center'}}>
+      style={{flexDirection: 'row', height: 40, alignItems: 'center', overflow: 'hidden'}}>
       <CheckBox
         containerStyle={{padding: 0}}
         checked={props.isChecked}
