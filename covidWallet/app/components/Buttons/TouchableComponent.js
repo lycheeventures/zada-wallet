@@ -10,7 +10,7 @@ const TouchableComponent = (props) => {
     );
   } else {
     return (
-      <View style={{ borderRadius: 16, overflow: 'hidden' }}>
+      <View style={{ borderRadius: 16 }}>
         <Pressable android_ripple={{ borderless: false }} {...props}>
           {props.children}
         </Pressable>
