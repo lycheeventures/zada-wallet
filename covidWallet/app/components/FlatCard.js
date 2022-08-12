@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   touchableStyle: {
+    overflow: 'hidden',
     paddingTop: 8,
     paddingBottom: 12,
     borderRadius: 16,
