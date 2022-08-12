@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
 
   swiperImage: {
-    width: 300,
+    width: 280,
     height: 250,
     backgroundColor: 'white',
   },
