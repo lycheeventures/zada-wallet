@@ -756,7 +756,7 @@ function ActionsScreen({ navigation }) {
             }}
             contentContainerStyle={{
               width: '100%',
-              height: DIMENSIONS.height,
+              paddingBottom: 100,
             }}
             keyExtractor={(rowData, index) => {
               return index;
