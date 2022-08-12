@@ -5,14 +5,16 @@ import {
   View,
   KeyboardAvoidingView,
   Platform,
-  // Modal,
   Animated,
+  Dimensions,
+  Pressable,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { BACKGROUND_COLOR, BLACK_COLOR, WHITE_COLOR } from '../theme/Colors';
 import TouchableComponent from './Buttons/TouchableComponent';
 import InputPinComponent from './Input/InputPinComponent';
 
+const { width } = Dimensions.get('screen');
 // PC= pincode
 // CPC = confirm pincode;
 const PincodeModal = ({
@@ -72,6 +74,13 @@ const PincodeModal = ({
       startShake();
       return;
     }
+    if (confirmPincode.length === 6) {
+      setTimeout(() => {
+        setType('PC');
+        onPincodeChange('');
+        onConfirmPincodeChange('');
+      }, 1000);
+    }
 
     onContinueClick();
   };
@@ -85,14 +94,15 @@ const PincodeModal = ({
 
   // Render
   const backButton = () => (
-    <TouchableComponent
+    <Pressable
+      android_ripple={{ borderless: false }}
       onPress={_handleBackPress}
       underlayColor={'#00000000'}
       style={styles.backButtonStyle}>
       <Text style={[styles._btnTitle, { color: BLACK_COLOR, fontWeight: 'bold' }]}>
         Back
       </Text>
-    </TouchableComponent>
+    </Pressable>
   );
 
   const renderView = () => {
@@ -159,6 +169,7 @@ const PincodeModal = ({
       <View style={{ flex: 1 }}>
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingViewStyle}
+          keyboardShouldPersistTaps="always"
           contentContainerStyle={{ flex: 1 }}
           behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
           <View style={[styles._mainContainer, { backgroundColor: BACKGROUND_COLOR }]}>
@@ -184,6 +195,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     fontSize: 18,
     marginTop: '20%',
+    fontFamily: 'Poppins-Regular',
+    color: BLACK_COLOR,
   },
   pincodeViewStyle: {
     marginTop: 24,
@@ -196,7 +209,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   _button: {
-    width: '80%',
+    width: width - 100,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,

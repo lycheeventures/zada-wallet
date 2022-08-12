@@ -1,5 +1,13 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Animated } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  Animated,
+  Keyboard,
+} from 'react-native';
 import { RED_COLOR } from '../../theme/Colors';
 
 interface INProps {
@@ -17,10 +25,24 @@ const InputPinComponent = (props: INProps) => {
   // States
   const [code, setCode] = useState('');
   const [containerIsFocused, setContainerIsFocused] = useState(false);
+  const [keyboardStatus, setKeyboardStatus] = useState(undefined);
 
   // Refs
   const ref = useRef<TextInput>(null);
 
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      ref?.current?.focus();
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      ref?.current?.blur();
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
   // Functions
   const handleOnPress = () => {
     setContainerIsFocused(true);
@@ -29,6 +51,7 @@ const InputPinComponent = (props: INProps) => {
 
   const handleOnBlur = () => {
     setContainerIsFocused(false);
+    ref?.current?.blur();
   };
   const handleCodeChange = (text: string) => {
     setCode(text);
@@ -67,7 +90,7 @@ const InputPinComponent = (props: INProps) => {
         value={code}
         onChangeText={handleCodeChange}
         onSubmitEditing={handleOnBlur}
-        keyboardType="number-pad"
+        keyboardType="phone-pad"
         returnKeyType="done"
         textContentType="oneTimeCode"
         maxLength={CODE_LENGTH}
