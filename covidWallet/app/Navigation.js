@@ -37,7 +37,7 @@ import AboutUs from './screens/AboutUs';
 import ContactUs from './screens/ContactUs';
 import IntroScreen from './screens/IntroScreen';
 import useInit from './hooks/useInit';
-import { updateToken } from './store/auth';
+import { logout, updateToken } from './store/auth';
 import { useAppDispatch } from './store';
 
 const Stack = createStackNavigator();
@@ -136,6 +136,7 @@ function NavigationComponent() {
       logout: () => {
         _loggingOut();
         getisFirstTime('true');
+        dispatch(logout());
       },
     }),
     [],

@@ -18,10 +18,11 @@ const slice = createSlice({
     updateToken: (state, action: PayloadAction<string | undefined>) => {
       if (action.payload) state.token = action.payload;
     },
+    logout: (state) => {},
   },
 });
 
 // Exporting Actions
-export const { updateToken } = slice.actions;
+export const { updateToken, logout } = slice.actions;
 
 export { slice as AuthSlice };
