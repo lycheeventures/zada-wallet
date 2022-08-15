@@ -338,7 +338,7 @@ function DetailsScreen(props) {
             <div class="cell" id="ir6hs">
               <div id="iutjp">
                 <span id="iizaq"
-                  >Date: ${get_local_date_time(new Date())}</span
+                  >PDF Creation Date: ${get_local_date_time(new Date())}</span
                 >
               </div>
             </div>
