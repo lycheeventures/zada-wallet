@@ -145,7 +145,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode 100
+        versionCode 101
         versionName "1.2.9(3)"
 
         setProperty("archivesBaseName", "ZADA-V-$versionName")
