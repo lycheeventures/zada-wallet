@@ -174,17 +174,6 @@ function SecurityScreen({navigation}) {
       return
     }
 
-
-    setIsPincode(true);
-    setShowPinCodeModal(false);
-    showMessage(
-      'Zada Wallet',
-      'Your pincode is set successfully. Please keep it safe and secure.',
-    );
-    setPincode('');
-    setConfirmPincode('');
-    navigation.navigate('NotifyMeScreen');
-
     // Saving pincode in async
     try {
       await saveItem(ConstantsList.PIN_CODE, pincode);
