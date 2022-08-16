@@ -3,6 +3,7 @@ import { RootState } from '..';
 import { CredentialAPI, VerificationAPI } from '../../gateways';
 import ConstantsList from '../../helpers/ConfigApp';
 import { IConnectionObject } from '../connections/interface';
+import { ICredentialObject } from '../credentials/interface';
 
 export const fetchActions = createAsyncThunk(
   'actions/fetchActions',
@@ -22,10 +23,8 @@ export const fetchActions = createAsyncThunk(
       if (response.data.success) {
         for (let i = 0; i < offers.length; ++i) {
           // Adding Credential Object
-          actions.actions[i] = await createCredentialObject(
-            offers[i].credentialId,
-            connArr
-          );
+          offers[i]['type'] = ConstantsList.CRED_OFFER;
+          actions.actions[i] = addImageAndNameFromConnectionList(offers[i], connArr);
         }
       }
 
@@ -39,26 +38,6 @@ export const fetchActions = createAsyncThunk(
     }
   }
 );
-
-// Create Crendential Object
-const createCredentialObject = async (
-  credentialID: string,
-  connections: IConnectionObject[]
-) => {
-  try {
-    let result = await CredentialAPI.get_credential(credentialID);
-
-    if (result.data.success) {
-      let obj = result.data.credential;
-      obj['type'] = ConstantsList.CRED_OFFER;
-      console.log('obj => ', obj);
-      obj = addImageAndNameFromConnectionList(obj, connections);
-      return obj;
-    }
-  } catch (e) {
-    throw e;
-  }
-};
 
 // Create Verification Object
 const createVerificationObject = async (connections: IConnectionObject[]) => {

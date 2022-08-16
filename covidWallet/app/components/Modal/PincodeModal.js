@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,15 +10,21 @@ import {
   Pressable,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { BACKGROUND_COLOR, BLACK_COLOR, WHITE_COLOR } from '../theme/Colors';
-import TouchableComponent from './Buttons/TouchableComponent';
-import InputPinComponent from './Input/InputPinComponent';
+import {
+  BACKGROUND_COLOR,
+  BLACK_COLOR,
+  GREEN_COLOR,
+  WHITE_COLOR,
+} from '../../theme/Colors';
+import TouchableComponent from '../Buttons/TouchableComponent';
+import InputPinComponent from '../Input/InputPinComponent';
 
 const { width } = Dimensions.get('screen');
 // PC= pincode
 // CPC = confirm pincode;
 const PincodeModal = ({
-  isVisible,
+  modalType, // 'verify'
+  isVisible, // true | false
   onCloseClick,
   onContinueClick,
   pincode,
@@ -31,17 +37,42 @@ const PincodeModal = ({
   // States
   const [type, setType] = useState('PC');
   const [animatedValue] = useState(new Animated.Value(0));
+  const [buttonBackgroundValue, setButtonBackgroundValue] = useState(
+    new Animated.Value(0)
+  );
+  const [mark, setMark] = useState(false);
 
   // UseEffects
   useEffect(() => {
     if (pincode.length === 6) {
-      _handleContinueClick();
+      setTimeout(() => {
+        _handleContinueClick();
+        setMark(false);
+        setButtonBackgroundValue(new Animated.Value(0));
+      }, 1000);
+
+      setMark(true);
     }
   }, [pincode]);
 
+  useEffect(() => {
+    if (mark) {
+      Animated.timing(buttonBackgroundValue, {
+        toValue: 100,
+        duration: 500,
+      }).start();
+    }
+  }, [mark, buttonBackgroundValue]);
+
+  useEffect(() => {
+    if (pincodeError !== '' || confirmPincodeError !== '') {
+      startShake();
+    }
+  }, [pincodeError, confirmPincodeError, startShake]);
+
   // Functions
   // Shake Animation
-  const startShake = () => {
+  const startShake = useCallback(() => {
     Animated.sequence([
       Animated.timing(animatedValue, {
         toValue: 10,
@@ -64,14 +95,19 @@ const PincodeModal = ({
         useNativeDriver: true,
       }),
     ]).start();
-  };
+  }, [animatedValue]);
 
   // Handle continue button
   const _handleContinueClick = () => {
-    // Handling pincode
+    // Handling Verification
+    if (modalType === 'verify') {
+      onContinueClick();
+      return;
+    }
+
+    // Handling Pincode Setting
     if (type === 'PC' && pincode.length === 6) {
       setType('CPC');
-      startShake();
       return;
     }
     if (confirmPincode.length === 6) {
@@ -93,23 +129,54 @@ const PincodeModal = ({
   };
 
   // Render
-  const backButton = () => (
+  const renderTopLeftButton = (title, func) => (
     <Pressable
       android_ripple={{ borderless: false }}
-      onPress={_handleBackPress}
+      onPress={func}
       underlayColor={'#00000000'}
       style={styles.backButtonStyle}>
       <Text style={[styles._btnTitle, { color: BLACK_COLOR, fontWeight: 'bold' }]}>
-        Back
+        {title}
       </Text>
     </Pressable>
   );
+
+  const renderVerifyView = () => {
+    return (
+      <>
+        {renderTopLeftButton('Cancel', () => {
+          onCloseClick();
+        })}
+        <Text style={styles._infoText}>
+          Please enter your 6 digit pincode to verify request
+        </Text>
+        <Animated.View
+          style={[
+            styles.pincodeViewStyle,
+            { transform: [{ translateX: animatedValue }] },
+          ]}>
+          <InputPinComponent
+            onPincodeChange={onPincodeChange}
+            pincodeError={pincodeError}
+          />
+        </Animated.View>
+        <View style={styles._btnContainer}>
+          <TouchableComponent
+            onPress={onContinueClick}
+            underlayColor={BLACK_COLOR}
+            style={[styles._button, { backgroundColor: '#28282B' }]}>
+            <Text style={styles._btnTitle}>CONTINUE</Text>
+          </TouchableComponent>
+        </View>
+      </>
+    );
+  };
 
   const renderView = () => {
     if (type === 'CPC') {
       return (
         <>
-          {backButton()}
+          {renderTopLeftButton('Back', _handleBackPress)}
           <Text style={styles._infoText}>Please confirm PIN Again.</Text>
           <Animated.View
             style={[
@@ -149,8 +216,23 @@ const PincodeModal = ({
             <TouchableComponent
               onPress={_handleContinueClick}
               underlayColor={BLACK_COLOR}
-              style={[styles._button, { backgroundColor: '#28282B' }]}>
-              <Text style={styles._btnTitle}>Next</Text>
+              // style={[
+              //   ,
+              //   { backgroundColor: mark ? GREEN_COLOR : '#28282B' },
+              // ]}
+            >
+              <Animated.View
+                style={[
+                  styles._button,
+                  {
+                    backgroundColor: buttonBackgroundValue.interpolate({
+                      inputRange: [0, 100],
+                      outputRange: ['#28282B', GREEN_COLOR],
+                    }),
+                  },
+                ]}>
+                <Text style={styles._btnTitle}>Next</Text>
+              </Animated.View>
             </TouchableComponent>
           </View>
         </>
@@ -173,7 +255,7 @@ const PincodeModal = ({
           contentContainerStyle={{ flex: 1 }}
           behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
           <View style={[styles._mainContainer, { backgroundColor: BACKGROUND_COLOR }]}>
-            {renderView()}
+            {modalType === 'verify' ? renderVerifyView() : renderView()}
           </View>
         </KeyboardAvoidingView>
       </View>

@@ -13,7 +13,7 @@ import {BACKGROUND_COLOR} from '../theme/Colors';
 import ImageBoxComponent from '../components/ImageBoxComponent';
 import TextComponent from '../components/TextComponent';
 import GreenPrimaryButton from '../components/GreenPrimaryButton';
-import PincodeModal from '../components/PincodeModal';
+import PincodeModal from '../components/Modal/PincodeModal';
 import {pincodeRegex} from '../helpers/validation';
 import {showMessage} from '../helpers/Toast';
 import {saveItem} from '../helpers/Storage';

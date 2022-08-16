@@ -41,7 +41,11 @@ function IntroScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.containerSwiper}>
-        <Swiper style={styles.wrapper} showsButtons={false} showsPagination={true}>
+        <Swiper
+          style={styles.wrapper}
+          showsButtons={true}
+          showsPagination={true}
+          scrollEnabled={false}>
           {Slides.map((item, index) => {
             let imageStyle = styles.swiperImage;
             return (
