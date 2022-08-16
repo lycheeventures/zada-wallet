@@ -30,7 +30,7 @@ import {getItem, saveItem} from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import EmailWarning from '../components/EmailWarning';
-import PincodeModal from '../components/PincodeModal';
+import PincodeModal from '../components/Modal/PincodeModal';
 import {_handleAxiosError} from '../helpers/AxiosResponse';
 
 const ProfileScreen = () => {

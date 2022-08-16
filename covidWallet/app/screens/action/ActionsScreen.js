@@ -39,7 +39,7 @@ import { delete_verification, submit_verification } from '../../gateways/verific
 import useNotification from '../../hooks/useNotification';
 import OverlayLoader from '../../components/OverlayLoader';
 import { analytics_log_action_screen } from '../../helpers/analytics';
-import PincodeModal from '../../components/PincodeModal';
+import PincodeModal from '../../components/Modal/PincodeModal';
 import { pincodeRegex } from '../../helpers/validation';
 import ConfirmPincodeModal from '../../components/ConfirmPincodeModal';
 import PullToRefresh from '../../components/PullToRefresh';
@@ -421,6 +421,8 @@ function ActionsScreen({ navigation }) {
         }, 100);
       }
     }
+    setIsLoading(false);
+    setLoaderText(null);
   };
 
   // put analytic for action screen
@@ -461,6 +463,7 @@ function ActionsScreen({ navigation }) {
     } else {
       selectedItemObj = JSON.parse(selectedItem);
     }
+    setSelectedItem(JSON.stringify(v));
 
     setModalVisible(false);
     setIsLoading(true);
@@ -650,6 +653,8 @@ function ActionsScreen({ navigation }) {
           // Deleting Verification
           await delete_verification(selectedItemObj.verificationId);
 
+          _showAlert('Zada Wallet', 'Verification request has been rejected!');
+
           // Deleting Verification from action list
           dispatch(
             deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId)
@@ -666,15 +671,15 @@ function ActionsScreen({ navigation }) {
           deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId)
         );
       }
-
-      setIsLoading(false);
-      setLoaderText(null);
     } else {
       showMessage(
         'Zada Wallet',
         'You entered incorrect pincode. Please check your pincode and try again'
       );
     }
+    setDialogData(null);
+    setIsLoading(false);
+    setLoaderText(null);
   };
 
   const refreshHandler = () => {
@@ -683,7 +688,7 @@ function ActionsScreen({ navigation }) {
 
   return (
     <View style={themeStyles.mainContainer}>
-      <ConfirmPincodeModal
+      {/* <ConfirmPincodeModal
         isVisible={showConfirmModal}
         pincode={verifyPincode}
         pincodeError={verifyPincodeError}
@@ -691,6 +696,23 @@ function ActionsScreen({ navigation }) {
           setVerifyPincode(text);
           if (text.length == 0 || text == undefined) setVerifyPincodeError('');
         }}
+        onCloseClick={() => {
+          setShowConfirmModal(!showConfirmModal);
+        }}
+        onContinueClick={_confirmingPincode}
+      /> */}
+
+      <PincodeModal
+        modalType={'verify'}
+        isVisible={showConfirmModal}
+        pincode={verifyPincode}
+        onPincodeChange={(text) => {
+          setVerifyPincode(text);
+          if (text.length === 0 || text === undefined) {
+            setVerifyPincodeError('');
+          }
+        }}
+        pincodeError={verifyPincodeError}
         onCloseClick={() => {
           setShowConfirmModal(!showConfirmModal);
         }}
