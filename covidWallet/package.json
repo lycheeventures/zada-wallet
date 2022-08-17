@@ -15,7 +15,7 @@
     "build:android-release": "npm-run-all -l clean:android build:android && pushd android && ./gradlew assembleRelease && popd",
 
     "clean:node":    "rm -rf node_modules && npm install",
-    "clean:ios":     "rm -rf ios/main.jsbundle && pushd ios && pod install && popd",
+    "clean:ios":     "rm -rf ios/main.jsbundle && pushd ios && xcodebuild clean && pod install && popd",
     "clean:android": "pushd android && ./gradlew clean && popd",
 
     "iosTasks":     "npm-run-all -l clean:ios build:ios",
