@@ -398,7 +398,7 @@ function ActionsScreen({ navigation }) {
     if (checkbiometric) {
       setModalVisible(false);
       setIsLoading(true);
-      setLoaderText('Deleting...');
+      setLoaderText('Submitting...');
 
       // Find cred action for deletion.
       let credObj = verificationActions.find(
