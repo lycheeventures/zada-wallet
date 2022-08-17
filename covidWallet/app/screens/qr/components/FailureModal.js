@@ -8,8 +8,8 @@ import HeadingComponent from '../../../components/HeadingComponent';
 const FailureModal = ({ isVisible, heading, info, onOkayPress, onCloseClick }) => {
   return (
     <Modal
-      animationIn="slideInLeft"
-      animationOut="slideOutRight"
+      animationIn="zoomIn"
+      animationOut="zoomOut"
       isVisible={isVisible}
       onBackButtonPress={onCloseClick}
       onBackdropPress={onCloseClick}>

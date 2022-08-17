@@ -30,7 +30,7 @@ import {
   analytics_log_verified_credential,
   analytics_log_verify_cred_qr,
 } from '../helpers/analytics';
-import { submit_cold_verification } from '../gateways/credentials';
+import { submit_cold_verification } from '../gateways/verifications';
 import useNetwork from '../hooks/useNetwork';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
 import ActionDialog from '../components/Dialogs/ActionDialog';

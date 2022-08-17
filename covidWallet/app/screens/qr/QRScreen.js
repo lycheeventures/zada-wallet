@@ -96,10 +96,10 @@ const QRScreen = ({ route, navigation }) => {
       setScanning(true);
 
       const result = await VerificationAPI.submit_cold_verification(
-        credentialData.data,
-        credentialData.signature,
-        credentialData.tenantId,
-        credentialData.keyVersion
+        credentialData.credentials.data,
+        credentialData.credentials.signature,
+        credentialData.credentials.tenantId,
+        credentialData.credentials.keyVersion
       );
 
       if (result.data.success) {
@@ -115,10 +115,12 @@ const QRScreen = ({ route, navigation }) => {
 
       setScanning(false);
       setCredentialData(defaultCredState);
+      setValues(null);
     } catch (error) {
       setErrMsg('Unable to verify credential');
       setScanning(false);
       setCredentialData(defaultCredState);
+      setValues(null);
       setTimeout(() => {
         setShowErrorModal(true);
       }, 500);
@@ -147,6 +149,7 @@ const QRScreen = ({ route, navigation }) => {
             let credObj = handleCredVerification(JSON.parse(e.data));
             // Setting values
             setValues(credObj.sortedValues);
+            console.log('credObj.credential => ', credObj.credential);
             setCredentialData({
               type: 'cred_ver',
               credentials: credObj.credential,

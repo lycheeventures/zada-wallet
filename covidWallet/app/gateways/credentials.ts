@@ -234,30 +234,3 @@ export const fetch_signature_by_cred_id = async (
     return {success: false};
   }
 };
-
-// Do verification of credential
-export const submit_cold_verification = async (
-  data: String,
-  signature: String,
-  tenantId: String,
-  keyVersion: String,
-) => {
-  try {
-    const result = await http_client({
-      method: 'POST',
-      url: '/api/credential/submit_cold_verification',
-      data: {
-        data,
-        signature,
-        tenantId,
-        keyVersion,
-      },
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
-      },
-    });
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
