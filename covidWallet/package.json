@@ -3,14 +3,26 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "ios:dev": "react-native run-ios --scheme \"reactNativeMultiEnvDev\"",
-    "ios:prod": "react-native run-ios --scheme \"reactNativeMultiEnv\"",
-    "clean:ios": "pushd ios && xcodebuild clean && ios",
-    "prep:ios": "pushd ios && pod install && popd",
-    "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios'",
-    "android:dev": "adb reverse tcp:8081 tcp:8081 && react-native run-android --variant Debug",
+    "ios:dev":      "react-native run-ios --scheme \"reactNativeMultiEnvDev\"",
+    "ios:prod":     "react-native run-ios --scheme \"reactNativeMultiEnv\"",
+    "ios:12m":      "npm run ios:dev --simulator='iPhone 12 mini'",
+    "android:dev":  "adb reverse tcp:8081 tcp:8081 && react-native run-android --variant Debug",
     "android:prod": "react-native run-android --variant Release",
-    "clean:android": "pushd android && ./gradlew clean && popd && npm-run-all -l android:dev",
+    
+    "build:ios":             "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios/'",
+    "build:android":         "react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res",
+    "build:android-debug":   "npm-run-all -l clean:android build:android && pushd android && ./gradlew assembleDebug && popd",
+    "build:android-release": "npm-run-all -l clean:android build:android && pushd android && ./gradlew assembleRelease && popd",
+
+    "clean:node":    "rm -rf node_modules && npm install",
+    "clean:ios":     "rm -rf ios/main.jsbundle && pushd ios && pod install && popd",
+    "clean:android": "pushd android && ./gradlew clean && popd",
+
+    "iosTasks":     "npm-run-all -l clean:ios build:ios",
+    "androidTasks": "npm-run-all -l clean:android build:android",
+
+    "build:parallel": "npm-run-all -l clean:node --parallel iosTasks androidTasks",
+
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
