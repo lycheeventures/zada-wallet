@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -14,12 +14,14 @@ import {
   WHITE_COLOR,
   BACKGROUND_COLOR,
 } from '../theme/Colors';
+import ViewShot from "react-native-view-shot";
 import { themeStyles } from '../theme/Styles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
   delete_credential,
   generate_credential_qr,
 } from '../gateways/credentials';
+import QRCode from 'react-native-qrcode-svg';
 import { showMessage, showAskDialog, _showAlert } from '../helpers/Toast';
 import { deleteCredentialByCredId, getItem, saveItem } from '../helpers/Storage';
 import OverlayLoader from '../components/OverlayLoader';
@@ -34,10 +36,20 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
 import { get_local_date_time, get_local_issue_date, parse_date_time } from '../helpers/time';
 import DetailCard from '../components/Cards/DetailCard';
+import { useAppDispatch, useAppSelector } from '../store';
+import { selectCredentialsStatus } from '../store/credentials/selectors';
+import { removeCredentials } from '../store/credentials/thunk';
 
 function DetailsScreen(props) {
-  // Credential
-  const data = props.route.params.data;
+  // Constants
+  const data = props.route.params.data; // Credential
+  const dispatch = useAppDispatch();
+
+  // Selectors
+  const credentialStatus = useAppSelector(selectCredentialsStatus);
+
+  // Refs
+  const viewShotRef = useRef(null);
 
   // States
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +70,7 @@ function DetailsScreen(props) {
             padding={30}
           />
           <MaterialIcons
-            onPress={() => (!isLoading ? showAlert() : {})}
+            onPress={() => (credentialStatus === 'idle' ? showAlert() : {})}
             style={styles.headerRightIcon}
             size={25}
             name="delete"
@@ -69,24 +81,18 @@ function DetailsScreen(props) {
     });
   });
 
+  useEffect(() => {
+    if (credentialStatus === 'succeeded') {
+      showMessage('ZADA Wallet', 'Credential is deleted successfully');
+      props.navigation.goBack();
+    }
+  }, [credentialStatus, props.navigation]);
+
   async function onSuccess() {
     try {
-      setIsLoading(true);
-
-      // Delete credentials Api
-      let result = await delete_credential(data.credentialId);
-      if (result.data.success) {
-        deleteCredentialByCredId(data.credentialId);
-        showMessage('ZADA Wallet', 'Credential is deleted successfully');
-        props.navigation.goBack();
-      } else {
-        showMessage('ZADA Wallet', result.data.message);
-      }
-
-      setIsLoading(false);
+      dispatch(removeCredentials(data.credentialId));
     } catch (e) {
       _handleAxiosError(e);
-      setIsLoading(false);
     }
   }
 
@@ -98,20 +104,7 @@ function DetailsScreen(props) {
     };
     values = JSON.stringify(values);
 
-    const res = await fetch(
-      `https://api.qrserver.com/v1/create-qr-code/?data=${values}`,
-    );
-
-    let blob = await res.blob();
-
-    return new Promise((resolve, reject) => {
-      let reader = new FileReader();
-      reader.onload = (event) => {
-        let base64String = event.target.result;
-        resolve(base64String);
-      };
-      reader.readAsDataURL(blob);
-    });
+    return await viewShotRef.current.capture();
   }
 
   async function generateHTML(jsonData) {
@@ -345,7 +338,7 @@ function DetailsScreen(props) {
             <div class="cell" id="ir6hs">
               <div id="iutjp">
                 <span id="iizaq"
-                  >Date: ${get_local_date_time(new Date())}</span
+                  >PDF Creation Date: ${get_local_date_time(new Date())}</span
                 >
               </div>
             </div>
@@ -394,7 +387,6 @@ function DetailsScreen(props) {
 
   async function generateAndSharePDF() {
     setGeneratingPDF(true);
-    console.log('html', generateHTML(data));
 
     let options = {
       html: await generateHTML(data),
@@ -403,7 +395,6 @@ function DetailsScreen(props) {
     };
 
     let file = await RNHTMLtoPDF.convert(options);
-    console.log('file,', file.filePath);
 
     //setPDFurl(file.filePath);
 
@@ -413,12 +404,10 @@ function DetailsScreen(props) {
         Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath,
     };
 
-    console.log('shareOptions', shareOptions);
     try {
       setGeneratingPDF(false);
 
       const ShareResponse = await Share.open(shareOptions);
-      console.log('ShareResponse', JSON.stringify(ShareResponse, null, 2));
     } catch (error) {
       setGeneratingPDF(false);
 
@@ -495,8 +484,21 @@ function DetailsScreen(props) {
 
   return (
     <View style={[themeStyles.mainContainer]}>
+      {/* hidden QRCODE */}
+      <View style={{ position: "absolute", top: '5%', left: '5%' }}>
+        <ViewShot ref={viewShotRef} options={{ fileName: "QRCode", format: "png", quality: 0.9 }}>
+          <QRCode
+            value={data.qrCode}
+            backgroundColor={BACKGROUND_COLOR}
+            size={Dimensions.get('window').width * 0.7}
+            ecl="L"
+          />
+        </ViewShot>
+      </View>
       <View style={styles.innerContainer}>
-        {isLoading && <OverlayLoader text="Deleting credential..." />}
+        {credentialStatus === 'pending' && (
+          <OverlayLoader text="Deleting credential..." />
+        )}
 
         {isGenerating && <OverlayLoader text="Generating credential QR..." />}
 
