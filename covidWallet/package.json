@@ -3,30 +3,28 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "ios:dev":      "react-native run-ios --scheme \"reactNativeMultiEnvDev\"",
-    "ios:prod":     "react-native run-ios --scheme \"reactNativeMultiEnv\"",
-    "ios:12m":      "npm run ios:dev --simulator='iPhone 12 mini'",
-    "android:dev":  "adb reverse tcp:8081 tcp:8081 && react-native run-android --variant Debug",
+    "/":"Development:",
+    "ios:dev": "react-native run-ios --scheme \"reactNativeMultiEnvDev\"",
+    "ios:prod": "react-native run-ios --scheme \"reactNativeMultiEnv\"",
+    "ios:12m": "npm run ios:dev --simulator='iPhone 12 mini'",
+    "android:dev": "adb reverse tcp:8081 tcp:8081 && react-native run-android --variant Debug",
     "android:prod": "react-native run-android --variant Release",
-    
-    "build:ios":             "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios/'",
-    "build:android":         "react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res",
-    "build:android-debug":   "npm-run-all -l clean:android build:android && pushd android && ./gradlew assembleDebug && popd",
+    "//":"Build:",
+    "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios/'",
+    "build:android": "react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res",
+    "build:android-debug": "npm-run-all -l clean:android build:android && pushd android && ./gradlew assembleDebug && popd",
     "build:android-release": "npm-run-all -l clean:android build:android && pushd android && ./gradlew assembleRelease && popd",
-
-    "clean:node":    "rm -rf node_modules && npm install",
-    "clean:ios":     "rm -rf ios/main.jsbundle && pushd ios && xcodebuild clean && pod install && popd",
+    "///":"Clean:",
+    "clean:node": "rm -rf node_modules && npm install",
+    "clean:ios": "rm -rf ios/main.jsbundle && pushd ios && xcodebuild clean && pod install && popd",
     "clean:android": "pushd android && ./gradlew clean && popd",
-
-    "iosTasks":     "npm-run-all -l clean:ios build:ios",
+    "////":"Deliver:",
+    "iosTasks": "npm-run-all -l clean:ios build:ios",
     "androidTasks": "npm-run-all -l clean:android build:android",
-
     "build:parallel": "npm-run-all -l clean:node --parallel iosTasks androidTasks",
-
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint .",
-    "postinstall": "patch-package"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@eliav2/react-native-collapsible-view": "^1.4.0",
@@ -55,7 +53,6 @@
     "react": "17.0.2",
     "react-native": "0.66.4",
     "react-native-action-button": "^2.8.5",
-    "react-native-appstate-hook": "^1.0.5",
     "react-native-camera": "^3.43.6",
     "react-native-check-version": "^1.0.11",
     "react-native-collapsible": "^1.6.0",
