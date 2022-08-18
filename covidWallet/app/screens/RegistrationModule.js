@@ -1,5 +1,5 @@
-import React, {useRef, useState} from 'react';
-import {Alert} from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Alert } from 'react-native';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Config from 'react-native-config';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import PhoneInput from 'react-native-phone-number-input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -22,26 +22,27 @@ import {
 } from '../theme/Colors';
 import HeadingComponent from '../components/HeadingComponent';
 import ConstantsList from '../helpers/ConfigApp';
-import {saveItem,getItem, removeItem} from '../helpers/Storage';
-import {showMessage, showNetworkMessage, _showAlert} from '../helpers/Toast';
-import {AuthenticateUser} from '../helpers/Authenticate';
-import {InputComponent} from '../components/Input/inputComponent';
+import { saveItem, getItem, removeItem } from '../helpers/Storage';
+import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
+import { AuthenticateUser } from '../helpers/Authenticate';
+import { InputComponent } from '../components/Input/inputComponent';
 import {
   nameRegex,
   validateLength,
   validatePasswordStrength,
 } from '../helpers/validation';
-import {_resgiterUserAPI} from '../gateways/auth';
+import { _resgiterUserAPI } from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import jwt_decode from 'jwt-decode';
-import {_fetchingAppData} from '../helpers/AppData';
+import { _fetchingAppData } from '../helpers/AppData';
 import useNetwork from '../hooks/useNetwork';
-import {_handleAxiosError} from '../helpers/AxiosResponse';
+import { _handleAxiosError } from '../helpers/AxiosResponse';
 import Recaptcha from 'react-native-recaptcha-that-works';
+import TouchableComponent from '../components/Buttons/TouchableComponent';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-function RegistrationModule({navigation}) {
+function RegistrationModule({ navigation }) {
   // States
   const [activeOption, updateActiveOption] = useState('register');
   const [name, setName] = useState('');
@@ -60,7 +61,7 @@ function RegistrationModule({navigation}) {
   const [authCount, setAuthCount] = useState(0);
 
   // Hooks
-  const {isConnected} = useNetwork();
+  const { isConnected } = useNetwork();
 
   // Refs
   const phoneInput = useRef(null);
@@ -77,16 +78,16 @@ function RegistrationModule({navigation}) {
 
   React.useEffect(() => {
     const getCount = async () => {
-        const authCount = JSON.parse(await getItem(ConstantsList.AUTH_COUNT) | 0);
-        setAuthCount(authCount)
-    }
+      const authCount = JSON.parse((await getItem(ConstantsList.AUTH_COUNT)) | 0);
+      setAuthCount(authCount);
+    };
     const clearAuthAsync = async () => {
       removeItem(ConstantsList.REGISTRATION_DATA);
       removeItem(ConstantsList.LOGIN_DATA);
-    }
+    };
     getCount();
     clearAuthAsync();
-  },[])
+  }, []);
 
   React.useEffect(() => {
     if (activeOption == 'register') {
@@ -102,7 +103,7 @@ function RegistrationModule({navigation}) {
     // Check if name is valid.
     if (!nameRegex.test(name) && activeOption == 'register') {
       setNameError(
-        'Please enter a name between 2-1000 alphabetical characters long. No numbers or special characters.',
+        'Please enter a name between 2-1000 alphabetical characters long. No numbers or special characters.'
       );
       return;
     }
@@ -168,20 +169,14 @@ function RegistrationModule({navigation}) {
 
         if (response.success) {
           // new user is going to register
-          await saveItem(
-            ConstantsList.REGISTRATION_DATA,
-            JSON.stringify(response),
-          );
+          await saveItem(ConstantsList.REGISTRATION_DATA, JSON.stringify(response));
           await saveItem(ConstantsList.WALLET_SECRET, secret);
-          navigation.replace('MultiFactorScreen', {from: 'Register'});
+          navigation.replace('MultiFactorScreen', { from: 'Register' });
         } else if (response.verified != undefined && !response.verified) {
           // unverified user come to register
-          await saveItem(
-            ConstantsList.REGISTRATION_DATA,
-            JSON.stringify(response),
-          );
+          await saveItem(ConstantsList.REGISTRATION_DATA, JSON.stringify(response));
           await saveItem(ConstantsList.WALLET_SECRET, secret);
-          navigation.replace('MultiFactorScreen', {from: 'Register'});
+          navigation.replace('MultiFactorScreen', { from: 'Register' });
         } else if (response.verified != undefined && response.verified) {
           // verified user came again to register
           selectionOnPress('login');
@@ -207,12 +202,9 @@ function RegistrationModule({navigation}) {
     try {
       if (response.verified != undefined && !response.verified) {
         // unverified user come to register
-        await saveItem(
-          ConstantsList.REGISTRATION_DATA,
-          JSON.stringify(response),
-        );
+        await saveItem(ConstantsList.REGISTRATION_DATA, JSON.stringify(response));
         await saveItem(ConstantsList.WALLET_SECRET, secret);
-        navigation.replace('MultiFactorScreen', {from: 'Register'});
+        navigation.replace('MultiFactorScreen', { from: 'Register' });
       } else if (response.verified != undefined && response.verified) {
         // verified user came again to register
         selectionOnPress('login');
@@ -244,10 +236,7 @@ function RegistrationModule({navigation}) {
             if (response.success == true) {
               storeUserID(response.userId);
               saveItem(ConstantsList.WALLET_SECRET, secret);
-              await saveItem(
-                ConstantsList.LOGIN_DATA,
-                JSON.stringify(response),
-              );
+              await saveItem(ConstantsList.LOGIN_DATA, JSON.stringify(response));
 
               await authenticateUserToken(response?.type);
             } else {
@@ -259,7 +248,7 @@ function RegistrationModule({navigation}) {
           } finally {
             setProgress(false);
           }
-        }),
+        })
       );
     } else {
       setProgress(false);
@@ -311,7 +300,7 @@ function RegistrationModule({navigation}) {
         } catch (error) {
           _showAlert('ZADA Wallet', `${error.toString()}`);
         }
-      }),
+      })
     );
   };
 
@@ -333,7 +322,7 @@ function RegistrationModule({navigation}) {
             if (isDemo != undefined && isDemo == 'demo') {
               navigation.replace('SecurityScreen');
             } else {
-              navigation.replace('MultiFactorScreen', {from: 'Login'});
+              navigation.replace('MultiFactorScreen', { from: 'Login' });
             }
           } else {
             // if token has not wallet id
@@ -371,7 +360,7 @@ function RegistrationModule({navigation}) {
           width: '88%',
           marginLeft: 4,
         }}
-        textInputStyle={{fontSize: 14, height: 45}}
+        textInputStyle={{ fontSize: 14, height: 45 }}
         countryPickerButtonStyle={{
           width: 65,
           borderRightColor: '00000040',
@@ -404,8 +393,8 @@ function RegistrationModule({navigation}) {
 
   const onVerify = () => {
     submit();
-  }
- 
+  };
+
   // KEYBOARD AVOIDING VIEW
   const keyboardVerticalOffset = Platform.OS == 'ios' ? 100 : 0;
   const keyboardBehaviour = Platform.OS == 'ios' ? 'padding' : null;
@@ -422,7 +411,7 @@ function RegistrationModule({navigation}) {
         behavior={keyboardBehaviour}
         keyboardVerticalOffset={keyboardVerticalOffset}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}>
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
         <View
           style={{
             backgroundColor: BACKGROUND_COLOR,
@@ -431,7 +420,7 @@ function RegistrationModule({navigation}) {
             justifyContent: 'space-around',
             borderRadius: 10,
           }}>
-          <View style={{marginLeft: 50, marginRight: 50}}>
+          <View style={{ marginLeft: 50, marginRight: 50 }}>
             <HeadingComponent text="Let's Get Started!" />
           </View>
 
@@ -468,8 +457,7 @@ function RegistrationModule({navigation}) {
               </Text>
               <View
                 style={{
-                  borderBottomColor:
-                    activeOption == 'register' ? GREEN_COLOR : 'grey',
+                  borderBottomColor: activeOption == 'register' ? GREEN_COLOR : 'grey',
                   borderBottomWidth: 4,
                 }}
               />
@@ -509,8 +497,7 @@ function RegistrationModule({navigation}) {
               </Text>
               <View
                 style={{
-                  borderBottomColor:
-                    activeOption == 'login' ? GREEN_COLOR : 'grey',
+                  borderBottomColor: activeOption == 'login' ? GREEN_COLOR : 'grey',
                   borderBottomWidth: 4,
                 }}
               />
@@ -575,9 +562,9 @@ function RegistrationModule({navigation}) {
                   marginTop: 10,
                   marginRight: 20,
                 }}>
-                We need your details as your ZADA WALLET will be based on it. We
-                are not going to send you ads or spam email, or sell your
-                information to a 3rd party.
+                We need your details as your ZADA WALLET will be based on it. We are not
+                going to send you ads or spam email, or sell your information to a 3rd
+                party.
               </Text>
               <SimpleButton
                 loaderColor={WHITE_COLOR}
@@ -587,7 +574,7 @@ function RegistrationModule({navigation}) {
                 title="Continue"
                 titleColor={WHITE_COLOR}
                 buttonColor={GREEN_COLOR}
-                style={{marginVertical: 20, alignSelf: 'center'}}
+                style={{ marginVertical: 20, alignSelf: 'center' }}
               />
             </View>
           )}
@@ -631,7 +618,7 @@ function RegistrationModule({navigation}) {
                 title="Continue"
                 titleColor={WHITE_COLOR}
                 buttonColor={GREEN_COLOR}
-                style={{marginVertical: 20, alignSelf: 'center'}}
+                style={{ marginVertical: 20, alignSelf: 'center' }}
               />
             </View>
           )}
@@ -643,17 +630,16 @@ function RegistrationModule({navigation}) {
           siteKey={ConstantsList.GOOGLE_RECAPTCHA_KEY}
           baseUrl={ConstantsList.RECAPTCHA_BASE_URL}
           onVerify={onVerify}
-          footerComponent={
-            <View style={{ alignItems: "center", backgroundColor:"#000000" }}>
-              <SimpleButton
-                onPress={() => recaptcha.current.close()}
-                width={250}
-                title="Close"
-                titleColor={WHITE_COLOR}
-                buttonColor={RED_COLOR}
-                style={{ marginBottom:16 }}
+          headerComponent={
+            <TouchableComponent
+              style={styles.crossViewStyle}
+              onPress={() => recaptcha.current.close()}>
+              <Image
+                resizeMode="contain"
+                source={require('../assets/images/close.png')}
+                style={styles.crossImageStyle}
               />
-            </View>
+            </TouchableComponent>
           }
         />
       </KeyboardAwareScrollView>
@@ -769,6 +755,15 @@ const styles = StyleSheet.create({
     right: '10%',
     top: '30%',
   },
+  crossViewStyle: {
+    backgroundColor: '#000000',
+    position: 'absolute',
+    padding: 4,
+    right: 16,
+    top: 70,
+    zIndex: 100,
+  },
+  crossImageStyle: { width: 30, height: 30 },
 });
 
 export default RegistrationModule;
