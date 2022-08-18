@@ -1,52 +1,63 @@
 import * as React from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
-import {GRAY_COLOR, GREEN_COLOR, WHITE_COLOR} from '../theme/Colors';
-const img = require('../assets/images/t&c.png');
-const action = require('../assets/images/action2.gif');
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { BLACK_COLOR, GREEN_COLOR, WHITE_COLOR } from '../theme/Colors';
+
+const img1 = require('../assets/images/walkthrough1.png');
+const img2 = require('../assets/images/walkthrough2.png');
+const img3 = require('../assets/images/walkthrough3.png');
+const img4 = require('../assets/images/walkthrough4.png');
 
 import Swiper from 'react-native-swiper';
 
 const Slides = [
   {
-    image: img,
-    text: 'You are about to take control of your own identity. Swipe through these slides fora run-down of this app,or click "Get Started" to dive right in.',
+    image: img1,
+    title: 'Introducing the ZADA Wallet',
+    text: 'You have now taken the first step to being in control of your personal data and identities.',
+    text2: 'Swipe or press Get Started',
   },
   {
-    image: img,
-    text: 'Connect with other organizations and users to begin exchanging information. Scan their QR code to connect.',
+    image: img2,
+    title: 'Creating a connection',
+    text: 'Connect with organisations you trust to receive and share credentials securely.',
   },
   {
-    image: action,
-    text: 'Collect credentials issued by different organizations.These are pieces of information that prove your identity.',
+    image: img3,
+    title: 'Credential Offers',
+    text: 'All New Credential offers will be listed under Actions.\n\nYou need to click and Accept before a credential is stored in your ZADA wallet.',
   },
   {
-    image: img,
-    text: 'Once you have a few credentials under your belt, others can request information from you through a proof request. You control the information you share and with whom.',
+    image: img4,
+    title: 'Verification Request',
+    text: "When an organisation want you to share data they will send a Verification request.Review the request and Accept or Decline. You are in control! \n\n That's all for now. Go ahead and explore the ZADA Ecosystem!",
   },
 ];
 
-function IntroScreen({navigation}) {
+function IntroScreen({ navigation }) {
   const nextHandler = () => {
     navigation.navigate('WelcomeScreen');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.welcomeText}> Welcome! </Text>
       <View style={styles.containerSwiper}>
         <Swiper
           style={styles.wrapper}
           showsButtons={true}
-          showsPagination={true}>
+          showsPagination={true}
+          scrollEnabled={false}>
           {Slides.map((item, index) => {
+            let imageStyle = styles.swiperImage;
             return (
               <View style={styles.slide1}>
-                <Image
-                  resizeMode="contain"
-                  style={styles.swiperImage}
-                  source={item.image}
-                />
-                <Text style={styles.swiperText}>{item.text}</Text>
+                <View style={styles.imageViewStyle}>
+                  <Image resizeMode="cover" style={imageStyle} source={item.image} />
+                </View>
+                <View style={styles.textViewStyle}>
+                  <Text style={styles.swiperTitle}>{item.title}</Text>
+                  <Text style={styles.swiperText}>{item.text}</Text>
+                  <Text style={styles.swiperText2}>{item.text2}</Text>
+                </View>
               </View>
             );
           })}
@@ -99,15 +110,43 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE_COLOR,
   },
 
+  imageViewStyle: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  textViewStyle: {
+    flex: 1,
+  },
+
   swiperImage: {
-    width: '40%',
-    height: '40%',
+    width: 280,
+    height: 250,
+    backgroundColor: 'white',
+  },
+  swiperTitle: {
+    marginHorizontal: 16,
+    textAlign: 'center',
+    color: BLACK_COLOR,
+    fontSize: 16,
+    fontFamily: 'Poppins-bold',
+    fontWeight: 'bold',
   },
   swiperText: {
+    marginTop: 8,
     marginHorizontal: 40,
-    color: GRAY_COLOR,
+    textAlign: 'center',
+    color: BLACK_COLOR,
     fontSize: 15,
     fontFamily: 'Poppins-Regular',
+  },
+  swiperText2: {
+    marginTop: 8,
+    marginHorizontal: 16,
+    textAlign: 'center',
+    color: BLACK_COLOR,
+    fontSize: 14,
+    fontFamily: 'Poppins-bold',
+    fontWeight: 'bold',
   },
   text: {
     color: WHITE_COLOR,
@@ -123,7 +162,8 @@ const styles = StyleSheet.create({
   },
 
   containerSwiper: {
-    height: '60%',
+    height: '70%',
+    // borderWidth: 2,
   },
 
   buttonView: {

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {View, Text, StyleSheet, Image, Platform} from 'react-native';
-import {BLACK_COLOR} from '../theme/Colors';
+import { View, Text, StyleSheet, Image, Platform } from 'react-native';
+import { BLACK_COLOR } from '../theme/Colors';
 
 function CertificateCard(props) {
   return (
@@ -15,14 +15,14 @@ function CertificateCard(props) {
               width: '60%',
             }}>
             <Text style={styles.card_small_text}>Issued by</Text>
-            <Text style={[styles.card_small_text, {fontWeight: 'bold'}]}>
+            <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>
               {props.issuer}
             </Text>
           </View>
           {props.date ? (
             <View>
               <Text style={styles.card_small_text}>Issued Time</Text>
-              <Text style={[styles.card_small_text, {fontWeight: 'bold'}]}>
+              <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>
                 {props.date}
               </Text>
             </View>

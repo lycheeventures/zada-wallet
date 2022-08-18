@@ -137,6 +137,7 @@ function ActionDialog(props) {
         setTimeout(() => {
             setValues({});
             props.dismissModal()
+            console.log('dismiing...')
         }, 500);
 
     }
@@ -223,7 +224,7 @@ function ActionDialog(props) {
                                     <View style={styles.buttonsRow}>
                                         {props.modalType === 'action' && (
                                             <BorderButton
-                                                nextHandler={props.rejectModal}
+                                                nextHandler={() => props.rejectModal(props.data)}
                                                 text="CANCEL"
                                                 color={BLACK_COLOR}
                                                 textColor={WHITE_COLOR}
@@ -324,7 +325,7 @@ function ActionDialog(props) {
                                 <View style={styles.buttonsRow}>
                                     {props.modalType === 'action' && (
                                         <BorderButton
-                                            nextHandler={props.rejectModal}
+                                            nextHandler={() => props.rejectModal(props.data)}
                                             text="REJECT"
                                             color={BLACK_COLOR}
                                             textColor={WHITE_COLOR}
