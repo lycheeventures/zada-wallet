@@ -63,38 +63,19 @@ function getAllDeliveredNotifications() {
 //Android: Automatically triggered on notification arrival for android
 //IOS: Triggered on clicking notification from notification center
 async function receiveNotificationEventListener(notification) {
-  let verData = null;
-  let result = null;
-  switch (notification.data.type) {
-    case CRED_OFFER:
-      result = await addCredentialToActionList(notification.data.metadata);
-      break;
-
-    case VER_REQ:
-      result = await addVerificationToActionList(notification.data.metadata);
-      verData = result;
-      break;
-
-    default:
-      break;
-  }
-
   if (Platform.OS === 'ios') {
     notification.finish(PushNotificationIOS.FetchResult.NoData);
   } else {
+    PushNotification.invokeApp(notification);
     //TODO: Process Android notification here
     showLocalNotification(
       notification.data.title,
       notification.data.body,
       DROID_CHANNEL_ID,
       true,
-      true,
+      true
     );
   }
-  if (notification.data.type == VER_REQ && verData.isZadaAuth)
-    return { auth_verification: true, data: verData.data };
-  else
-    return { auth_verification: false, data: null };
 }
 
 async function onRegisterEventListener(token) {
@@ -122,13 +103,6 @@ function onRegistrationErrorEventListener(err) {
 
 function initNotifications(localReceiveNotificationEventListener) {
   // NOTIFICATION START
-
-  // //Run every 5 seconds
-  // if (Platform.OS === 'ios') {
-  //   setInterval(() => {
-  //     checkNotificationIOS();
-  //   }, 5000)
-  // }
 
   if (Platform.OS === 'android') {
     PushNotification.getChannels(function (channel_ids) {
@@ -198,7 +172,6 @@ module.exports = {
   onRegisterEventListener: onRegisterEventListener,
   onActionEventListener: onActionEventListener,
   onRegistrationErrorEventListener: onRegistrationErrorEventListener,
-  getAllDeliveredNotifications: getAllDeliveredNotifications,
   // iOSforegroundTrigger: iOSforegroundTrigger,
   initNotifications: initNotifications,
   DROID_CHANNEL_ID: DROID_CHANNEL_ID,
