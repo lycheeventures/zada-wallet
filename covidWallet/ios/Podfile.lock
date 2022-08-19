@@ -409,6 +409,8 @@ PODS:
     - React-Core
   - react-native-netinfo (6.2.1):
     - React-Core
+  - react-native-notifications (4.3.1):
+    - React-Core
   - react-native-pager-view (5.4.25):
     - React-Core
   - react-native-safe-area-context (0.7.3):
@@ -488,8 +490,6 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.11):
     - React
-  - RNCPushNotificationIOS (1.10.1):
-    - React-Core
   - RNDeviceInfo (8.7.1):
     - React-Core
   - RNExitApp (1.1.0):
@@ -611,6 +611,7 @@ DEPENDENCIES:
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - react-native-notifications (from `../node_modules/react-native-notifications`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
@@ -630,7 +631,6 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
-  - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNExitApp (from `../node_modules/react-native-exit-app`)
   - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
@@ -738,6 +738,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-html-to-pdf"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
+  react-native-notifications:
+    :path: "../node_modules/react-native-notifications"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
@@ -776,8 +778,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
-  RNCPushNotificationIOS:
-    :path: "../node_modules/@react-native-community/push-notification-ios"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNExitApp:
@@ -868,6 +868,7 @@ SPEC CHECKSUMS:
   react-native-fingerprint-scanner: 77140320ed56d612200371ebc2abefa5f20b574e
   react-native-html-to-pdf: d994a500216e88032cce3635d3240f6e4fa0cb40
   react-native-netinfo: 877946c7b4eb85a639cf1ea31333dadc2be999a1
+  react-native-notifications: 33ec77006f7987bb22de8f1665889abc633b9196
   react-native-pager-view: fc311e95f8ba2b710deae6cb0a21f2102fb49d99
   react-native-safe-area-context: 8260e5157617df4b72865f44006797f895b2ada7
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
@@ -887,7 +888,6 @@ SPEC CHECKSUMS:
   ReactCommon: 57b69f6383eafcbd7da625bfa6003810332313c4
   RNCAsyncStorage: 7f9c2d854193313a97c9cc6673f66d2d59d7be81
   RNCMaskedView: f127cd9652acfa31b91dcff613e07ba18b774db6
-  RNCPushNotificationIOS: 089da3b657e1e3d464f38195fd2e3069608ef5af
   RNDeviceInfo: af47a7d1a09d64c8cbb8b0c883db9bca422a9813
   RNExitApp: 7d81855142a4d11eb75f4f06fdebf5a950d7aef2
   RNFBAnalytics: f333ca7f05d2cccd0f7092e54434d10a4f5982d1
@@ -907,6 +907,6 @@ SPEC CHECKSUMS:
   Yoga: e7dc4e71caba6472ff48ad7d234389b91dadc280
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: bac623b0d24d5209068216ec912b99c9c2141931
+PODFILE CHECKSUM: 35668b56781661b8c62320402ad8563796d5c82b
 
 COCOAPODS: 1.11.3
