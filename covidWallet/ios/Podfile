@@ -11,7 +11,6 @@ target 'ZADA' do
   pod 'Permission-Camera', :path => "../node_modules/react-native-permissions/ios/Camera/Permission-Camera.podspec"
   pod 'react-native-config/Extension', :path => '../node_modules/react-native-config'
 
-
   # Pods for ZADA
   use_react_native!(
     :path => config[:reactNativePath],

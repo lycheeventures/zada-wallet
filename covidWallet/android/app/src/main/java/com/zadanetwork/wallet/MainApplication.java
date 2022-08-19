@@ -1,5 +1,6 @@
 package com.zadanetwork.wallet;
 
+import com.wix.reactnativenotifications.RNNotificationsPackage;
 import com.facebook.react.bridge.JSIModulePackage; // <- add
 import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
 import com.zadanetwork.wallet.generated.BasePackageList;
