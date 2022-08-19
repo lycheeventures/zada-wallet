@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
+// import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import PushNotification from 'react-native-push-notification';
 import { Platform } from 'react-native';
 import { registerDeviceToken } from '../gateways/auth';
