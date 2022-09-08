@@ -66,6 +66,7 @@ function ActionsScreen({ navigation }) {
 
   // Selectors
   const actions = useAppSelector(selectActions.selectAll);
+  const actionEntities = useAppSelector(selectActions.selectEntities);
   const credentials = useAppSelector(selectCredentials.selectAll);
   const connections = useAppSelector(selectConnections.selectAll);
   const credentialActions = useAppSelector(selectCredentialActions);
@@ -775,7 +776,7 @@ function ActionsScreen({ navigation }) {
               paddingBottom: 100,
             }}
             keyExtractor={(rowData, index) => {
-              return index;
+              return Object.keys(actionEntities)[index];
             }}
             // ListEmptyComponent={emptyListComponent}
             renderItem={(rowData, rowMap) => {

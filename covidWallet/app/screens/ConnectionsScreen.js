@@ -65,24 +65,26 @@ function ConnectionsScreen() {
     );
   };
 
-  const renderHiddenItem = ({ item, index }) => (
-    <View key={index} style={styles.rowBack}>
-      <TextComponent text="" />
-      <Animated.View>
-        <TouchableOpacity
-          onPress={() => onDeletePressed(item)}
-          activeOpacity={0.8}
-          style={[styles.swipeableViewStyle]}>
-          <MaterialCommunityIcons
-            size={30}
-            name="delete"
-            padding={30}
-            color={RED_COLOR}
-          />
-        </TouchableOpacity>
-      </Animated.View>
-    </View>
-  );
+  const renderHiddenItem = ({ item, index }) => {
+    return (
+      <View key={index + item.connectionId} style={styles.rowBack}>
+        <TextComponent text="" />
+        <Animated.View>
+          <TouchableOpacity
+            onPress={() => onDeletePressed(item)}
+            activeOpacity={0.8}
+            style={[styles.swipeableViewStyle]}>
+            <MaterialCommunityIcons
+              size={30}
+              name="delete"
+              padding={30}
+              color={RED_COLOR}
+            />
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
+    );
+  };
 
   // Empty List Component
   const listEmptyComponent = () => (
@@ -119,7 +121,7 @@ function ConnectionsScreen() {
           style={styles.flatListStyle}
           contentContainerStyle={styles.flatListStyle}
           keyExtractor={(rowData, index) => {
-            return index;
+            return index + rowData.connectionId;
           }}
           renderItem={renderItem}
           renderHiddenItem={renderHiddenItem}
