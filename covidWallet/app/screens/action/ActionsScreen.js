@@ -825,8 +825,7 @@ function ActionsScreen({ navigation }) {
           text="There are no actions to complete, Please scan a QR code to either get a digital certificate or to prove it."
           image={require('../../assets/images/action.png')}
           onPress={() => {
-            generateLocalNotificaition();
-            // navigation.navigate('QRScreen');
+            navigation.navigate('QRScreen');
           }}
           screen="actions"
         />
