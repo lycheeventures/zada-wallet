@@ -149,7 +149,6 @@ const QRScreen = ({ route, navigation }) => {
             let credObj = handleCredVerification(JSON.parse(e.data));
             // Setting values
             setValues(credObj.sortedValues);
-            console.log('credObj.credential => ', credObj.credential);
             setCredentialData({
               type: 'cred_ver',
               credentials: credObj.credential,
@@ -214,10 +213,15 @@ const QRScreen = ({ route, navigation }) => {
 
   // Accept modal handler
   const acceptModal = async (e) => {
-    setProgress(true);
-    setScan(false);
-    setCredentialData(defaultCredState);
-    setDialogTitle('Submitting Verification...');
+    setTimeout(() => {
+      setProgress(true);
+      setDialogTitle('Submitting Verification...');
+    }, 500);
+
+    setCredentialData({
+      ...credentialData,
+      type: 'temp',
+    });
 
     try {
       // Submitting verification
@@ -226,7 +230,10 @@ const QRScreen = ({ route, navigation }) => {
         e.policyName,
         e.credentialId
       );
+
+      console.log('setting progress to false!');
       setProgress(false);
+      setCredentialData(defaultCredState);
       showOKDialog('ZADA', 'Submitted Successfully!', navigateToMainScreen);
       navigation.goBack();
     } catch (error) {
