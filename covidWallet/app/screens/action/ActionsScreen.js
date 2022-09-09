@@ -377,7 +377,12 @@ function ActionsScreen({ navigation }) {
         showMessage('ZADA Wallet', 'Credential offer is already accepted');
       }
     } catch (e) {
-      showMessage('ZADA Wallet', e);
+      if (e?.message) {
+        showMessage('ZADA Wallet', e.message);
+      } else {
+        showMessage('ZADA Wallet', e);
+      }
+      setModalVisible(false);
       setIsLoading(false);
     }
   };
