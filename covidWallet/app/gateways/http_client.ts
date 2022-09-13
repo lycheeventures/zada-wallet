@@ -4,5 +4,5 @@ import Config from 'react-native-config';
 Config
 export default axios.create({
   baseURL: Config.API_URL,
-  timeout: 30000,
+  timeout: 60000,
 });
