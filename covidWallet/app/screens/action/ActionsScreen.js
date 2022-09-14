@@ -57,6 +57,7 @@ import { changeActionStatus, deleteAction } from '../../store/actions';
 import { fetchCredentials } from '../../store/credentials/thunk';
 import { fetchConnections } from '../../store/connections/thunk';
 import { selectCredentials } from '../../store/credentials/selectors';
+import { fetchToken } from '../../store/auth/thunk';
 
 const DIMENSIONS = Dimensions.get('screen');
 
@@ -78,14 +79,10 @@ function ActionsScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isAction, setAction] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [actionsList, setActionsList] = useState([]);
   const [modalData, setModalData] = useState([]);
   const [selectedItem, setSelectedItem] = useState('');
-  const [Uid, storeUid] = useState();
-  const [secret, storeSecret] = useState('');
   const [networkState, setNetworkState] = useState(false);
   const [deepLink, setDeepLink] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [dialogData, setDialogData] = useState(null);
 
   // For Pincode
@@ -283,12 +280,6 @@ function ActionsScreen({ navigation }) {
 
         if (resp.success) {
           let selectedItemObj = JSON.parse(selectedItem);
-
-          let userID = await getItem(ConstantsList.USER_ID);
-          let walletSecret = await getItem(ConstantsList.WALLET_SECRET);
-
-          storeUid(userID);
-          storeSecret(walletSecret);
 
           setModalVisible(false);
 

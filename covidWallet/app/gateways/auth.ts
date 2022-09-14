@@ -1,10 +1,9 @@
 import http_client from './http_client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthenticateUser } from '../helpers/Authenticate';
-import {
-  analytics_log_register_success,
-  analytics_log_verifies_otp,
-} from '../helpers/analytics';
+import { analytics_log_register_success, analytics_log_verifies_otp } from '../helpers/analytics';
+import { throwErrorIfExist } from '.';
+import axios from 'axios';
 
 export async function getToken() {
   let resp = await AuthenticateUser();
@@ -14,6 +13,51 @@ export async function getToken() {
     return '';
   }
 }
+
+// login user api
+export const login = async (phone: string, secret: string) => {
+  try {
+    console.log(phone, secret);
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/login',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify({
+        phone: phone,
+        secretPhrase: secret,
+      }),
+    });
+
+    return result;
+  } catch (error) {
+    throwErrorIfExist(error);
+  }
+};
+
+// authenticate user api
+export const authenticate = async (userID: String, secret: String) => {
+  try {
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/authenticate',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify({
+        userId: userID,
+        secretPhrase: secret,
+      }),
+    });
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // register user api
 export const _resgiterUserAPI = async (data: Object) => {
@@ -101,10 +145,7 @@ export const _updateProfileAPI = async (data: Object) => {
 };
 
 // Validate OTP
-export async function validateOTP(
-  phoneConfirmationCode: string,
-  userId: string
-) {
+export async function validateOTP(phoneConfirmationCode: string, userId: string) {
   try {
     let obj = {
       otpsms: phoneConfirmationCode,
@@ -132,10 +173,7 @@ export async function validateOTP(
 }
 
 // Register device token.
-export async function registerDeviceToken(
-  devicePlatform: string,
-  devicePushToken: string
-) {
+export async function registerDeviceToken(devicePlatform: string, devicePushToken: string) {
   try {
     let obj = {
       platform: devicePlatform,
@@ -159,6 +197,17 @@ export async function registerDeviceToken(
   }
 }
 
+export async function createWallet() {
+  try {
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/wallet/create',
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
 // // Register Api
 // export async function register(
 //   email: string,

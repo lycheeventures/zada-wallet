@@ -28,13 +28,21 @@ import { validateOTP, _resendOTPAPI } from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import useNetwork from '../hooks/useNetwork';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
+import { updateUser } from '../store/auth';
+import { useAppDispatch, useAppSelector } from '../store';
+import { selectUser } from '../store/auth/selectors';
+import { selectNetworkStatus } from '../store/app/selectors';
 
 const { width } = Dimensions.get('window');
 
 function MultiFactorScreen(props) {
+  
+  const dispatch = useAppDispatch();
+  // Selectors
+  const user = useAppSelector(selectUser);
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
   const fromScreen = props.route.params.from;
-  const { isConnected } = useNetwork();
   const [phoneConfirmationCode, setPhoneConfirmationCode] = useState('');
   const [progress, setProgress] = useState(false);
   const [isAuthenticated, setAuthentication] = useState(false);
@@ -83,16 +91,19 @@ function MultiFactorScreen(props) {
 
   const validate = async () => {
     try {
-      if (isConnected) {
+      if (networkStatus === 'connected') {
         let result = await validateOTP(phoneConfirmationCode, userData.userId);
 
         if (result.data.success) {
+          // Updating user in store.
+          dispatch(updateUser({ ...user, id: result.data.userId }));
+
           // Setting auto acceptance to true by default.
           saveItem(ConstantsList.AUTO_ACCEPT_CONNECTION, JSON.stringify(true));
 
           // Setting auth count to zero for disabling recaptcha.
           await saveItem(ConstantsList.AUTH_COUNT, JSON.stringify(0));
-          
+
           await saveItem(ConstantsList.USER_ID, result.data.userId);
 
           if (fromScreen == 'Register') {
@@ -115,7 +126,7 @@ function MultiFactorScreen(props) {
   };
 
   const reNewAuthenticationToken = async () => {
-    if (isConnected) {
+    if (networkStatus === 'connected') {
       setAuthentication(true);
       let resp = await AuthenticateUser(true);
       if (resp.success) {
@@ -136,7 +147,7 @@ function MultiFactorScreen(props) {
   };
 
   const authenticateUser = async () => {
-    if (isConnected) {
+    if (networkStatus === 'connected') {
       setAuthentication(true);
       let resp = await AuthenticateUser();
       if (resp.success) {
@@ -154,7 +165,7 @@ function MultiFactorScreen(props) {
   };
 
   const createWallet = async (userToken) => {
-    if (isConnected) {
+    if (networkStatus === 'connected') {
       await fetch(Config.API_URL + `/api/wallet/create`, {
         method: 'POST',
         headers: {
@@ -185,7 +196,7 @@ function MultiFactorScreen(props) {
   // Funcion to resend phone code
   const _reSendPhoneCode = async () => {
     try {
-      if (isConnected) {
+      if (networkStatus === 'connected') {
         setPhoneCodeLoading(true);
         const result = await _resendOTPAPI(userData.userId, 'phone');
         if (result.data.success) {

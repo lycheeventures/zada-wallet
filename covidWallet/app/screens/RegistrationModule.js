@@ -1,13 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { Alert } from 'react-native';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import Config from 'react-native-config';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import PhoneInput from 'react-native-phone-number-input';
@@ -18,31 +11,39 @@ import {
   GREEN_COLOR,
   WHITE_COLOR,
   GRAY_COLOR,
-  RED_COLOR,
 } from '../theme/Colors';
 import HeadingComponent from '../components/HeadingComponent';
 import ConstantsList from '../helpers/ConfigApp';
 import { saveItem, getItem, removeItem } from '../helpers/Storage';
-import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
+import { showNetworkMessage, _showAlert } from '../helpers/Toast';
 import { AuthenticateUser } from '../helpers/Authenticate';
 import { InputComponent } from '../components/Input/inputComponent';
-import {
-  nameRegex,
-  validateLength,
-  validatePasswordStrength,
-} from '../helpers/validation';
+import { nameRegex, validateLength, validatePasswordStrength } from '../helpers/validation';
 import { _resgiterUserAPI } from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import jwt_decode from 'jwt-decode';
 import { _fetchingAppData } from '../helpers/AppData';
-import useNetwork from '../hooks/useNetwork';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
 import Recaptcha from 'react-native-recaptcha-that-works';
 import TouchableComponent from '../components/Buttons/TouchableComponent';
+import { useAppDispatch, useAppSelector } from '../store';
+import { selectAuthStatus, selectToken, selectUser } from '../store/auth/selectors';
+import { selectNetworkStatus } from '../store/app/selectors';
+import { createWallet, fetchToken, loginUser } from '../store/auth/thunk';
+import { updateTempVar } from '../store/auth';
 
 const { width } = Dimensions.get('window');
 
 function RegistrationModule({ navigation }) {
+  // Redux
+  const dispatch = useAppDispatch();
+
+  // Selectors
+  const token = useAppSelector(selectToken);
+  const user = useAppSelector(selectUser);
+  const status = useAppSelector(selectAuthStatus);
+  const networkStatus = useAppSelector(selectNetworkStatus);
+
   // States
   const [activeOption, updateActiveOption] = useState('register');
   const [name, setName] = useState('');
@@ -59,9 +60,6 @@ function RegistrationModule({ navigation }) {
 
   const [progress, setProgress] = useState(false);
   const [authCount, setAuthCount] = useState(0);
-
-  // Hooks
-  const { isConnected } = useNetwork();
 
   // Refs
   const phoneInput = useRef(null);
@@ -100,6 +98,9 @@ function RegistrationModule({ navigation }) {
   }, [activeOption]);
 
   const submit = async () => {
+    login();
+
+    return;
     // Check if name is valid.
     if (!nameRegex.test(name) && activeOption == 'register') {
       setNameError(
@@ -157,7 +158,7 @@ function RegistrationModule({ navigation }) {
 
   const register = async () => {
     try {
-      if (isConnected) {
+      if (networkStatus === 'connected') {
         let data = {
           name: name.trim(),
           phone: phone.trim(),
@@ -217,128 +218,124 @@ function RegistrationModule({ navigation }) {
     }
   };
 
+  // const login = async () => {
+  //   if (networkStatus === 'connected') {
+  //     await fetch(Config.API_URL + `/api/login`, {
+  //       method: 'POST',
+  //       headers: {
+  //         Accept: 'application/json',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         phone: phone,
+  //         secretPhrase: secret,
+  //       }),
+  //     }).then((credsResult) =>
+  //       credsResult.json().then(async (data) => {
+  //         try {
+  //           let response = JSON.parse(JSON.stringify(data));
+  //           if (response.success == true) {
+  //             // Updating user in store.
+  //             dispatch(updateUser({ ...user, id: response.userId, walletSecret: secret }));
+
+  //             // storeUserID(response.userId);
+  //             // saveItem(ConstantsList.WALLET_SECRET, secret);
+  //             // await saveItem(ConstantsList.LOGIN_DATA, JSON.stringify(response));
+
+  //             await authenticateUserToken(response?.type);
+  //           } else {
+  //             showMessage('ZADA Wallet', response.error);
+  //             setProgress(false);
+  //           }
+  //         } catch (error) {
+  //           _handleAxiosError(error);
+  //         } finally {
+  //           setProgress(false);
+  //         }
+  //       })
+  //     );
+  //   } else {
+  //     setProgress(false);
+  //     showNetworkMessage();
+  //   }
+  // };
   const login = async () => {
-    if (isConnected) {
-      await fetch(Config.API_URL + `/api/login`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phone: phone,
-          secretPhrase: secret,
-        }),
-      }).then((credsResult) =>
-        credsResult.json().then(async (data) => {
-          try {
-            let response = JSON.parse(JSON.stringify(data));
-            if (response.success == true) {
-              storeUserID(response.userId);
-              saveItem(ConstantsList.WALLET_SECRET, secret);
-              await saveItem(ConstantsList.LOGIN_DATA, JSON.stringify(response));
-
-              await authenticateUserToken(response?.type);
-            } else {
-              showMessage('ZADA Wallet', response.error);
-              setProgress(false);
-            }
-          } catch (error) {
-            _handleAxiosError(error);
-          } finally {
-            setProgress(false);
-          }
-        })
-      );
-    } else {
-      setProgress(false);
-      showNetworkMessage();
-    }
-  };
-
-  const storeUserID = async (userId) => {
-    try {
-      await AsyncStorage.setItem(ConstantsList.USER_ID, userId);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const createWallet = async (userToken) => {
-    await fetch(Config.API_URL + `/api/wallet/create`, {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + userToken,
-      },
-    }).then((walletResult) =>
-      walletResult.json().then(async (data) => {
-        try {
-          let response = JSON.parse(JSON.stringify(data));
-          if (response.success == true) {
-            // reauthentication
-            let reAuth = await AuthenticateUser(true);
-
-            if (reAuth.success) {
-              // decoding token
-              const decodedreAuthToken = jwt_decode(reAuth.token);
-
-              if (decodedreAuthToken.dub.length) {
-                await _fetchingAppData(isConnected);
-                setProgress(false);
-                // if token has wallet id
-                navigation.replace('SecurityScreen');
-              } else {
-                //await authenticateUserToken();
-              }
-            } else {
-              setProgress(false);
-              _showAlert('ZADA Wallet', `${reAuth.message}`);
-            }
-          } else {
-            _showAlert('ZADA Wallet', `${response.error}`);
-          }
-        } catch (error) {
-          _showAlert('ZADA Wallet', `${error.toString()}`);
-        }
+    let resp = await dispatch(loginUser({ phone: '+923125688076', secret: 'test@1' })).unwrap();
+    // Adding temp values in redux.
+    dispatch(
+      updateTempVar({
+        isNew: true,
+        type: resp.type,
+        id: resp.userId,
+        walletSecret: resp.walletSecret,
       })
     );
+    await authenticateUserToken(resp?.type, resp.token);
   };
 
-  const authenticateUserToken = async (isDemo) => {
+  // const createWallet = async (userToken) => {
+  //   await fetch(Config.API_URL + `/api/wallet/create`, {
+  //     method: 'POST',
+  //     headers: {
+  //       Authorization: 'Bearer ' + userToken,
+  //     },
+  //   }).then((walletResult) =>
+  //     walletResult.json().then(async (data) => {
+  //       try {
+  //         let response = JSON.parse(JSON.stringify(data));
+  //         if (response.success === true) {
+  //           // reauthentication
+  //           let reAuth = await AuthenticateUser(true);
+
+  //           if (reAuth.success) {
+  //             // decoding token
+  //             const decodedreAuthToken = jwt_decode(reAuth.token);
+
+  //             if (decodedreAuthToken.dub.length) {
+  //               await _fetchingAppData(networkStatus === 'connected');
+  //               setProgress(false);
+  //               // if token has wallet id
+  //               navigation.replace('SecurityScreen');
+  //             } else {
+  //               //await authenticateUserToken();
+  //             }
+  //           } else {
+  //             setProgress(false);
+  //             _showAlert('ZADA Wallet', `${reAuth.message}`);
+  //           }
+  //         } else {
+  //           _showAlert('ZADA Wallet', `${response.error}`);
+  //         }
+  //       } catch (error) {
+  //         _showAlert('ZADA Wallet', `${error.toString()}`);
+  //       }
+  //     })
+  //   );
+  // };
+
+  const authenticateUserToken = async (isDemo, userToken) => {
+    isDemo = undefined;
     try {
-      if (isConnected) {
-        // autthenticating user
-        let resp = await AuthenticateUser(true);
-        if (resp.success) {
-          // decoding token
-          const decodedToken = jwt_decode(resp.token);
-
-          if (decodedToken.dub.length) {
-            await _fetchingAppData(isConnected);
-            setProgress(false);
-
-            // if token has wallet id
-            //  navigation.replace('SecurityScreen');
-            if (isDemo != undefined && isDemo == 'demo') {
-              navigation.replace('SecurityScreen');
-            } else {
-              navigation.replace('MultiFactorScreen', { from: 'Login' });
-            }
+      if (networkStatus === 'connected') {
+        const decodedToken = jwt_decode(userToken);
+        if (decodedToken.dub.length) {
+          if (isDemo !== undefined && isDemo === 'demo') {
+            navigation.replace('SecurityScreen');
           } else {
-            // if token has not wallet id
-            // CREATING WALLET
-            await createWallet(resp.token);
+            navigation.replace('MultiFactorScreen', { from: 'Login' });
           }
         } else {
-          setProgress(false);
-          _showAlert('ZADA Wallet', resp.message);
+          // If walletid does not exist in database.
+          // CREATING WALLET
+          let response = await dispatch(createWallet(userToken)).unwrap();
+          if (response.data.status === 'success') {
+            navigation.replace('SecurityScreen');
+          }
         }
       } else {
-        setProgress(false);
         showNetworkMessage();
       }
     } catch (error) {
-      setProgress(false);
       _showAlert('Zada Wallet', error.toString());
     }
   };
@@ -396,17 +393,11 @@ function RegistrationModule({ navigation }) {
   };
 
   // KEYBOARD AVOIDING VIEW
-  const keyboardVerticalOffset = Platform.OS == 'ios' ? 100 : 0;
-  const keyboardBehaviour = Platform.OS == 'ios' ? 'padding' : null;
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
+  const keyboardBehaviour = Platform.OS === 'ios' ? 'padding' : null;
 
   return (
-    <View
-      pointerEvents={progress ? 'none' : 'auto'}
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: PRIMARY_COLOR,
-      }}>
+    <View pointerEvents={status === 'pending' ? 'none' : 'auto'} style={styles.topViewStyle}>
       <KeyboardAwareScrollView
         behavior={keyboardBehaviour}
         keyboardVerticalOffset={keyboardVerticalOffset}
@@ -517,9 +508,7 @@ function RegistrationModule({ navigation }) {
               </View>
 
               {renderPhoneNumberInput()}
-              <Text style={styles.secretMessage}>
-                Password (please save in safe place)
-              </Text>
+              <Text style={styles.secretMessage}>Password (please save in safe place)</Text>
               <View>
                 <InputComponent
                   type={'secret'}
@@ -562,13 +551,12 @@ function RegistrationModule({ navigation }) {
                   marginTop: 10,
                   marginRight: 20,
                 }}>
-                We need your details as your ZADA WALLET will be based on it. We are not
-                going to send you ads or spam email, or sell your information to a 3rd
-                party.
+                We need your details as your ZADA WALLET will be based on it. We are not going to
+                send you ads or spam email, or sell your information to a 3rd party.
               </Text>
               <SimpleButton
                 loaderColor={WHITE_COLOR}
-                isLoading={progress}
+                isLoading={status === 'pending'}
                 onPress={authCount >= 3 ? recaptcha.current.open : submit}
                 width={250}
                 title="Continue"
@@ -612,8 +600,9 @@ function RegistrationModule({ navigation }) {
               </Text>
               <SimpleButton
                 loaderColor={WHITE_COLOR}
-                isLoading={progress}
-                onPress={authCount >= 3 ? recaptcha.current.open : submit}
+                isLoading={status === 'pending'}
+                // onPress={authCount >= 3 ? recaptcha.current.open : submit}
+                onPress={submit}
                 width={250}
                 title="Continue"
                 titleColor={WHITE_COLOR}
@@ -648,6 +637,11 @@ function RegistrationModule({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  topViewStyle: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: PRIMARY_COLOR,
+  },
   inputView: {
     backgroundColor: WHITE_COLOR,
     borderRadius: 10,

@@ -44,13 +44,10 @@ export const removeConnection = createAsyncThunk(
       let credObj = credential.entities;
       let actionObj = actions.entities;
 
-      const actionArr = Object.values(actionObj).reduce(
-        (acc: IActionObject[], item, index) => {
-          item?.connectionId == connId && acc.push(item);
-          return acc;
-        },
-        []
-      );
+      const actionArr = Object.values(actionObj).reduce((acc: IActionObject[], item, index) => {
+        item?.connectionId == connId && acc.push(item);
+        return acc;
+      }, []);
 
       for (let i = 0; i < actionArr.length; i++) {
         if (actionArr[i] !== undefined) {

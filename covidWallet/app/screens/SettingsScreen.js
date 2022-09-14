@@ -1,46 +1,30 @@
-import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Linking,
-  Switch,
-  Dimensions,
-  Platform,
-  Pressable,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Linking, Switch, Dimensions, Platform } from 'react-native';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { getVersion } from 'react-native-device-info';
+import Icon from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  BLACK_COLOR,
-  GRAY_COLOR,
-  GREEN_COLOR,
-  PRIMARY_COLOR,
-  WHITE_COLOR,
-} from '../theme/Colors';
-import {getItem, saveItem} from '../helpers/Storage';
-import {AUTO_ACCEPT_CONNECTION, BIOMETRIC_ENABLED} from '../helpers/ConfigApp';
-import {showMessage} from '../helpers/Toast';
-import {AuthContext} from '../context/AuthContext';
+
+import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
+import { getItem, saveItem } from '../helpers/Storage';
+import { AUTO_ACCEPT_CONNECTION, BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
+import { showMessage } from '../helpers/Toast';
 import ConstantsList from '../helpers/ConfigApp';
 import ZignSecModal from '../components/ZignSecModal';
-import {getVersion} from 'react-native-device-info';
-import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/AntDesign';
+import { useAppDispatch } from '../store';
+import { logout } from '../store/auth';
 
 export default function SettingsScreen(props) {
-  const {logout} = React.useContext(AuthContext);
+  // Constants
+  const dispatch = useAppDispatch();
+
   const [isBioEnable, setBioEnable] = useState(false);
   const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(false);
   const [version, setVersion] = useState(null);
 
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
-
   useEffect(() => {
     const updatevalues = async () => {
-      let appVersion = JSON.parse(
-        (await getItem(ConstantsList.APP_VERSION)) || null,
-      );
+      let appVersion = JSON.parse((await getItem(ConstantsList.APP_VERSION)) || null);
 
       let biometric = JSON.parse((await getItem(BIOMETRIC_ENABLED)) || 'false');
 
@@ -76,21 +60,20 @@ export default function SettingsScreen(props) {
         }, 1000);
       }
     } else {
-      if (result)
-        setBioEnable(false);
+      if (result) setBioEnable(false);
     }
   };
 
   const _toggleAcceptConnection = (value) => {
     saveItem(ConstantsList.AUTO_ACCEPT_CONNECTION, JSON.stringify(value));
-    setIsAcceptConnectionEnabled(value)
-  }
+    setIsAcceptConnectionEnabled(value);
+  };
 
   const onLogoutPressed = async () => {
     const pCode = await getItem(ConstantsList.PIN_CODE);
     AsyncStorage.clear();
     saveItem(ConstantsList.PIN_CODE, pCode);
-    logout();
+    dispatch(logout());
   };
 
   // when user will click on edit profile screen
@@ -168,7 +151,7 @@ export default function SettingsScreen(props) {
           <Icon name="right" color={GREEN_COLOR} size={18} />
         </TouchableOpacity>
 
-        <Text style={[styles._rowHeading, {marginTop: 15}]}>Support</Text>
+        <Text style={[styles._rowHeading, { marginTop: 15 }]}>Support</Text>
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles._row}
@@ -200,22 +183,17 @@ export default function SettingsScreen(props) {
           onPress={() => {
             if (Platform.OS === 'android')
               Linking.openURL(
-                'https://play.google.com/store/apps/details?id=com.zadanetwork.wallet',
+                'https://play.google.com/store/apps/details?id=com.zadanetwork.wallet'
               );
-            else
-              Linking.openURL(
-                'https://apps.apple.com/us/app/zada-wallet/id1578666669',
-              );
+            else Linking.openURL('https://apps.apple.com/us/app/zada-wallet/id1578666669');
           }}
           style={styles._appVersion}>{`Version ${
-          version == undefined || version === null
-            ? getVersion().toString()
-            : version.version
+          version == undefined || version === null ? getVersion().toString() : version.version
         }`}</Text>
         <Text style={styles.footerText}>
           In Collaboration with&nbsp;
           <Text
-            style={{color: PRIMARY_COLOR}}
+            style={{ color: PRIMARY_COLOR }}
             onPress={() => {
               Linking.openURL('https://trust.net.pk/');
             }}>
@@ -249,7 +227,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     shadowColor: BLACK_COLOR,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 5,

@@ -7,16 +7,20 @@ import {
 import { PRIMARY_COLOR } from '../theme/Colors';
 import ImageBoxComponent from '../components/ImageBoxComponent';
 import TextComponent from '../components/TextComponent';
-import { AuthContext } from '../Navigation';
 import GreenPrimaryButton from '../components/GreenPrimaryButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import { useAppDispatch, useAppSelector } from '../store';
+import { updateIsAuthorized, updateUser } from '../store/auth';
+import { selectUser } from '../store/auth/selectors';
 
 const img = require('../assets/images/notifications.png');
 
 function NotifyMeScreen() {
 
-  const { isFirstTimeFunction } = React.useContext(AuthContext);
+  const dispatch = useAppDispatch();
+  // Selectors
+  const user = useAppSelector(selectUser);
 
   async function enableNotifications() {
 
@@ -51,9 +55,11 @@ function NotifyMeScreen() {
       }
     }
 
-    await AsyncStorage.setItem('isfirstTime', 'false').then(() => {
-      isFirstTimeFunction();
-    });
+    dispatch(updateUser({ ...user, isNew: false }));
+    dispatch(updateIsAuthorized(true));
+    // await AsyncStorage.setItem('isfirstTime', 'false').then(() => {
+    //   isFirstTimeFunction();
+    // });
   }
 
   return (

@@ -3,10 +3,10 @@ import {
   analytics_log_accept_connection_request,
   analytics_log_reject_connection_request,
 } from '../helpers/analytics';
-import {AuthenticateUser, authenticateZadaAuth} from '../helpers/Authenticate';
-import {getItem, saveItem} from '../helpers/Storage';
+import { AuthenticateUser, authenticateZadaAuth } from '../helpers/Authenticate';
+import { getItem, saveItem } from '../helpers/Storage';
 import http_client from './http_client';
-import ConstantsList, {ZADA_AUTH_URL} from '../helpers/ConfigApp';
+import ConstantsList, { ZADA_AUTH_URL } from '../helpers/ConfigApp';
 import { getToken } from './auth';
 
 // Get All Connections
@@ -15,33 +15,9 @@ export async function get_all_connections() {
     const result = await http_client({
       method: 'GET',
       url: '/api/connection/get_all_connections',
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
-      },
     });
 
     return result;
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function get_all_connections_for_screen() {
-  try {
-    let result = await get_all_connections();
-    if (result.data.success) {
-      let connectionsList = result.data.connections;
-      if (connectionsList.length > 0) {
-        await saveItem(
-          ConstantsList.CONNECTIONS,
-          JSON.stringify(connectionsList),
-        );
-      } else {
-        await saveItem(ConstantsList.CONNECTIONS, JSON.stringify([]));
-      }
-    } else {
-      throw result.data.error;
-    }
   } catch (error) {
     throw error;
   }
@@ -222,7 +198,7 @@ export async function get_tenant(verification: any) {
     let connections: any = await getItem(ConstantsList.CONNECTIONS);
 
     if (connections == undefined || connections == null) {
-      return {success: false, error: 'There are no connections in your wallet'};
+      return { success: false, error: 'There are no connections in your wallet' };
     }
 
     let did = undefined;
@@ -246,12 +222,12 @@ export async function get_tenant(verification: any) {
           did: did,
         },
       });
-      return {success: true, data: tenant.data.data};
+      return { success: true, data: tenant.data.data };
     } else {
-      return {success: false, error: tokenResult.error.toString()};
+      return { success: false, error: tokenResult.error.toString() };
     }
   } catch (error: any) {
-    return {success: false, error: error.toString()};
+    return { success: false, error: error.toString() };
   }
 }
 

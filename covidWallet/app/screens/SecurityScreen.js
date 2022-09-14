@@ -40,7 +40,6 @@ function SecurityScreen({navigation}) {
 
   useEffect(() => {
     isSecureIDAvailable();
-    dispatch(fetchToken());
   }, []);
 
   function enableSecureID() {

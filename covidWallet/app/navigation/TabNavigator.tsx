@@ -20,7 +20,7 @@ function TabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+          let iconName = '';
           if (route.name === 'Actions') {
             iconName = 'md-notifications-outline';
             return <Ionicons name={iconName} size={size} color={color} />;

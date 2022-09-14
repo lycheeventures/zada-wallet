@@ -1,13 +1,23 @@
-import { useContext } from "react";
-import { Network } from "../context/NetworkContext";
+import { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
-
+import { useAppDispatch } from '../store';
+import { updateNetworkStatus } from '../store/app';
 
 const useNetwork = () => {
+  // Constants
+  const dispatch = useAppDispatch();
 
-    const { isConnected } = useContext(Network);
+  useEffect(() => {
+    // Subscribe
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      dispatch(updateNetworkStatus(state.isConnected ? 'connected' : 'disconnected'));
+    });
 
-    return { isConnected };
-}
+    // Unsubscribe
+    unsubscribe();
+  }, [dispatch]);
+
+  return undefined;
+};
 
 export default useNetwork;

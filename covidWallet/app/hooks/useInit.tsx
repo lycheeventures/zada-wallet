@@ -7,10 +7,7 @@ import {
   selectConnectionsError,
   selectConnectionsStatus,
 } from '../store/connections/selectors';
-import {
-  selectCredentialsError,
-  selectCredentialsStatus,
-} from '../store/credentials/selectors';
+import { selectCredentialsError, selectCredentialsStatus } from '../store/credentials/selectors';
 
 import { fetchToken } from '../store/auth/thunk';
 import { fetchActions } from '../store/actions/thunk';
@@ -20,8 +17,9 @@ import { _showAlert } from '../helpers/Toast';
 import { changeCredentialStatus } from '../store/credentials';
 import { changeActionStatus } from '../store/actions';
 import { changeConnectionStatus } from '../store/connections';
-import { selectToken } from '../store/auth/interface';
+import { selectAuthError, selectAuthStatus, selectToken } from '../store/auth/selectors';
 import { getItem } from '../helpers/Storage';
+import { updateAuthStatus } from '../store/auth';
 
 const useInit = () => {
   // Constants
@@ -30,10 +28,12 @@ const useInit = () => {
   // Selectors
   const token = useAppSelector(selectToken);
   const connections = useAppSelector(selectConnections.selectAll);
+  const authStatus = useAppSelector(selectAuthStatus);
   const actionStatus = useAppSelector(selectActionsStatus);
   const connStatus = useAppSelector(selectConnectionsStatus);
   const credStatus = useAppSelector(selectCredentialsStatus);
 
+  const authError = useAppSelector(selectAuthError);
   const actionError = useAppSelector(selectActionsError);
   const connError = useAppSelector(selectConnectionsError);
   const credError = useAppSelector(selectCredentialsError);
@@ -44,7 +44,6 @@ const useInit = () => {
 
   // useEffects
   useEffect(() => {
-    init();
     setMessageIndex(1);
   }, []);
 
@@ -80,6 +79,9 @@ const useInit = () => {
   }, [connections, token]);
 
   useEffect(() => {
+    // Auth status handling
+    handleAuthStatus();
+
     // Action status handling
     handleActionStatus();
 
@@ -88,11 +90,17 @@ const useInit = () => {
 
     // Connection status handling
     handleConnectionStatus();
-  }, [actionStatus, credStatus, connStatus]);
+  }, [authStatus, actionStatus, credStatus, connStatus]);
 
-  // Functions
-  const init = async () => {
-    await dispatch(fetchToken());
+  // Handling Action Status
+  const handleAuthStatus = () => {
+    if (authStatus == 'succeeded' || authStatus == 'failed') {
+      dispatch(updateAuthStatus('idle'));
+
+      if (authStatus === 'failed') {
+        _showAlert(authError);
+      }
+    }
   };
 
   // Handling Action Status
