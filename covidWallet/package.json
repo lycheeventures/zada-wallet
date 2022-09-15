@@ -14,7 +14,7 @@
     "build:android": "react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res",
     "build:android-debug": "npm-run-all -l build:android && pushd android && ./gradlew assembleDebug && popd",
     "build:android-release": "npm-run-all -l build:android && pushd android && ./gradlew assembleRelease && popd",
-    "build:android-all":"npm-run-all -l clean:android build:android-debug build:android-release",
+    "build:android-all": "npm-run-all -l clean:android build:android-debug build:android-release",
     "///": "Clean:",
     "clean:node": "rm -rf node_modules && npm install",
     "clean:ios": "rm -rf ios/main.jsbundle && pushd ios && xcodebuild clean && pod install && popd",
