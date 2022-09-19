@@ -66,6 +66,7 @@ function ActionsScreen({ navigation }) {
 
   // Selectors
   const actions = useAppSelector(selectActions.selectAll);
+  const actionEntities = useAppSelector(selectActions.selectEntities);
   const credentials = useAppSelector(selectCredentials.selectAll);
   const connections = useAppSelector(selectConnections.selectAll);
   const credentialActions = useAppSelector(selectCredentialActions);
@@ -101,7 +102,7 @@ function ActionsScreen({ navigation }) {
   const [verifyPincodeError, setVerifyPincodeError] = useState('');
 
   // Notification hook
-  const { isZadaAuth, authData } = useNotification();
+  useNotification();
 
   var requestArray = [];
 
@@ -129,12 +130,6 @@ function ActionsScreen({ navigation }) {
   useEffect(() => {
     if (!deepLink) getUrl();
   }, [deepLink]);
-
-  useEffect(() => {
-    if (isZadaAuth) {
-      toggleModal(authData);
-    }
-  }, [isZadaAuth, authData]);
 
   useEffect(() => {
     // Setting listener for deeplink
@@ -382,7 +377,12 @@ function ActionsScreen({ navigation }) {
         showMessage('ZADA Wallet', 'Credential offer is already accepted');
       }
     } catch (e) {
-      showMessage('ZADA Wallet', e);
+      if (e?.message) {
+        showMessage('ZADA Wallet', e.message);
+      } else {
+        showMessage('ZADA Wallet', e);
+      }
+      setModalVisible(false);
       setIsLoading(false);
     }
   };
@@ -781,7 +781,7 @@ function ActionsScreen({ navigation }) {
               paddingBottom: 100,
             }}
             keyExtractor={(rowData, index) => {
-              return index;
+              return Object.keys(actionEntities)[index];
             }}
             // ListEmptyComponent={emptyListComponent}
             renderItem={(rowData, rowMap) => {

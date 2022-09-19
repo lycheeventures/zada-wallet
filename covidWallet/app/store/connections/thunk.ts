@@ -4,8 +4,8 @@ import { RootState } from '..';
 import { ConnectionAPI, CredentialAPI, VerificationAPI } from '../../gateways';
 import { deleteAction } from '../actions';
 import { IActionObject } from '../actions/interface';
-import { removeCredentials } from '../credentials/thunk';
 import ConstantList from '../../helpers/ConfigApp';
+import { deleteCredential } from '../credentials';
 
 export const fetchConnections = createAsyncThunk(
   'connection/fetchConnections',
@@ -65,8 +65,6 @@ export const removeConnection = createAsyncThunk(
             actionArr[i]?.credentialId &&
             actionArr[i].type == ConstantList.CRED_OFFER
           ) {
-            await CredentialAPI.delete_credential(actionArr[i].credentialId);
-
             // Delete from redux
             let combinedCredId = actionArr[i].connectionId + actionArr[i].credentialId;
             dispatch(deleteAction(combinedCredId));
@@ -78,9 +76,6 @@ export const removeConnection = createAsyncThunk(
             actionArr[i]?.verificationId &&
             actionArr[i].type == ConstantList.VER_REQ
           ) {
-            // Delele API call
-            await VerificationAPI.delete_verification(actionArr[i].verificationId || '');
-
             // Delete from redux
             let combinedVerId = actionArr[i].connectionId + actionArr[i].verificationId;
             dispatch(deleteAction(combinedVerId));
@@ -91,7 +86,7 @@ export const removeConnection = createAsyncThunk(
       // Remove Credentials
       let credArr = Object.values(credObj).filter((x) => x?.connectionId == connId);
       credArr.forEach((e) => {
-        if (e?.credentialId) dispatch(removeCredentials(e?.credentialId));
+        if (e?.credentialId) dispatch(deleteCredential(e?.credentialId));
       });
 
       // Remove Connection

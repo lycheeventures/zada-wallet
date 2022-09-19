@@ -1,10 +1,19 @@
 import { useDispatch, useSelector } from 'react-redux';
-import thunkMiddleware from 'redux-thunk';
+import {
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from 'redux-persist';
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { AuthSlice } from './auth';
 import { CredentialSlice } from './credentials';
 import { ConnectionSlice } from './connections';
 import { ActionSlice } from './actions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const reducers = combineReducers({
   auth: AuthSlice.reducer,
@@ -21,12 +30,20 @@ const rootReducer = (state: any, action: any) => {
   return reducers(state, action);
 };
 
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  version: 1,
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) => {
     const middlewares = getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [],
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     });
     // .concat(api.middleware)

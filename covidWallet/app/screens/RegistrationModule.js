@@ -758,9 +758,10 @@ const styles = StyleSheet.create({
   crossViewStyle: {
     backgroundColor: '#000000',
     position: 'absolute',
-    padding: 4,
+    padding: 2,
     right: 16,
     top: 70,
+    borderRadius: 20,
     zIndex: 100,
   },
   crossImageStyle: { width: 30, height: 30 },
