@@ -4,7 +4,6 @@ import { getItem } from '../helpers/Storage';
 import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
 import { showMessage } from '../helpers/Toast';
 
-// import useAppState from 'react-native-appstate-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 

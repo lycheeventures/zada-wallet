@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import SettingsScreen from './screens/SettingsScreen';
 import DetailsScreen from './screens/DetailsScreen';
-import QRScreen from './screens/QRScreen';
+import QRScreen from './screens/qr/QRScreen';
 import {BLACK_COLOR, BACKGROUND_COLOR} from './theme/Colors';
 import RegistrationModule from './screens/RegistrationModule';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
@@ -36,6 +36,10 @@ import useNetwork from './hooks/useNetwork';
 import AboutUs from './screens/AboutUs';
 import ContactUs from './screens/ContactUs';
 import IntroScreen from './screens/IntroScreen';
+import useInit from './hooks/useInit';
+import { logout, updateToken } from './store/auth';
+import { useAppDispatch } from './store';
+
 const Stack = createStackNavigator();
 
 const navigationAnimation =
@@ -47,17 +51,21 @@ function NavigationComponent() {
   const linking = {
     prefixes: ['https://zadanetwork.com', 'zada://'], //npx uri-scheme open https://zadanetwork.com/connection_request/abcd --android
   };
-
+  
+  const dispatch = useAppDispatch();
+  
   // Hooks
   const { isConnected } = useNetwork();
+  const { isAppReady, messageIndex, setMessageIndex } = useInit();
 
   // States
   const [isLoading, setLoading] = useState(true);
-  const [messageIndex, setMessageIndex] = useState(2);
+  // const [messageIndex, setMessageIndex] = useState(2);
   const [isNewVersion, setIsNewVersion] = useState(false);
   const [versionDetails, setVersionDetails] = useState(null);
   const {authStatus, oneTimeAuthentication} = useBiometric();
   const [isFirstTime, getisFirstTime] = React.useState('true');
+  
 
   const storeData = async () => {
     try {
@@ -82,10 +90,10 @@ function NavigationComponent() {
         
         // Getting Network info
         if(isConnected){
-          setMessageIndex(1);
+          // setMessageIndex(1);
           
           // Fetching data
-          await _fetchingAppData(isConnected);
+          // await _fetchingAppData(isConnected);
           
           setMessageIndex(3)
 
@@ -111,6 +119,8 @@ function NavigationComponent() {
   const _loggingOut = () => {
     try {
       AsyncStorage.setItem('isfirstTime', 'true');
+      AsyncStorage.setItem(ConstantList.USER_ID, 'null');
+      dispatch(updateToken(undefined));
       analytics_log_logout();
     } catch (error) {
       alert(error);
@@ -126,16 +136,17 @@ function NavigationComponent() {
       logout: () => {
         _loggingOut();
         getisFirstTime('true');
+        dispatch(logout());
       },
     }),
     [],
   );
 
-
   // UseEffects
   useEffect(() => {
     AsyncStorage.setItem('temporarilyMovedToBackground', 'false');
   },[])
+
 
   useEffect(() => {
     const _checkVersion = async () => {
@@ -185,11 +196,11 @@ function NavigationComponent() {
             </Stack.Navigator>
           ) : isFirstTime === 'true' ? (
             <Stack.Navigator screenOptions={{...navigationAnimation}}>
-              {/* <Stack.Screen
+              <Stack.Screen
                 options={{headerShown: false}}
                 name="IntroScreen"
                 component={IntroScreen}
-              /> */}
+              />
 
               <Stack.Screen
                 options={{headerShown: false}}

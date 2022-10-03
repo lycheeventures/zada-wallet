@@ -1,5 +1,6 @@
 package com.zadanetwork.wallet;
 
+import com.wix.reactnativenotifications.RNNotificationsPackage;
 import com.facebook.react.bridge.JSIModulePackage; // <- add
 import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
 import com.zadanetwork.wallet.generated.BasePackageList;
@@ -7,6 +8,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 import org.reactnative.camera.RNCameraPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;

@@ -12,22 +12,21 @@ export const addCredentialToActionList = async (credentialID) => {
   let cred_arr_archive = await getItem(ConstantsList.CRED_OFFER);
 
   if (cred_arr_archive !== null) {
-    if (JSON.parse(cred_arr_archive).find(i => i !== null))
+    if (JSON.parse(cred_arr_archive).find((i) => i !== null))
       cred_arr = JSON.parse(cred_arr_archive);
   }
 
   if (ifExist(cred_arr, credentialID)) {
-    return
+    return;
   }
 
   if (resp.success) {
     try {
       let result = await get_credential(credentialID);
       if (result.data.success) {
-
         let obj = result.data.credential;
         obj['type'] = ConstantsList.CRED_OFFER;
-        obj = await addImageAndNameFromConnectionList(obj)
+        obj = await addImageAndNameFromConnectionList(obj);
         cred_arr.push(obj);
 
         // Adding item to credentials.
@@ -39,97 +38,95 @@ export const addCredentialToActionList = async (credentialID) => {
     } catch (e) {
       console.log(e);
     }
-  }
-  else {
+  } else {
     showMessage('ZADA Wallet', resp.message);
   }
 };
 
 export const addVerificationToActionList = async (credentialID) => {
-
   try {
-
     let result = await get_all_verification_proposals();
 
     if (result.data.success) {
-      let verifications = result.data.verifications
+      let verifications = result.data.verifications;
 
-      if (verifications.length === 0) return
+      if (verifications.length === 0) return;
 
       let verification_arr = [];
       for (let i = 0; i < verifications.length; i++) {
         // Adding Image and Name to array.
-        verification_arr.push(await addImageAndNameFromConnectionList(verifications[i]))
+        verification_arr.push(await addImageAndNameFromConnectionList(verifications[i]));
 
         // Adding type to verification request.
-        verification_arr[i]['type'] = ConstantsList.VER_REQ
+        verification_arr[i]['type'] = ConstantsList.VER_REQ;
       }
 
       // Save Verification Request.
       await saveItem(ConstantsList.VER_REQ, JSON.stringify(verification_arr));
 
-      if (verifications[0].organizationName && verifications[0].organizationName == ZADA_AUTH_TEST)
-        return { isZadaAuth: true, data: verifications[0] }
-      else
-        return { isZadaAuth: false, data: null }
-
+      if (
+        verifications[0].organizationName &&
+        verifications[0].organizationName == ZADA_AUTH_TEST
+      )
+        return { isZadaAuth: true, data: verifications[0] };
+      else return { isZadaAuth: false, data: null };
     } else {
       showMessage('ZADA Wallet', result.data.message);
     }
   } catch (e) {
     console.log(e);
   }
-}
+};
 
 // Search and add Image and Name attr to Object
 export async function addImageAndNameFromConnectionList(obj) {
   let conn = await getItem(ConstantsList.CONNECTIONS);
-  if (conn == null) return null
-  let parseConn = JSON.parse(conn)
-  parseConn.forEach(e => {
+  if (conn == null) return null;
+  let parseConn = JSON.parse(conn);
+  parseConn.forEach((e) => {
     if (e.connectionId == obj.connectionId) {
       obj.imageUrl = e.imageUrl;
       obj.organizationName = e.name;
     }
   });
-  return obj
+  return obj;
 }
 
 export function getActionHeader(v) {
   switch (v) {
     case ConstantsList.CONN_REQ:
-      return 'Connection Request'
+      return 'Connection Request';
     case ConstantsList.CRED_OFFER:
-      return 'Certificate Offer'
+      return 'Certificate Offer';
     case ConstantsList.VER_REQ:
-      return 'Verification Request'
+      return 'Verification Request';
     default:
-      return ""
+      return '';
   }
 }
 
 export function getActionText(v) {
   switch (v) {
     case ConstantsList.CONN_REQ:
-      return ' has invited you to connect.'
+      return ' has invited you to connect.';
     case ConstantsList.CRED_OFFER:
-      return ' has sent you a certificate. Do you want to accept it?'
+      return ' has sent you a certificate. Do you want to accept it?';
     case ConstantsList.VER_REQ:
-      return ' has sent you a request for data verification'
+      return ' has sent you a request for data verification';
     case ZADA_AUTH_TEST:
-      return ' has sent you authorization request'
+      return ' has sent you authorization request';
     default:
-      return ""
+      return '';
   }
 }
 
 function ifExist(arr, credentialID) {
   let exist = false;
-  arr.forEach(e => {
+  arr.forEach((e) => {
     if (e.credentialId == credentialID) {
       exist = true;
     }
-  })
+  });
 
-  return exist
+  return exist;
 }

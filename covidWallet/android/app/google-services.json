@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "166915490826-ij646rrukqcm0d0h36kq4e5l2f15v244.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zadanetwork.wallet",
+            "certificate_hash": "c52c69f79912ccfa867412acbd59af96b957a3ac"
+          }
+        },
+        {
           "client_id": "166915490826-v7fflkqvbicq1iq4tme7qsvncrhlokf1.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,14 @@
             {
               "client_id": "166915490826-v7fflkqvbicq1iq4tme7qsvncrhlokf1.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "166915490826-kl5m355ojb15b2filnmvbacin2acdlpv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zadanetwork.wallet",
+                "app_store_id": "1578666669"
+              }
             }
           ]
         }
@@ -58,6 +74,14 @@
             {
               "client_id": "166915490826-v7fflkqvbicq1iq4tme7qsvncrhlokf1.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "166915490826-kl5m355ojb15b2filnmvbacin2acdlpv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zadanetwork.wallet",
+                "app_store_id": "1578666669"
+              }
             }
           ]
         }

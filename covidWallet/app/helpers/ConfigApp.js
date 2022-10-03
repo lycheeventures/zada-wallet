@@ -8,8 +8,7 @@ module.exports = Object.freeze({
   ZIGNSEC_TEST_URL: 'https://test.zignsec.com/v3',
   ZIGNSEC_WEBHOOK: 'http://ce63-206-84-130-27.ngrok.io/api/kycs_webhook',
   ZIGNSEC_TEST_AUTH: 'fd0b1bac-5707-4f32-8132-e8c9168941ea',
-  ZADA_S3_BASE_URL:
-    'https://zada-wallet-cred-bg.s3.ap-southeast-1.amazonaws.com',
+  ZADA_S3_BASE_URL: 'https://zada-wallet-cred-bg.s3.ap-southeast-1.amazonaws.com',
   ZADA_AUTH: 'zada_auth',
   WALLET_SECRET: 'wallet_secret',
   WALLET_NAME: 'wallet_name',
@@ -44,7 +43,7 @@ module.exports = Object.freeze({
   MEDIUM: 'Medium',
   WEAK: 'Weak',
   AUTO_ACCEPT_CONNECTION: 'auto_accept_connection',
-  GOOGLE_RECAPTCHA_KEY: "6LcNdGwgAAAAAKMkAtQKe24pMFQOCFHouS2x5j0m",
-  RECAPTCHA_BASE_URL: "https://zadanetwork.com",
+  GOOGLE_RECAPTCHA_KEY: '6LcNdGwgAAAAAKMkAtQKe24pMFQOCFHouS2x5j0m',
+  RECAPTCHA_BASE_URL: 'https://zadanetwork.com',
   AUTH_COUNT: 'auth_count',
 });

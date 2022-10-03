@@ -1,0 +1,90 @@
+#many of the settings are inspired by the article https://three29.com/set-up-eslint-and-prettier-for-react-native-projects
+
+env:
+  browser: true
+  commonjs: true
+  es2021: true
+  react-native/react-native: true
+extends:
+  - 'plugin:react/recommended'
+  - airbnb
+  - airbnb/hooks
+  - prettier
+parser: '@typescript-eslint/parser'
+parserOptions:
+  ecmaVersion: 2021
+  ecmaFeatures:
+    jsx: true
+plugins:
+  - react
+  - react-native
+  - '@typescript-eslint'
+settings:
+  import/resolver:
+    node:
+      extensions: [.js, .jsx, .ts, .tsx]
+
+globals:
+  it: readonly
+
+# some of the disabled rules were done because they were not important enough and incompatible with existing style
+# this might be tightened up some later
+rules:
+  no-array-constructor: warn
+  no-const-assign: error
+  no-unreachable: warn
+  no-lonely-if: warn
+  no-useless-concat: warn
+  no-throw-literal: warn
+  radix: warn
+  no-bitwise: warn
+  no-self-compare: warn # WTF
+  react-hooks/rules-of-hooks: error # todo massive error
+  no-redeclare: warn
+  no-await-in-loop: warn
+  no-empty: warn
+  no-return-assign: warn
+  react/no-unused-prop-types: warn
+  no-case-declarations: warn
+  no-param-reassign: warn
+  no-undef: warn
+  no-prototype-builtins: warn
+  no-lone-blocks: warn
+  no-unused-expressions: warn
+  no-restricted-syntax: warn
+  consistent-return: error
+  no-useless-catch: warn
+  import/no-duplicates: warn
+  array-callback-return: warn
+  react/require-default-props: warn
+  import/no-extraneous-dependencies: warn
+  react/jsx-props-no-spreading: warn
+  prefer-destructuring: warn
+  import/no-unresolved: warn
+  react-hooks/exhaustive-deps: warn
+  camelcase: warn
+  no-nested-ternary: warn
+  global-require: warn
+  react/no-array-index-key: warn
+  no-useless-escape: warn
+  react/prop-types: warn
+  eqeqeq: warn
+  # disabling the base no-shadow rule as it can report incorrect errors
+  no-shadow: off
+  '@typescript-eslint/no-shadow': [warn]
+  no-use-before-define: off    # hopefully enable this later when we can
+  '@typescript-eslint/no-use-before-define': off  # [ 'error' ]
+  no-unused-vars: warn
+  '@typescript-eslint/no-unused-vars': [ warn ]
+
+  no-underscore-dangle: off  # we have lots of properties like _id
+  quotes: [warn, single, {avoidEscape: true, allowTemplateLiterals: true}]
+  '@typescript-eslint/quotes': [warn, single, {avoidEscape: true, allowTemplateLiterals: true}]
+  prefer-arrow-callback: warn   # set to off as temporary setting to prevent automated eslint breaking certain cases
+  react/jsx-enable-boolean: off
+  react/destructuring-assignment: [off, always]  # if set to on, always it will insist on destructuring
+  #following recommendation for "import React, ..." errors
+  import/extensions: [ warn, never, { svg: always, json: always } ]
+  import/prefer-default-export: off
+  no-plusplus: off
+  react/jsx-filename-extension: [2, {extensions: [.jsx, .tsx]}]
