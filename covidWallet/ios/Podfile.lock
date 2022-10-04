@@ -501,7 +501,7 @@ PODS:
   - RNFBApp (12.5.0):
     - Firebase/CoreOnly (= 8.5.0)
     - React-Core
-  - RNFBMessaging (12.9.3):
+  - RNFBMessaging (12.5.0):
     - Firebase/Messaging (= 8.5.0)
     - React-Core
     - RNFBApp
@@ -892,7 +892,7 @@ SPEC CHECKSUMS:
   RNExitApp: 7d81855142a4d11eb75f4f06fdebf5a950d7aef2
   RNFBAnalytics: f333ca7f05d2cccd0f7092e54434d10a4f5982d1
   RNFBApp: 5f583e80cd7a32621d6057da3b786c4db96f1ef4
-  RNFBMessaging: 6a5c260dd010dc21fd5ed0a84cc9b11ff8bb288c
+  RNFBMessaging: 8cdc29efb1916e27579583c47d8d9634e5b05cb4
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNPermissions: 79d0c889562fd792329821bea3155fe6eb54d359
   RNReanimated: 11e6e30bbc49079b7f0c321ac5830e6d113d0224

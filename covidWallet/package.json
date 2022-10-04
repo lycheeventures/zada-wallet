@@ -34,7 +34,7 @@
     "@react-native-community/netinfo": "^6.0.2",
     "@react-native-firebase/analytics": "12.5.0",
     "@react-native-firebase/app": "12.5.0",
-    "@react-native-firebase/messaging": "^12.5.0",
+    "@react-native-firebase/messaging": "12.5.0",
     "@react-navigation/bottom-tabs": "^5.2.8",
     "@react-navigation/native": "^5.1.7",
     "@react-navigation/stack": "^5.2.14",
