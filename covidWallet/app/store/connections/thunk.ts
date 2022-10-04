@@ -48,7 +48,7 @@ export const removeConnection = createAsyncThunk(
 
       // Throw error if actions are available from this connection.
       if (actionArr.length > 0) {
-        throw 'Before deleting connection, please make sure you have responded to all offers (actions) available from this connection.';
+        throw 'Unable to delete, this connection has action items available.';
       }
 
       // Delete connection API call.
