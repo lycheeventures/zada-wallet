@@ -23,23 +23,30 @@ import ConstantsList from '../helpers/ConfigApp';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveItem, getItem } from '../helpers/Storage';
 import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
-import { AuthenticateUser } from '../helpers/Authenticate'
+import { AuthenticateUser } from '../helpers/Authenticate';
 import { validateOTP, _resendOTPAPI } from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import useNetwork from '../hooks/useNetwork';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
+import { updateUser } from '../store/auth';
+import { useAppDispatch, useAppSelector } from '../store';
+import { selectTempVar } from '../store/auth/selectors';
+import { selectNetworkStatus } from '../store/app/selectors';
+import { fetchToken } from '../store/auth/thunk';
 
 const { width } = Dimensions.get('window');
 
 function MultiFactorScreen(props) {
+  const dispatch = useAppDispatch();
+  // Selectors
+  const tempUser = useAppSelector(selectTempVar);
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
   const fromScreen = props.route.params.from;
-  const { isConnected } = useNetwork();
   const [phoneConfirmationCode, setPhoneConfirmationCode] = useState('');
   const [progress, setProgress] = useState(false);
   const [isAuthenticated, setAuthentication] = useState(false);
   const [isWalletCreated, setWallet] = useState(false);
-  const [userData, setUserData] = useState(null);
 
   // Countdown
   const [phoneMins, setPhoneMins] = useState(1);
@@ -48,6 +55,10 @@ function MultiFactorScreen(props) {
 
   const [phoneCodeLoading, setPhoneCodeLoading] = useState(false);
 
+  useLayoutEffect(() => {
+    _resendOTPAPI(tempUser.id, 'phone');
+  }, [tempUser.id]);
+
   // Effect for phone code countdown
   React.useEffect(() => {
     let interval = setInterval(() => {
@@ -55,25 +66,21 @@ function MultiFactorScreen(props) {
       if (tempSec <= 0 && phoneMins > 0) {
         setPhoneSecs(59);
         setPhoneMins(phoneMins - 1);
-      }
-      else if (tempSec <= 0 && phoneMins == 0) {
+      } else if (tempSec <= 0 && phoneMins == 0) {
         setPhoneSecs(0);
         setPhoneMins(0);
         clearInterval(interval);
         setPhoneTimeout(true);
-      }
-      else {
+      } else {
         setPhoneSecs(tempSec);
       }
-    }, 1000) //each count lasts for a second
+    }, 1000); //each count lasts for a second
     //cleanup the interval on complete
-    return () => clearInterval(interval)
-  })
+    return () => clearInterval(interval);
+  });
 
   const submit = () => {
-    if (
-      phoneConfirmationCode == ''
-    ) {
+    if (phoneConfirmationCode === '') {
       showMessage('ZADA Wallet', 'Fill the empty fields');
     } else {
       setProgress(true);
@@ -83,25 +90,23 @@ function MultiFactorScreen(props) {
 
   const validate = async () => {
     try {
-      if (isConnected) {
-        let result = await validateOTP(phoneConfirmationCode, userData.userId);
+      if (networkStatus === 'connected') {
+        let result = await validateOTP(phoneConfirmationCode, tempUser.id);
 
         if (result.data.success) {
-          // Setting auto acceptance to true by default.
-          saveItem(ConstantsList.AUTO_ACCEPT_CONNECTION, JSON.stringify(true));
+          // Updating user in store.
+          dispatch(updateUser({ ...tempUser, id: result.data.userId }));
 
           // Setting auth count to zero for disabling recaptcha.
           await saveItem(ConstantsList.AUTH_COUNT, JSON.stringify(0));
-          
-          await saveItem(ConstantsList.USER_ID, result.data.userId);
 
-          if (fromScreen == 'Register') {
-            await authenticateUser();
-          } else if (fromScreen == 'Login') {
-            await reNewAuthenticationToken();
+          if (fromScreen === 'Register') {
+            await dispatch(fetchToken({ secret: tempUser.walletSecret }));
+          } else {
+            await dispatch(fetchToken());
           }
-        }
-        else {
+          props.navigation.replace('SecurityScreen');
+        } else {
           showMessage('ZADA Wallet', result.data.error);
         }
       } else {
@@ -114,117 +119,32 @@ function MultiFactorScreen(props) {
     }
   };
 
-  const reNewAuthenticationToken = async () => {
-    if (isConnected) {
-      setAuthentication(true);
-      let resp = await AuthenticateUser(true);
-      if (resp.success) {
-
-        // Put User isFirsTime Logic here as well
-        await AsyncStorage.setItem('isfirstTime', 'false');
-
-        props.navigation.replace('SecurityScreen');
-        setProgress(false);
-      } else {
-        showMessage('ZADA Wallet', resp.message);
-        setProgress(false);
-      }
-    } else {
-      showNetworkMessage();
-      setProgress(false);
-    }
-  };
-
-  const authenticateUser = async () => {
-    if (isConnected) {
-      setAuthentication(true);
-      let resp = await AuthenticateUser();
-      if (resp.success) {
-        createWallet(resp.token);
-        setProgress(false);
-      } else {
-        showMessage('ZADA Wallet', resp.message);
-        setAuthentication(false);
-        setProgress(false);
-      }
-    } else {
-      showNetworkMessage();
-      setAuthentication(false);
-    }
-  };
-
-  const createWallet = async (userToken) => {
-    if (isConnected) {
-      await fetch(Config.API_URL + `/api/wallet/create`, {
-        method: 'POST',
-        headers: {
-          Authorization: 'Bearer ' + userToken,
-        },
-      }).then((walletResult) =>
-        walletResult.json().then((data) => {
-          try {
-            let response = JSON.parse(JSON.stringify(data));
-            if (response.success == true) {
-              setWallet(true);
-              reNewAuthenticationToken();
-            } else {
-              showMessage('ZADA Wallet', response.error)
-            }
-          } catch (error) {
-            _handleAxiosError(error);
-          } finally {
-            setProgress(false);
-          }
-        }),
-      );
-    } else {
-      showNetworkMessage();
-    }
-  };
-
   // Funcion to resend phone code
   const _reSendPhoneCode = async () => {
     try {
-      if (isConnected) {
+      if (networkStatus === 'connected') {
         setPhoneCodeLoading(true);
-        const result = await _resendOTPAPI(userData.userId, 'phone');
+        const result = await _resendOTPAPI(tempUser.id, 'phone');
         if (result.data.success) {
           setPhoneTimeout(false);
           setPhoneMins(1);
           setPhoneSecs(59);
+        } else {
+          _showAlert('Zada Wallet', result.data.error.toString());
         }
-        else {
-          _showAlert("Zada Wallet", result.data.error.toString());
-        }
-      }
-      else {
+      } else {
         showNetworkMessage();
       }
       setPhoneCodeLoading(false);
     } catch (error) {
       setPhoneCodeLoading(false);
-      _showAlert("Zada Wallet", error.toString());
+      _showAlert('Zada Wallet', error.toString());
     }
-  }
-
-  // Function to get registeration data of user
-  const _getRegisterUserInfo = async () => {
-    let regData = JSON.parse(await getItem(ConstantsList.REGISTRATION_DATA));
-    if (!regData) {
-      regData = JSON.parse(await getItem(ConstantsList.LOGIN_DATA));
-    }
-    // sending phone OTP
-    _resendOTPAPI(regData.userId, 'phone');
-    setUserData(regData);
-  }
-
-  useLayoutEffect(() => {
-    _getRegisterUserInfo();
-  }, [])
+  };
 
   // KEYBOARD AVOIDING VIEW
   const keyboardVerticalOffset = Platform.OS == 'ios' ? 100 : 0;
-  const keyboardBehaviour = Platform.OS == 'ios' ? 'padding' : null
+  const keyboardBehaviour = Platform.OS == 'ios' ? 'padding' : null;
 
   return (
     <View
@@ -237,8 +157,7 @@ function MultiFactorScreen(props) {
         behavior={keyboardBehaviour}
         keyboardVerticalOffset={keyboardVerticalOffset}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-      >
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
         <View
           style={{
             backgroundColor: BACKGROUND_COLOR,
@@ -253,11 +172,7 @@ function MultiFactorScreen(props) {
                 <HeadingComponent text="We're getting things ready!" />
               </View>
               <Text style={styles.textView}>Thanks for your patience</Text>
-              <ActivityIndicator
-                style={styles.progressView}
-                size="small"
-                color={PRIMARY_COLOR}
-              />
+              <ActivityIndicator style={styles.progressView} size="small" color={PRIMARY_COLOR} />
               {isAuthenticated ? (
                 <Text style={styles.opTextView}>Authenticating User...</Text>
               ) : (
@@ -270,8 +185,7 @@ function MultiFactorScreen(props) {
                 <HeadingComponent text="Multi Factor Authentication to keep you safe!" />
               </View>
               <Text style={styles.textView}>
-                We have sent confirmation code to your
-                phone. Please input it below.
+                We have sent confirmation code to your phone. Please input it below.
               </Text>
               <View>
                 {/* Phone Confirmation Code */}
@@ -279,8 +193,7 @@ function MultiFactorScreen(props) {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                  }}
-                >
+                  }}>
                   <View style={styles.inputView}>
                     <TextInput
                       style={styles.TextInput}
@@ -292,27 +205,30 @@ function MultiFactorScreen(props) {
                       }}
                     />
                   </View>
-                  {
-                    phoneTimeout ? (
-                      !phoneCodeLoading ? (
-                        <Text onPress={_reSendPhoneCode} style={styles._expireText}>Send Again</Text>
-                      ) : (
-                        <ActivityIndicator
-                          color={PRIMARY_COLOR}
-                          size={'small'}
-                          style={{
-                            marginLeft: 30,
-                          }}
-                        />
-                      )
+                  {phoneTimeout ? (
+                    !phoneCodeLoading ? (
+                      <Text onPress={_reSendPhoneCode} style={styles._expireText}>
+                        Send Again
+                      </Text>
                     ) : (
-                      <Text style={styles._countdown}>{('0' + phoneMins).slice(-2)} : {('0' + phoneSecs).slice(-2)}</Text>
+                      <ActivityIndicator
+                        color={PRIMARY_COLOR}
+                        size={'small'}
+                        style={{
+                          marginLeft: 30,
+                        }}
+                      />
                     )
-                  }
+                  ) : (
+                    <Text style={styles._countdown}>
+                      {('0' + phoneMins).slice(-2)} : {('0' + phoneSecs).slice(-2)}
+                    </Text>
+                  )}
                 </View>
 
                 <Text style={styles.textView}>
-                  Please wait until 2 minutes for the code. If you will not receive then you will be able to resend it
+                  Please wait until 2 minutes for the code. If you will not receive then you will be
+                  able to resend it
                 </Text>
 
                 <SimpleButton
@@ -320,9 +236,9 @@ function MultiFactorScreen(props) {
                   isLoading={progress}
                   width={250}
                   onPress={() => {
-                    submit()
+                    submit();
                   }}
-                  title='Continue'
+                  title="Continue"
                   titleColor={WHITE_COLOR}
                   buttonColor={GREEN_COLOR}
                   style={{
@@ -380,7 +296,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: PRIMARY_COLOR,
     marginLeft: 15,
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
   },
   checkboxContainer: {
     flexDirection: 'row',

@@ -38,13 +38,10 @@ export const removeConnection = createAsyncThunk(
       let { actions } = getState() as RootState;
       let actionObj = actions.entities;
 
-      const actionArr = Object.values(actionObj).reduce(
-        (acc: IActionObject[], item, index) => {
-          item?.connectionId == connId && acc.push(item);
-          return acc;
-        },
-        []
-      );
+      const actionArr = Object.values(actionObj).reduce((acc: IActionObject[], item, index) => {
+        item?.connectionId == connId && acc.push(item);
+        return acc;
+      }, []);
 
       // Throw error if actions are available from this connection.
       if (actionArr.length > 0) {

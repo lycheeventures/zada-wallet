@@ -2,7 +2,7 @@ import React, {useState,useEffect} from 'react';
 import {StyleSheet, Platform, Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
-import TabNavigator from './components/TabNavigator';
+import TabNavigator from './navigation/TabNavigator';
 import {AuthContext} from './context/AuthContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import SplashScreen from 'react-native-splash-screen';

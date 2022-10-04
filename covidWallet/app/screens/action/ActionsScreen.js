@@ -7,11 +7,9 @@ import {
   TouchableOpacity,
   Animated,
   RefreshControl,
-  Dimensions,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
-import NetInfo from '@react-native-community/netinfo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -41,7 +39,6 @@ import OverlayLoader from '../../components/OverlayLoader';
 import { analytics_log_action_screen } from '../../helpers/analytics';
 import PincodeModal from '../../components/Modal/PincodeModal';
 import { pincodeRegex } from '../../helpers/validation';
-import ConfirmPincodeModal from '../../components/ConfirmPincodeModal';
 import PullToRefresh from '../../components/PullToRefresh';
 import EmptyList from '../../components/EmptyList';
 import { useAppDispatch, useAppSelector } from '../../store';
@@ -53,12 +50,11 @@ import {
   selectCredentialActions,
   selectVerificationActions,
 } from '../../store/actions/selectors';
-import { changeActionStatus, deleteAction } from '../../store/actions';
+import { deleteAction } from '../../store/actions';
 import { fetchCredentials } from '../../store/credentials/thunk';
 import { fetchConnections } from '../../store/connections/thunk';
 import { selectCredentials } from '../../store/credentials/selectors';
-
-const DIMENSIONS = Dimensions.get('screen');
+import { selectNetworkStatus } from '../../store/app/selectors';
 
 function ActionsScreen({ navigation }) {
   //Constants
@@ -72,20 +68,16 @@ function ActionsScreen({ navigation }) {
   const credentialActions = useAppSelector(selectCredentialActions);
   const verificationActions = useAppSelector(selectVerificationActions);
   const actionStatus = useAppSelector(selectActionsStatus);
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
   // States
   const [loaderText, setLoaderText] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAction, setAction] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [actionsList, setActionsList] = useState([]);
   const [modalData, setModalData] = useState([]);
   const [selectedItem, setSelectedItem] = useState('');
-  const [Uid, storeUid] = useState();
-  const [secret, storeSecret] = useState('');
-  const [networkState, setNetworkState] = useState(false);
   const [deepLink, setDeepLink] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [dialogData, setDialogData] = useState(null);
 
   // For Pincode
@@ -106,26 +98,20 @@ function ActionsScreen({ navigation }) {
 
   var requestArray = [];
 
-  // Setting right icon
-  const headerOptions = {
-    headerRight: () => (
-      <MaterialCommunityIcons
-        onPress={() => {
-          navigation.navigate('QRScreen');
-        }}
-        style={styles.headerRightIcon}
-        size={30}
-        name="qrcode"
-        padding={30}
-      />
-    ),
-  };
-
-  useLayoutEffect(() => {
-    NetInfo.fetch().then((networkState) => {
-      setNetworkState(networkState.isConnected);
-    });
-  }, []);
+  // // Setting right icon
+  // const headerOptions = {
+  //   headerRight: () => (
+  //     <MaterialCommunityIcons
+  //       onPress={() => {
+  //         navigation.navigate('QRScreen');
+  //       }}
+  //       style={styles.headerRightIcon}
+  //       size={30}
+  //       name="qrcode"
+  //       padding={30}
+  //     />
+  //   ),
+  // };
 
   useEffect(() => {
     if (!deepLink) getUrl();
@@ -188,9 +174,9 @@ function ActionsScreen({ navigation }) {
     }, [])
   );
 
-  React.useLayoutEffect(() => {
-    navigation.dangerouslyGetParent().setOptions(headerOptions);
-  }, [isAction, navigation]);
+  // React.useLayoutEffect(() => {
+  //   navigation.setOptions(headerOptions);
+  // }, [isAction, navigation]);
 
   const getUrl = async (url) => {
     let initialUrl = '';
@@ -257,10 +243,7 @@ function ActionsScreen({ navigation }) {
     let find = false;
 
     for (let i = 0; i < connections.length; ++i) {
-      if (
-        connections[i].name.toLowerCase() ===
-        selectedItemObj.organizationName.toLowerCase()
-      )
+      if (connections[i].name.toLowerCase() === selectedItemObj.organizationName.toLowerCase())
         find = true;
     }
 
@@ -274,7 +257,7 @@ function ActionsScreen({ navigation }) {
 
   // Handle Connection Request
   const handleConnectionRequest = async () => {
-    if (networkState) {
+    if (networkStatus === 'connected') {
       setIsLoading(true);
 
       if (!(await _isConnectionAlreadyExist())) {
@@ -284,12 +267,6 @@ function ActionsScreen({ navigation }) {
         if (resp.success) {
           let selectedItemObj = JSON.parse(selectedItem);
 
-          let userID = await getItem(ConstantsList.USER_ID);
-          let walletSecret = await getItem(ConstantsList.WALLET_SECRET);
-
-          storeUid(userID);
-          storeSecret(walletSecret);
-
           setModalVisible(false);
 
           try {
@@ -298,9 +275,7 @@ function ActionsScreen({ navigation }) {
 
             if (result.data.success) {
               // Delete Action from redux
-              let conn = actions.find(
-                (x) => x.connectionId === selectedItemObj.connectionId
-              );
+              let conn = actions.find((x) => x.connectionId === selectedItemObj.connectionId);
 
               // Adding Connection
               dispatch(fetchConnections());
@@ -342,14 +317,10 @@ function ActionsScreen({ navigation }) {
       setIsLoading(true);
 
       // Find cred action for deletion.
-      let credObj = credentialActions.find(
-        (x) => x.credentialId === selectedItemObj.credentialId
-      );
+      let credObj = credentialActions.find((x) => x.credentialId === selectedItemObj.credentialId);
 
       // Check if crendential already exist
-      let credArr = credentials.find(
-        (x) => x.credentialId === selectedItemObj.credentialId
-      );
+      let credArr = credentials.find((x) => x.credentialId === selectedItemObj.credentialId);
 
       if (credArr === undefined) {
         if (credObj) {
@@ -486,9 +457,7 @@ function ActionsScreen({ navigation }) {
     if (selectedItemObj.type === ConstantsList.CRED_OFFER) {
       try {
         await delete_credential(selectedItemObj.credentialId);
-        dispatch(
-          deleteAction(selectedItemObj.connectionId + selectedItemObj.credentialId)
-        );
+        dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.credentialId));
       } catch (e) {
         console.log(e);
       }
@@ -503,9 +472,7 @@ function ActionsScreen({ navigation }) {
       if (checkbiometric) {
         try {
           await delete_verification(selectedItemObj.verificationId);
-          dispatch(
-            deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId)
-          );
+          dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
         } catch (e) {
           console.log(e);
         }
@@ -524,8 +491,7 @@ function ActionsScreen({ navigation }) {
     let message = '';
     if (action == 'conn') message = 'Your connection is created successfully.';
     else if (action == 'cred') message = 'You have received a certificate successfully.';
-    else if (action == 'ver')
-      message = 'Your verification request is fulfilled successfully.';
+    else if (action == 'ver') message = 'Your verification request is fulfilled successfully.';
 
     Alert.alert(
       'Zada Wallet',
@@ -561,8 +527,7 @@ function ActionsScreen({ navigation }) {
   const _checkPinCode = async () => {
     try {
       const isPincode = await getItem(ConstantsList.PIN_CODE);
-      if (isPincode != null && isPincode != undefined && isPincode.length != 0)
-        setIsPincode(true);
+      if (isPincode != null && isPincode != undefined && isPincode.length != 0) setIsPincode(true);
       else setIsPincode(false);
     } catch (error) {
       setPincodeChecked(false);
@@ -656,9 +621,7 @@ function ActionsScreen({ navigation }) {
           _showAlert('Zada Wallet', 'Verification request has been rejected!');
 
           // Deleting Verification from action list
-          dispatch(
-            deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId)
-          );
+          dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
         }
       } else {
         setLoaderText('Submitting...');
@@ -667,9 +630,7 @@ function ActionsScreen({ navigation }) {
         await accept_verification_request(selectedItemObj, dialogData);
 
         // Delete Credential from action list.
-        dispatch(
-          deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId)
-        );
+        dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
       }
     } else {
       showMessage(

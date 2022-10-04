@@ -23,6 +23,7 @@ module.exports = Object.freeze({
   USER_AUTH: 'userAuth',
   DEVICE_TOKEN: 'deviceToken',
   USER_ID: 'userId',
+  IS_DEVICE_REGISTERED: 'is_device_registered',
   CREDENTIALS: 'credentials',
   API_SECRET: '',
   BIOMETRIC_ENABLED: 'biometric_enabled',

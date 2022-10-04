@@ -1,15 +1,17 @@
 import axios from 'axios';
 import * as React from 'react';
-import {View, Text, StyleSheet, Image, ActivityIndicator} from 'react-native';
-import {ZADA_S3_BASE_URL} from '../helpers/ConfigApp';
+import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { ZADA_S3_BASE_URL } from '../helpers/ConfigApp';
 import useNetwork from '../hooks/useNetwork';
-import {BLACK_COLOR, WHITE_COLOR} from '../theme/Colors';
+import { useAppSelector } from '../store';
+import { selectNetworkStatus } from '../store/app/selectors';
+import { BLACK_COLOR, WHITE_COLOR } from '../theme/Colors';
 
 const CARD_BG = require('../assets/images/card-bg.png');
 
 function CardBackground(props) {
   const { updateBackgroundImage, item } = props;
-  const {isConnected} = useNetwork();
+  const networkStatus = useAppSelector(selectNetworkStatus);
   const [backgroundImage, setBakcgroundImage] = React.useState(CARD_BG);
   const [loading, setLoading] = React.useState(true);
   const [isUrl, setUrl] = React.useState(false);
@@ -26,7 +28,7 @@ function CardBackground(props) {
 
   const _checkForImageInS3 = () => {
     try {
-      if (!isConnected) {
+      if (networkStatus === 'disconnected') {
         setLoading(false);
         setBakcgroundImage(CARD_BG);
         setUrl(false);
@@ -36,8 +38,7 @@ function CardBackground(props) {
 
       let schemeId = props.schemeId.replace(/:/g, '.');
 
-      const result = axios
-        .get(`${ZADA_S3_BASE_URL}/${schemeId}.png`)
+      axios(`${ZADA_S3_BASE_URL}/${schemeId}.png`)
         .then((res) => {
           if (res.status === 200) {
             updateBackgroundImage(
@@ -53,7 +54,6 @@ function CardBackground(props) {
         .catch((error) => {
           setUrl(false);
           setLoading(false);
-          //setBakcgroundImage(`${ZADA_S3_BASE_URL}/default.png`);
         });
     } catch (error) {
       setUrl(false);
@@ -77,7 +77,7 @@ function CardBackground(props) {
       ) : (
         <>
           <Image
-            source={isUrl ? {uri: backgroundImage} : backgroundImage}
+            source={isUrl ? { uri: backgroundImage } : backgroundImage}
             style={styles._frontLayer}
           />
           {props.children}

@@ -7,12 +7,8 @@ import {
   selectConnectionsError,
   selectConnectionsStatus,
 } from '../store/connections/selectors';
-import {
-  selectCredentialsError,
-  selectCredentialsStatus,
-} from '../store/credentials/selectors';
+import { selectCredentialsError, selectCredentialsStatus } from '../store/credentials/selectors';
 
-import { fetchToken } from '../store/auth/thunk';
 import { fetchActions } from '../store/actions/thunk';
 import { fetchConnections } from '../store/connections/thunk';
 import { fetchCredentials } from '../store/credentials/thunk';
@@ -20,9 +16,11 @@ import { _showAlert } from '../helpers/Toast';
 import { changeCredentialStatus } from '../store/credentials';
 import { changeActionStatus } from '../store/actions';
 import { changeConnectionStatus } from '../store/connections';
-import { selectToken } from '../store/auth/interface';
+import { selectAuthError, selectAuthStatus, selectToken } from '../store/auth/selectors';
 import { getItem } from '../helpers/Storage';
-import { ConnectionAPI, CredentialAPI } from '../gateways';
+import { updateAuthStatus, updateIsAuthorized } from '../store/auth';
+import useDecryption from './useDecryption';
+import { fetchToken } from '../store/auth/thunk';
 
 const useInit = () => {
   // Constants
@@ -31,13 +29,18 @@ const useInit = () => {
   // Selectors
   const token = useAppSelector(selectToken);
   const connections = useAppSelector(selectConnections.selectAll);
+  const authStatus = useAppSelector(selectAuthStatus);
   const actionStatus = useAppSelector(selectActionsStatus);
   const connStatus = useAppSelector(selectConnectionsStatus);
   const credStatus = useAppSelector(selectCredentialsStatus);
 
+  const authError = useAppSelector(selectAuthError);
   const actionError = useAppSelector(selectActionsError);
   const connError = useAppSelector(selectConnectionsError);
   const credError = useAppSelector(selectCredentialsError);
+
+  // Hooks
+  const { decrpytData } = useDecryption();
 
   // States
   const [isAppReady, setIsAppReady] = useState(false);
@@ -45,7 +48,6 @@ const useInit = () => {
 
   // useEffects
   useEffect(() => {
-    init();
     setMessageIndex(1);
   }, []);
 
@@ -56,6 +58,7 @@ const useInit = () => {
     }
   }, [actionStatus, connStatus, credStatus]);
 
+  // Whenever token gets updated.
   useEffect(() => {
     if (token) {
       // Invalidating cache.
@@ -68,6 +71,20 @@ const useInit = () => {
       dispatch(changeConnectionStatus('idle'));
     }
   }, [token]);
+
+  const startApp = async () => {
+    if (token) {
+      setMessageIndex(3);
+      // Decrypt Redux.
+      await decrpytData();
+
+      // Fetch Tokens.
+      await dispatch(fetchToken({ secret: undefined }));
+      dispatch(changeConnectionStatus('idle'));
+    } else {
+      dispatch(changeConnectionStatus('idle'));
+    }
+  };
 
   // Fetching all crendetials and actions after fetching connections.
   useEffect(() => {
@@ -85,6 +102,9 @@ const useInit = () => {
   }, [connections, token]);
 
   useEffect(() => {
+    // Auth status handling
+    handleAuthStatus();
+
     // Action status handling
     handleActionStatus();
 
@@ -93,11 +113,17 @@ const useInit = () => {
 
     // Connection status handling
     handleConnectionStatus();
-  }, [actionStatus, credStatus, connStatus]);
+  }, [authStatus, actionStatus, credStatus, connStatus]);
 
-  // Functions
-  const init = async () => {
-    await dispatch(fetchToken());
+  // Handling Action Status
+  const handleAuthStatus = () => {
+    if (authStatus == 'succeeded' || authStatus == 'failed') {
+      dispatch(updateAuthStatus('idle'));
+
+      if (authStatus === 'failed') {
+        _showAlert(authError);
+      }
+    }
   };
 
   // Handling Action Status
@@ -137,6 +163,7 @@ const useInit = () => {
     isAppReady,
     messageIndex,
     setMessageIndex,
+    startApp,
   };
 };
 

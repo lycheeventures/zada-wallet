@@ -4,6 +4,8 @@ import { Notifications, Registered, RegistrationError } from 'react-native-notif
 import { useAppDispatch } from '../store';
 import { fetchActions } from '../store/actions/thunk';
 import { AuthAPI } from '../gateways';
+import { getItem, saveItem } from '../helpers/Storage';
+import ConstantList from '../helpers/ConfigApp';
 
 const useNotification = () => {
   // Constants
@@ -14,9 +16,14 @@ const useNotification = () => {
     Notifications.registerRemoteNotifications();
 
     // Register Device Token
-    Notifications.events().registerRemoteNotificationsRegistered((event: Registered) => {
+    Notifications.events().registerRemoteNotificationsRegistered(async (event: Registered) => {
       if (event.deviceToken) {
-        AuthAPI.registerDeviceToken(Platform.OS, event.deviceToken);
+        let parsedItem = await getItem(ConstantList.IS_DEVICE_REGISTERED);
+        let isReg = parsedItem ? false : parsedItem;
+        if (!isReg) {
+          AuthAPI.registerDeviceToken(Platform.OS, event.deviceToken);
+          await saveItem(ConstantList.IS_DEVICE_REGISTERED, JSON.stringify(true));
+        }
       }
     });
 
