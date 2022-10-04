@@ -101,7 +101,7 @@ const useInit = () => {
       dispatch(changeActionStatus('idle'));
 
       if (actionStatus === 'failed') {
-        _showAlert(actionError);
+        _showAlert('Error', actionError);
       }
     }
   };
@@ -112,7 +112,7 @@ const useInit = () => {
       dispatch(changeCredentialStatus('idle'));
 
       if (credStatus === 'failed') {
-        _showAlert(credError);
+        _showAlert('Error', credError);
       }
     }
   };
@@ -123,7 +123,7 @@ const useInit = () => {
       dispatch(changeConnectionStatus('idle'));
 
       if (connStatus === 'failed') {
-        _showAlert(connError);
+        _showAlert('Error', connError);
       }
     }
   };
