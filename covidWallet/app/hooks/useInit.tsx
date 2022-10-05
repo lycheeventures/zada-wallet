@@ -58,6 +58,10 @@ const useInit = () => {
 
   useEffect(() => {
     if (token) {
+      // Invalidating cache.
+      ConnectionAPI.invalidateCache();
+      CredentialAPI.invalidateCache();
+
       // Fetching Connections
       dispatch(fetchConnections());
     } else {
@@ -94,10 +98,6 @@ const useInit = () => {
   // Functions
   const init = async () => {
     await dispatch(fetchToken());
-
-    // Invalidating cache.
-    ConnectionAPI.invalidateCache();
-    await CredentialAPI.invalidateCache();
   };
 
   // Handling Action Status
