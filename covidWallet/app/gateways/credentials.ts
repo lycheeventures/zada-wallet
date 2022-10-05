@@ -248,7 +248,6 @@ export async function invalidateCache() {
       url: '/api/credential/invalidate_cache',
       headers,
     });
-    console.log('INVADIDATEd!!!!')
     return result;
   } catch (error) {
     throw error;
