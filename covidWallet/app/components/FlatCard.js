@@ -8,7 +8,7 @@ function FlatCard(props) {
     <View style={{ paddingLeft: 4, paddingRight: 4 }}>
       <View style={styles.card}>
         <TouchableComponent
-          android_ripple={{ borderless: false }}
+          android_ripple={{ borderless: true }}
           style={styles.touchableStyle}
           onPress={() => props.onPress()}>
           <View style={styles.container}>
