@@ -234,3 +234,23 @@ export const fetch_signature_by_cred_id = async (
     return {success: false};
   }
 };
+
+
+export async function invalidateCache() {
+  try {
+    let headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + (await getToken()),
+    };
+
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/credential/invalidate_cache',
+      headers,
+    });
+    console.log('INVADIDATEd!!!!')
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}

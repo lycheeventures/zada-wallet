@@ -279,3 +279,21 @@ export async function delete_mongo_connection(did: string) {
     throw error;
   }
 }
+
+export async function invalidateCache() {
+  try {
+    let headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + (await getToken()),
+    };
+
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/connection/invalidate_cache',
+      headers,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}

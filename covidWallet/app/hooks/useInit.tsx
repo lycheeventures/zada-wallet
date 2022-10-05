@@ -22,6 +22,7 @@ import { changeActionStatus } from '../store/actions';
 import { changeConnectionStatus } from '../store/connections';
 import { selectToken } from '../store/auth/interface';
 import { getItem } from '../helpers/Storage';
+import { ConnectionAPI, CredentialAPI } from '../gateways';
 
 const useInit = () => {
   // Constants
@@ -93,6 +94,10 @@ const useInit = () => {
   // Functions
   const init = async () => {
     await dispatch(fetchToken());
+
+    // Invalidating cache.
+    ConnectionAPI.invalidateCache();
+    await CredentialAPI.invalidateCache();
   };
 
   // Handling Action Status
