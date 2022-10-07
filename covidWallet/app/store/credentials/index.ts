@@ -15,6 +15,7 @@ export const slice = createSlice({
   reducers: {
     addCredential: credentialAdapter.addOne,
     addCredentials: credentialAdapter.addMany,
+    updateCredential: credentialAdapter.updateOne,
     deleteCredential: credentialAdapter.removeOne,
 
     changeCredentialStatus(state, action) {
@@ -55,7 +56,12 @@ export const slice = createSlice({
 });
 
 // Exporting Actions
-export const { changeCredentialStatus, addCredential, deleteCredential } = slice.actions;
+export const {
+  changeCredentialStatus,
+  addCredential,
+  updateCredential,
+  deleteCredential,
+} = slice.actions;
 
 // export const {
 //     selectAll: selectAllCredentials,

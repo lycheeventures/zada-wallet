@@ -8,13 +8,20 @@ import {BLACK_COLOR, WHITE_COLOR} from '../theme/Colors';
 const CARD_BG = require('../assets/images/card-bg.png');
 
 function CardBackground(props) {
+  const { updateBackgroundImage, item } = props;
   const {isConnected} = useNetwork();
   const [backgroundImage, setBakcgroundImage] = React.useState(CARD_BG);
   const [loading, setLoading] = React.useState(true);
   const [isUrl, setUrl] = React.useState(false);
 
   React.useEffect(() => {
-    _checkForImageInS3();
+    if (item.backgroundImage === undefined) {
+      _checkForImageInS3();
+    } else {
+      setLoading(false);
+      setBakcgroundImage(item.backgroundImage);
+      setUrl(true);
+    }
   }, []);
 
   const _checkForImageInS3 = () => {
@@ -33,6 +40,11 @@ function CardBackground(props) {
         .get(`${ZADA_S3_BASE_URL}/${schemeId}.png`)
         .then((res) => {
           if (res.status === 200) {
+            updateBackgroundImage(
+              item.credentialId,
+              `${ZADA_S3_BASE_URL}/${schemeId}.png`
+            );
+            // background_image={{ uri: item.backgroundImage }}
             setBakcgroundImage(`${ZADA_S3_BASE_URL}/${schemeId}.png`);
             setUrl(true);
             setLoading(false);
