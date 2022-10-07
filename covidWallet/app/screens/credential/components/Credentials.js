@@ -16,6 +16,7 @@ import {
   selectSearchedCredentials,
 } from '../../../store/credentials/selectors';
 import { fetchCredentials } from '../../../store/credentials/thunk';
+import { updateCredential } from '../../../store/credentials';
 
 function Credentials(props) {
   // Constants
@@ -37,8 +38,15 @@ function Credentials(props) {
     });
   };
 
+  const updateBackgroundImage = (credentialId, background_url) => {
+    console.log(credentialId, background_url);
+    dispatch(
+      updateCredential({ id: credentialId, changes: { backgroundImage: background_url } })
+    );
+  };
+
   // List Empty Component
-  const emptyListComponent = () => (
+  const emptyListComponent = (item) => (
     <EmptyList
       // refreshing={refreshing}
       // onRefresh={fetchCredentials}
@@ -69,7 +77,10 @@ function Credentials(props) {
     return (
       <TouchableOpacity onPress={() => toggleModal(item)} activeOpacity={0.9}>
         <View style={styles.CredentialsCardContainer}>
-          <CardBackground schemeId={item.schemaId}>
+          <CardBackground
+            updateBackgroundImage={updateBackgroundImage}
+            item={item}
+            schemeId={item.schemaId}>
             <CertificateCard
               card_type={item.type}
               issuer={item.organizationName}
