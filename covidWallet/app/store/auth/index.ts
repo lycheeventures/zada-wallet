@@ -8,6 +8,9 @@ export const AuthState: IAuthState = {
   status: 'idle',
   isAuthorized: false,
   error: undefined,
+  status: 'idle',
+  isAuthorized: false,
+  error: undefined,
   token: undefined,
   user: {
     isNew: true,
@@ -30,6 +33,12 @@ const slice = createSlice({
   name: 'auth',
   initialState: AuthState,
   reducers: {
+    updateAuthStatus(state, action) {
+      state.status = action.payload;
+    },
+    updateIsAuthorized(state, action) {
+      state.isAuthorized = action.payload;
+    },
     updateAuthStatus(state, action) {
       state.status = action.payload;
     },

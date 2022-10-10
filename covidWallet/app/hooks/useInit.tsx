@@ -21,6 +21,7 @@ import { getItem } from '../helpers/Storage';
 import { updateAuthStatus, updateIsAuthorized } from '../store/auth';
 import useDecryption from './useDecryption';
 import { fetchToken } from '../store/auth/thunk';
+import { ConnectionAPI, CredentialAPI } from '../gateways';
 
 const useInit = () => {
   // Constants
@@ -114,6 +115,11 @@ const useInit = () => {
     // Connection status handling
     handleConnectionStatus();
   }, [authStatus, actionStatus, credStatus, connStatus]);
+
+  // Functions
+  const init = async () => {
+    await dispatch(fetchToken());
+  };
 
   // Handling Action Status
   const handleAuthStatus = () => {

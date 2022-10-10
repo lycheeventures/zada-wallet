@@ -46,7 +46,15 @@ import TouchableComponent from '../../components/Buttons/TouchableComponent';
 import RegisterButton from './components/buttons/RegisterButton';
 import LoginButton from './components/buttons/LoginButton';
 
-const { width } = Dimensions.get('window');
+  // Selectors
+  const token = useAppSelector(selectToken);
+  const user = useAppSelector(selectUser);
+<<<<<<< HEAD:covidWallet/app/screens/auth/AuthScreen.tsx
+  const tempUser = useAppSelector(selectTempVar);
+=======
+>>>>>>> 3657d90e423aa586c4fc58dd0a8c12f06204a6f0:covidWallet/app/screens/RegistrationModule.js
+  const status = useAppSelector(selectAuthStatus);
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
 const AuthScreen = ({
   navigation,
@@ -188,8 +196,17 @@ const AuthScreen = ({
           registerUser({ name: data.name, phone: data.phone, secret: data.secretPhrase })
         ).unwrap();
       }
-    } catch (e) {
-      console.log(e);
+        setProgress(false);
+      } else {
+        setProgress(false);
+        showNetworkMessage();
+      }
+    } catch (error) {
+      console.log(error.response);
+      setProgress(false);
+      if (error.response && error.response.data) {
+        _checkForVerification(error.response.data);
+      }
     }
   };
 
@@ -402,7 +419,7 @@ const AuthScreen = ({
               </Text>
               <SimpleButton
                 loaderColor={WHITE_COLOR}
-                isLoading={progress}
+                isLoading={status === 'pending'}
                 onPress={authCount >= 3 ? recaptcha.current.open : submit}
                 width={250}
                 title="Continue"
