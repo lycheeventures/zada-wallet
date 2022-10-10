@@ -16,9 +16,6 @@ export const selectAutoAcceptConnection = (state: RootState) =>
 export const selectAuthStatus = (state: RootState) => state.auth.status;
 export const selectIsAuthorized = (state: RootState) => state.auth.isAuthorized;
 export const selectAuthError = (state: RootState) => state.auth.error;
-export const selectAuthStatus = (state: RootState) => state.auth.status;
-export const selectIsAuthorized = (state: RootState) => state.auth.isAuthorized;
-export const selectAuthError = (state: RootState) => state.auth.error;
 // export const selectToken = createSelector(
 //     (s: RootState) => s.auth.token,
 //     (token) => // do something with token

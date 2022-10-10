@@ -9,13 +9,7 @@ import jwt_decode from 'jwt-decode';
 import Recaptcha from 'react-native-recaptcha-that-works';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import {
-  PRIMARY_COLOR,
-  BACKGROUND_COLOR,
-  GREEN_COLOR,
-  WHITE_COLOR,
-  GRAY_COLOR,
-} from '../../theme/Colors';
+import { GREEN_COLOR, WHITE_COLOR, GRAY_COLOR, PRIMARY_COLOR, BACKGROUND_COLOR } from '../../theme/Colors';
 import { AuthStackParamList } from '../../navigation/types';
 
 import ConstantsList from '../../helpers/ConfigApp';
@@ -46,15 +40,7 @@ import TouchableComponent from '../../components/Buttons/TouchableComponent';
 import RegisterButton from './components/buttons/RegisterButton';
 import LoginButton from './components/buttons/LoginButton';
 
-  // Selectors
-  const token = useAppSelector(selectToken);
-  const user = useAppSelector(selectUser);
-<<<<<<< HEAD:covidWallet/app/screens/auth/AuthScreen.tsx
-  const tempUser = useAppSelector(selectTempVar);
-=======
->>>>>>> 3657d90e423aa586c4fc58dd0a8c12f06204a6f0:covidWallet/app/screens/RegistrationModule.js
-  const status = useAppSelector(selectAuthStatus);
-  const networkStatus = useAppSelector(selectNetworkStatus);
+const { width } = Dimensions.get('window');
 
 const AuthScreen = ({
   navigation,
@@ -196,17 +182,8 @@ const AuthScreen = ({
           registerUser({ name: data.name, phone: data.phone, secret: data.secretPhrase })
         ).unwrap();
       }
-        setProgress(false);
-      } else {
-        setProgress(false);
-        showNetworkMessage();
-      }
-    } catch (error) {
-      console.log(error.response);
-      setProgress(false);
-      if (error.response && error.response.data) {
-        _checkForVerification(error.response.data);
-      }
+    } catch (e) {
+      console.log(e);
     }
   };
 

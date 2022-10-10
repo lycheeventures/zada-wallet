@@ -62,3 +62,15 @@ export async function delete_connection(connectionId: string) {
     throw error;
   }
 }
+
+export async function invalidateCache() {
+  try {
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/credential/invalidate_cache',
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
