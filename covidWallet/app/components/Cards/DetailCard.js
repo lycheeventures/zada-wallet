@@ -6,6 +6,7 @@ import CardBackground from '../CardBackground';
 
 const { width } = Dimensions.get('screen');
 const DetailCard = ({
+  item,
   schemaId,
   imageUrl,
   issue_date,
@@ -36,7 +37,7 @@ const DetailCard = ({
 
   return (
     <TouchableComponent style={{ overflow: 'hidden' }} onPress={handleQRPress}>
-      <CardBackground schemeId={schemaId}>
+      <CardBackground item={item} schemeId={schemaId}>
         <View style={styles.issueTextContainerStyle}>
           <Text style={styles.issueTextStyle}>{date}</Text>
         </View>

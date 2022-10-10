@@ -519,6 +519,7 @@ function DetailsScreen(props) {
         {data.qrCode != undefined ? (
           <View style={styles.topContainer}>
             <DetailCard
+              item={data}
               schemaId={data.schemaId}
               imageUrl={data.imageUrl}
               issue_date={data.values['Issue Time']

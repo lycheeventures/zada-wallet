@@ -15,7 +15,7 @@ function CardBackground(props) {
   const [isUrl, setUrl] = React.useState(false);
 
   React.useEffect(() => {
-    if (item.backgroundImage === undefined) {
+    if (item?.backgroundImage === undefined) {
       _checkForImageInS3();
     } else {
       setLoading(false);
