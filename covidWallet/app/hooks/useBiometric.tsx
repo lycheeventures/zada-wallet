@@ -1,11 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { AppState } from 'react-native';
 import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
 import { getItem, saveItem } from '../helpers/Storage';
 import { showMessage } from '../helpers/Toast';
-import useDecryption from './useDecryption';
 
 const useBiometric = () => {
 
@@ -16,10 +15,6 @@ const useBiometric = () => {
     // States
     const [authStatus, setAuthStatus] = useState(false);
 
-    // Hooks
-    const { backgroundDataEncryption, decrypt_userData } = useDecryption();
-
-
     // UseEffects
     useEffect(() => {
         const subscription = AppState.addEventListener("change", nextAppState => {
@@ -27,13 +22,8 @@ const useBiometric = () => {
                 appState.current.match(/inactive|background/) &&
                 nextAppState === "active"
             ) {
-                // decrypt User data
-                // decrypt_userData();
                 checkIfAuthIsRequired();
             } else {
-                if(nextAppState === 'background'){
-                    backgroundDataEncryption();
-                }
                 setAuthStatus(false);
             }
             appState.current = nextAppState;

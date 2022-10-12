@@ -21,6 +21,7 @@ export const slice = createSlice({
     changeConnectionStatus(state, action) {
       state.status = action.payload;
     },
+    resetConnection: () => ConnectionAdapter.getInitialState(ConnectionState),
   },
   extraReducers: (builder) => {
     // Fetch connection.
@@ -71,6 +72,7 @@ export const slice = createSlice({
 });
 
 // Exporting Actions
-export const { changeConnectionStatus, addConnection, deleteConnection } = slice.actions;
+export const { changeConnectionStatus, addConnection, deleteConnection, resetConnection } =
+  slice.actions;
 
 export { slice as ConnectionSlice };

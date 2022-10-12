@@ -83,20 +83,23 @@ export async function get_all_qr_credentials() {
 // Accept Crendentials API
 export async function accept_credential(credentialId: string) {
   try {
+    console.log('acccepting creds...')
     const params = new URLSearchParams();
     params.append('credentialId', credentialId);
 
+    console.log('params => ', params)
     const result = await http_client({
       method: 'POST',
       url: '/api/credential/accept_credential',
       data: params,
     });
-
+    console.log('result => ', result.data)
     // Google Analytics
     analytics_log_accept_credential_request();
 
     return result;
   } catch (error) {
+    console.log(error.response.data.message);
     throw error;
   }
 }

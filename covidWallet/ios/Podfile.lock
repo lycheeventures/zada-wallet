@@ -546,6 +546,8 @@ PODS:
     - Yoga
   - RNScreens (2.18.1):
     - React-Core
+  - RNSecureRandom (1.0.1):
+    - React
   - RNShare (7.8.0):
     - React-Core
   - RNSVG (12.4.4):
@@ -650,6 +652,7 @@ DEPENDENCIES:
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSecureRandom (from `../node_modules/react-native-securerandom`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -810,6 +813,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSecureRandom:
+    :path: "../node_modules/react-native-securerandom"
   RNShare:
     :path: "../node_modules/react-native-share"
   RNSVG:
@@ -913,6 +918,7 @@ SPEC CHECKSUMS:
   RNPermissions: 79d0c889562fd792329821bea3155fe6eb54d359
   RNReanimated: 11e6e30bbc49079b7f0c321ac5830e6d113d0224
   RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
+  RNSecureRandom: 07efbdf2cd99efe13497433668e54acd7df49fef
   RNShare: 31b418e3ff2084712f0f39618bafa5f97a322c0e
   RNSVG: ecd661f380a07ba690c9c5929c475a44f432d674
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4

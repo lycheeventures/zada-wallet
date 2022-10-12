@@ -8,9 +8,6 @@ export const AuthState: IAuthState = {
   status: 'idle',
   isAuthorized: false,
   error: undefined,
-  status: 'idle',
-  isAuthorized: false,
-  error: undefined,
   token: undefined,
   user: {
     isNew: true,
@@ -39,16 +36,11 @@ const slice = createSlice({
     updateIsAuthorized(state, action) {
       state.isAuthorized = action.payload;
     },
-    updateAuthStatus(state, action) {
-      state.status = action.payload;
-    },
-    updateIsAuthorized(state, action) {
-      state.isAuthorized = action.payload;
-    },
     updateToken: (state, action: PayloadAction<string | undefined>) => {
       if (action.payload) state.token = action.payload;
     },
     updateUser: (state, action: PayloadAction<IUserState | undefined>) => {
+      console.log('update user called.!');
       if (action.payload) {
         state.user = action.payload;
       }
@@ -58,16 +50,7 @@ const slice = createSlice({
         state.tempVar = action.payload;
       }
     },
-    logout: (state) => {
-      state.token = undefined;
-      state.user = {
-        isNew: true,
-        id: undefined,
-        walletSecret: undefined,
-        type: undefined,
-        auto_accept_connection: true,
-      };
-    },
+    resetAuth: () => AuthState,
   },
   extraReducers: (builder) => {
     // Fetch Token.
@@ -130,7 +113,7 @@ export const {
   updateTempVar,
   updateAuthStatus,
   updateIsAuthorized,
-  logout,
+  resetAuth,
 } = slice.actions;
 
 export { slice as AuthSlice };

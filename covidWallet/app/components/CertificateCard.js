@@ -8,23 +8,25 @@ function CertificateCard(props) {
       <Text style={styles._cardTitle}>{props.card_type}</Text>
 
       <View style={styles._bottomContainer}>
-        <Image source={props.card_logo} style={styles._cardLogo} />
+        {props.card_logo && props.card_logo.uri !== '' && (
+          <Image source={props.card_logo} style={styles._cardLogo} />
+        )}
         <View style={styles._cardInfoContainer}>
           <View
             style={{
               width: '60%',
             }}>
-            <Text style={styles.card_small_text}>Issued by</Text>
-            <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>
-              {props.issuer}
-            </Text>
+            {props.issuer && (
+              <>
+                <Text style={styles.card_small_text}>Issued by</Text>
+                <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>{props.issuer}</Text>
+              </>
+            )}
           </View>
           {props.date ? (
             <View>
               <Text style={styles.card_small_text}>Issued Time</Text>
-              <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>
-                {props.date}
-              </Text>
+              <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>{props.date}</Text>
             </View>
           ) : null}
         </View>

@@ -17,7 +17,6 @@ const url_arr = [
   '/api/validateOTPs',
   '/api/wallet/create',
 ];
-
 // Api request Queue machanism, if authorization token has expired.
 const processQueue = (error: any, token = null) => {
   failedQueue.forEach((prom: any) => {
@@ -51,7 +50,7 @@ const setup = (store: any) => {
     (config) => {
       if (!url_arr.includes(config.url ? config.url : '')) {
         const token = store.getState().auth.token;
-        if(!token) throw 'Invalid token'
+        if (!token) throw 'Invalid token';
         if (isJWTExp(token)) {
           throw {
             response: { status: 401 },
@@ -110,7 +109,8 @@ const setup = (store: any) => {
           originalRequest._retry = true;
           isRefreshing = true;
 
-          let { userId, walletSecret } = getUserCredentials(store.getState());
+          let state = store.getState() as RootState;
+          let { id: userId, walletSecret } = state.auth.user;
           // Fetch token
           return new Promise((resolve, reject) => {
             fetch(Config.API_URL + '/api/authenticate', {

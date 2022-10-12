@@ -8,7 +8,6 @@ export const fetchActions = createAsyncThunk(
   'actions/fetchActions',
   async (args, { getState }) => {
     try {
-      console.log('fetching actions ...');
       // Current State
       const { connection } = getState() as RootState;
       const connArr = Object.values(connection.entities) as IConnectionObject[];

@@ -5,17 +5,7 @@ import TouchableComponent from '../Buttons/TouchableComponent';
 import CardBackground from '../CardBackground';
 
 const { width } = Dimensions.get('screen');
-const DetailCard = ({
-  item,
-  schemaId,
-  imageUrl,
-  issue_date,
-  organizationName,
-  setShowQRModal,
-}) => {
-  // Date
-  let date = issue_date ? `Issued on ` + issue_date : '';
-
+const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
   // Functions
   const handleQRPress = () => {
     analytics_log_show_cred_qr();
@@ -26,34 +16,37 @@ const DetailCard = ({
   const issuerImage = () => {
     return (
       <View style={styles.issuerImageContainer}>
-        <Image
-          resizeMode="contain"
-          source={{ uri: imageUrl }}
-          style={styles.imageStyle}
-        />
+        <Image resizeMode="contain" source={{ uri: item.imageUrl }} style={styles.imageStyle} />
       </View>
     );
   };
 
   return (
     <TouchableComponent style={{ overflow: 'hidden' }} onPress={handleQRPress}>
-      <CardBackground item={item} schemeId={schemaId}>
-        <View style={styles.issueTextContainerStyle}>
-          <Text style={styles.issueTextStyle}>{date}</Text>
+      <CardBackground item={item} schemeId={item.schemaId}>
+        <View style={styles.issueDateViewStyle}>
+          {issue_date && (
+            <>
+              <Text style={styles.issueDateLabelStyle}>Issue Date</Text>
+              <Text style={styles.issueTextStyle}>{issue_date}</Text>
+            </>
+          )}
         </View>
-
+        <View style={styles.issueTextContainerStyle}>
+          <Text style={styles.typeTextStyle}>{item?.type}</Text>
+        </View>
         <View style={styles._bottomContainer}>
           <View style={styles._bottomInsideContainer}>
             {issuerImage()}
             <View style={styles._cardInfoContainer}>
-              <View>
-                <Text style={styles.card_small_text}>Issued by</Text>
-                <Text
-                  numberOfLines={2}
-                  style={[styles.card_small_text, { fontWeight: 'bold' }]}>
-                  {organizationName}
-                </Text>
-              </View>
+              {organizationName && (
+                <View>
+                  <Text style={styles.card_small_text}>Issued by</Text>
+                  <Text numberOfLines={2} style={[styles.card_small_text, { fontWeight: 'bold' }]}>
+                    {organizationName}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
           <View>
@@ -83,16 +76,35 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   issueTextContainerStyle: {
-    marginTop: 16,
-    height: 30,
+    minHeight: 24,
+    marginTop: 8,
     width: '100%',
     justifyContent: 'center',
     backgroundColor: '#ffffff20',
   },
+  issueDateViewStyle: {
+    minHeight: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  issueDateLabelStyle: {
+    marginLeft: 16,
+    marginTop: 8,
+    color: 'white',
+    fontWeight: 'bold',
+  },
   issueTextStyle: {
     alignSelf: 'flex-end',
-    color: 'white',
+    color: '#ffffff90',
     marginRight: 16,
+    marginTop: 8,
+  },
+  typeTextStyle: {
+    color: 'white',
+    width: '100%',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   _bottomContainer: {
     width: '100%',

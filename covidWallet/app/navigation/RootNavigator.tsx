@@ -76,7 +76,6 @@ const RootNavigator = () => {
   };
 
   const renderNavigator = useCallback(() => {
-    console.log('rendering navigator...')
     if (!isAuthorized) {
       return <AuthNavigator />;
     } else {

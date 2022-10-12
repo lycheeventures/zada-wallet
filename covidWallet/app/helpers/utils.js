@@ -1,3 +1,6 @@
+import * as Keychain from 'react-native-keychain';
+import CryptoJS from 'react-native-crypto-js';
+
 export const capitalizeFirstLetter = (str) => {
   if (!str) {
     str = '';
@@ -12,4 +15,44 @@ export const sortValuesByKey = (values) => {
       obj[key] = values[key];
       return obj;
     }, {});
+};
+
+// Get user secrets.
+export const getUserCredentials = async () => {
+  try {
+    // Retrieve the credentials
+    const credentials = await Keychain.getGenericPassword();
+    if (credentials) {
+      return credentials.password;
+    } else {
+      console.log('No credentials stored');
+      return null;
+    }
+  } catch (error) {
+    console.log("Keychain couldn't be accessed!", error);
+    return null;
+  }
+};
+
+// Store user secrets
+export const storeUserCredentials = async (id, secret) => {
+  const username = id;
+  const password = secret;
+  try {
+    await Keychain.setGenericPassword(username, password);
+  } catch (error) {
+    console.log("Keychain couldn't be accessed!", error);
+    return null;
+  }
+};
+
+// Remove secrets
+export const resetUserCredentials = async () => {
+  try {
+    // Retrieve the credentials
+    await Keychain.resetGenericPassword();
+  } catch (error) {
+    console.log("Keychain couldn't be accessed!", error);
+    return null;
+  }
 };

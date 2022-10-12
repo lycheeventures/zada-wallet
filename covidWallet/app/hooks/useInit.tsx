@@ -54,8 +54,10 @@ const useInit = () => {
 
   useEffect(() => {
     if (actionStatus == 'idle' && connStatus == 'idle' && credStatus == 'idle') {
-      setIsAppReady(true);
       setMessageIndex(3);
+      setTimeout(() => {
+        setIsAppReady(true);
+      }, 1000);
     }
   }, [actionStatus, connStatus, credStatus]);
 
@@ -89,7 +91,7 @@ const useInit = () => {
 
   // Fetching all crendetials and actions after fetching connections.
   useEffect(() => {
-    if (connections.length > 0) {
+    if (connections.length > 0 && isAppReady) {
       // Fetching all credentials
       dispatch(fetchCredentials());
 
@@ -100,7 +102,7 @@ const useInit = () => {
       dispatch(changeActionStatus('idle'));
       dispatch(changeCredentialStatus('idle'));
     }
-  }, [connections, token]);
+  }, [connections]);
 
   useEffect(() => {
     // Auth status handling

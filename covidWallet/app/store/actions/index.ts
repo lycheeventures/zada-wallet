@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { RootState } from '..';
 import { IActionState } from './interface';
-import { ActionAdapter } from './selectors';
+import { ActionAdapter, selectActions } from './selectors';
 import { fetchActions } from './thunk';
 
 // State initialization

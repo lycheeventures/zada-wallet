@@ -11,9 +11,14 @@ import { AUTO_ACCEPT_CONNECTION, BIOMETRIC_ENABLED } from '../helpers/ConfigApp'
 import { showMessage } from '../helpers/Toast';
 import ConstantsList from '../helpers/ConfigApp';
 import ZignSecModal from '../components/ZignSecModal';
-import { useAppDispatch, useAppSelector } from '../store';
-import { logout, updateUser } from '../store/auth';
+import { persistor, useAppDispatch, useAppSelector } from '../store';
+import { resetAuth, updateUser } from '../store/auth';
 import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
+import { resetUserCredentials } from '../helpers/utils';
+import { resetConnection } from '../store/connections';
+import { resetCredential } from '../store/credentials';
+import useDevelopment from '../hooks/useDevelopment';
+import { resetApp } from '../store/app';
 
 export default function SettingsScreen(props) {
   // Constants
@@ -22,6 +27,10 @@ export default function SettingsScreen(props) {
   // Selectors
   const autoAcceptConnection = useAppSelector(selectAutoAcceptConnection);
   const user = useAppSelector(selectUser);
+
+  // hooks
+  const { longPressCount, pressCount, buttonPressed, developmentMode, setDevelopmentMode } =
+    useDevelopment();
 
   const [isBioEnable, setBioEnable] = useState(false);
   const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(autoAcceptConnection);
@@ -79,7 +88,10 @@ export default function SettingsScreen(props) {
     const pCode = await getItem(ConstantsList.PIN_CODE);
     AsyncStorage.clear();
     saveItem(ConstantsList.PIN_CODE, pCode);
-    dispatch(logout());
+    dispatch(resetAuth());
+    dispatch(resetConnection());
+    dispatch(resetCredential());
+    dispatch(resetApp());
   };
 
   // when user will click on edit profile screen
@@ -157,7 +169,12 @@ export default function SettingsScreen(props) {
           <Icon name="right" color={GREEN_COLOR} size={18} />
         </TouchableOpacity>
 
-        <Text style={[styles._rowHeading, { marginTop: 15 }]}>Support</Text>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onLongPress={buttonPressed}
+          onPress={longPressCount !== 3 ? () => {} : buttonPressed}>
+          <Text style={[styles._rowHeading, { marginTop: 15 }]}>Support</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles._row}
@@ -183,6 +200,29 @@ export default function SettingsScreen(props) {
           <Text style={styles._rowLabel}>About Us</Text>
           <Icon name="right" color={GREEN_COLOR} size={18} />
         </TouchableOpacity>
+
+        <Text style={styles.devTextStyle}>
+          {longPressCount === 3 && !developmentMode
+            ? 'Now just tap ' + (4 - pressCount) + ' more times!'
+            : ''}
+        </Text>
+        {developmentMode && (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[styles._row, { marginTop: 50 }]}
+            onPress={() => props.navigation.navigate('AboutUs')}>
+            <Text style={styles._rowLabel}>Development Mode</Text>
+            <Switch
+              trackColor={{
+                false: '#81b0ff',
+                true: '#3ab6ae',
+              }}
+              ios_backgroundColor="#ffffff"
+              onValueChange={() => setDevelopmentMode(!developmentMode)}
+              value={developmentMode}
+            />
+          </TouchableOpacity>
+        )}
       </ScrollView>
       <View style={styles.footer}>
         <Text
@@ -274,5 +314,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginBottom: 10,
     fontFamily: 'Poppins-Regular',
+  },
+  devTextStyle: {
+    textAlign: 'center',
+    marginTop: 24,
   },
 });

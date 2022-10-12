@@ -9,6 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import CryptoJS from 'react-native-crypto-js';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -112,6 +113,12 @@ function ActionsScreen({ navigation }) {
   //     />
   //   ),
   // };
+
+  useEffect(() => {
+    setTimeout(() => {
+      console.log('Generating ....');
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     if (!deepLink) getUrl();
@@ -261,41 +268,33 @@ function ActionsScreen({ navigation }) {
       setIsLoading(true);
 
       if (!(await _isConnectionAlreadyExist())) {
-        // Connection is not exist
-        let resp = await AuthenticateUser();
+        // Connection do not exist
+        setModalVisible(false);
+        let selectedItemObj = JSON.parse(selectedItem);
 
-        if (resp.success) {
-          let selectedItemObj = JSON.parse(selectedItem);
+        try {
+          // Accept connection Api call.
+          let result = await accept_connection(selectedItemObj.metadata);
 
-          setModalVisible(false);
+          if (result.data.success) {
+            // Delete Action from redux
+            let conn = actions.find((x) => x.connectionId === selectedItemObj.connectionId);
 
-          try {
-            // Accept connection Api call.
-            let result = await accept_connection(selectedItemObj.metadata);
+            // Adding Connection
+            dispatch(fetchConnections());
 
-            if (result.data.success) {
-              // Delete Action from redux
-              let conn = actions.find((x) => x.connectionId === selectedItemObj.connectionId);
+            // Deleting Action
+            dispatch(deleteAction(conn.connectionId));
 
-              // Adding Connection
-              dispatch(fetchConnections());
-
-              // Deleting Action
-              dispatch(deleteAction(conn.connectionId));
-
-              setTimeout(() => {
-                _showSuccessAlert('conn');
-              }, 500);
-            } else {
-              showMessage('ZADA Wallet', result.data.error);
-              return;
-            }
-            setIsLoading(false);
-          } catch (e) {
-            setIsLoading(false);
+            setTimeout(() => {
+              _showSuccessAlert('conn');
+            }, 500);
+          } else {
+            showMessage('ZADA Wallet', result.data.error);
+            return;
           }
-        } else {
-          showMessage('ZADA Wallet', resp.data.message);
+          setIsLoading(false);
+        } catch (e) {
           setIsLoading(false);
         }
       } else {

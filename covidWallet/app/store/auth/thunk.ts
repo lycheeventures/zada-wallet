@@ -7,12 +7,20 @@ import { updateTempVar } from '.';
 
 export const fetchToken = createAsyncThunk(
   'auth/fetchToken',
-  async (args: { secret: string | undefined }, { getState, dispatch }) => {
+  async (
+    args: { secret: string | undefined; tempUserId?: string | undefined },
+    { getState, dispatch }
+  ) => {
     try {
       // Current State
-      let { secret } = args;
+      let { secret, tempUserId } = args;
       let { auth } = getState() as RootState;
       let userId = auth.user.id || '';
+
+      // If userid is passed
+      if (tempUserId) {
+        userId = tempUserId;
+      }
 
       let walletSecret;
       if (secret != undefined) {
@@ -30,7 +38,6 @@ export const fetchToken = createAsyncThunk(
           await dispatch(createWallet(response.data.token));
         }
       } else {
-        console.log('response.data => ', response.data);
         throw 'Authentication failed!';
       }
     } catch (e) {
@@ -114,7 +121,7 @@ export const registerUser = createAsyncThunk(
 
 export const createWallet = createAsyncThunk('auth/createWallet', async (token: string) => {
   try {
-    return await AuthAPI.createWallet(token);
+    await AuthAPI.createWallet(token);
   } catch (e) {
     throwErrorIfExist(e);
   }

@@ -1,21 +1,13 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
-import { persistStore } from 'redux-persist';
 import NetworkContext from './app/context/NetworkContext';
 import RootNavigator from './app/navigation/RootNavigator';
 import { PRIMARY_COLOR } from './app/theme/Colors';
 import ErrorBoundary from 'react-native-error-boundary';
 import { analytics_log_app_error } from './app/helpers/analytics';
 import ErrorFallback from './app/components/ErrorFallback';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-import { PersistGate } from 'redux-persist/integration/react';
-import { setup } from './app/gateways/http_client';
-
-let persistor = persistStore(store);
-
-setup(store);
+import BootstrapPersistance from './app/BootstrapPersistance';
 
 const App = () => {
   const errorHandler = (error, stackTrace) => {
@@ -26,13 +18,13 @@ const App = () => {
     <NetworkContext>
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
         <StatusBar barStyle="light-content" backgroundColor={PRIMARY_COLOR} />
-        <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
+        <BootstrapPersistance>
+          {(clearPersistor) => (
             <View style={styles.viewStyle}>
-              <RootNavigator />
+              <RootNavigator clearPersistor={clearPersistor} />
             </View>
-          </PersistGate>
-        </Provider>
+          )}
+        </BootstrapPersistance>
       </ErrorBoundary>
     </NetworkContext>
   );

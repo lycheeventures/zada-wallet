@@ -39,6 +39,7 @@ import SimpleButton from '../../components/Buttons/SimpleButton';
 import TouchableComponent from '../../components/Buttons/TouchableComponent';
 import RegisterButton from './components/buttons/RegisterButton';
 import LoginButton from './components/buttons/LoginButton';
+import { getUserCredentials, storeUserCredentials } from '../../helpers/utils';
 
 const { width } = Dimensions.get('window');
 
@@ -189,6 +190,7 @@ const AuthScreen = ({
 
   // Login
   const login = async () => {
+    // let resp = await dispatch(loginUser({ phone: '+358401838373', secret: 'test' })).unwrap();
     let resp = await dispatch(loginUser({ phone: '+923125688076', secret: 'test@1' })).unwrap();
     // Adding temp values in redux.
     dispatch(
@@ -201,13 +203,28 @@ const AuthScreen = ({
       })
     );
 
-    console.log('resp?.type => ', resp?.type);
+    // let response = await dispatch(fetchToken({secret: resp?.walletSecret, tempUserId: resp?.userId})).unwrap();
+    // await authenticateUserToken(resp?.type, response?.token);
 
     // If token exist authenticate user.
+    // if(resp?.type === 'demo'){
+      
+    // }else{
+    //   navigation.navigate('MultiFactorScreen', { from: 'Register' });
+    // }
     if (resp?.token) {
+      Alert.alert('TOKEN EXIST...');
       await authenticateUserToken(resp?.type, resp?.token);
     } else {
-      navigation.navigate('MultiFactorScreen', { from: 'Register' });
+      if(resp?.type === 'demo'){
+        let password = await getUserCredentials();
+        if(password){
+          storeUserCredentials('STORE', password);
+        }
+        navigation.replace('SecurityScreen', { navigation });
+      }else{
+        navigation.navigate('MultiFactorScreen', { from: 'Register' });
+      } 
     }
   };
 
