@@ -30,13 +30,10 @@ import { _registerUserAPI } from '../../gateways/auth';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import {
   selectAuthStatus,
-  selectTempVar,
-  selectToken,
-  selectUser,
 } from '../../store/auth/selectors';
 import { selectNetworkStatus } from '../../store/app/selectors';
 import { createWallet, loginUser, registerUser } from '../../store/auth/thunk';
-import { updateAuthStatus, updateTempVar, updateToken } from '../../store/auth';
+import { updateTempVar } from '../../store/auth';
 
 import HeadingComponent from '../../components/HeadingComponent';
 import { InputComponent } from '../../components/Input/inputComponent';
@@ -56,9 +53,6 @@ const AuthScreen = ({
   const dispatch = useAppDispatch<AppDispatch>();
 
   // Selectors
-  const token = useAppSelector(selectToken);
-  const user = useAppSelector(selectUser);
-  const tempUser = useAppSelector(selectTempVar);
   const status = useAppSelector(selectAuthStatus);
   const networkStatus = useAppSelector(selectNetworkStatus);
 

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { showOKDialog } from '../helpers/Toast';
-import { AppDispatch, persistor, useAppDispatch, useAppSelector } from '../store';
+import { AppDispatch, useAppDispatch, useAppSelector } from '../store';
 import { updateDevelopmentMode } from '../store/app';
 import { selectDevelopmentMode } from '../store/app/selectors';
-import { fetchCredentials } from '../store/credentials/thunk';
 
 // Development mode feature
 const useDevelopment = () => {
@@ -21,13 +20,10 @@ const useDevelopment = () => {
   useEffect(() => {
     if (pressCount === 4) {
       setDevelopmentMode(true);
+      setPressCount(0);
+      setLongPressCount(0);
     }
   }, [pressCount]);
-
-  useEffect(() => {
-    persistor.purge();
-    dispatch(fetchCredentials());
-  }, [developmentMode]);
 
   // Button press
   const buttonPressed = () => {

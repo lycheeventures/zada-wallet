@@ -21,6 +21,10 @@ export const slice = createSlice({
     changeActionStatus(state, action) {
       state.status = action.payload;
     },
+    resetAction: () => {
+      console.log(ActionAdapter.getInitialState(ActionState));
+      return ActionAdapter.getInitialState(ActionState);
+    },
   },
   extraReducers: (builder) => {
     // FetchActions
@@ -46,6 +50,6 @@ export const slice = createSlice({
 });
 
 // Exporting Actions
-export const { changeActionStatus, addAction, deleteAction } = slice.actions;
+export const { changeActionStatus, addAction, deleteAction, resetAction } = slice.actions;
 
 export { slice as ActionSlice };

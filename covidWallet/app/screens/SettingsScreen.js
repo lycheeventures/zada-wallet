@@ -3,22 +3,18 @@ import { StyleSheet, Text, View, Linking, Switch, Dimensions, Platform } from 'r
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { getVersion } from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/AntDesign';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
-import { AUTO_ACCEPT_CONNECTION, BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
+import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
 import { showMessage } from '../helpers/Toast';
 import ConstantsList from '../helpers/ConfigApp';
 import ZignSecModal from '../components/ZignSecModal';
-import { persistor, useAppDispatch, useAppSelector } from '../store';
-import { resetAuth, updateUser } from '../store/auth';
+import { useAppDispatch, useAppSelector } from '../store';
+import { updateUser } from '../store/auth';
 import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
-import { resetSecureItems, resetUserCredentials } from '../helpers/utils';
-import { resetConnection } from '../store/connections';
-import { resetCredential } from '../store/credentials';
 import useDevelopment from '../hooks/useDevelopment';
-import { resetApp } from '../store/app';
+import { clearAll } from '../store/utils';
 
 export default function SettingsScreen(props) {
   // Constants
@@ -86,13 +82,8 @@ export default function SettingsScreen(props) {
 
   const onLogoutPressed = async () => {
     const pCode = await getItem(ConstantsList.PIN_CODE);
-    AsyncStorage.clear();
-    resetSecureItems();
     saveItem(ConstantsList.PIN_CODE, pCode);
-    dispatch(resetAuth());
-    dispatch(resetConnection());
-    dispatch(resetCredential());
-    dispatch(resetApp());
+    clearAll(dispatch);
   };
 
   // when user will click on edit profile screen
@@ -208,10 +199,7 @@ export default function SettingsScreen(props) {
             : ''}
         </Text>
         {developmentMode && (
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={[styles._row, { marginTop: 50 }]}
-            onPress={() => props.navigation.navigate('AboutUs')}>
+          <View activeOpacity={0.8} style={styles._row}>
             <Text style={styles._rowLabel}>Development Mode</Text>
             <Switch
               trackColor={{
@@ -222,7 +210,7 @@ export default function SettingsScreen(props) {
               onValueChange={() => setDevelopmentMode(!developmentMode)}
               value={developmentMode}
             />
-          </TouchableOpacity>
+          </View>
         )}
       </ScrollView>
       <View style={styles.footer}>

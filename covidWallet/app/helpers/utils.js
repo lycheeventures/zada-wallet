@@ -1,5 +1,5 @@
 import * as Keychain from 'react-native-keychain';
-import CryptoJS from 'react-native-crypto-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const capitalizeFirstLetter = (str) => {
   if (!str) {
@@ -50,4 +50,8 @@ export const resetSecureItems = async () => {
     console.log("Keychain couldn't be accessed!", error);
     return null;
   }
+};
+
+export const resetLocalStorage = async () => {
+  AsyncStorage.clear();
 };

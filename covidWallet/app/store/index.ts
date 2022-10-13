@@ -16,7 +16,7 @@ import { CredentialSlice } from './credentials';
 import { ConnectionSlice } from './connections';
 import { ActionSlice } from './actions';
 import { AppSlice } from './app';
-import { createEncryptor } from './init/utils';
+import { createEncryptor } from './utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setup } from '../gateways/http_client';
 import { middleware } from './middleware';

@@ -1,5 +1,11 @@
 import createTransform from 'redux-persist/es/createTransform';
 import CryptoJS from 'react-native-crypto-js';
+import { resetLocalStorage, resetSecureItems } from '../helpers/utils';
+import { resetAuth } from './auth';
+import { resetConnection } from './connections';
+import { resetCredential } from './credentials';
+import { resetApp } from './app';
+import { resetAction } from './actions';
 
 export const createEncryptor = ({ secretKey }) =>
   createTransform(
@@ -33,3 +39,13 @@ export const createEncryptor = ({ secretKey }) =>
       }
     }
   );
+
+export const clearAll = async (dispatch) => {
+  resetLocalStorage();
+  await resetSecureItems();
+  dispatch(resetAuth());
+  dispatch(resetAction());
+  dispatch(resetConnection());
+  dispatch(resetCredential());
+  dispatch(resetApp());
+};

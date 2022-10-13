@@ -9,7 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import CryptoJS from 'react-native-crypto-js';
+import * as Keychain from 'react-native-keychain';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -113,12 +113,6 @@ function ActionsScreen({ navigation }) {
   //     />
   //   ),
   // };
-
-  useEffect(() => {
-    setTimeout(() => {
-      console.log('Generating ....');
-    }, 3000);
-  }, []);
 
   useEffect(() => {
     if (!deepLink) getUrl();
