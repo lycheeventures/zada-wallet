@@ -14,7 +14,7 @@ import ZignSecModal from '../components/ZignSecModal';
 import { persistor, useAppDispatch, useAppSelector } from '../store';
 import { resetAuth, updateUser } from '../store/auth';
 import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
-import { resetUserCredentials } from '../helpers/utils';
+import { resetSecureItems, resetUserCredentials } from '../helpers/utils';
 import { resetConnection } from '../store/connections';
 import { resetCredential } from '../store/credentials';
 import useDevelopment from '../hooks/useDevelopment';
@@ -87,6 +87,7 @@ export default function SettingsScreen(props) {
   const onLogoutPressed = async () => {
     const pCode = await getItem(ConstantsList.PIN_CODE);
     AsyncStorage.clear();
+    resetSecureItems();
     saveItem(ConstantsList.PIN_CODE, pCode);
     dispatch(resetAuth());
     dispatch(resetConnection());

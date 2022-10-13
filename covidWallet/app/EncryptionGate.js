@@ -3,6 +3,7 @@ import binaryToBase64 from 'react-native/Libraries/Utilities/binaryToBase64';
 import * as Keychain from 'react-native-keychain';
 import LoadingScreen from './screens/LoadingScreen';
 import { generateSecureRandom } from 'react-native-securerandom';
+import { getSecureItems } from './helpers/utils';
 
 const ENCRYPTION_KEY = 'ZADA_UNIQUE_ID';
 export const EncryptionGate = ({ children }) => {
@@ -24,7 +25,8 @@ export const EncryptionGate = ({ children }) => {
   const getEncryptionKey = async () => {
     // check for existing credentials
     const existingCredentials = await Keychain.getGenericPassword();
-    if (existingCredentials && existingCredentials.password !== '1') {
+    const existingToken = await getSecureItems();
+    if (existingToken && existingCredentials && existingCredentials.password !== '1') {
       return { isFresh: false, key: existingCredentials.password };
     }
 

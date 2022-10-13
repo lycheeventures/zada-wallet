@@ -1,6 +1,3 @@
-import { RootState, store } from '.';
-import { getUserCredentials } from '../helpers/utils';
-import { updateUser } from './auth';
 import CryptoJS from 'react-native-crypto-js';
 import { getItem } from '../helpers/Storage';
 

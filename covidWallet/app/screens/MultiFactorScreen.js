@@ -103,7 +103,7 @@ function MultiFactorScreen(props) {
           if (fromScreen === 'Register') {
             await dispatch(fetchToken({ secret: tempUser.walletSecret }));
           } else {
-            await dispatch(fetchToken());
+            await dispatch(fetchToken({ secret: undefined }));
           }
           props.navigation.replace('SecurityScreen');
         } else {

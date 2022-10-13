@@ -6,7 +6,7 @@ import { store, useAppDispatch } from '../store';
 import { updateIsAuthorized } from '../store/auth';
 import CryptoJS from 'react-native-crypto-js';
 import { getItem, saveItem } from '../helpers/Storage';
-import { getUserCredentials } from '../helpers/utils';
+// import { getUserCredentials } from '../helpers/utils';
 
 const options = {
   taskName: 'Example',
@@ -37,47 +37,47 @@ const useDecryption = () => {
 
   // Decrypt User data
   const decrypt_userData = async () => {
-    // User secret
-    let password = await getUserCredentials();
-    if (password) {
-      var iv = CryptoJS.MD5(password);
+    // // User secret
+    // let password = await getUserCredentials();
+    // if (password) {
+    //   var iv = CryptoJS.MD5(password);
 
-      let cipherObject = await getItem('STORE');
-      if (reduxStore != null && cipherObject) {
-        let decipherObject = await new Promise(async (resolve) => {
-          let result = decrypt(cipherObject, iv);
-          console.log('typeof result => ', typeof result);
-          resolve(result);
-        });
-        // update redux data
-        console.log('decipherObject => ', decipherObject);
-      } else {
-        console.log('cipherObject is empty');
-      }
-    } else {
-      console.log('Unable to decrypt data!');
-    }
+    //   let cipherObject = await getItem('STORE');
+    //   if (reduxStore != null && cipherObject) {
+    //     let decipherObject = await new Promise(async (resolve) => {
+    //       let result = decrypt(cipherObject, iv);
+    //       console.log('typeof result => ', typeof result);
+    //       resolve(result);
+    //     });
+    //     // update redux data
+    //     console.log('decipherObject => ', decipherObject);
+    //   } else {
+    //     console.log('cipherObject is empty');
+    //   }
+    // } else {
+    //   console.log('Unable to decrypt data!');
+    // }
   };
 
   // Encrypt User data
   const encrypt_userData = async (taskDataArguments: any) => {
-    await new Promise(async (resolve, reject) => {
-      // User secret
-      let password = await getUserCredentials();
-      if (password) {
-        var iv = CryptoJS.MD5(password);
+    // await new Promise(async (resolve, reject) => {
+    //   // User secret
+    //   let password = await getUserCredentials();
+    //   if (password) {
+    //     var iv = CryptoJS.MD5(password);
 
-        // encrypt
-        let ecryptedData = encrypt(reduxStore, iv);
-        console.log('ecryptedData => ', ecryptedData);
-        await saveItem('STORE', ecryptedData);
-        console.log('Encrypted!');
-        resolve(true);
-      } else {
-        console.log('Unable to encrypt!');
-        reject();
-      }
-    });
+    //     // encrypt
+    //     let ecryptedData = encrypt(reduxStore, iv);
+    //     console.log('ecryptedData => ', ecryptedData);
+    //     await saveItem('STORE', ecryptedData);
+    //     console.log('Encrypted!');
+    //     resolve(true);
+    //   } else {
+    //     console.log('Unable to encrypt!');
+    //     reject();
+    //   }
+    // });
   };
 
   const encrypt = (data: any, iv: CryptoJS.lib.WordArray) => {

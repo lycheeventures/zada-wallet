@@ -4,6 +4,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AuthAPI, throwErrorIfExist } from '../../gateways';
 import { navigationRef } from '../../navigation/utils';
 import { updateTempVar } from '.';
+import { storeSecureItems } from '../../helpers/utils';
 
 export const fetchToken = createAsyncThunk(
   'auth/fetchToken',
@@ -31,6 +32,9 @@ export const fetchToken = createAsyncThunk(
 
       let response = await AuthAPI.authenticate(userId, walletSecret);
       if (response.data.success) {
+        // saving token in secure storage
+        await storeSecureItems('TOKEN', response.data.token);
+
         const decodedAuthToken = jwt_decode(response.data.token);
         if (decodedAuthToken?.dub?.length) {
           return response.data;
@@ -80,7 +84,6 @@ export const loginUser = createAsyncThunk(
         }
       }
 
-      console.log('data => ', data);
       return data;
     } catch (e) {
       throwErrorIfExist(e);
@@ -106,7 +109,6 @@ export const registerUser = createAsyncThunk(
             auto_accept_connection: true,
           })
         );
-        navigationRef.navigate('MultiFactorScreen', { from: 'Register' });
       }
 
       return {

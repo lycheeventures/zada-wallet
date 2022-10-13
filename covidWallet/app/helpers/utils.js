@@ -17,40 +17,35 @@ export const sortValuesByKey = (values) => {
     }, {});
 };
 
-// Get user secrets.
-export const getUserCredentials = async () => {
+// Get secure items from storage.
+export const getSecureItems = async (key) => {
   try {
     // Retrieve the credentials
-    const credentials = await Keychain.getGenericPassword();
-    if (credentials) {
-      return credentials.password;
-    } else {
-      console.log('No credentials stored');
-      return null;
-    }
+    let credentials = await Keychain.getInternetCredentials('Server');
+    credentials = JSON.parse(credentials.password);
+    return credentials;
   } catch (error) {
     console.log("Keychain couldn't be accessed!", error);
     return null;
   }
 };
 
-// Store user secrets
-export const storeUserCredentials = async (id, secret) => {
-  const username = id;
-  const password = secret;
+// Store secure items in storage.
+export const storeSecureItems = async (key, value) => {
   try {
-    await Keychain.setGenericPassword(username, password);
+    value = JSON.stringify(value);
+    await Keychain.setInternetCredentials('Server', key, value);
   } catch (error) {
     console.log("Keychain couldn't be accessed!", error);
     return null;
   }
 };
 
-// Remove secrets
-export const resetUserCredentials = async () => {
+// Remove secure storage
+export const resetSecureItems = async () => {
   try {
     // Retrieve the credentials
-    await Keychain.resetGenericPassword();
+    await Keychain.resetInternetCredentials('Server');
   } catch (error) {
     console.log("Keychain couldn't be accessed!", error);
     return null;

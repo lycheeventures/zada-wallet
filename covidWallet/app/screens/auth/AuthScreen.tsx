@@ -9,13 +9,18 @@ import jwt_decode from 'jwt-decode';
 import Recaptcha from 'react-native-recaptcha-that-works';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { GREEN_COLOR, WHITE_COLOR, GRAY_COLOR, PRIMARY_COLOR, BACKGROUND_COLOR } from '../../theme/Colors';
+import {
+  GREEN_COLOR,
+  WHITE_COLOR,
+  GRAY_COLOR,
+  PRIMARY_COLOR,
+  BACKGROUND_COLOR,
+} from '../../theme/Colors';
 import { AuthStackParamList } from '../../navigation/types';
 
 import ConstantsList from '../../helpers/ConfigApp';
-import { saveItem, getItem, removeItem } from '../../helpers/Storage';
+import { saveItem, getItem } from '../../helpers/Storage';
 import { showNetworkMessage, _showAlert } from '../../helpers/Toast';
-import { AuthenticateUser } from '../../helpers/Authenticate';
 import { nameRegex, validateLength, validatePasswordStrength } from '../../helpers/validation';
 import { _fetchingAppData } from '../../helpers/AppData';
 import { _handleAxiosError } from '../../helpers/AxiosResponse';
@@ -30,7 +35,7 @@ import {
   selectUser,
 } from '../../store/auth/selectors';
 import { selectNetworkStatus } from '../../store/app/selectors';
-import { createWallet, fetchToken, loginUser, registerUser } from '../../store/auth/thunk';
+import { createWallet, loginUser, registerUser } from '../../store/auth/thunk';
 import { updateAuthStatus, updateTempVar, updateToken } from '../../store/auth';
 
 import HeadingComponent from '../../components/HeadingComponent';
@@ -39,7 +44,6 @@ import SimpleButton from '../../components/Buttons/SimpleButton';
 import TouchableComponent from '../../components/Buttons/TouchableComponent';
 import RegisterButton from './components/buttons/RegisterButton';
 import LoginButton from './components/buttons/LoginButton';
-import { getUserCredentials, storeUserCredentials } from '../../helpers/utils';
 
 const { width } = Dimensions.get('window');
 
@@ -93,10 +97,6 @@ const AuthScreen = ({
       const authCount = JSON.parse((await getItem(ConstantsList.AUTH_COUNT)) | 0);
       setAuthCount(authCount);
     };
-    // const clearAuthAsync = async () => {
-    //   removeItem(ConstantsList.REGISTRATION_DATA);
-    //   removeItem(ConstantsList.LOGIN_DATA);
-    // };
     getCount();
     // clearAuthAsync();
   }, []);
@@ -112,9 +112,6 @@ const AuthScreen = ({
   }, [activeOption]);
 
   const submit = async () => {
-    // register();
-    login();
-    return;
     // Check if name is valid.
     if (!nameRegex.test(name) && activeOption == 'register') {
       setNameError(
@@ -179,9 +176,11 @@ const AuthScreen = ({
           secretPhrase: secret,
         };
 
-        dispatch(
+        await dispatch(
           registerUser({ name: data.name, phone: data.phone, secret: data.secretPhrase })
         ).unwrap();
+
+        navigation.navigate('MultiFactorScreen', { from: 'Register' });
       }
     } catch (e) {
       console.log(e);
@@ -190,8 +189,7 @@ const AuthScreen = ({
 
   // Login
   const login = async () => {
-    // let resp = await dispatch(loginUser({ phone: '+358401838373', secret: 'test' })).unwrap();
-    let resp = await dispatch(loginUser({ phone: '+923125688076', secret: 'test@1' })).unwrap();
+    let resp = await dispatch(loginUser({ phone: phone.trim(), secret: secret })).unwrap();
     // Adding temp values in redux.
     dispatch(
       updateTempVar({
@@ -203,28 +201,15 @@ const AuthScreen = ({
       })
     );
 
-    // let response = await dispatch(fetchToken({secret: resp?.walletSecret, tempUserId: resp?.userId})).unwrap();
-    // await authenticateUserToken(resp?.type, response?.token);
-
-    // If token exist authenticate user.
-    // if(resp?.type === 'demo'){
-      
-    // }else{
-    //   navigation.navigate('MultiFactorScreen', { from: 'Register' });
-    // }
     if (resp?.token) {
-      Alert.alert('TOKEN EXIST...');
       await authenticateUserToken(resp?.type, resp?.token);
     } else {
-      if(resp?.type === 'demo'){
-        let password = await getUserCredentials();
-        if(password){
-          storeUserCredentials('STORE', password);
-        }
+      // Checking if type is 'demo'.
+      if (resp?.type === 'demo') {
         navigation.replace('SecurityScreen', { navigation });
-      }else{
-        navigation.navigate('MultiFactorScreen', { from: 'Register' });
-      } 
+      } else {
+        navigation.navigate('MultiFactorScreen', { from: 'Login' });
+      }
     }
   };
 

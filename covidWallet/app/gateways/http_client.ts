@@ -57,6 +57,7 @@ const setup = (store: any) => {
           };
         }
 
+        // Add token if exist
         if (token) {
           config.headers = {
             ...config.headers,
@@ -65,14 +66,26 @@ const setup = (store: any) => {
         }
       }
 
+      // Add Accept header.
       config.headers = {
         ...config.headers,
         Accept: 'application/json',
-        'Content-Type': 'application/json',
       };
 
+      // Add Content-Type header.
+      if (!config.headers['Content-Type']) {
+        config.headers = {
+          ...config.headers,
+          'Content-Type': 'application/json',
+        };
+      }
+
+      // Setting timeout
       config.timeout = 60000;
+
+      // Setting baseurl
       config.baseURL = Config.API_URL;
+
       return config;
     },
     (error) => {
