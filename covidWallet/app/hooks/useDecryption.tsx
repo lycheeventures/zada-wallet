@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import BackgroundService from 'react-native-background-actions';
-import * as Keychain from 'react-native-keychain';
 
 import { store, useAppDispatch } from '../store';
 import { updateIsAuthorized } from '../store/auth';
