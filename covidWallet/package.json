@@ -22,7 +22,7 @@
     "clean:android": "pushd android && ./gradlew clean && popd",
     "////": "Deliver:",
     "iosTasks": "npm-run-all -l clean:ios build:ios",
-    "androidTasks": "npm-run-all -l clean:android build:android",
+    "androidTasks": "npm-run-all -l clean:android build:android-all",
     "build:parallel": "npm-run-all -l clean:node --parallel iosTasks androidTasks",
     "start": "react-native start",
     "test": "jest",
