@@ -1,8 +1,6 @@
-import axios from 'axios';
 import * as React from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { ZADA_S3_BASE_URL } from '../helpers/ConfigApp';
-import useNetwork from '../hooks/useNetwork';
 import { useAppSelector } from '../store';
 import { selectNetworkStatus } from '../store/app/selectors';
 import { BLACK_COLOR, WHITE_COLOR } from '../theme/Colors';
