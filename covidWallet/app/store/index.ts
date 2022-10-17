@@ -32,7 +32,7 @@ let reducers = combineReducers({
   connection: ConnectionSlice.reducer,
 });
 
-// Just to get store type
+// Function to get store type.
 const functionForGettingStoreType = (preloadedState = {}) => {
   return configureStore({
     reducer: reducers,

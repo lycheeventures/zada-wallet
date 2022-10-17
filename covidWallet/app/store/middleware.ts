@@ -1,3 +1,5 @@
+// Dummy middleware.
+
 import CryptoJS from 'react-native-crypto-js';
 import { getItem } from '../helpers/Storage';
 
@@ -28,39 +30,6 @@ const decrypt = (state, password: string) => {
   }
 };
 
-const hydrateMnually = async (password: string) => {
-  let encrypted = await getItem('STORE');
-  if (encrypted) {
-    return await decrypt(encrypted, password);
-  } else {
-    return;
-  }
-};
-
 export const middleware = (store) => (next) => async (action) => {
-  // let state = store.getState() as RootState;
-  // if (action.type === 'persist/REHYDRATE') {
-  //   console.log('rehrdrating...');
-  //   let password = await getUserCredentials();
-  //   if (password) {
-  //     console.log('hydrating manually');
-  //     let newState = await hydrateMnually(password);
-  //     newState._persist.rehydrated = true;
-  //     console.log('newState => ', newState);
-  //     return {
-  //       ...newState,
-  //     };
-  //     // store.dispatch(
-  //     //   updateUser({
-  //     //     auto_accept_connection: true,
-  //     //     id: undefined,
-  //     //     isNew: false,
-  //     //     type: undefined,
-  //     //     walletSecret: password,
-  //     //   })
-  //     // );
-  //   }
-  // }
-  // console.log(state.auth);
   next(action);
 };

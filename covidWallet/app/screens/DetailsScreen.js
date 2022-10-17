@@ -52,7 +52,6 @@ function DetailsScreen(props) {
   const viewShotRef = useRef(null);
 
   // States
-  const [isLoading, setIsLoading] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [isGenerating, setGenerating] = useState(false);
   const [isGeneratingPDF, setGeneratingPDF] = useState(false);

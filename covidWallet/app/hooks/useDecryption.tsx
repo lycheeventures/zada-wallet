@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+// Unused file
+// Note: Please remove these line when used!
+
+import { useEffect } from 'react';
 import BackgroundService from 'react-native-background-actions';
 
 import { store, useAppDispatch } from '../store';
 import { updateIsAuthorized } from '../store/auth';
 import CryptoJS from 'react-native-crypto-js';
-import { getItem, saveItem } from '../helpers/Storage';
 // import { getUserCredentials } from '../helpers/utils';
 
 const options = {
@@ -40,7 +42,6 @@ const useDecryption = () => {
     // let password = await getUserCredentials();
     // if (password) {
     //   var iv = CryptoJS.MD5(password);
-
     //   let cipherObject = await getItem('STORE');
     //   if (reduxStore != null && cipherObject) {
     //     let decipherObject = await new Promise(async (resolve) => {
@@ -65,7 +66,6 @@ const useDecryption = () => {
     //   let password = await getUserCredentials();
     //   if (password) {
     //     var iv = CryptoJS.MD5(password);
-
     //     // encrypt
     //     let ecryptedData = encrypt(reduxStore, iv);
     //     console.log('ecryptedData => ', ecryptedData);
@@ -97,25 +97,7 @@ const useDecryption = () => {
     });
     let decrypted = bytes.toString(CryptoJS.enc.Utf8);
     return JSON.parse(decrypted);
-    // return JSON.parse(
-    //   CryptoJS.enc.Utf8.stringify(
-    //     CryptoJS.AES.decrypt(data, iv, {
-    //       keySize: 128 / 8,
-    //       iv: iv,
-    //       mode: CryptoJS.mode.CBC,
-    //       padding: CryptoJS.pad.Pkcs7,
-    //     })
-    //   )
-    // );
   };
-
-  // const storeUserCredentials = async () => {
-  //   const username = user.id;
-  //   const password = reduxStore.auth.user.walletSecret;
-  //   if (password)
-  //     // Store the credentials
-  //     await Keychain.setGenericPassword(username, password);
-  // };
 
   const decrpytData = async () => {
     // Decrypt User Data

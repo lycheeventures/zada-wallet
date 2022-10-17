@@ -12,7 +12,6 @@ import { pincodeRegex } from '../helpers/validation';
 import { showMessage } from '../helpers/Toast';
 import { saveItem } from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
-import { useAppDispatch } from '../store';
 
 const img = require('../assets/images/security.png');
 
@@ -21,9 +20,8 @@ const SecurityScreen = ({
 }: {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
 }) => {
-  // Constants
-  const dispatch = useAppDispatch();
 
+  // States
   const [isSensorAvailable, checkSensor] = useState(false);
   const [isSuccessful, checkSecureIDAuth] = useState(false);
 
@@ -53,11 +51,6 @@ const SecurityScreen = ({
           })
           .catch((error) => {
             setShowPinCodeModal(true);
-            // if (Platform.OS === 'ios') {
-            //   Alert.alert('Failed to Authenticate Secure ID');
-            // } else {
-            //   Alert.alert('Secure ID Authentication Failed', error.message);
-            // }
           });
       } else {
         if (requiresLegacyAuthentication()) {
@@ -92,19 +85,11 @@ const SecurityScreen = ({
       title: 'Log in with Secure ID to continue',
     })
       .then(() => {
-        // this.props.handlePopupDismissedLegacy();
-
         checkSecureIDAuth(true);
-        // nextHandler();
       })
       .catch((error) => {
         //set OTP also
         setShowPinCodeModal(true);
-        // if (Platform.OS === 'ios') {
-        //   AlertIOS.alert('Failed to Authenticate Secure ID');
-        // } else {
-        //   Alert.alert('Secure ID Authentication Failed', error.message);
-        // }
         checkSecureIDAuth(false);
       });
   }
@@ -122,11 +107,6 @@ const SecurityScreen = ({
       })
       .catch((error) => {
         setShowPinCodeModal(true);
-        // if (Platform.OS === 'ios') {
-        //   AlertIOS.alert('Failed to Authenticate Secure ID');
-        // } else {
-        //   Alert.alert('Secure ID Authentication Failed', error.message);
-        // }
         checkSecureIDAuth(false);
       });
   }
@@ -249,10 +229,5 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
 });
-
-// SecurityScreen.defaultProps = {
-//   isSensorAvailable: false,
-//   isSuccessful: false,
-// };
 
 export default SecurityScreen;

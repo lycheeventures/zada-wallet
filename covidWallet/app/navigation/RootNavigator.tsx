@@ -58,17 +58,6 @@ const RootNavigator = () => {
     })();
   }, [networkStatus, setMessageIndex]);
 
-  // // Checking authentication status
-  // const _checkAuthStatus = async () => {
-  //   if (token) {
-  //     // Decrypt Redux.
-  //     await decrpytData();
-
-  //     // Fetch Tokens.
-  //     dispatch(fetchToken());
-  //   }
-  // };
-
   // On Version skip click
   const _onSkipClick = () => {
     setIsNewVersion(false);

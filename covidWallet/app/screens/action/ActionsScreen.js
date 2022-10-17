@@ -73,7 +73,6 @@ function ActionsScreen({ navigation }) {
   // States
   const [loaderText, setLoaderText] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isAction, setAction] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState([]);
   const [selectedItem, setSelectedItem] = useState('');
@@ -97,21 +96,6 @@ function ActionsScreen({ navigation }) {
   useNotification();
 
   var requestArray = [];
-
-  // // Setting right icon
-  // const headerOptions = {
-  //   headerRight: () => (
-  //     <MaterialCommunityIcons
-  //       onPress={() => {
-  //         navigation.navigate('QRScreen');
-  //       }}
-  //       style={styles.headerRightIcon}
-  //       size={30}
-  //       name="qrcode"
-  //       padding={30}
-  //     />
-  //   ),
-  // };
 
   useEffect(() => {
     if (!deepLink) getUrl();
@@ -153,30 +137,11 @@ function ActionsScreen({ navigation }) {
     return;
   }, []);
 
-  // // Update Actionlist if notificationReceived is true.
-  // useEffect(() => {
-  //   if (notificationReceived) {
-  //     dispatch(fetchActions());
-  //     // updateActionsList();
-  //   }
-  // }, [dispatch, notificationReceived]);
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     updateActionsList();
-  //     return;
-  //   }, [isAction])
-  // );
-
   useFocusEffect(
     React.useCallback(() => {
       _sendActionScreenAnalytic();
     }, [])
   );
-
-  // React.useLayoutEffect(() => {
-  //   navigation.setOptions(headerOptions);
-  // }, [isAction, navigation]);
 
   const getUrl = async (url) => {
     let initialUrl = '';
@@ -641,20 +606,6 @@ function ActionsScreen({ navigation }) {
 
   return (
     <View style={themeStyles.mainContainer}>
-      {/* <ConfirmPincodeModal
-        isVisible={showConfirmModal}
-        pincode={verifyPincode}
-        pincodeError={verifyPincodeError}
-        onPincodeChange={(text) => {
-          setVerifyPincode(text);
-          if (text.length == 0 || text == undefined) setVerifyPincodeError('');
-        }}
-        onCloseClick={() => {
-          setShowConfirmModal(!showConfirmModal);
-        }}
-        onContinueClick={_confirmingPincode}
-      /> */}
-
       <PincodeModal
         modalType={'verify'}
         isVisible={showConfirmModal}

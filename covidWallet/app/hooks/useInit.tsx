@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../store';
 
 import { selectActionsError, selectActionsStatus } from '../store/actions/selectors';
@@ -19,7 +19,6 @@ import { changeConnectionStatus } from '../store/connections';
 import { selectAuthError, selectAuthStatus, selectToken } from '../store/auth/selectors';
 import { getItem } from '../helpers/Storage';
 import { updateAuthStatus, updateIsAuthorized } from '../store/auth';
-import useDecryption from './useDecryption';
 import { fetchToken } from '../store/auth/thunk';
 import { ConnectionAPI, CredentialAPI } from '../gateways';
 
@@ -39,9 +38,6 @@ const useInit = () => {
   const actionError = useAppSelector(selectActionsError);
   const connError = useAppSelector(selectConnectionsError);
   const credError = useAppSelector(selectCredentialsError);
-
-  // Hooks
-  const { decrpytData } = useDecryption();
 
   // States
   const [isAppReady, setIsAppReady] = useState(false);
@@ -78,8 +74,8 @@ const useInit = () => {
   const startApp = async () => {
     if (token) {
       setMessageIndex(3);
-      // Decrypt Redux.
-      await decrpytData();
+      // Update isAuthorized!
+      dispatch(updateIsAuthorized(true));
 
       // Fetch Tokens.
       await dispatch(fetchToken({ secret: undefined }));

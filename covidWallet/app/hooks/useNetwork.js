@@ -22,19 +22,6 @@ const useNetwork = () => {
     };
   }, [dispatch]);
 
-  // // Handling connection change.
-  // const handleConnectionChange = useCallback(
-  //   (isConnected) => {
-  //     if (isConnected) {
-  //       dispatch(updateNetworkStatus(isConnected ? 'connected' : 'disconnected'));
-  //       NetInfo.isConnected.removeEventListener('connectionChange');
-  //     } else {
-  //       NetInfo.isConnected.removeEventListener('connectionChange');
-  //     }
-  //   },
-  //   [dispatch]
-  // );
-
   return undefined;
 };
 
