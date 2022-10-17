@@ -81,7 +81,7 @@ const setup = (store: any) => {
       }
 
       // Setting timeout
-      config.timeout = 60000;
+      config.timeout = 60000 * 2;
 
       // Setting baseurl
       config.baseURL = Config.API_URL;
