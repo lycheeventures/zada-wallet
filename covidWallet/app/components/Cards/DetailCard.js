@@ -1,11 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { analytics_log_show_cred_qr } from '../../helpers/analytics';
+import { useAppDispatch } from '../../store';
+import { updateCredential } from '../../store/credentials';
 import TouchableComponent from '../Buttons/TouchableComponent';
 import CardBackground from '../CardBackground';
 
 const { width } = Dimensions.get('screen');
 const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
+  // Constants
+  const dispatch = useAppDispatch();
+
   // Functions
   const handleQRPress = () => {
     analytics_log_show_cred_qr();
@@ -21,9 +26,16 @@ const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
     );
   };
 
+  const updateBackgroundImage = (credentialId, background_url) => {
+    dispatch(updateCredential({ id: credentialId, changes: { backgroundImage: background_url } }));
+  };
+
   return (
     <TouchableComponent style={{ overflow: 'hidden' }} onPress={handleQRPress}>
-      <CardBackground item={item} schemeId={item.schemaId}>
+      <CardBackground
+        item={item}
+        schemeId={item.schemaId}
+        updateBackgroundImage={updateBackgroundImage}>
         <View style={styles.issueDateViewStyle}>
           {issue_date && (
             <>

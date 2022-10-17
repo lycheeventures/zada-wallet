@@ -37,15 +37,12 @@ function Credentials(props) {
   };
 
   const updateBackgroundImage = (credentialId, background_url) => {
-    console.log(credentialId, background_url);
     dispatch(updateCredential({ id: credentialId, changes: { backgroundImage: background_url } }));
   };
 
   // List Empty Component
-  const emptyListComponent = (item) => (
+  const emptyListComponent = () => (
     <EmptyList
-      // refreshing={refreshing}
-      // onRefresh={fetchCredentials}
       text="There are no certificates in your wallet. Once you receive a certificate, it will show up here."
       image={require('../../../assets/images/credentialsempty.png')}
       style={styles.emptyListStyle}
