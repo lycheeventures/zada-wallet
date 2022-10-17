@@ -4,10 +4,6 @@ import StoreGate from './StoreGate';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
-const onBeforeLift = (store) => {
-  console.log('Before persist gate call!');
-};
-
 const BootstrapPersistance = ({ children }) => {
   return (
     <EncryptionGate>
@@ -16,10 +12,7 @@ const BootstrapPersistance = ({ children }) => {
           {({ store, persistor }) => {
             return (
               <Provider store={store}>
-                <PersistGate
-                  persistor={persistor}
-                  loading={null}
-                  onBeforeLift={onBeforeLift(store)}>
+                <PersistGate persistor={persistor} loading={null}>
                   {children}
                 </PersistGate>
               </Provider>
