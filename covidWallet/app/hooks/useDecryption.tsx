@@ -2,7 +2,7 @@
 // Note: Please remove these line when used!
 
 import { useEffect } from 'react';
-import BackgroundService from 'react-native-background-actions';
+// import BackgroundService from 'react-native-background-actions';
 
 import { store, useAppDispatch } from '../store';
 import { updateIsAuthorized } from '../store/auth';
@@ -30,10 +30,10 @@ const useDecryption = () => {
   const user = reduxStore.auth.user;
 
   const backgroundDataEncryption = async () => {
-    await BackgroundService.start(encrypt_userData, options);
-    await BackgroundService.updateNotification({ taskDesc: 'New ExampleTask description' }); // Only Android, iOS will ignore this call
-    // iOS will also run everything here in the background until .stop() is called
-    await BackgroundService.stop();
+    // await BackgroundService.start(encrypt_userData, options);
+    // await BackgroundService.updateNotification({ taskDesc: 'New ExampleTask description' }); // Only Android, iOS will ignore this call
+    // // iOS will also run everything here in the background until .stop() is called
+    // await BackgroundService.stop();
   };
 
   // Decrypt User data
