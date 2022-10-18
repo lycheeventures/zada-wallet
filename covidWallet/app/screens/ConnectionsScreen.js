@@ -6,6 +6,7 @@ import {
   Animated,
   StyleSheet,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -20,12 +21,10 @@ import { themeStyles } from '../theme/Styles';
 import { RED_COLOR, SECONDARY_COLOR } from '../theme/Colors';
 
 import { useAppDispatch, useAppSelector } from '../store';
-import {
-  selectConnections,
-  selectConnectionsStatus,
-} from '../store/connections/selectors';
+import { selectConnections, selectConnectionsStatus } from '../store/connections/selectors';
 import { fetchConnections, removeConnection } from '../store/connections/thunk';
 import { showAskDialog } from '../helpers/Toast';
+import { selectDevelopmentMode } from '../store/app/selectors';
 
 function ConnectionsScreen() {
   // Constants
@@ -34,6 +33,7 @@ function ConnectionsScreen() {
   // Selectors
   const connections = useAppSelector(selectConnections.selectAll);
   const connectionStatus = useAppSelector(selectConnectionsStatus);
+  const developmentMode = useAppSelector(selectDevelopmentMode);
 
   async function onSuccessPress(connection) {
     dispatch(removeConnection(connection.connectionId));
@@ -57,12 +57,8 @@ function ConnectionsScreen() {
     let imgURI = rowData.item.imageUrl;
     let header = rowData.item.name != undefined ? rowData.item.name : '';
     let subtitle =
-      'The connection between you and ' +
-      header.toLowerCase() +
-      ' is secure and encrypted.';
-    return (
-      <FlatCard onPress={() => {}} imageURL={imgURI} heading={header} text={subtitle} />
-    );
+      'The connection between you and ' + header.toLowerCase() + ' is secure and encrypted.';
+    return <FlatCard onPress={() => {}} imageURL={imgURI} heading={header} text={subtitle} />;
   };
 
   const renderHiddenItem = ({ item, index }) => {
@@ -74,12 +70,7 @@ function ConnectionsScreen() {
             onPress={() => onDeletePressed(item)}
             activeOpacity={0.8}
             style={[styles.swipeableViewStyle]}>
-            <MaterialCommunityIcons
-              size={30}
-              name="delete"
-              padding={30}
-              color={RED_COLOR}
-            />
+            <MaterialCommunityIcons size={30} name="delete" padding={30} color={RED_COLOR} />
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -116,6 +107,7 @@ function ConnectionsScreen() {
           }
           useFlatList
           disableRightSwipe
+          disableLeftSwipe={!developmentMode}
           ListEmptyComponent={listEmptyComponent}
           data={connections}
           style={styles.flatListStyle}

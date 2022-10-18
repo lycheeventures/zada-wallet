@@ -52,7 +52,6 @@ function DetailsScreen(props) {
   const viewShotRef = useRef(null);
 
   // States
-  const [isLoading, setIsLoading] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [isGenerating, setGenerating] = useState(false);
   const [isGeneratingPDF, setGeneratingPDF] = useState(false);
@@ -520,8 +519,6 @@ function DetailsScreen(props) {
           <View style={styles.topContainer}>
             <DetailCard
               item={data}
-              schemaId={data.schemaId}
-              imageUrl={data.imageUrl}
               issue_date={data.values['Issue Time']
                 ? get_local_issue_date(data.values['Issue Time'])
                 : undefined}

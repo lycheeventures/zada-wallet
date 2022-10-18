@@ -27,9 +27,7 @@ function Credentials(props) {
 
   // Selectors
   const credentialStatus = useAppSelector(selectCredentialsStatus);
-  const searchedCredentials = useAppSelector((state) =>
-    selectSearchedCredentials(state, search)
-  );
+  const searchedCredentials = useAppSelector((state) => selectSearchedCredentials(state, search));
 
   // Function
   const toggleModal = (v) => {
@@ -39,17 +37,12 @@ function Credentials(props) {
   };
 
   const updateBackgroundImage = (credentialId, background_url) => {
-    console.log(credentialId, background_url);
-    dispatch(
-      updateCredential({ id: credentialId, changes: { backgroundImage: background_url } })
-    );
+    dispatch(updateCredential({ id: credentialId, changes: { backgroundImage: background_url } }));
   };
 
   // List Empty Component
-  const emptyListComponent = (item) => (
+  const emptyListComponent = () => (
     <EmptyList
-      // refreshing={refreshing}
-      // onRefresh={fetchCredentials}
       text="There are no certificates in your wallet. Once you receive a certificate, it will show up here."
       image={require('../../../assets/images/credentialsempty.png')}
       style={styles.emptyListStyle}
@@ -82,6 +75,7 @@ function Credentials(props) {
             item={item}
             schemeId={item.schemaId}>
             <CertificateCard
+              item={item}
               card_type={item.type}
               issuer={item.organizationName}
               date={

@@ -42,25 +42,23 @@ export const fetchCredentials = createAsyncThunk(
           qrCode = await get_qr_credentials(cred.credentialId, cred.values);
         }
 
-        if (item !== undefined || null) {
-          let obj = {
-            ...cred,
-            imageUrl: item?.imageUrl,
-            organizationName: item?.name,
-            qrCode: qrCode,
-            type:
-              cred.values != undefined && cred.values.Type != undefined
-                ? cred.values.Type
-                : (cred.values != undefined || cred.values != null) &&
-                  cred.values['Vaccine Name'] != undefined &&
-                  cred.values['Vaccine Name'].length != 0 &&
-                  cred.values['Dose'] != undefined &&
-                  cred.values['Dose'].length != 0
-                ? 'COVIDpass (Vaccination)'
-                : 'Digital Certificate',
-          };
-          credObj.credentials.push(obj);
-        }
+        let obj = {
+          ...cred,
+          imageUrl: item?.imageUrl ? item?.imageUrl : null,
+          organizationName: item?.name ? item?.name : null,
+          qrCode: qrCode,
+          type:
+            cred.values != undefined && cred.values.Type != undefined
+              ? cred.values.Type
+              : (cred.values != undefined || cred.values != null) &&
+                cred.values['Vaccine Name'] != undefined &&
+                cred.values['Vaccine Name'].length != 0 &&
+                cred.values['Dose'] != undefined &&
+                cred.values['Dose'].length != 0
+              ? 'COVIDpass (Vaccination)'
+              : 'Digital Certificate',
+        };
+        credObj.credentials.push(obj);
       }
 
       return credObj;

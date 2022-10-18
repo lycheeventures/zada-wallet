@@ -1,15 +1,13 @@
 import http_client from './http_client';
-import {Buffer} from 'buffer';
+import { Buffer } from 'buffer';
 import ConstantsList from '../helpers/ConfigApp';
-import {AuthenticateUser} from '../helpers/Authenticate';
 import {
   analytics_log_accept_credential_request,
   analytics_log_credential_delete,
   analytics_log_reject_credential_request,
 } from '../helpers/analytics';
-import {getItem, saveItem} from '../helpers/Storage';
-import {get_all_connections} from './connections';
-import { getToken } from './auth';
+import { saveItem } from '../helpers/Storage';
+import { get_all_connections } from './connections';
 
 // Get Specific Credential
 export async function get_credential(credentialID: string) {
@@ -17,9 +15,6 @@ export async function get_credential(credentialID: string) {
     const result = await http_client({
       method: 'GET',
       url: '/api/credential/get_credential' + `?credentialId=${credentialID}`,
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
-      },
     });
     return result;
   } catch (error) {
@@ -33,9 +28,6 @@ export async function get_all_credentials() {
     const result = await http_client({
       method: 'GET',
       url: '/api/credential/get_all_credentials',
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
-      },
     });
     return result;
   } catch (error) {
@@ -57,13 +49,8 @@ export async function get_all_qr_credentials() {
     if (credentials.length && connections.length) {
       for (let i = 0; i < credentials.length; ++i) {
         let cred = credentials[i];
-        let item = connections.find(
-          (c: any) => c.connectionId == cred.connectionId,
-        );
-        let qrResult = await fetch_signature_by_cred_id(
-          cred.credentialId,
-          cred.values,
-        );
+        let item = connections.find((c: any) => c.connectionId == cred.connectionId);
+        let qrResult = await fetch_signature_by_cred_id(cred.credentialId, cred.values);
         if (item !== undefined || null) {
           let obj = {
             ...cred,
@@ -101,7 +88,6 @@ export async function accept_credential(credentialId: string) {
 
     let headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: 'Bearer ' + (await getToken()),
     };
 
     const result = await http_client({
@@ -128,7 +114,6 @@ export async function delete_credential(credentialId: string) {
 
     let headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: 'Bearer ' + (await getToken()),
     };
 
     const result = await http_client({
@@ -154,9 +139,6 @@ export async function get_all_credentials_offers() {
     const result = await http_client({
       method: 'GET',
       url: '/api/credential/get_all_credential_offers',
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
-      },
     });
     return result;
   } catch (error) {
@@ -172,9 +154,6 @@ export async function get_signature(credentialId: string) {
       url: '/api/credential/get_credential_signature',
       params: {
         credentialId: credentialId,
-      },
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
       },
     });
     return result;
@@ -192,22 +171,16 @@ export async function generate_credential_qr(credentialId: string) {
       params: {
         credentialId: credentialId,
       },
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
-      },
     });
     return result;
   } catch (error) {
-    console.log('error => ', error)
+    console.log('error => ', error);
     throw error;
   }
 }
 
 // Fetching signature for credential
-export const fetch_signature_by_cred_id = async (
-  credentialId: string,
-  values: Object,
-) => {
+export const fetch_signature_by_cred_id = async (credentialId: string, values: Object) => {
   try {
     const result = await get_signature(credentialId);
     if (result.data.success) {
@@ -228,25 +201,18 @@ export const fetch_signature_by_cred_id = async (
         qrcode: `${JSON.stringify(qrData)}`,
       };
     } else {
-      return {success: false};
+      return { success: false };
     }
   } catch (error) {
-    return {success: false};
+    return { success: false };
   }
 };
 
-
 export async function invalidateCache() {
   try {
-    let headers = {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + (await getToken()),
-    };
-
     const result = await http_client({
       method: 'POST',
       url: '/api/credential/invalidate_cache',
-      headers,
     });
     return result;
   } catch (error) {

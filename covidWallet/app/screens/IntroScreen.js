@@ -49,7 +49,7 @@ function IntroScreen({ navigation }) {
           {Slides.map((item, index) => {
             let imageStyle = styles.swiperImage;
             return (
-              <View style={styles.slide1}>
+              <View style={styles.slide1} key={'id' + index}>
                 <View style={styles.imageViewStyle}>
                   <Image resizeMode="cover" style={imageStyle} source={item.image} />
                 </View>
