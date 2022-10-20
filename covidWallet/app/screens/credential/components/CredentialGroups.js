@@ -22,7 +22,6 @@ import {
   fetch_all_groups,
   remove_all_credentials_group,
 } from '../../../helpers/Credential_Groups';
-import useNetwork from '../../../hooks/useNetwork';
 import ActionButton from 'react-native-action-button';
 import {
   BLACK_COLOR,
@@ -62,7 +61,7 @@ const CredentialGroups = (props) => {
   const [selectedEditGroup, setSelectedEditGroup] = useState([]);
 
   const toggleModal = (v) => {
-    props.navigation.navigate('DetailsScreen', {
+    props.navigation.navigate('CredDetailScreen', {
       data: v,
     });
   };

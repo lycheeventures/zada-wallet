@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { createStackNavigator } from '@react-navigation/stack';
+import { ICredentialObject } from '../store/credentials/interface';
 
 export type AuthStackParamList = {
   IntroScreen: undefined;
@@ -20,7 +21,7 @@ export type MainStackParamList = {
   ContactUs: undefined;
   AboutUs: undefined;
   ProfileScreen: undefined;
-  DetailsScreen: undefined;
+  CredDetailScreen: { data: ICredentialObject };
   AuthScreen: undefined;
   QRScreen: undefined;
 };

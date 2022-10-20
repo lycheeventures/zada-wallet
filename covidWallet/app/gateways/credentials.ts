@@ -208,6 +208,22 @@ export const fetch_signature_by_cred_id = async (credentialId: string, values: O
   }
 };
 
+export async function get_credential_template(credDef: string) {
+  try {
+    let params = {
+      credDef,
+    };
+    const result = await http_client({
+      method: 'GET',
+      url: '/api/credential/get_credential_template',
+      params,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function invalidateCache() {
   try {
     const result = await http_client({

@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
-import { analytics_log_show_cred_qr } from '../../helpers/analytics';
-import { useAppDispatch } from '../../store';
-import { updateCredential } from '../../store/credentials';
-import TouchableComponent from '../Buttons/TouchableComponent';
-import CardBackground from '../CardBackground';
+import { analytics_log_show_cred_qr } from '../../../helpers/analytics';
+import { useAppDispatch } from '../../../store';
+import { updateCredential } from '../../../store/credentials';
+import TouchableComponent from '../../../components/Buttons/TouchableComponent';
+import CardBackground from '../../../components/CardBackground';
 
 const { width } = Dimensions.get('screen');
 const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
@@ -65,7 +65,7 @@ const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
             <View style={styles.touchableStyle}>
               <View style={styles.touchableContainerStyle}>
                 <Image
-                  source={require('../../assets/images/qr-code.png')}
+                  source={require('../../../assets/images/qr-code.png')}
                   style={styles.topContainerImage}
                 />
               </View>

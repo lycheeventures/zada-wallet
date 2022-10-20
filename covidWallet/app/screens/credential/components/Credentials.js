@@ -31,7 +31,7 @@ function Credentials(props) {
 
   // Function
   const toggleModal = (v) => {
-    props.navigation.navigate('DetailsScreen', {
+    props.navigation.navigate('CredDetailScreen', {
       data: v,
     });
   };
