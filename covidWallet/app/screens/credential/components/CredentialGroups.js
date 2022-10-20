@@ -61,7 +61,7 @@ const CredentialGroups = (props) => {
   const [selectedEditGroup, setSelectedEditGroup] = useState([]);
 
   const toggleModal = (v) => {
-    props.navigation.navigate('DetailsScreen', {
+    props.navigation.navigate('CredDetailScreen', {
       data: v,
     });
   };

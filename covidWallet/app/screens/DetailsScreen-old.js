@@ -27,7 +27,7 @@ import { deleteCredentialByCredId, getItem, saveItem } from '../helpers/Storage'
 import OverlayLoader from '../components/OverlayLoader';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import { PreventScreenshots } from 'react-native-prevent-screenshots';
-import CredQRModal from '../components/CredQRModal';
+import CredQRModal from './credential/components/CredQRModal';
 import RenderValues from '../components/RenderValues';
 import ConstantsList from '../helpers/ConfigApp';
 import { Buffer } from 'buffer';
@@ -35,10 +35,10 @@ import { _handleAxiosError } from '../helpers/AxiosResponse';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
 import { get_local_date_time, get_local_issue_date, parse_date_time } from '../helpers/time';
-import DetailCard from '../components/Cards/DetailCard';
 import { useAppDispatch, useAppSelector } from '../store';
 import { selectCredentialsStatus } from '../store/credentials/selectors';
 import { removeCredentials } from '../store/credentials/thunk';
+import DetailCard from './credential/components/DetailCard';
 
 function DetailsScreen(props) {
   // Constants

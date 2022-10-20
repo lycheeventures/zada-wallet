@@ -1,9 +1,9 @@
 import React from 'react';
 import {StyleSheet, View, Dimensions} from 'react-native';
 import Modal from 'react-native-modal';
-import {BACKGROUND_COLOR, GREEN_COLOR} from '../theme/Colors';
-import SimpleButton from './Buttons/SimpleButton';
-import HeadingComponent from './HeadingComponent';
+import {BACKGROUND_COLOR, GREEN_COLOR} from '../../../theme/Colors';
+import SimpleButton from '../../../components/Buttons/SimpleButton';
+import HeadingComponent from '../../../components/HeadingComponent';
 import QRCode from 'react-native-qrcode-svg';
 
 const CredQRModal = ({isVisible, onCloseClick, qrCode}) => {

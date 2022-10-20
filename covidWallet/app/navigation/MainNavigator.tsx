@@ -14,9 +14,9 @@ import SettingsScreen from '../screens/SettingsScreen';
 import ContactUs from '../screens/ContactUs';
 import AboutUs from '../screens/AboutUs';
 import ProfileScreen from '../screens/ProfileScreen';
-import DetailsScreen from '../screens/DetailsScreen';
 import QRScreen from '../screens/qr/QRScreen';
 import useBiometric from '../hooks/useBiometric';
+import CredDetailScreen from '../screens/credential/CredDetailScreen';
 
 const navigationAnimation =
   Platform.OS == 'ios'
@@ -135,8 +135,8 @@ const MainNavigator = () => {
         component={ProfileScreen}
       />
       <MainStack.Screen
-        name="DetailsScreen"
-        component={DetailsScreen}
+        name="CredDetailScreen"
+        component={CredDetailScreen}
         options={({ navigation }) => ({
           headerTintColor: 'black',
           headerStyle: {
