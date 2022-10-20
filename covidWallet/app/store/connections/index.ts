@@ -42,7 +42,6 @@ export const slice = createSlice({
       }
     });
     builder.addCase(fetchConnections.rejected, (state, action) => {
-      console.log(action);
       state.status = 'failed';
       state.error = action?.error;
     });

@@ -167,7 +167,7 @@ const setup = (store: any) => {
         }
         // Error message handling.
         handleErrorMessage(error);
-
+        
         return Promise.reject(error);
       } else {
         showNetworkMessage();
