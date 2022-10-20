@@ -170,7 +170,6 @@ const setup = (store: any) => {
         
         return Promise.reject(error);
       } else {
-        showNetworkMessage();
         networkError = true;
       }
     }
