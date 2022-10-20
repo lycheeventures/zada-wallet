@@ -12,7 +12,7 @@ import { selectCredentialsError, selectCredentialsStatus } from '../store/creden
 import { fetchActions } from '../store/actions/thunk';
 import { fetchConnections } from '../store/connections/thunk';
 import { fetchCredentials } from '../store/credentials/thunk';
-import { _showAlert } from '../helpers/Toast';
+import { showNetworkMessage, _showAlert } from '../helpers/Toast';
 import { changeCredentialStatus } from '../store/credentials';
 import { changeActionStatus } from '../store/actions';
 import { changeConnectionStatus } from '../store/connections';
@@ -135,8 +135,10 @@ const useInit = () => {
     if (actionStatus == 'succeeded' || actionStatus == 'failed') {
       dispatch(changeActionStatus('idle'));
 
-      if (actionStatus === 'failed') {
-        _showAlert('Error', actionError);
+      if (actionStatus === 'failed' && actionError.message === 'Network Error') {
+        setTimeout(() => {
+          showNetworkMessage();
+        }, 500);
       }
     }
   };
@@ -146,8 +148,10 @@ const useInit = () => {
     if (credStatus == 'succeeded' || credStatus == 'failed') {
       dispatch(changeCredentialStatus('idle'));
 
-      if (credStatus === 'failed') {
-        _showAlert('Error', credError);
+      if (credStatus === 'failed' && credError.message === 'Network Error') {
+        setTimeout(() => {
+          showNetworkMessage();
+        }, 500);
       }
     }
   };
@@ -157,8 +161,10 @@ const useInit = () => {
     if (connStatus == 'succeeded' || connStatus == 'failed') {
       dispatch(changeConnectionStatus('idle'));
 
-      if (connStatus === 'failed') {
-        _showAlert('Error', connError);
+      if (connStatus === 'failed' && connError.message === 'Network Error') {
+        setTimeout(() => {
+          showNetworkMessage();
+        }, 500);
       }
     }
   };

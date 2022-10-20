@@ -7,7 +7,12 @@ import { fetchToken, loginUser, registerUser } from './thunk';
 export const AuthState: IAuthState = {
   status: 'idle',
   isAuthorized: false,
-  error: undefined,
+  error: {
+    code: undefined,
+    message: undefined,
+    name: undefined,
+    stack: undefined,
+  },
   token: undefined,
   user: {
     isNew: true,
@@ -67,7 +72,7 @@ const slice = createSlice({
     });
     builder.addCase(fetchToken.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
 
     // Login.
@@ -84,7 +89,7 @@ const slice = createSlice({
     });
     builder.addCase(loginUser.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
 
     // Register.
@@ -101,7 +106,7 @@ const slice = createSlice({
     });
     builder.addCase(registerUser.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
   },
 });

@@ -6,7 +6,12 @@ import { CredentialAdapter } from './selectors';
 // State initialization
 export const CredentialState: ICredentialState = {
   status: 'loading',
-  error: undefined,
+  error: {
+    code: undefined,
+    message: undefined,
+    name: undefined,
+    stack: undefined,
+  },
 };
 
 export const slice = createSlice({
@@ -37,7 +42,7 @@ export const slice = createSlice({
     });
     builder.addCase(fetchCredentials.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
 
     // Remove Credentials
@@ -51,7 +56,7 @@ export const slice = createSlice({
     });
     builder.addCase(removeCredentials.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
   },
 });

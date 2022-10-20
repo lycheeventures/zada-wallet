@@ -2,6 +2,15 @@ import * as AuthAPI from './auth';
 import * as CredentialAPI from './credentials';
 import * as ConnectionAPI from './connections';
 import * as VerificationAPI from './verifications';
+import { ResponseCodesEnum } from '../enums';
+import { _showAlert } from '../helpers';
+
+const UNEXPECTED_ERROR = 'This was not suppose to happen. Our team has been notified.';
+const SERVER_DOWN = 'Something is wrong with our servers. Please try again later.';
+const SERVER_TIMEOUT = 'The operation could not be completed. Please try again!';
+const INVALID_TOKEN = 'Invalid Token!';
+const INVALID_PARAMS = 'Invalid parameters!';
+const ALREADY_EXIST = 'Already exist in database';
 
 export function throwErrorIfExist(error: any) {
   if (error?.response?.data.error) {
@@ -9,6 +18,34 @@ export function throwErrorIfExist(error: any) {
   } else {
     throw error;
   }
+}
+
+export function responseCodeMessages(code: number) {
+  switch (code) {
+    case ResponseCodesEnum.BAD_REQUEST:
+      return INVALID_PARAMS;
+    case ResponseCodesEnum.NOT_AUTHORIZED:
+      return INVALID_TOKEN;
+    case ResponseCodesEnum.ALREADY_FOUND:
+      return ALREADY_EXIST;
+    case ResponseCodesEnum.INTERNAL_SERVER_ERROR:
+      return UNEXPECTED_ERROR;
+    case ResponseCodesEnum.SERVICE_UNAVAILABLE:
+      return SERVER_DOWN;
+    case ResponseCodesEnum.GATEWAY_TIMEOUT:
+      return SERVER_TIMEOUT;
+
+    default:
+      return 'Something went wrong!';
+  }
+}
+
+export function handleErrorMessage(error: any) {
+  if (error.response.status && !error.response.data.error) {
+    let userMessage = responseCodeMessages(error.response.status);
+    error.response.data.error = userMessage;
+  }
+  _showAlert('Error', error.response.data.error);
 }
 
 export { AuthAPI, CredentialAPI, ConnectionAPI, VerificationAPI };

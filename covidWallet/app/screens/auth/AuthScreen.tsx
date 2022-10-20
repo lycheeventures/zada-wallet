@@ -393,7 +393,7 @@ const AuthScreen = ({
               <SimpleButton
                 loaderColor={WHITE_COLOR}
                 isLoading={status === 'pending'}
-                onPress={authCount >= 3 ? recaptcha.current.open : submit}
+                onPress={authCount >= 3 ? recaptcha.current?.open : submit}
                 width={250}
                 title="Continue"
                 titleColor={WHITE_COLOR}
@@ -437,8 +437,7 @@ const AuthScreen = ({
               <SimpleButton
                 loaderColor={WHITE_COLOR}
                 isLoading={status === 'pending'}
-                // onPress={authCount >= 3 ? recaptcha.current.open : submit}
-                onPress={submit}
+                onPress={authCount >= 3 ? recaptcha.current?.open : submit}
                 width={250}
                 title="Continue"
                 titleColor={WHITE_COLOR}
@@ -458,7 +457,7 @@ const AuthScreen = ({
           headerComponent={
             <TouchableComponent
               style={styles.crossViewStyle}
-              onPress={() => recaptcha.current.close()}>
+              onPress={() => recaptcha.current?.close()}>
               <Image
                 resizeMode="contain"
                 source={require('../../assets/images/close.png')}
