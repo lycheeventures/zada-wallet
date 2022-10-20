@@ -26,7 +26,6 @@ import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
 import { AuthenticateUser } from '../helpers/Authenticate';
 import { validateOTP, _resendOTPAPI } from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
-import useNetwork from '../hooks/useNetwork';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
 import { updateUser } from '../store/auth';
 import { useAppDispatch, useAppSelector } from '../store';
