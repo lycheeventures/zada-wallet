@@ -7,7 +7,12 @@ import { fetchActions } from './thunk';
 // State initialization
 export const ActionState: IActionState = {
   status: 'loading',
-  error: undefined,
+  error: {
+    code: undefined,
+    message: undefined,
+    name: undefined,
+    stack: undefined,
+  },
 };
 
 // Slice
@@ -44,7 +49,7 @@ export const slice = createSlice({
     builder.addCase(fetchActions.rejected, (state, action) => {
       // Handle the rejected result
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
   },
 });

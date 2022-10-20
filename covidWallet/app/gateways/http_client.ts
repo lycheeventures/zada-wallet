@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Config from 'react-native-config';
+import { handleErrorMessage } from '.';
 import { isJWTExp } from '../helpers/Authenticate';
 import { showNetworkMessage } from '../helpers/Toast';
 import { RootState } from '../store';
@@ -162,16 +163,11 @@ const setup = (store: any) => {
         }
         // Error handling
         if (!axios.isCancel(error)) {
-          // ShowAlert Message
-          // errorAlert();
-          // alert(error);
-          // Log error message
-          // logErrorMessage(error);
+          // on cancel.
         }
+        // Error message handling.
+        handleErrorMessage(error);
 
-        console.log('error url => ', originalRequest.url);
-        console.log('error => ', error);
-        console.log('error response data => ', error.response.data);
         return Promise.reject(error);
       } else {
         showNetworkMessage();

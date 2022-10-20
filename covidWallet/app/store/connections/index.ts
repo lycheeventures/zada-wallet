@@ -6,7 +6,12 @@ import { ConnectionAdapter } from './selectors';
 // State initialization
 export const ConnectionState: IConnectionState = {
   status: 'loading',
-  error: undefined,
+  error: {
+    code: undefined,
+    message: undefined,
+    name: undefined,
+    stack: undefined,
+  },
 };
 
 // Slice
@@ -37,8 +42,9 @@ export const slice = createSlice({
       }
     });
     builder.addCase(fetchConnections.rejected, (state, action) => {
+      console.log(action);
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
 
     // Accept Connection
@@ -52,7 +58,7 @@ export const slice = createSlice({
     });
     builder.addCase(acceptConnection.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
 
     // Delete connection.
@@ -66,7 +72,7 @@ export const slice = createSlice({
     });
     builder.addCase(removeConnection.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
   },
 });

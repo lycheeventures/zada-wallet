@@ -2,7 +2,12 @@ export type IStatus = 'idle' | 'loading' | 'pending' | 'succeeded' | 'failed';
 
 export interface IConnectionState {
   status: IStatus;
-  error: string | undefined;
+  error: {
+    code?: string | undefined;
+    message?: string | undefined;
+    name?: string | undefined;
+    stack?: any;
+  };
 }
 
 interface IEndpoint {

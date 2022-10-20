@@ -135,9 +135,13 @@ const useInit = () => {
     if (actionStatus == 'succeeded' || actionStatus == 'failed') {
       dispatch(changeActionStatus('idle'));
 
-      if (actionStatus === 'failed') {
-        _showAlert('Error', actionError);
-      }
+      // if (actionStatus === 'failed') {
+      //   if (actionError.code) {
+      //     console.log('typeof actionError.code => ', typeof actionError.code);
+      //     // responseCodeMessages(actionError.code);
+      //   }
+      //   _showAlert('Error', actionError.message);
+      // }
     }
   };
 
@@ -146,9 +150,9 @@ const useInit = () => {
     if (credStatus == 'succeeded' || credStatus == 'failed') {
       dispatch(changeCredentialStatus('idle'));
 
-      if (credStatus === 'failed') {
-        _showAlert('Error', credError);
-      }
+      // if (credStatus === 'failed') {
+      //   _showAlert('Error', credError.message);
+      // }
     }
   };
 
@@ -156,10 +160,9 @@ const useInit = () => {
   const handleConnectionStatus = () => {
     if (connStatus == 'succeeded' || connStatus == 'failed') {
       dispatch(changeConnectionStatus('idle'));
-
-      if (connStatus === 'failed') {
-        _showAlert('Error', connError);
-      }
+      // if (connStatus === 'failed') {
+      //   _showAlert('Error', connError.message);
+      // }
     }
   };
 

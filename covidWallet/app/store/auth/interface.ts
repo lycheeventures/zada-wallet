@@ -9,7 +9,12 @@ export interface IUserState {
 export interface IAuthState {
   status: IStatus;
   isAuthorized: boolean;
-  error: string | undefined;
+  error: {
+    code?: string | undefined;
+    message?: string | undefined;
+    name?: string | undefined;
+    stack?: any;
+  };
   token: string | undefined;
   user: IUserState;
   tempVar: IUserState;
