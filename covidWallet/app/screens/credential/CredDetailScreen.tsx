@@ -6,9 +6,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 
 import { BACKGROUND_COLOR, BLACK_COLOR, GRAY_COLOR, WHITE_COLOR } from '../../theme/Colors';
-import { generatePDF, getCredentialTemplate } from './utils';
+import { generatePDF, getCredentialTemplate, replacePlaceHolders } from './utils';
 import {
-  get_local_date_time,
   get_local_issue_date,
   parse_date_time,
   showAskDialog,
@@ -109,24 +108,38 @@ const CredDetailScreen = (props: IProps) => {
     let credentialDetails = Object.keys(orderedData).map((key, index) => {
       let value = orderedData[key];
       value = parse_date_time(value);
-      return `<div class="pair-items">
-                <b class="text-space" id="iizaq">${key}:</b>
-                <p id="iizaq">${value}</p>
-              </div>
-                `;
+      if (index % 3 === 0) {
+        return `
+        <tr>
+        <td class="tds">
+          <p class="pt">${key}: <strong>${value}</strong></p>
+        </td>`;
+      } else if ((index - 1) % 3 === 2) {
+        return `</tr>`;
+      } else {
+        return `
+        <td class="tds">
+          <p class="pt">${key}: <strong>${value}</strong></p>
+        </td>`;
+      }
     });
 
     // Getting template
     let template = await getCredentialTemplate(data.definitionId);
+
     // Injecting data into template
     let htmlStr = template.file;
-    htmlStr = htmlStr.replaceAll('placeholder_qr', qrUrl);
-    htmlStr = htmlStr.replaceAll('placeholder_type', orderedData.Type);
-    htmlStr = htmlStr.replaceAll('placeholder_imageUrl', data.imageUrl);
-    htmlStr = htmlStr.replaceAll('placeholder_organizationName', data.organizationName);
-    htmlStr = htmlStr.replaceAll('placeholder_fullName', orderedData['Full Name']);
-    htmlStr = htmlStr.replaceAll('placeholder_creationDate', get_local_date_time(new Date()));
-    htmlStr = htmlStr.replaceAll('placeholder_credentialList', credentialDetails.join(''));
+    htmlStr = replacePlaceHolders(
+      htmlStr,
+      {
+        ...orderedData,
+        qrUrl: qrUrl,
+        logo: data.imageUrl,
+        type: data.type,
+        organizationName: data.organizationName,
+      },
+      credentialDetails
+    );
 
     // Generating and sharing pdf
     let result = await generatePDF(htmlStr);

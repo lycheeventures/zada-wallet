@@ -5,6 +5,9 @@ import * as VerificationAPI from './verifications';
 import { ResponseCodesEnum } from '../enums';
 import { _showAlert } from '../helpers';
 
+// Exception List
+const exceptionList = ['The specified key does not exist.'];
+// Errors
 const UNEXPECTED_ERROR = 'This was not suppose to happen. Our team has been notified.';
 const SERVER_DOWN = 'Something is wrong with our servers. Please try again later.';
 const SERVER_TIMEOUT = 'The operation could not be completed. Please try again!';
@@ -45,6 +48,9 @@ export function handleErrorMessage(error: any) {
     let userMessage = responseCodeMessages(error.response.status);
     error.response.data.error = userMessage;
   }
+
+  if (exceptionList.includes(error.response.data.error)) return;
+
   _showAlert('Error', error.response.data.error);
 }
 
