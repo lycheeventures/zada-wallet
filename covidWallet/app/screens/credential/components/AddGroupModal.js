@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  View,
-  SafeAreaView,
-  Pressable,
-} from 'react-native';
+import { Dimensions, FlatList, StyleSheet, View, SafeAreaView, Pressable } from 'react-native';
 import Modal from 'react-native-modal';
 import {
   BACKGROUND_COLOR,
@@ -22,8 +15,9 @@ import SimpleButton from '../../../components/Buttons/SimpleButton';
 import CredentialsCard from '../../../components/CredentialsCard';
 import EmptyList from '../../../components/EmptyList';
 import { get_local_issue_date } from '../../../helpers/time';
-import { useAppSelector } from '../../../store';
+import { useAppDispatch, useAppSelector } from '../../../store';
 import { selectSearchedCredentials } from '../../../store/credentials/selectors';
+import { updateCredential } from '../../../store/credentials';
 
 const AddGroupModal = ({
   isVisible,
@@ -36,12 +30,14 @@ const AddGroupModal = ({
   onRefresh,
   refreshing,
 }) => {
+  // Constants
+  const dispatch = useAppDispatch();
+
+  // States
   const [search, setSearch] = useState('');
   const [creds, setCreds] = useState([]);
 
-  const filteredCreds = useAppSelector((state) =>
-    selectSearchedCredentials(state, search)
-  );
+  const filteredCreds = useAppSelector((state) => selectSearchedCredentials(state, search));
 
   useEffect(() => {
     const _changeCreds = () => {
@@ -58,6 +54,10 @@ const AddGroupModal = ({
     _changeCreds();
   }, [credentials, isVisible]);
 
+  const updateBackgroundImage = (credentialId, background_url) => {
+    dispatch(updateCredential({ id: credentialId, changes: { backgroundImage: background_url } }));
+  };
+
   const _searchInputHandler = (searchText) => {
     setSearch(searchText);
   };
@@ -72,15 +72,15 @@ const AddGroupModal = ({
         setCreds([...creds]);
       }}>
       <CredentialsCard
+        updateBackgroundImage={updateBackgroundImage}
+        item={item}
         schemeId={item['schemaId']}
         card_title={item.name}
         card_type={item.type}
         issuer={item.organizationName}
         card_user=""
         date={
-          item.values['Issue Time']
-            ? get_local_issue_date(item.values['Issue Time'])
-            : undefined
+          item.values['Issue Time'] ? get_local_issue_date(item.values['Issue Time']) : undefined
         }
         card_logo={{ uri: item.imageUrl }}
       />

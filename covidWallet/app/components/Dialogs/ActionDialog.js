@@ -137,7 +137,6 @@ function ActionDialog(props) {
         setTimeout(() => {
             setValues({});
             props.dismissModal()
-            console.log('dismiing...')
         }, 500);
 
     }

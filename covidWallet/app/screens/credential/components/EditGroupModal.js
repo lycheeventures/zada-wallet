@@ -162,6 +162,7 @@ const EditGroupModal = ({
                   setCreds([...creds]);
                 }}>
                 <CredentialsCard
+                  item={item}
                   schemeId={item['schemaId']}
                   card_title={item.name}
                   card_type={item.type}

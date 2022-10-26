@@ -1,6 +1,10 @@
 import { ToastAndroid, Platform, Alert } from 'react-native';
 
 export function showMessage(title, message) {
+  if (typeof message === 'object') {
+    message = JSON.stringify(message);
+  }
+
   if (Platform.OS === 'android') {
     ToastAndroid.show(message, ToastAndroid.SHORT);
   } else {

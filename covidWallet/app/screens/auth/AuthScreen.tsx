@@ -1,50 +1,63 @@
-import React, { useRef, useState } from 'react';
-import { Alert } from 'react-native';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import Config from 'react-native-config';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import PhoneInput from 'react-native-phone-number-input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwt_decode from 'jwt-decode';
+import Recaptcha from 'react-native-recaptcha-that-works';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import {
-  PRIMARY_COLOR,
-  BACKGROUND_COLOR,
   GREEN_COLOR,
   WHITE_COLOR,
   GRAY_COLOR,
-  RED_COLOR,
-} from '../theme/Colors';
-import HeadingComponent from '../components/HeadingComponent';
-import ConstantsList from '../helpers/ConfigApp';
-import { saveItem, getItem, removeItem } from '../helpers/Storage';
-import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
-import { AuthenticateUser } from '../helpers/Authenticate';
-import { InputComponent } from '../components/Input/inputComponent';
+  PRIMARY_COLOR,
+  BACKGROUND_COLOR,
+} from '../../theme/Colors';
+import { AuthStackParamList } from '../../navigation/types';
+
+import ConstantsList from '../../helpers/ConfigApp';
+import { saveItem, getItem } from '../../helpers/Storage';
+import { showNetworkMessage, _showAlert } from '../../helpers/Toast';
+import { nameRegex, validateLength, validatePasswordStrength } from '../../helpers/validation';
+import { _fetchingAppData } from '../../helpers/AppData';
+import { _handleAxiosError } from '../../helpers/AxiosResponse';
+
+import { _registerUserAPI } from '../../gateways/auth';
+
+import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import {
-  nameRegex,
-  validateLength,
-  validatePasswordStrength,
-} from '../helpers/validation';
-import { _resgiterUserAPI } from '../gateways/auth';
-import SimpleButton from '../components/Buttons/SimpleButton';
-import jwt_decode from 'jwt-decode';
-import { _fetchingAppData } from '../helpers/AppData';
-import useNetwork from '../hooks/useNetwork';
-import { _handleAxiosError } from '../helpers/AxiosResponse';
-import Recaptcha from 'react-native-recaptcha-that-works';
-import TouchableComponent from '../components/Buttons/TouchableComponent';
+  selectAuthStatus,
+} from '../../store/auth/selectors';
+import { selectNetworkStatus } from '../../store/app/selectors';
+import { createWallet, loginUser, registerUser } from '../../store/auth/thunk';
+import { updateTempVar } from '../../store/auth';
+
+import HeadingComponent from '../../components/HeadingComponent';
+import { InputComponent } from '../../components/Input/inputComponent';
+import SimpleButton from '../../components/Buttons/SimpleButton';
+import TouchableComponent from '../../components/Buttons/TouchableComponent';
+import RegisterButton from './components/buttons/RegisterButton';
+import LoginButton from './components/buttons/LoginButton';
 
 const { width } = Dimensions.get('window');
 
-function RegistrationModule({ navigation }) {
+const AuthScreen = ({
+  navigation,
+}: {
+  navigation: NativeStackNavigationProp<AuthStackParamList>;
+}) => {
+  // Redux
+  const dispatch = useAppDispatch<AppDispatch>();
+
+  // Selectors
+  const status = useAppSelector(selectAuthStatus);
+  const networkStatus = useAppSelector(selectNetworkStatus);
+
   // States
-  const [activeOption, updateActiveOption] = useState('register');
+  const [activeOption, updateActiveOption] = useState<'register' | 'login'>('register');
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('');
   const [phone, setPhone] = useState('');
@@ -59,9 +72,6 @@ function RegistrationModule({ navigation }) {
 
   const [progress, setProgress] = useState(false);
   const [authCount, setAuthCount] = useState(0);
-
-  // Hooks
-  const { isConnected } = useNetwork();
 
   // Refs
   const phoneInput = useRef(null);
@@ -81,12 +91,8 @@ function RegistrationModule({ navigation }) {
       const authCount = JSON.parse((await getItem(ConstantsList.AUTH_COUNT)) | 0);
       setAuthCount(authCount);
     };
-    const clearAuthAsync = async () => {
-      removeItem(ConstantsList.REGISTRATION_DATA);
-      removeItem(ConstantsList.LOGIN_DATA);
-    };
     getCount();
-    clearAuthAsync();
+    // clearAuthAsync();
   }, []);
 
   React.useEffect(() => {
@@ -157,188 +163,72 @@ function RegistrationModule({ navigation }) {
 
   const register = async () => {
     try {
-      if (isConnected) {
+      if (networkStatus === 'connected') {
         let data = {
           name: name.trim(),
           phone: phone.trim(),
           secretPhrase: secret,
         };
 
-        const result = await _resgiterUserAPI(data);
-        const response = result.data;
+        await dispatch(
+          registerUser({ name: data.name, phone: data.phone, secret: data.secretPhrase })
+        ).unwrap();
 
-        if (response.success) {
-          // new user is going to register
-          await saveItem(ConstantsList.REGISTRATION_DATA, JSON.stringify(response));
-          await saveItem(ConstantsList.WALLET_SECRET, secret);
-          navigation.replace('MultiFactorScreen', { from: 'Register' });
-        } else if (response.verified != undefined && !response.verified) {
-          // unverified user come to register
-          await saveItem(ConstantsList.REGISTRATION_DATA, JSON.stringify(response));
-          await saveItem(ConstantsList.WALLET_SECRET, secret);
-          navigation.replace('MultiFactorScreen', { from: 'Register' });
-        } else if (response.verified != undefined && response.verified) {
-          // verified user came again to register
-          selectionOnPress('login');
-          _showAlert('Zada Wallet', response.error);
-        } else {
-          _showAlert('Zada Wallet', response.error);
-        }
-        setProgress(false);
-      } else {
-        setProgress(false);
-        showNetworkMessage();
+        navigation.navigate('MultiFactorScreen', { from: 'Register' });
       }
-    } catch (error) {
-      console.log(error.response);
-      setProgress(false);
-      if (error.response && error.response.data) {
-        _checkForVerification(error.response.data);
-      }
+    } catch (e) {
+      console.log(e);
     }
   };
 
-  const _checkForVerification = async (response) => {
-    try {
-      if (response.verified != undefined && !response.verified) {
-        // unverified user come to register
-        await saveItem(ConstantsList.REGISTRATION_DATA, JSON.stringify(response));
-        await saveItem(ConstantsList.WALLET_SECRET, secret);
-        navigation.replace('MultiFactorScreen', { from: 'Register' });
-      } else if (response.verified != undefined && response.verified) {
-        // verified user came again to register
-        selectionOnPress('login');
-        _showAlert('Zada Wallet', response.error);
-      } else {
-        _showAlert('Zada Wallet', response.error);
-      }
-    } catch (error) {
-      _handleAxiosError(error);
-    }
-  };
-
+  // Login
   const login = async () => {
-    if (isConnected) {
-      await fetch(Config.API_URL + `/api/login`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phone: phone,
-          secretPhrase: secret,
-        }),
-      }).then((credsResult) =>
-        credsResult.json().then(async (data) => {
-          try {
-            let response = JSON.parse(JSON.stringify(data));
-            if (response.success == true) {
-              storeUserID(response.userId);
-              saveItem(ConstantsList.WALLET_SECRET, secret);
-              await saveItem(ConstantsList.LOGIN_DATA, JSON.stringify(response));
-
-              await authenticateUserToken(response?.type);
-            } else {
-              showMessage('ZADA Wallet', response.error);
-              setProgress(false);
-            }
-          } catch (error) {
-            _handleAxiosError(error);
-          } finally {
-            setProgress(false);
-          }
-        })
-      );
-    } else {
-      setProgress(false);
-      showNetworkMessage();
-    }
-  };
-
-  const storeUserID = async (userId) => {
-    try {
-      await AsyncStorage.setItem(ConstantsList.USER_ID, userId);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const createWallet = async (userToken) => {
-    await fetch(Config.API_URL + `/api/wallet/create`, {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + userToken,
-      },
-    }).then((walletResult) =>
-      walletResult.json().then(async (data) => {
-        try {
-          let response = JSON.parse(JSON.stringify(data));
-          if (response.success == true) {
-            // reauthentication
-            let reAuth = await AuthenticateUser(true);
-
-            if (reAuth.success) {
-              // decoding token
-              const decodedreAuthToken = jwt_decode(reAuth.token);
-
-              if (decodedreAuthToken.dub.length) {
-                await _fetchingAppData(isConnected);
-                setProgress(false);
-                // if token has wallet id
-                navigation.replace('SecurityScreen');
-              } else {
-                //await authenticateUserToken();
-              }
-            } else {
-              setProgress(false);
-              _showAlert('ZADA Wallet', `${reAuth.message}`);
-            }
-          } else {
-            _showAlert('ZADA Wallet', `${response.error}`);
-          }
-        } catch (error) {
-          _showAlert('ZADA Wallet', `${error.toString()}`);
-        }
+    let resp = await dispatch(loginUser({ phone: phone.trim(), secret: secret })).unwrap();
+    // Adding temp values in redux.
+    dispatch(
+      updateTempVar({
+        isNew: true,
+        type: resp?.type,
+        id: resp?.userId,
+        walletSecret: resp?.walletSecret,
+        auto_accept_connection: true,
       })
     );
+
+    if (resp?.token) {
+      await authenticateUserToken(resp?.type, resp?.token);
+    } else {
+      // Checking if type is 'demo'.
+      if (resp?.type === 'demo') {
+        navigation.replace('SecurityScreen', { navigation });
+      } else {
+        navigation.navigate('MultiFactorScreen', { from: 'Login' });
+      }
+    }
   };
 
-  const authenticateUserToken = async (isDemo) => {
+  const authenticateUserToken = async (isDemo: 'demo' | undefined, userToken: string) => {
     try {
-      if (isConnected) {
-        // autthenticating user
-        let resp = await AuthenticateUser(true);
-        if (resp.success) {
-          // decoding token
-          const decodedToken = jwt_decode(resp.token);
-
-          if (decodedToken.dub.length) {
-            await _fetchingAppData(isConnected);
-            setProgress(false);
-
-            // if token has wallet id
-            //  navigation.replace('SecurityScreen');
-            if (isDemo != undefined && isDemo == 'demo') {
-              navigation.replace('SecurityScreen');
-            } else {
-              navigation.replace('MultiFactorScreen', { from: 'Login' });
-            }
+      if (networkStatus === 'connected') {
+        const decodedToken = jwt_decode(userToken);
+        if (decodedToken && decodedToken.dub?.length) {
+          if (isDemo !== undefined && isDemo === 'demo') {
+            navigation.replace('SecurityScreen', { navigation });
           } else {
-            // if token has not wallet id
-            // CREATING WALLET
-            await createWallet(resp.token);
+            navigation.replace('MultiFactorScreen', { from: 'Login' });
           }
         } else {
-          setProgress(false);
-          _showAlert('ZADA Wallet', resp.message);
+          // If walletid does not exist in database.
+          // CREATING WALLET
+          let response = await dispatch(createWallet(userToken)).unwrap();
+          if (response?.data.status === 'success') {
+            navigation.replace('SecurityScreen', { navigation });
+          }
         }
       } else {
-        setProgress(false);
         showNetworkMessage();
       }
-    } catch (error) {
-      setProgress(false);
+    } catch (error: any) {
       _showAlert('Zada Wallet', error.toString());
     }
   };
@@ -396,36 +286,26 @@ function RegistrationModule({ navigation }) {
   };
 
   // KEYBOARD AVOIDING VIEW
-  const keyboardVerticalOffset = Platform.OS == 'ios' ? 100 : 0;
-  const keyboardBehaviour = Platform.OS == 'ios' ? 'padding' : null;
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
+  const keyboardBehaviour = Platform.OS === 'ios' ? 'padding' : null;
 
   return (
     <View
-      pointerEvents={progress ? 'none' : 'auto'}
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: PRIMARY_COLOR,
-      }}>
+      pointerEvents={status === 'pending' ? 'none' : 'auto'}
+      style={styles.topViewContainerStyle}>
       <KeyboardAwareScrollView
         behavior={keyboardBehaviour}
         keyboardVerticalOffset={keyboardVerticalOffset}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
-        <View
-          style={{
-            backgroundColor: BACKGROUND_COLOR,
-            alignContent: 'center',
-            width: width - 40,
-            justifyContent: 'space-around',
-            borderRadius: 10,
-          }}>
+        <View style={styles.topViewStyle}>
           <View style={{ marginLeft: 50, marginRight: 50 }}>
             <HeadingComponent text="Let's Get Started!" />
           </View>
 
           <View style={styles.headerContainer}>
-            <TouchableOpacity
+            {/* Register Button */}
+            <RegisterButton
               onPress={() => {
                 selectionOnPress('register');
                 setName('');
@@ -433,36 +313,12 @@ function RegistrationModule({ navigation }) {
                 setSecret('');
                 setSecretError('');
                 setPhone('');
-              }}>
-              <Image
-                style={{
-                  height: 50,
-                  width: '50%',
-                  resizeMode: 'contain',
-                  alignSelf: 'center',
-                  tintColor: activeOption == 'register' ? GREEN_COLOR : 'grey',
-                }}
-                source={require('../assets/images/register.png')}
-              />
-              <Text
-                style={{
-                  width: 150,
-                  height: 30,
-                  textAlignVertical: 'center',
-                  textAlign: 'center',
-                  fontFamily: 'Poppins-Regular',
-                  color: 'grey',
-                }}>
-                Register Account
-              </Text>
-              <View
-                style={{
-                  borderBottomColor: activeOption == 'register' ? GREEN_COLOR : 'grey',
-                  borderBottomWidth: 4,
-                }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
+              }}
+              activeOption={activeOption}
+            />
+
+            {/* Login Button */}
+            <LoginButton
               onPress={() => {
                 selectionOnPress('login');
                 setName('');
@@ -470,38 +326,9 @@ function RegistrationModule({ navigation }) {
                 setSecret('');
                 setSecretError('');
                 setPhone('');
-              }}>
-              <Image
-                onPress={() => {
-                  selectionOnPress('login');
-                }}
-                style={{
-                  height: 50,
-                  width: 50,
-                  resizeMode: 'contain',
-                  alignSelf: 'center',
-                  tintColor: activeOption == 'login' ? GREEN_COLOR : 'grey',
-                }}
-                source={require('../assets/images/already.png')}
-              />
-              <Text
-                style={{
-                  width: 150,
-                  textAlign: 'center',
-                  textAlignVertical: 'center',
-                  fontFamily: 'Poppins-Regular',
-                  height: 30,
-                  color: 'grey',
-                }}>
-                Login
-              </Text>
-              <View
-                style={{
-                  borderBottomColor: activeOption == 'login' ? GREEN_COLOR : 'grey',
-                  borderBottomWidth: 4,
-                }}
-              />
-            </TouchableOpacity>
+              }}
+              activeOption={activeOption}
+            />
           </View>
           {activeOption == 'register' && (
             <View>
@@ -517,9 +344,7 @@ function RegistrationModule({ navigation }) {
               </View>
 
               {renderPhoneNumberInput()}
-              <Text style={styles.secretMessage}>
-                Password (please save in safe place)
-              </Text>
+              <Text style={styles.secretMessage}>Password (please save in safe place)</Text>
               <View>
                 <InputComponent
                   type={'secret'}
@@ -562,14 +387,13 @@ function RegistrationModule({ navigation }) {
                   marginTop: 10,
                   marginRight: 20,
                 }}>
-                We need your details as your ZADA WALLET will be based on it. We are not
-                going to send you ads or spam email, or sell your information to a 3rd
-                party.
+                We need your details as your ZADA WALLET will be based on it. We are not going to
+                send you ads or spam email, or sell your information to a 3rd party.
               </Text>
               <SimpleButton
                 loaderColor={WHITE_COLOR}
-                isLoading={progress}
-                onPress={authCount >= 3 ? recaptcha.current.open : submit}
+                isLoading={status === 'pending'}
+                onPress={authCount >= 3 ? recaptcha.current?.open : submit}
                 width={250}
                 title="Continue"
                 titleColor={WHITE_COLOR}
@@ -612,8 +436,8 @@ function RegistrationModule({ navigation }) {
               </Text>
               <SimpleButton
                 loaderColor={WHITE_COLOR}
-                isLoading={progress}
-                onPress={authCount >= 3 ? recaptcha.current.open : submit}
+                isLoading={status === 'pending'}
+                onPress={authCount >= 3 ? recaptcha.current?.open : submit}
                 width={250}
                 title="Continue"
                 titleColor={WHITE_COLOR}
@@ -633,10 +457,10 @@ function RegistrationModule({ navigation }) {
           headerComponent={
             <TouchableComponent
               style={styles.crossViewStyle}
-              onPress={() => recaptcha.current.close()}>
+              onPress={() => recaptcha.current?.close()}>
               <Image
                 resizeMode="contain"
-                source={require('../assets/images/close.png')}
+                source={require('../../assets/images/close.png')}
                 style={styles.crossImageStyle}
               />
             </TouchableComponent>
@@ -645,9 +469,21 @@ function RegistrationModule({ navigation }) {
       </KeyboardAwareScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  topViewContainerStyle: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: PRIMARY_COLOR,
+  },
+  topViewStyle: {
+    backgroundColor: BACKGROUND_COLOR,
+    alignContent: 'center',
+    width: width - 40,
+    justifyContent: 'space-around',
+    borderRadius: 10,
+  },
   inputView: {
     backgroundColor: WHITE_COLOR,
     borderRadius: 10,
@@ -758,12 +594,13 @@ const styles = StyleSheet.create({
   crossViewStyle: {
     backgroundColor: '#000000',
     position: 'absolute',
-    padding: 4,
+    padding: 2,
     right: 16,
     top: 70,
+    borderRadius: 20,
     zIndex: 100,
   },
   crossImageStyle: { width: 30, height: 30 },
 });
 
-export default RegistrationModule;
+export default AuthScreen;

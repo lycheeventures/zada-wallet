@@ -1,27 +1,55 @@
 import http_client from './http_client';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthenticateUser } from '../helpers/Authenticate';
-import {
-  analytics_log_register_success,
-  analytics_log_verifies_otp,
-} from '../helpers/analytics';
+import { analytics_log_register_success, analytics_log_verifies_otp } from '../helpers/analytics';
+import { throwErrorIfExist } from '.';
 
-export async function getToken() {
-  let resp = await AuthenticateUser();
-  if (resp.success) {
-    return resp.token;
-  } else {
-    return '';
+// login user api
+export const login = async (phone: string, secret: string) => {
+  try {
+    console.log(phone, secret);
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/login',
+      data: JSON.stringify({
+        phone: phone,
+        secretPhrase: secret,
+      }),
+    });
+
+    return result;
+  } catch (error) {
+    throwErrorIfExist(error);
   }
-}
+};
+
+// authenticate user api
+export const authenticate = async (userID: String, secret: String) => {
+  try {
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/authenticate',
+      data: JSON.stringify({
+        userId: userID,
+        secretPhrase: secret,
+      }),
+    });
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // register user api
-export const _resgiterUserAPI = async (data: Object) => {
+export const _registerUserAPI = async (name: string, phone: string, secretPhrase: string) => {
   try {
     const result = await http_client({
       method: 'POST',
       url: '/api/register',
-      data: data,
+      data: {
+        name,
+        phone,
+        secretPhrase,
+      },
     });
 
     analytics_log_register_success();
@@ -68,13 +96,9 @@ export const _sendPasswordResetAPI = async (phone: string) => {
 // api to fetch user profile data
 export const _fetchProfileAPI = async () => {
   try {
-    const token = await getToken();
     const result = await http_client({
       method: 'GET',
       url: '/api/get_user_data',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     return result;
   } catch (error) {
@@ -85,14 +109,10 @@ export const _fetchProfileAPI = async () => {
 // api to update user profile
 export const _updateProfileAPI = async (data: Object) => {
   try {
-    const token = await getToken();
     const result = await http_client({
       method: 'POST',
       url: '/api/update_user',
       data: data,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     return result;
   } catch (error) {
@@ -101,26 +121,17 @@ export const _updateProfileAPI = async (data: Object) => {
 };
 
 // Validate OTP
-export async function validateOTP(
-  phoneConfirmationCode: string,
-  userId: string
-) {
+export async function validateOTP(phoneConfirmationCode: string, userId: string) {
   try {
     let obj = {
       otpsms: phoneConfirmationCode,
       userId: userId,
     };
 
-    let headers = {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + (await getToken()),
-    };
-
     const result = await http_client({
       method: 'POST',
       url: '/api/validateOTPs',
       data: obj,
-      headers,
     });
 
     analytics_log_verifies_otp();
@@ -132,26 +143,17 @@ export async function validateOTP(
 }
 
 // Register device token.
-export async function registerDeviceToken(
-  devicePlatform: string,
-  devicePushToken: string
-) {
+export async function registerDeviceToken(devicePlatform: string, devicePushToken: string) {
   try {
     let obj = {
       platform: devicePlatform,
       deviceToken: devicePushToken,
     };
 
-    let headers = {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + (await getToken()),
-    };
-
     const result = await http_client({
       method: 'POST',
       url: '/api/enableNotifications',
       data: obj,
-      headers,
     });
     return result;
   } catch (error) {
@@ -159,24 +161,18 @@ export async function registerDeviceToken(
   }
 }
 
-// // Register Api
-// export async function register(
-//   email: string,
-//   name: string,
-//   login_id: string,
-// ) {
-//   let fd = new FormData();
-//   fd.append('email', email);
-//   fd.append('name', name);
-//   fd.append('login_id', login_id);
-//   try {
-//     const result = await http_client({
-//       method: 'POST',
-//       url: 'register',
-//       data: fd,
-//     });
-//     return result;
-//   } catch (error) {
-//     alert(error.response.data.message);
-//   }
-// }
+export async function createWallet(token: string) {
+  try {
+    let headers = {
+      Authorization: 'Bearer ' + token,
+    };
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/wallet/create',
+      headers,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}

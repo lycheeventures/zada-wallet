@@ -1,14 +1,13 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import { StatusBar, View } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import NetworkContext from './app/context/NetworkContext';
-import NavigationComponent from './app/Navigation';
+import RootNavigator from './app/navigation/RootNavigator';
 import { PRIMARY_COLOR } from './app/theme/Colors';
 import ErrorBoundary from 'react-native-error-boundary';
 import { analytics_log_app_error } from './app/helpers/analytics';
 import ErrorFallback from './app/components/ErrorFallback';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
+import BootstrapPersistance from './app/BootstrapPersistance';
 
 const App = () => {
   const errorHandler = (error, stackTrace) => {
@@ -18,19 +17,23 @@ const App = () => {
   return (
     <NetworkContext>
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
-        <Provider store={store}>
-          <StatusBar barStyle="light-content" backgroundColor={PRIMARY_COLOR} />
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: PRIMARY_COLOR,
-            }}>
-            <NavigationComponent />
-          </View>
-        </Provider>
+        <StatusBar barStyle="light-content" backgroundColor={PRIMARY_COLOR} />
+        <BootstrapPersistance>
+          {(clearPersistor) => (
+            <View style={styles.viewStyle}>
+              <RootNavigator clearPersistor={clearPersistor} />
+            </View>
+          )}
+        </BootstrapPersistance>
       </ErrorBoundary>
     </NetworkContext>
   );
 };
 
+const styles = StyleSheet.create({
+  viewStyle: {
+    flex: 1,
+    backgroundColor: PRIMARY_COLOR,
+  },
+});
 export default App;

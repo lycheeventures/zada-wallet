@@ -145,8 +145,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode 103
-        versionName "1.2.9(6)"
+        versionCode 115
+        versionName "1.3.1(8)"
 
         setProperty("archivesBaseName", "ZADA-V-$versionName")
         missingDimensionStrategy 'react-native-camera', 'general'
@@ -194,6 +194,9 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
+        lintOptions {
+            checkReleaseBuilds false
+        }
     }
 
     packagingOptions {
@@ -224,13 +227,19 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation project(':react-native-splash-screen')
+    implementation project(':react-native-notifications')
+    implementation 'com.google.firebase:firebase-core:16.0.0'
     implementation platform('com.google.firebase:firebase-bom:28.1.0')
     implementation 'com.google.firebase:firebase-analytics'
     //FingerPrint scanner Library
     implementation project(':react-native-fingerprint-scanner')
     
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
-
+    implementation ("androidx.appcompat:appcompat:1.3.1") {
+        version {
+            strictly '1.3.1'
+        }
+    }
     addUnimodulesDependencies()
     
 //    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {

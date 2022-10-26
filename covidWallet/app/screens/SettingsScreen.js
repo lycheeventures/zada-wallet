@@ -1,53 +1,47 @@
-import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Linking,
-  Switch,
-  Dimensions,
-  Platform,
-  Pressable,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  BLACK_COLOR,
-  GRAY_COLOR,
-  GREEN_COLOR,
-  PRIMARY_COLOR,
-  WHITE_COLOR,
-} from '../theme/Colors';
-import {getItem, saveItem} from '../helpers/Storage';
-import {AUTO_ACCEPT_CONNECTION, BIOMETRIC_ENABLED} from '../helpers/ConfigApp';
-import {showMessage} from '../helpers/Toast';
-import {AuthContext} from '../context/AuthContext';
-import ConstantsList from '../helpers/ConfigApp';
-import ZignSecModal from '../components/ZignSecModal';
-import {getVersion} from 'react-native-device-info';
-import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Linking, Switch, Dimensions, Platform } from 'react-native';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { getVersion } from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-export default function SettingsScreen(props) {
-  const {logout} = React.useContext(AuthContext);
-  const [isBioEnable, setBioEnable] = useState(false);
-  const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(false);
-  const [version, setVersion] = useState(null);
+import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
+import { getItem, saveItem } from '../helpers/Storage';
+import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
+import { showMessage } from '../helpers/Toast';
+import ConstantsList from '../helpers/ConfigApp';
+import ZignSecModal from '../components/ZignSecModal';
+import { useAppDispatch, useAppSelector } from '../store';
+import { updateUser } from '../store/auth';
+import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
+import useDevelopment from '../hooks/useDevelopment';
+import { clearAll } from '../store/utils';
 
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+export default function SettingsScreen(props) {
+  // Constants
+  const dispatch = useAppDispatch();
+
+  // Selectors
+  const autoAcceptConnection = useAppSelector(selectAutoAcceptConnection);
+  const user = useAppSelector(selectUser);
+
+  // hooks
+  const { longPressCount, pressCount, buttonPressed, developmentMode, setDevelopmentMode } =
+    useDevelopment();
+
+  const [isBioEnable, setBioEnable] = useState(false);
+  const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(autoAcceptConnection);
+  const [version, setVersion] = useState(null);
 
   useEffect(() => {
     const updatevalues = async () => {
-      let appVersion = JSON.parse(
-        (await getItem(ConstantsList.APP_VERSION)) || null,
-      );
+      let appVersion = JSON.parse((await getItem(ConstantsList.APP_VERSION)) || null);
 
       let biometric = JSON.parse((await getItem(BIOMETRIC_ENABLED)) || 'false');
 
-      let auto_accept_connection = JSON.parse((await getItem(AUTO_ACCEPT_CONNECTION)) || 'false');
+      // let auto_accept_connection = JSON.parse((await getItem(AUTO_ACCEPT_CONNECTION)) || 'false');
 
       setBioEnable(biometric);
-      setIsAcceptConnectionEnabled(auto_accept_connection);
+      // setIsAcceptConnectionEnabled(auto_accept_connection);
       setVersion(appVersion);
     };
     updatevalues();
@@ -76,21 +70,20 @@ export default function SettingsScreen(props) {
         }, 1000);
       }
     } else {
-      if (result)
-        setBioEnable(false);
+      if (result) setBioEnable(false);
     }
   };
 
   const _toggleAcceptConnection = (value) => {
-    saveItem(ConstantsList.AUTO_ACCEPT_CONNECTION, JSON.stringify(value));
-    setIsAcceptConnectionEnabled(value)
-  }
+    // saveItem(ConstantsList.AUTO_ACCEPT_CONNECTION, JSON.stringify(value));
+    dispatch(updateUser({ ...user, auto_accept_connection: value }));
+    setIsAcceptConnectionEnabled(value);
+  };
 
   const onLogoutPressed = async () => {
     const pCode = await getItem(ConstantsList.PIN_CODE);
-    AsyncStorage.clear();
     saveItem(ConstantsList.PIN_CODE, pCode);
-    logout();
+    clearAll(dispatch);
   };
 
   // when user will click on edit profile screen
@@ -168,7 +161,12 @@ export default function SettingsScreen(props) {
           <Icon name="right" color={GREEN_COLOR} size={18} />
         </TouchableOpacity>
 
-        <Text style={[styles._rowHeading, {marginTop: 15}]}>Support</Text>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onLongPress={buttonPressed}
+          onPress={longPressCount !== 3 ? () => {} : buttonPressed}>
+          <Text style={[styles._rowHeading, { marginTop: 15 }]}>Support</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles._row}
@@ -194,28 +192,43 @@ export default function SettingsScreen(props) {
           <Text style={styles._rowLabel}>About Us</Text>
           <Icon name="right" color={GREEN_COLOR} size={18} />
         </TouchableOpacity>
+
+        <Text style={styles.devTextStyle}>
+          {longPressCount === 3 && !developmentMode
+            ? 'Now just tap ' + (4 - pressCount) + ' more times!'
+            : ''}
+        </Text>
+        {developmentMode && (
+          <View activeOpacity={0.8} style={styles._row}>
+            <Text style={styles._rowLabel}>Development Mode</Text>
+            <Switch
+              trackColor={{
+                false: '#81b0ff',
+                true: '#3ab6ae',
+              }}
+              ios_backgroundColor="#ffffff"
+              onValueChange={() => setDevelopmentMode(!developmentMode)}
+              value={developmentMode}
+            />
+          </View>
+        )}
       </ScrollView>
       <View style={styles.footer}>
         <Text
           onPress={() => {
             if (Platform.OS === 'android')
               Linking.openURL(
-                'https://play.google.com/store/apps/details?id=com.zadanetwork.wallet',
+                'https://play.google.com/store/apps/details?id=com.zadanetwork.wallet'
               );
-            else
-              Linking.openURL(
-                'https://apps.apple.com/us/app/zada-wallet/id1578666669',
-              );
+            else Linking.openURL('https://apps.apple.com/us/app/zada-wallet/id1578666669');
           }}
           style={styles._appVersion}>{`Version ${
-          version == undefined || version === null
-            ? getVersion().toString()
-            : version.version
+          version == undefined || version === null ? getVersion().toString() : version.version
         }`}</Text>
         <Text style={styles.footerText}>
           In Collaboration with&nbsp;
           <Text
-            style={{color: PRIMARY_COLOR}}
+            style={{ color: PRIMARY_COLOR }}
             onPress={() => {
               Linking.openURL('https://trust.net.pk/');
             }}>
@@ -249,7 +262,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     shadowColor: BLACK_COLOR,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 5,
@@ -290,5 +303,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginBottom: 10,
     fontFamily: 'Poppins-Regular',
+  },
+  devTextStyle: {
+    textAlign: 'center',
+    marginTop: 24,
   },
 });
