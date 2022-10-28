@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Config from 'react-native-config';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import CredValuesModal from './components/CredValuesModal';
 import CustomProgressBar from './components/CustomProgressBar';
@@ -154,6 +155,18 @@ const QRScreen = ({ route, navigation }) => {
         }
 
         if (qrJSON.type === ConstantsList.CONN_REQ) {
+          if (
+            Config.API_URL === 'https://test-agency.zadanetwork.com' &&
+            qrJSON.env === 'production'
+          ) {
+            throw 'You are trying to scan production QR code with test app!';
+          }
+          if (
+            Config.API_URL === 'https://agency.zadanetwork.com' &&
+            (qrJSON.env === 'debug' || qrJSON.env === 'test')
+          ) {
+            throw 'You are trying to scan test QR code with production app!';
+          }
           setDialogTitle('Fetching Connection Details');
           setScan(false);
           setProgress(true);
@@ -191,7 +204,7 @@ const QRScreen = ({ route, navigation }) => {
         console.log(error);
       }
     },
-    [connections, dispatch, navigateToMainScreen]
+    [auto_accept_connection, connections, dispatch, navigateToMainScreen]
   );
 
   // Accept modal handler
