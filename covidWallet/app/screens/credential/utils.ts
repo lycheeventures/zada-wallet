@@ -17,14 +17,25 @@ export const generatePDF = async (html: any) => {
   return { url: Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath };
 };
 
-export const getCredentialTemplate = async (credDef: string) => {
+export const getCredentialTemplate = async (schemaId: string, credDef: string) => {
   try {
     let result = await CredentialAPI.get_credential_template(credDef);
     return result.data;
   } catch (e: any) {
     if (e.response.data.error === 'The specified key does not exist.') {
-      let result = await CredentialAPI.get_credential_template('default');
-      return result.data;
+      // Get schema based template.
+      try {
+        let result = await CredentialAPI.get_credential_template(schemaId);
+        return result.data;
+      } catch (e: any) {
+        if (e.response.data.error === 'The specified key does not exist.') {
+          // Get default template.
+          let result = await CredentialAPI.get_credential_template('default');
+          return result.data;
+        } else {
+          console.log(e);
+        }
+      }
     } else {
       console.log(e);
     }
