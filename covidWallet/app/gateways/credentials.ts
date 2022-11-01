@@ -208,10 +208,10 @@ export const fetch_signature_by_cred_id = async (credentialId: string, values: O
   }
 };
 
-export async function get_credential_template(credDef: string) {
+export async function get_credential_template(name: string) {
   try {
     let params = {
-      credDef,
+      fileName: name,
     };
     const result = await http_client({
       method: 'GET',

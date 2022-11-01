@@ -7,12 +7,7 @@ import Share from 'react-native-share';
 
 import { BACKGROUND_COLOR, BLACK_COLOR, GRAY_COLOR, WHITE_COLOR } from '../../theme/Colors';
 import { generatePDF, getCredentialTemplate, replacePlaceHolders } from './utils';
-import {
-  get_local_issue_date,
-  parse_date_time,
-  showAskDialog,
-  showMessage,
-} from '../../helpers';
+import { get_local_issue_date, parse_date_time, showAskDialog, showMessage } from '../../helpers';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { selectCredentialsStatus } from '../../store/credentials/selectors';
 
@@ -125,7 +120,7 @@ const CredDetailScreen = (props: IProps) => {
     });
 
     // Getting template
-    let template = await getCredentialTemplate(data.definitionId);
+    let template = await getCredentialTemplate(data.schemaId, data.definitionId);
 
     // Injecting data into template
     let htmlStr = template.file;
