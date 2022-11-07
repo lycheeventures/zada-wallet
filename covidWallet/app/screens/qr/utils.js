@@ -1,5 +1,7 @@
 import { Buffer } from 'buffer';
 import queryString from 'query-string';
+import { get_encrypted_credential } from '../../gateways/credentials';
+import { decryptAES256CBC, performSHA256 } from '../../helpers/crypto';
 import { sortValuesByKey } from '../../helpers/utils';
 
 export const getType = (str) => {
@@ -30,10 +32,34 @@ export const handleQRLogin = async (loginQRData) => {
   }
 };
 
-export const handleCredVerification = (credQrData) => {
+export const handleCredVerification = async (credQrData) => {
   try {
-    let credValues = Buffer.from(credQrData.data, 'base64').toString();
-    var sortedValues = sortValuesByKey(JSON.parse(credValues));
+    let credValues = {};
+    // spliting hash and credentialId from QR data.
+    if (credQrData.data.startsWith('https://')) {
+      let strArr = credQrData.data.split('/');
+      let credentialId = strArr[strArr.length - 1];
+      let key = strArr[strArr.length - 2];
+
+      // Getting encrypted credentials from database.
+      let resp = await get_encrypted_credential(credentialId, key);
+      if (!resp.data.success) {
+        return false;
+      }
+
+      // Getting hash from key.
+      let hash = await performSHA256(key);
+      // substring is used to increase complexity.
+      hash = hash.substring(16, 48);
+
+      // Decrypting encrypted credentials
+      credValues = await decryptAES256CBC(resp.data.credential.encryptedCredential, hash);
+    } else {
+      // Handling old implementation
+      credValues = Buffer.from(credQrData.data, 'base64').toString();
+      credValues = JSON.parse(credValues);
+    }
+    var sortedValues = sortValuesByKey(credValues);
 
     return {
       credential: {

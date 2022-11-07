@@ -4,6 +4,7 @@ import ViewShot from 'react-native-view-shot';
 import QRCode from 'react-native-qrcode-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
+import Config from 'react-native-config';
 
 import { BACKGROUND_COLOR, BLACK_COLOR, GRAY_COLOR, WHITE_COLOR } from '../../theme/Colors';
 import { generatePDF, getCredentialTemplate, replacePlaceHolders } from './utils';
@@ -17,6 +18,14 @@ import DetailCard from './components/DetailCard';
 import RenderValues from '../../components/RenderValues';
 import usePreventScreenshot from '../../hooks/usePreventScreenshot';
 import { removeCredentials } from '../../store/credentials/thunk';
+import {
+  decryptAES256CBC,
+  encryptAES256CBC,
+  generateRandomSecret,
+  performSHA256,
+} from '../../helpers/crypto';
+import { getItemFromLocalStorage, saveItemInLocalStorage } from '../../helpers/Storage';
+import { get_encrypted_credential, save_encrypted_credential } from '../../gateways/credentials';
 
 interface IProps {
   route: any;
@@ -86,10 +95,37 @@ const CredDetailScreen = (props: IProps) => {
 
   // Make and Share PDF
   async function sharePDF() {
-    setGeneratingPDF(true);
+    // setGeneratingPDF(true);
 
-    // Getting hidden screenshot of QR.
-    let qrUrl = await viewShotRef.current?.capture();
+    let key = '';
+    let hash = '';
+
+    let isPDFAlreadyGenerated = await getItemFromLocalStorage(data.credentialId);
+    if (!isPDFAlreadyGenerated) {
+      key = generateRandomSecret(32);
+      hash = await performSHA256(key);
+      // substring is used to increase complexity.
+      hash = hash.substring(16, 48);
+      let str = await encryptAES256CBC(data.values, hash);
+      let obj = {
+        key: key,
+        hash,
+      };
+      saveItemInLocalStorage(data.credentialId, obj);
+      save_encrypted_credential(data.credentialId, str);
+    } else {
+      key = isPDFAlreadyGenerated.key;
+      hash = isPDFAlreadyGenerated.hash;
+      let resp = await get_encrypted_credential(data.credentialId, key);
+      if (resp.data.sucess) {
+        let encryptedCred = resp.data.credential.encryptedCredential;
+        hash = await performSHA256(key);
+        // substring is used to increase complexity.
+        hash = hash.substring(16, 48);
+        // decrypting
+        await decryptAES256CBC(encryptedCred, hash);
+      }
+    }
 
     // Ordering data
     const orderedData = Object.keys(data.values)
@@ -122,13 +158,42 @@ const CredDetailScreen = (props: IProps) => {
     // Getting template
     let template = await getCredentialTemplate(data.schemaId, data.definitionId);
 
+    // Making QR data.
+    let qrJSON = JSON.parse(data.qrCode);
+    let qrData = {
+      data:
+        Config.API_URL + '/credentials/get_encrypted_credential/' + key + '/' + data.credentialId,
+      type: 'cred_ver',
+      tenantId: qrJSON.tenantId,
+      signature: qrJSON.signature,
+      keyVersion: qrJSON.keyVersion,
+    };
+    let qrUrl = await new Promise(async (resolve, reject) => {
+      await fetch(
+        'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + JSON.stringify(qrData)
+      ).then(async (resp) => {
+        let blob = await resp.blob();
+
+        resolve(
+          new Promise((resolve, reject) => {
+            let reader = new FileReader();
+            reader.onload = (event) => {
+              let base64String = event.target?.result;
+              resolve(base64String);
+            };
+            reader.readAsDataURL(blob);
+          })
+        );
+      });
+    });
+
     // Injecting data into template
     let htmlStr = template.file;
     htmlStr = replacePlaceHolders(
       htmlStr,
       {
         ...orderedData,
-        qrUrl: qrUrl,
+        qrUrl,
         logo: data.imageUrl,
         type: data.type,
         organizationName: data.organizationName,
