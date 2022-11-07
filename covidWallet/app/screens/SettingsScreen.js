@@ -4,10 +4,17 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { getVersion } from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
+import {
+  AppColors,
+  BLACK_COLOR,
+  GRAY_COLOR,
+  GREEN_COLOR,
+  PRIMARY_COLOR,
+  WHITE_COLOR,
+} from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
 import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
-import { showMessage } from '../helpers/Toast';
+import { showAskDialog, showMessage, showOKDialog } from '../helpers/Toast';
 import ConstantsList from '../helpers/ConfigApp';
 import ZignSecModal from '../components/ZignSecModal';
 import { useAppDispatch, useAppSelector } from '../store';
@@ -31,6 +38,7 @@ export default function SettingsScreen(props) {
   const [isBioEnable, setBioEnable] = useState(false);
   const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(autoAcceptConnection);
   const [version, setVersion] = useState(null);
+  const [showZignSecModal, setZignSecModal] = useState(false);
 
   useEffect(() => {
     const updatevalues = async () => {
@@ -96,7 +104,20 @@ export default function SettingsScreen(props) {
     setZignSecModal(true);
   };
 
-  const [showZignSecModal, setZignSecModal] = useState(false);
+  const initDeleteAccount = () => {
+    showOKDialog(
+      'ZADA Wallet',
+      'Account deletion has been intiated. An Email has been dispatched. Please check your mailbox to continue with this process.',
+      () => {
+        console.log('asdas');
+      }
+    );
+
+    setTimeout(() => {
+      // logout user
+      onLogoutPressed();
+    }, 3000);
+  };
 
   return (
     <View style={styles._mainContainer}>
@@ -191,6 +212,20 @@ export default function SettingsScreen(props) {
           onPress={() => props.navigation.navigate('AboutUs')}>
           <Text style={styles._rowLabel}>About Us</Text>
           <Icon name="right" color={GREEN_COLOR} size={18} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={[styles._row, { marginTop: 16 }]}
+          onPress={() =>
+            showAskDialog(
+              'Are you sure?',
+              'Do you want to DELETE your account ?',
+              () => initDeleteAccount(),
+              () => {}
+            )
+          }>
+          <Text style={[styles._rowLabel, { color: AppColors.DANGER }]}>Delete Account</Text>
         </TouchableOpacity>
 
         <Text style={styles.devTextStyle}>
