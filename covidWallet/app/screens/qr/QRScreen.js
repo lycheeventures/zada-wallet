@@ -135,14 +135,16 @@ const QRScreen = ({ route, navigation }) => {
 
           // Credential Request
           if (type === 'cred_ver') {
-            let credObj = handleCredVerification(JSON.parse(e.data));
-            // Setting values
-            setValues(credObj.sortedValues);
-            setCredentialData({
-              type: 'cred_ver',
-              credentials: credObj.credential,
-            });
-            return;
+            let credObj = await handleCredVerification(JSON.parse(e.data));
+            if (credObj) {
+              // Setting values
+              setValues(credObj.sortedValues);
+              setCredentialData({
+                type: 'cred_ver',
+                credentials: credObj.credential,
+              });
+              return;
+            }
           }
         }
 

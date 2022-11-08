@@ -32,9 +32,7 @@ export const fetchCredentials = createAsyncThunk(
         );
 
         // Finding credential from store.
-        let credItem = Object.values(credentials).find(
-          (x) => x?.credentialId == cred.credentialId
-        );
+        let credItem = Object.values(credentials).find((x) => x?.credentialId == cred.credentialId);
 
         // Adding QR Code.
         let qrCode = credItem?.qrCode;
