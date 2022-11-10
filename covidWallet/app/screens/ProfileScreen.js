@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,34 +6,30 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 
-import {InputComponent} from '../components/Input/inputComponent';
+import { InputComponent } from '../components/Input/inputComponent';
 import OverlayLoader from '../components/OverlayLoader';
-import {_fetchProfileAPI, _updateProfileAPI} from '../gateways/auth';
-import {showMessage, _showAlert} from '../helpers/Toast';
+import { _fetchProfileAPI, _updateProfileAPI } from '../gateways/auth';
+import { showAskDialog, showMessage, _showAlert } from '../helpers/Toast';
 import {
   emailRegex,
   nameRegex,
   pincodeRegex,
-  validateIfLowerCased,
   validateLength,
   validatePasswordStrength,
 } from '../helpers/validation';
-import {
-  BLACK_COLOR,
-  GREEN_COLOR,
-  SECONDARY_COLOR,
-  WHITE_COLOR,
-} from '../theme/Colors';
-import {getItem, saveItem} from '../helpers/Storage';
+import { AppColors, BLACK_COLOR, GREEN_COLOR, SECONDARY_COLOR, WHITE_COLOR } from '../theme/Colors';
+import { getItem, saveItem } from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import EmailWarning from '../components/EmailWarning';
 import PincodeModal from '../components/Modal/PincodeModal';
-import {_handleAxiosError} from '../helpers/AxiosResponse';
+import { _handleAxiosError } from '../helpers/AxiosResponse';
 
-const ProfileScreen = () => {
+const ProfileScreen = (props) => {
+  const { initDeleteAccount } = props.route.params;
   const [isLoading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
 
@@ -117,7 +113,7 @@ const ProfileScreen = () => {
   const _onNameSave = async () => {
     if (!nameRegex.test(name)) {
       setNameError(
-        'Please enter a name between 2-1000 alphabetical characters long. No numbers or special characters.',
+        'Please enter a name between 2-1000 alphabetical characters long. No numbers or special characters.'
       );
       return;
     }
@@ -183,10 +179,7 @@ const ProfileScreen = () => {
       setProfileLoading(true);
       const result = await _fetchProfileAPI();
       if (result.data.success) {
-        await saveItem(
-          ConstantsList.USER_PROFILE,
-          JSON.stringify(result.data.user),
-        );
+        await saveItem(ConstantsList.USER_PROFILE, JSON.stringify(result.data.user));
         setName(result.data.user.name);
         setEmail(result.data.user.email);
         setPhone(result.data.user.phone ?? '');
@@ -238,10 +231,7 @@ const ProfileScreen = () => {
     setRePasswordError('');
 
     if (newPassword != rePassword) {
-      showMessage(
-        'Zada Wallet',
-        'New Password and Confirm Password should be same',
-      );
+      showMessage('Zada Wallet', 'New Password and Confirm Password should be same');
       return;
     }
 
@@ -280,8 +270,7 @@ const ProfileScreen = () => {
   const _checkPinCode = async () => {
     try {
       const isPincode = await getItem(ConstantsList.PIN_CODE);
-      if (isPincode != null && isPincode != undefined && isPincode.length != 0)
-        setIsPincode(true);
+      if (isPincode != null && isPincode != undefined && isPincode.length != 0) setIsPincode(true);
       else setIsPincode(false);
     } catch (error) {
       showMessage('Zada Wallet', error.toString());
@@ -320,7 +309,7 @@ const ProfileScreen = () => {
     if (pincode != confirmPincode) {
       showMessage(
         'Zada Wallet',
-        'Pincode and confirm pincode are not same. Please check them carefully',
+        'Pincode and confirm pincode are not same. Please check them carefully'
       );
     }
 
@@ -332,7 +321,7 @@ const ProfileScreen = () => {
       setShowPinCodeModal(false);
       showMessage(
         'Zada Wallet',
-        'Your pincode is set successfully. Please keep it safe and secure.',
+        'Your pincode is set successfully. Please keep it safe and secure.'
       );
       setPincode('');
       setConfirmPincode('');
@@ -379,10 +368,7 @@ const ProfileScreen = () => {
     setRePincodeError('');
 
     if (newPincode != rePincode) {
-      showMessage(
-        'Zada Wallet',
-        'New pincode and confirm pincode should be same',
-      );
+      showMessage('Zada Wallet', 'New pincode and confirm pincode should be same');
       return;
     }
 
@@ -396,14 +382,34 @@ const ProfileScreen = () => {
         setNewpincode('');
         setRepincode('');
       } else {
-        showMessage(
-          'Zada Wallet',
-          'You entered wrong old pincode. Please enter the correct.',
-        );
+        showMessage('Zada Wallet', 'You entered wrong old pincode. Please enter the correct.');
       }
     } catch (error) {
       showMessage('Zada Wallet', error.toString());
     }
+  };
+
+  const deleteAccount = () => {
+    // Check if email exist.
+    if (!emailRegex.test(email)) {
+      showMessage(
+        'Zada Wallet',
+        'Please set your EMAIL in order to continue with account deletion.'
+      );
+      return;
+    }
+
+    // Show dialog to confirm account deletion.
+    showAskDialog(
+      'Are you sure?',
+      'Do you want to DELETE your account ?',
+      () => initDeleteAccount(),
+      () => {},
+      'Delete',
+      'destructive',
+      'Cancel',
+      'default'
+    );
   };
 
   return (
@@ -446,7 +452,7 @@ const ProfileScreen = () => {
         <View style={styles._itemContainer}>
           <Text style={styles._itemLabel}>Full Name (Official Name)</Text>
           <View style={styles._row}>
-            <View style={{width: '85%'}}>
+            <View style={{ width: '85%' }}>
               <InputComponent
                 height={45}
                 placeholderText="Name"
@@ -475,7 +481,7 @@ const ProfileScreen = () => {
         <View style={styles._itemContainer}>
           <Text style={styles._itemLabel}>Email</Text>
           <View style={styles._row}>
-            <View style={{width: '85%'}}>
+            <View style={{ width: '85%' }}>
               <InputComponent
                 height={45}
                 placeholderText="Email"
@@ -528,7 +534,7 @@ const ProfileScreen = () => {
         <View style={styles._itemContainer}>
           <Text style={styles._itemLabel}>Phone Number</Text>
           <View style={styles._row}>
-            <View style={{width: '100%'}}>
+            <View style={{ width: '100%' }}>
               <InputComponent
                 height={45}
                 placeholderText="Phone Number"
@@ -548,7 +554,7 @@ const ProfileScreen = () => {
 
         {/* Current Password */}
         <View style={styles._itemContainer}>
-          <View style={{width: '100%'}}>
+          <View style={{ width: '100%' }}>
             <InputComponent
               height={45}
               type={'secret'}
@@ -569,7 +575,7 @@ const ProfileScreen = () => {
 
         {/* New Password */}
         <View style={styles._itemContainer}>
-          <View style={{width: '100%'}}>
+          <View style={{ width: '100%' }}>
             <InputComponent
               height={45}
               type={'secret'}
@@ -598,7 +604,7 @@ const ProfileScreen = () => {
 
         {/* Re Enter New Password */}
         <View style={styles._itemContainer}>
-          <View style={{width: '100%'}}>
+          <View style={{ width: '100%' }}>
             <InputComponent
               height={45}
               type={'secret'}
@@ -627,7 +633,7 @@ const ProfileScreen = () => {
 
         {/* Update Password Button */}
         <View style={styles._itemContainer}>
-          <View style={{width: 250, alignSelf: 'center'}}>
+          <View style={{ width: 250, alignSelf: 'center' }}>
             <SimpleButton
               onPress={_onUpdatePasswordClick}
               width={'100%'}
@@ -646,12 +652,11 @@ const ProfileScreen = () => {
         {!isPincodeSet ? (
           <>
             <Text style={styles._pincodeInfo}>
-              You didn't set your pincode yet. Please click below button to set
-              your 6 digit pincode
+              You didn't set your pincode yet. Please click below button to set your 6 digit pincode
             </Text>
             {/* Set Pincode Button */}
             <View style={styles._itemContainer}>
-              <View style={{width: 250, alignSelf: 'center'}}>
+              <View style={{ width: 250, alignSelf: 'center' }}>
                 <SimpleButton
                   onPress={() => {
                     setShowPinCodeModal(!showPincodeModal);
@@ -671,7 +676,7 @@ const ProfileScreen = () => {
           <>
             {/* Old Pincode */}
             <View style={styles._itemContainer}>
-              <View style={{width: '100%'}}>
+              <View style={{ width: '100%' }}>
                 <InputComponent
                   height={45}
                   type={'secret'}
@@ -682,12 +687,11 @@ const ProfileScreen = () => {
                   keyboardType="number-pad"
                   isSecureText={oldpincodeSecurity}
                   autoCapitalize={'none'}
-                  inputContainerStyle={{width: '80%'}}
+                  inputContainerStyle={{ width: '80%' }}
                   inputContainerStyle={styles._inputView}
                   setStateValue={(text) => {
                     setOldPincode(text);
-                    if (text.length == 0 || text == undefined)
-                      setOldPincodeError('');
+                    if (text.length == 0 || text == undefined) setOldPincodeError('');
                   }}
                 />
               </View>
@@ -695,7 +699,7 @@ const ProfileScreen = () => {
 
             {/* New Pincode */}
             <View style={styles._itemContainer}>
-              <View style={{width: '100%'}}>
+              <View style={{ width: '100%' }}>
                 <InputComponent
                   height={45}
                   type={'secret'}
@@ -706,12 +710,11 @@ const ProfileScreen = () => {
                   keyboardType="number-pad"
                   isSecureText={newPincodeSecurity}
                   autoCapitalize={'none'}
-                  inputContainerStyle={{width: '80%'}}
+                  inputContainerStyle={{ width: '80%' }}
                   inputContainerStyle={styles._inputView}
                   setStateValue={(text) => {
                     setNewpincode(text);
-                    if (text.length == 0 || text == undefined)
-                      setNewPincodeError('');
+                    if (text.length == 0 || text == undefined) setNewPincodeError('');
                   }}
                 />
               </View>
@@ -719,7 +722,7 @@ const ProfileScreen = () => {
 
             {/* Re Enter Pincode */}
             <View style={styles._itemContainer}>
-              <View style={{width: '100%'}}>
+              <View style={{ width: '100%' }}>
                 <InputComponent
                   height={45}
                   type={'secret'}
@@ -730,12 +733,11 @@ const ProfileScreen = () => {
                   keyboardType="number-pad"
                   isSecureText={rePincodeSecurity}
                   autoCapitalize={'none'}
-                  inputContainerStyle={{width: '80%'}}
+                  inputContainerStyle={{ width: '80%' }}
                   inputContainerStyle={styles._inputView}
                   setStateValue={(text) => {
                     setRepincode(text);
-                    if (text.length == 0 || text == undefined)
-                      setRePincodeError('');
+                    if (text.length == 0 || text == undefined) setRePincodeError('');
                   }}
                 />
               </View>
@@ -743,7 +745,7 @@ const ProfileScreen = () => {
 
             {/* Set Pincode Button */}
             <View style={styles._itemContainer}>
-              <View style={{width: 250, alignSelf: 'center'}}>
+              <View style={{ width: 250, alignSelf: 'center' }}>
                 <SimpleButton
                   onPress={() => {
                     _updatePincode();
@@ -760,6 +762,21 @@ const ProfileScreen = () => {
             </View>
           </>
         )}
+
+        <View style={styles.deleteAccountViewStyle}>
+          <SimpleButton
+            onPress={() => {
+              deleteAccount();
+            }}
+            width={'100%'}
+            title="Delete Account"
+            titleColor={AppColors.WHITE}
+            buttonColor={AppColors.DANGER}
+            style={{
+              marginTop: 10,
+            }}
+          />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -773,7 +790,7 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     paddingRight: 5,
     backgroundColor: '#f7f7f7',
-    paddingBottom: '50%',
+    paddingBottom: '10%',
   },
   _parent: {
     marginHorizontal: 5,
@@ -820,6 +837,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     color: SECONDARY_COLOR,
     marginBottom: 10,
+  },
+  deleteAccountViewStyle: {
+    width: 250,
+    alignSelf: 'center',
+    marginTop: 200,
+  },
+  deleteAccountStyle: {
+    padding: 5,
+    justifyContent: 'flex-end',
+    backgroundColor: AppColors.DANGER,
+    borderRadius: 4,
   },
 });
 

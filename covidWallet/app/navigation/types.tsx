@@ -10,7 +10,10 @@ export type AuthStackParamList = {
   ForgotPasswordScreen: undefined;
   MultiFactorScreen: { from: 'Register' | 'Login' };
   PassCodeContainer: undefined;
-  SecurityScreen: { navigation: NativeStackNavigationProp<AuthStackParamList> };
+  SecurityScreen: {
+    navigation: NativeStackNavigationProp<AuthStackParamList>;
+    initDeleteAccount: () => {};
+  };
   SecureidContainer: undefined;
   NotifyMeScreen: undefined;
 };

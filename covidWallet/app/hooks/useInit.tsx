@@ -114,19 +114,10 @@ const useInit = () => {
     handleConnectionStatus();
   }, [authStatus, actionStatus, credStatus, connStatus]);
 
-  // Functions
-  const init = async () => {
-    await dispatch(fetchToken());
-  };
-
   // Handling Action Status
   const handleAuthStatus = () => {
     if (authStatus == 'succeeded' || authStatus == 'failed') {
       dispatch(updateAuthStatus('idle'));
-
-      if (authStatus === 'failed') {
-        _showAlert(authError);
-      }
     }
   };
 

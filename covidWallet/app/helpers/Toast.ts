@@ -1,6 +1,6 @@
 import { ToastAndroid, Platform, Alert } from 'react-native';
 
-export function showMessage(title, message) {
+export function showMessage(title: string, message: any) {
   if (typeof message === 'object') {
     message = JSON.stringify(message);
   }
@@ -12,7 +12,7 @@ export function showMessage(title, message) {
   }
 }
 
-export function _showAlert(title, message) {
+export function _showAlert(title: string, message: any) {
   if (typeof message === 'object') {
     message = JSON.stringify(message);
   }
@@ -24,20 +24,29 @@ export function _showAlert(title, message) {
   Alert.alert(title, message);
 }
 
-export function showAskDialog(title, message, onSuccessPress, onRejectPress) {
+export function showAskDialog(
+  title: string,
+  message: string,
+  onSuccessPress: Function,
+  onRejectPress: Function,
+  confirmButtonText?: string,
+  confirmButtonStyle?: 'default' | 'cancel' | 'destructive',
+  cancelButtonText?: string,
+  cancelButtonStyle?: 'default' | 'cancel' | 'destructive'
+) {
   Alert.alert(
     title,
     message,
     [
       {
-        text: 'Cancel',
+        text: cancelButtonText ? cancelButtonText : 'Cancel',
         onPress: () => onRejectPress(),
-        style: 'cancel',
+        style: cancelButtonStyle ? cancelButtonStyle : 'cancel',
       },
       {
-        text: 'Confirm',
+        text: confirmButtonText ? confirmButtonText : 'Confirm',
         onPress: () => onSuccessPress(),
-        style: 'default',
+        style: confirmButtonStyle ? confirmButtonStyle : 'default',
       },
     ],
     {
@@ -62,8 +71,5 @@ export function showOKDialog(title, subtitle, onOkPress) {
 }
 
 export function showNetworkMessage() {
-  Alert.alert(
-    'No Internet',
-    'You are not connected with internet. Please connect and try again.'
-  );
+  Alert.alert('No Internet', 'You are not connected with internet. Please connect and try again.');
 }

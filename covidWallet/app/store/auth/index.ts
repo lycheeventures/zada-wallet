@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { navigationRef } from '../../navigation/utils';
 import { IAuthState, IUserState } from './interface';
-import { fetchToken, loginUser, registerUser } from './thunk';
+import { fetchToken, loginUser, reactivateUserAccount, registerUser } from './thunk';
 
 // State initialization
 export const AuthState: IAuthState = {
@@ -63,7 +63,6 @@ const slice = createSlice({
       if (action.payload?.success) {
         state.status = 'succeeded';
         state.token = action.payload.token;
-        // state.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxM2FlMjYxYS1lNzc0LTRiNWMtYTY0ZS1kNjdjODVlZDcwOWMiLCJkdWIiOiIwYjc2OTIyYy0zYmMyLTQyMGQtODg1Ni02NzBhMTdjMmM3NTEiLCJpYXQiOjE2NjQxOTU0ODMsImV4cCI6MTY2NDIxMzQ4M30.WEsUdv6J0Dxw9DfxpdAGUx2QryGYKXp3drEe1yX_RKk'
         state.user.id = state.tempVar.id;
         state.user.walletSecret = state.tempVar.walletSecret;
         state.user.isNew = false;
@@ -105,6 +104,23 @@ const slice = createSlice({
       }
     });
     builder.addCase(registerUser.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action?.error;
+    });
+
+    // Account re-activation
+    builder.addCase(reactivateUserAccount.pending, (state, action) => {
+      if (state.status === 'idle') {
+        state.status = 'pending';
+      }
+    });
+    builder.addCase(reactivateUserAccount.fulfilled, (state, action) => {
+      if (action.payload?.success) {
+        state.status = 'succeeded';
+        state.user.type = action.payload.type;
+      }
+    });
+    builder.addCase(reactivateUserAccount.rejected, (state, action) => {
       state.status = 'failed';
       state.error = action?.error;
     });
