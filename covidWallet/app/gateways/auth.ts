@@ -176,3 +176,20 @@ export async function createWallet(token: string) {
     throw error;
   }
 }
+
+export async function reactivateAccount(phone: string) {
+  try {
+    let obj = {
+      phone,
+    };
+
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/reactivate',
+      data: obj,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}

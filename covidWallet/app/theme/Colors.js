@@ -14,4 +14,5 @@ export const AppColors = {
   DANGER: '#f32013',
   BLUE: '#2870da',
   GRAY: '#708090',
+  WHITE: 'white',
 };

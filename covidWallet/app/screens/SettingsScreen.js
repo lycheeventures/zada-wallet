@@ -96,7 +96,7 @@ export default function SettingsScreen(props) {
 
   // when user will click on edit profile screen
   const _onEditProfileClick = () => {
-    props.navigation.navigate('ProfileScreen');
+    props.navigation.navigate('ProfileScreen', { initDeleteAccount });
   };
 
   // on Scan Document click
@@ -109,7 +109,7 @@ export default function SettingsScreen(props) {
       'ZADA Wallet',
       'Account deletion has been intiated. An Email has been dispatched. Please check your mailbox to continue with this process.',
       () => {
-        console.log('asdas');
+        console.log('ok');
       }
     );
 
@@ -212,20 +212,6 @@ export default function SettingsScreen(props) {
           onPress={() => props.navigation.navigate('AboutUs')}>
           <Text style={styles._rowLabel}>About Us</Text>
           <Icon name="right" color={GREEN_COLOR} size={18} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={[styles._row, { marginTop: 16 }]}
-          onPress={() =>
-            showAskDialog(
-              'Are you sure?',
-              'Do you want to DELETE your account ?',
-              () => initDeleteAccount(),
-              () => {}
-            )
-          }>
-          <Text style={[styles._rowLabel, { color: AppColors.DANGER }]}>Delete Account</Text>
         </TouchableOpacity>
 
         <Text style={styles.devTextStyle}>

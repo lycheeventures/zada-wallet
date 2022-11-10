@@ -63,6 +63,7 @@ export const loginUser = createAsyncThunk(
         type: undefined,
         token: undefined,
         verified: undefined,
+        status: undefined,
       };
 
       // If success then authenticate user.
@@ -74,6 +75,7 @@ export const loginUser = createAsyncThunk(
           type: response?.data.type,
           verified: response?.data.verified,
           token: undefined,
+          status: response?.data.status,
         };
         if (response?.data.verified) {
           let authResp = await AuthAPI.authenticate(response?.data.userId, secret);
@@ -99,7 +101,7 @@ export const registerUser = createAsyncThunk(
       let response = await AuthAPI._registerUserAPI(name, phone, secret);
       let data = response.data;
       // Handling new and unverified user.
-      if (!data.verified) {
+      if (!data.verified || data.status === 'inactive') {
         await dispatch(
           updateTempVar({
             isNew: true,
@@ -114,6 +116,7 @@ export const registerUser = createAsyncThunk(
       return {
         success: data.success,
         type: data.type,
+        status: data.status,
       };
     } catch (e) {
       throwErrorIfExist(e);
@@ -128,3 +131,16 @@ export const createWallet = createAsyncThunk('auth/createWallet', async (token: 
     throwErrorIfExist(e);
   }
 });
+
+export const reactivateUserAccount = createAsyncThunk(
+  'auth/reactivateUserAccount',
+  async (args: { phone: string }) => {
+    try {
+      let { phone } = args;
+      let response = await AuthAPI.reactivateAccount(phone);
+      return response?.data;
+    } catch (e) {
+      throwErrorIfExist(e);
+    }
+  }
+);
