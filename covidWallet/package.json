@@ -83,6 +83,7 @@
     "react-native-prevent-screenshots": "^1.0.0",
     "react-native-qrcode-scanner": "^1.4.1",
     "react-native-qrcode-svg": "^6.1.2",
+    "react-native-quick-base64": "^2.0.5",
     "react-native-reanimated": "^2.2.4",
     "react-native-recaptcha-that-works": "^1.2.0",
     "react-native-safe-area-context": "^4.3.4",

@@ -1,5 +1,6 @@
 import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { btoa, atob } from 'react-native-quick-base64';
 
 export const capitalizeFirstLetter = (str: string) => {
   if (!str) {
@@ -15,6 +16,14 @@ export const sortValuesByKey = (values: any) => {
       obj[key] = values[key];
       return obj;
     }, {});
+};
+
+export const convertStringToBase64 = (str: string) => {
+  return btoa(str);
+};
+
+export const convertBase64ToString = (str: string) => {
+  return atob(str);
 };
 
 // Get secure items from storage.
