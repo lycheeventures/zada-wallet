@@ -26,6 +26,7 @@ import {
 } from '../../helpers/crypto';
 import { getItemFromLocalStorage, saveItemInLocalStorage } from '../../helpers/Storage';
 import { get_encrypted_credential, save_encrypted_credential } from '../../gateways/credentials';
+import { convertStringToBase64 } from '../../helpers/utils';
 
 interface IProps {
   route: any;
@@ -95,35 +96,32 @@ const CredDetailScreen = (props: IProps) => {
 
   // Make and Share PDF
   async function sharePDF() {
-    // setGeneratingPDF(true);
+    setGeneratingPDF(true);
 
-    let key = '';
+    let encryptionKey = '';
     let hash = '';
 
     let isPDFAlreadyGenerated = await getItemFromLocalStorage(data.credentialId);
     if (!isPDFAlreadyGenerated) {
-      key = generateRandomSecret(32);
-      hash = await performSHA256(key);
-      // substring is used to increase complexity.
-      hash = hash.substring(16, 48);
-      let str = await encryptAES256CBC(data.values, hash);
+      encryptionKey = generateRandomSecret(64);
+      // Hash from key.
+      hash = await performSHA256(encryptionKey);
       let obj = {
-        key: key,
+        key: encryptionKey,
         hash,
       };
+      let valuesInBase64 = convertStringToBase64(JSON.stringify(data.values));
+      let str = await encryptAES256CBC(valuesInBase64, encryptionKey);
+      save_encrypted_credential(data.credentialId, str, hash);
       saveItemInLocalStorage(data.credentialId, obj);
-      save_encrypted_credential(data.credentialId, str);
     } else {
-      key = isPDFAlreadyGenerated.key;
+      encryptionKey = isPDFAlreadyGenerated.key;
       hash = isPDFAlreadyGenerated.hash;
-      let resp = await get_encrypted_credential(data.credentialId, key);
+      let resp = await get_encrypted_credential(data.credentialId, hash);
       if (resp.data.sucess) {
         let encryptedCred = resp.data.credential.encryptedCredential;
-        hash = await performSHA256(key);
-        // substring is used to increase complexity.
-        hash = hash.substring(16, 48);
         // decrypting
-        await decryptAES256CBC(encryptedCred, hash);
+        await decryptAES256CBC(encryptedCred, encryptionKey);
       }
     }
 
@@ -159,14 +157,11 @@ const CredDetailScreen = (props: IProps) => {
     let template = await getCredentialTemplate(data.schemaId, data.definitionId);
 
     // Making QR data.
-    let qrJSON = JSON.parse(data.qrCode);
     let qrData = {
-      data:
-        Config.API_URL + '/credentials/get_encrypted_credential/' + key + '/' + data.credentialId,
+      credentialId: data.credentialId,
+      key: encryptionKey,
       type: 'cred_ver',
-      tenantId: qrJSON.tenantId,
-      signature: qrJSON.signature,
-      keyVersion: qrJSON.keyVersion,
+      version: 2,
     };
     let qrUrl = await new Promise(async (resolve, reject) => {
       await fetch(

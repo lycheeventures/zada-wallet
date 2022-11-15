@@ -36,29 +36,29 @@ export const handleCredVerification = async (credQrData) => {
   try {
     let credValues = {};
     // spliting hash and credentialId from QR data.
-    if (credQrData.data.startsWith('https://')) {
-      let strArr = credQrData.data.split('/');
-      let credentialId = strArr[strArr.length - 1];
-      let key = strArr[strArr.length - 2];
-
-      // Getting encrypted credentials from database.
-      let resp = await get_encrypted_credential(credentialId, key);
-      if (!resp.data.success) {
-        return false;
-      }
+    if (credQrData.version === 2) {
+      let credentialId = credQrData.credentialId;
+      let key = credQrData.key;
 
       // Getting hash from key.
       let hash = await performSHA256(key);
-      // substring is used to increase complexity.
-      hash = hash.substring(16, 48);
+
+      // Getting encrypted credentials from database.
+      let resp = await get_encrypted_credential(credentialId, hash);
+      if (!resp.data.success) {
+        return false;
+      }
+      credQrData = resp.data.credential;
 
       // Decrypting encrypted credentials
-      credValues = await decryptAES256CBC(resp.data.credential.encryptedCredential, hash);
+      let base64Data = await decryptAES256CBC(credQrData.encryptedCredential, key);
+      credValues = Buffer.from(base64Data, 'base64').toString();
     } else {
       // Handling old implementation
       credValues = Buffer.from(credQrData.data, 'base64').toString();
-      credValues = JSON.parse(credValues);
     }
+
+    credValues = JSON.parse(credValues);
     var sortedValues = sortValuesByKey(credValues);
 
     return {
