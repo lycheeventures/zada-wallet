@@ -94,36 +94,128 @@ const CredDetailScreen = (props: IProps) => {
     dispatch(removeCredentials(data.credentialId));
   }
 
+  // // Make and Share PDF
+  // async function sharePDF() {
+  //   setGeneratingPDF(true);
+
+  //   let encryptionKey = '';
+  //   let hash = '';
+
+  //   let isPDFAlreadyGenerated = await getItemFromLocalStorage(data.credentialId);
+  //   if (!isPDFAlreadyGenerated) {
+  //     encryptionKey = generateRandomSecret(64);
+  //     // Hash from key.
+  //     hash = await performSHA256(encryptionKey);
+  //     let obj = {
+  //       key: encryptionKey,
+  //       hash,
+  //     };
+  //     let valuesInBase64 = convertStringToBase64(JSON.stringify(data.values));
+  //     let str = await encryptAES256CBC(valuesInBase64, encryptionKey);
+  //     save_encrypted_credential(data.credentialId, str, hash);
+  //     saveItemInLocalStorage(data.credentialId, obj);
+  //   } else {
+  //     encryptionKey = isPDFAlreadyGenerated.key;
+  //     hash = isPDFAlreadyGenerated.hash;
+  //     let resp = await get_encrypted_credential(data.credentialId, hash);
+  //     if (resp.data.sucess) {
+  //       let encryptedCred = resp.data.credential.encryptedCredential;
+  //       // decrypting
+  //       await decryptAES256CBC(encryptedCred, encryptionKey);
+  //     }
+  //   }
+
+  //   // Ordering data
+  //   const orderedData = Object.keys(data.values)
+  //     .sort()
+  //     .reduce((obj: any, key) => {
+  //       obj[key] = data.values[key];
+  //       return obj;
+  //     }, {});
+
+  //   // Making html to be injected later as {key: value} pair.
+  //   let credentialDetails = Object.keys(orderedData).map((key, index) => {
+  //     let value = orderedData[key];
+  //     value = parse_date_time(value);
+  //     if (index % 3 === 0) {
+  //       return `
+  //       <tr>
+  //       <td class="tds">
+  //         <p class="pt">${key}: <strong>${value}</strong></p>
+  //       </td>`;
+  //     } else if ((index - 1) % 3 === 2) {
+  //       return `</tr>`;
+  //     } else {
+  //       return `
+  //       <td class="tds">
+  //         <p class="pt">${key}: <strong>${value}</strong></p>
+  //       </td>`;
+  //     }
+  //   });
+
+  //   // Getting template
+  //   let template = await getCredentialTemplate(data.schemaId, data.definitionId);
+
+  //   // Making QR data.
+  //   let qrData = {
+  //     credentialId: data.credentialId,
+  //     key: encryptionKey,
+  //     type: 'cred_ver',
+  //     version: 2,
+  //   };
+  //   let qrUrl = await new Promise(async (resolve, reject) => {
+  //     await fetch(
+  //       'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + JSON.stringify(qrData)
+  //     ).then(async (resp) => {
+  //       let blob = await resp.blob();
+
+  //       resolve(
+  //         new Promise((resolve, reject) => {
+  //           let reader = new FileReader();
+  //           reader.onload = (event) => {
+  //             let base64String = event.target?.result;
+  //             resolve(base64String);
+  //           };
+  //           reader.readAsDataURL(blob);
+  //         })
+  //       );
+  //     });
+  //   });
+
+  //   // Injecting data into template
+  //   let htmlStr = template.file;
+  //   htmlStr = replacePlaceHolders(
+  //     htmlStr,
+  //     {
+  //       ...orderedData,
+  //       qrUrl,
+  //       logo: data.imageUrl,
+  //       type: data.type,
+  //       organizationName: data.organizationName,
+  //     },
+  //     credentialDetails
+  //   );
+
+  //   // Generating and sharing pdf
+  //   let result = await generatePDF(htmlStr);
+  //   const shareOptions = {
+  //     title: 'Certificate',
+  //     url: result.url,
+  //   };
+  //   try {
+  //     setGeneratingPDF(false);
+  //     await Share.open(shareOptions);
+  //   } catch (error) {
+  //     setGeneratingPDF(false);
+  //     console.log('error', error);
+  //   }
+  // }
   // Make and Share PDF
   async function sharePDF() {
     setGeneratingPDF(true);
 
-    let encryptionKey = '';
-    let hash = '';
-
-    let isPDFAlreadyGenerated = await getItemFromLocalStorage(data.credentialId);
-    if (!isPDFAlreadyGenerated) {
-      encryptionKey = generateRandomSecret(64);
-      // Hash from key.
-      hash = await performSHA256(encryptionKey);
-      let obj = {
-        key: encryptionKey,
-        hash,
-      };
-      let valuesInBase64 = convertStringToBase64(JSON.stringify(data.values));
-      let str = await encryptAES256CBC(valuesInBase64, encryptionKey);
-      save_encrypted_credential(data.credentialId, str, hash);
-      saveItemInLocalStorage(data.credentialId, obj);
-    } else {
-      encryptionKey = isPDFAlreadyGenerated.key;
-      hash = isPDFAlreadyGenerated.hash;
-      let resp = await get_encrypted_credential(data.credentialId, hash);
-      if (resp.data.sucess) {
-        let encryptedCred = resp.data.credential.encryptedCredential;
-        // decrypting
-        await decryptAES256CBC(encryptedCred, encryptionKey);
-      }
-    }
+    // Getting hidden screenshot of QR.
+    let qrUrl = await viewShotRef.current?.capture();
 
     // Ordering data
     const orderedData = Object.keys(data.values)
@@ -154,33 +246,7 @@ const CredDetailScreen = (props: IProps) => {
     });
 
     // Getting template
-    let template = await getCredentialTemplate(data.schemaId, data.definitionId);
-
-    // Making QR data.
-    let qrData = {
-      credentialId: data.credentialId,
-      key: encryptionKey,
-      type: 'cred_ver',
-      version: 2,
-    };
-    let qrUrl = await new Promise(async (resolve, reject) => {
-      await fetch(
-        'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + JSON.stringify(qrData)
-      ).then(async (resp) => {
-        let blob = await resp.blob();
-
-        resolve(
-          new Promise((resolve, reject) => {
-            let reader = new FileReader();
-            reader.onload = (event) => {
-              let base64String = event.target?.result;
-              resolve(base64String);
-            };
-            reader.readAsDataURL(blob);
-          })
-        );
-      });
-    });
+    let template = await getCredentialTemplate(data.definitionId);
 
     // Injecting data into template
     let htmlStr = template.file;
@@ -188,7 +254,7 @@ const CredDetailScreen = (props: IProps) => {
       htmlStr,
       {
         ...orderedData,
-        qrUrl,
+        qrUrl: qrUrl,
         logo: data.imageUrl,
         type: data.type,
         organizationName: data.organizationName,
