@@ -6,7 +6,7 @@ import { get_local_date_time } from '../../helpers';
 export const generatePDF = async (html: any) => {
   let options = {
     html: html,
-    fileName: 'ceritificate',
+    fileName: 'credential',
     directory: 'Documents',
     padding: 0,
     height: 842,
