@@ -131,6 +131,8 @@ const useInit = () => {
           showNetworkMessage();
         }, 500);
       }
+
+      handleCustomErrorMessages(actionError);
     }
   };
 
@@ -144,6 +146,8 @@ const useInit = () => {
           showNetworkMessage();
         }, 500);
       }
+
+      handleCustomErrorMessages(credError);
     }
   };
 
@@ -157,6 +161,14 @@ const useInit = () => {
           showNetworkMessage();
         }, 500);
       }
+
+      handleCustomErrorMessages(connError);
+    }
+  };
+
+  const handleCustomErrorMessages = (error: any) => {
+    if (error.message?.substring(0, 6) === 'custom') {
+      _showAlert('Error', error.message?.split(':')[1]);
     }
   };
 

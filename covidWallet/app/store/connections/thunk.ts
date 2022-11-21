@@ -4,17 +4,14 @@ import { RootState } from '..';
 import { ConnectionAPI } from '../../gateways';
 import { IActionObject } from '../actions/interface';
 
-export const fetchConnections = createAsyncThunk(
-  'connection/fetchConnections',
-  async () => {
-    try {
-      const response = await ConnectionAPI.get_all_connections();
-      return response.data;
-    } catch (e: any) {
-      throw e;
-    }
+export const fetchConnections = createAsyncThunk('connection/fetchConnections', async () => {
+  try {
+    const response = await ConnectionAPI.get_all_connections();
+    return response.data;
+  } catch (e: any) {
+    throw e;
   }
-);
+});
 
 export const acceptConnection = createAsyncThunk(
   'connection/acceptConnection',
@@ -45,7 +42,7 @@ export const removeConnection = createAsyncThunk(
 
       // Throw error if actions are available from this connection.
       if (actionArr.length > 0) {
-        throw 'Unable to delete, this connection has action items available.';
+        throw 'custom:Unable to delete, this connection has action items available.';
       }
 
       // Delete connection API call.
