@@ -193,3 +193,15 @@ export async function reactivateAccount(phone: string) {
     throw error;
   }
 }
+
+export async function deleteAccount() {
+  try {
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/delete_account',
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}

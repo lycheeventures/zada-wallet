@@ -144,3 +144,15 @@ export const reactivateUserAccount = createAsyncThunk(
     }
   }
 );
+
+export const deleteUserAccount = createAsyncThunk(
+  'auth/deleteUserAccount',
+  async (args: { phone: string }) => {
+    try {
+      let response = await AuthAPI.deleteAccount();
+      return response?.data;
+    } catch (e) {
+      throwErrorIfExist(e);
+    }
+  }
+);

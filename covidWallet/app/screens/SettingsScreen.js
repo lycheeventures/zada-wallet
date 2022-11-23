@@ -22,6 +22,7 @@ import { updateUser } from '../store/auth';
 import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
 import useDevelopment from '../hooks/useDevelopment';
 import { clearAll } from '../store/utils';
+import { deleteUserAccount } from '../store/auth/thunk';
 
 export default function SettingsScreen(props) {
   // Constants
@@ -112,6 +113,8 @@ export default function SettingsScreen(props) {
         console.log('ok');
       }
     );
+
+    dispatch(deleteUserAccount());
 
     setTimeout(() => {
       // logout user
