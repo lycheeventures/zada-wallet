@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Animated,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -59,6 +60,7 @@ import { selectNetworkStatus } from '../../store/app/selectors';
 function ActionsScreen({ navigation }) {
   //Constants
   const dispatch = useAppDispatch();
+  const { width, height } = Dimensions.get('window');
 
   // Selectors
   const actions = useAppSelector(selectActions.selectAll);
@@ -674,6 +676,7 @@ function ActionsScreen({ navigation }) {
             data={actions}
             style={{
               flexGrow: 1,
+              height: height * 0.7,
             }}
             contentContainerStyle={{
               width: '100%',
