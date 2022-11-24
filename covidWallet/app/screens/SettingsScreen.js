@@ -89,10 +89,14 @@ export default function SettingsScreen(props) {
     setIsAcceptConnectionEnabled(value);
   };
 
-  const onLogoutPressed = async () => {
+  const logoutUser = async () => {
     const pCode = await getItem(ConstantsList.PIN_CODE);
     saveItem(ConstantsList.PIN_CODE, pCode);
     clearAll(dispatch);
+  };
+
+  const onLogoutPressed = async () => {
+    showAskDialog('Are you sure?', 'Are you sure you want to log out?', logoutUser, () => {}, 'Ok');
   };
 
   // when user will click on edit profile screen
@@ -118,7 +122,7 @@ export default function SettingsScreen(props) {
 
     setTimeout(() => {
       // logout user
-      onLogoutPressed();
+      logoutUser();
     }, 3000);
   };
 
