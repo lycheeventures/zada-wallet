@@ -8,7 +8,13 @@ import Config from 'react-native-config';
 
 import { BACKGROUND_COLOR, BLACK_COLOR, GRAY_COLOR, WHITE_COLOR } from '../../theme/Colors';
 import { generatePDF, getCredentialTemplate, replacePlaceHolders } from './utils';
-import { get_local_issue_date, parse_date_time, showAskDialog, showMessage } from '../../helpers';
+import {
+  get_local_issue_date,
+  parse_date_time,
+  showAskDialog,
+  showMessage,
+  _showAlert,
+} from '../../helpers';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { selectCredentialsStatus } from '../../store/credentials/selectors';
 
@@ -212,6 +218,11 @@ const CredDetailScreen = (props: IProps) => {
   // }
   // Make and Share PDF
   async function sharePDF() {
+    if (data.type === 'Authentication') {
+      _showAlert('Zada Wallet', 'You cannot share this type of Credential.');
+      return;
+    }
+
     setGeneratingPDF(true);
 
     // Getting hidden screenshot of QR.
@@ -246,7 +257,7 @@ const CredDetailScreen = (props: IProps) => {
     });
 
     // Getting template
-    let template = await getCredentialTemplate(data.definitionId);
+    let template = await getCredentialTemplate(data.schemaId, data.definitionId);
 
     // Injecting data into template
     let htmlStr = template.file;
