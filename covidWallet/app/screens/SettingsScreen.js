@@ -123,7 +123,7 @@ export default function SettingsScreen(props) {
     setTimeout(() => {
       // logout user
       logoutUser();
-    }, 3000);
+    }, 1000);
   };
 
   return (
