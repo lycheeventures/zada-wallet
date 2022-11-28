@@ -16,10 +16,8 @@ import { showNetworkMessage, _showAlert } from '../helpers/Toast';
 import { changeCredentialStatus } from '../store/credentials';
 import { changeActionStatus } from '../store/actions';
 import { changeConnectionStatus } from '../store/connections';
-import { selectAuthError, selectAuthStatus, selectToken } from '../store/auth/selectors';
-import { getItem } from '../helpers/Storage';
+import { selectAuthStatus, selectToken } from '../store/auth/selectors';
 import { updateAuthStatus, updateIsAuthorized } from '../store/auth';
-import { fetchToken } from '../store/auth/thunk';
 import { ConnectionAPI, CredentialAPI } from '../gateways';
 
 const useInit = () => {
@@ -34,7 +32,6 @@ const useInit = () => {
   const connStatus = useAppSelector(selectConnectionsStatus);
   const credStatus = useAppSelector(selectCredentialsStatus);
 
-  const authError = useAppSelector(selectAuthError);
   const actionError = useAppSelector(selectActionsError);
   const connError = useAppSelector(selectConnectionsError);
   const credError = useAppSelector(selectCredentialsError);
@@ -76,9 +73,6 @@ const useInit = () => {
       setMessageIndex(3);
       // Update isAuthorized!
       dispatch(updateIsAuthorized(true));
-
-      // Fetch Tokens.
-      await dispatch(fetchToken({ secret: undefined }));
       dispatch(changeConnectionStatus('idle'));
     } else {
       dispatch(changeConnectionStatus('idle'));

@@ -21,7 +21,7 @@ const img = require('../assets/images/t&c.png');
 
 function WelcomeScreen({navigation}) {
   const nextHandler = () => {
-    navigation.navigate('AuthScreen');
+    navigation.navigate('RegistrationScreen');
   };
 
   return (

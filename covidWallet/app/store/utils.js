@@ -6,6 +6,9 @@ import { resetConnection } from './connections';
 import { resetCredential } from './credentials';
 import { resetApp } from './app';
 import { resetAction } from './actions';
+import { resetCache } from './app/thunk';
+import { deleteUserAccount } from './auth/thunk';
+import { persistor } from '.';
 
 export const createEncryptor = ({ secretKey }) =>
   createTransform(
@@ -42,10 +45,25 @@ export const createEncryptor = ({ secretKey }) =>
 
 export const clearAll = async (dispatch) => {
   resetLocalStorage();
-  await resetSecureItems();
-  dispatch(resetAuth());
+  resetSecureItems();
   dispatch(resetAction());
   dispatch(resetConnection());
   dispatch(resetCredential());
+  dispatch(resetCache());
   dispatch(resetApp());
+  dispatch(resetAuth());
+  persistor.purge();
+};
+
+export const deleteAccountAndClearAll = async (dispatch) => {
+  resetLocalStorage();
+  resetSecureItems();
+  dispatch(resetAction());
+  dispatch(resetConnection());
+  dispatch(resetCredential());
+  dispatch(resetCache());
+  dispatch(resetApp());
+  await dispatch(deleteUserAccount()).unwrap();
+  dispatch(resetAuth());
+  persistor.purge();
 };

@@ -1,6 +1,6 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {StyleSheet, View, TouchableOpacity, Text, Animated} from 'react-native';
-import {Input, Overlay, Divider} from 'react-native-elements';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, TouchableOpacity, Text, Animated } from 'react-native';
+import { Input, Overlay, Divider } from 'react-native-elements';
 import ConstantsList from '../../helpers/ConfigApp';
 
 import {
@@ -37,9 +37,9 @@ interface InputIProps {
   infoText?: string;
   inputContainerStyle?: any;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  height?: Number;
+  strengthMessage?: string;
   type: 'default' | 'secret';
-  height: Number;
-  strengthMessage: string;
 }
 
 export function InputComponent(props: InputIProps) {
@@ -57,7 +57,7 @@ export function InputComponent(props: InputIProps) {
   };
 
   useEffect(() => {
-    setShowStrenghtMessage(props.strengthMessage != undefined ? true : false);
+    setShowStrenghtMessage(props.strengthMessage != '' ? true : false);
     strengthMessageColor(props.strengthMessage);
     toggleShowStrengthMessage();
   }, [props.strengthMessage]);
@@ -71,9 +71,7 @@ export function InputComponent(props: InputIProps) {
       case 'user':
         return <AntDesign name={'user'} size={24} color={GRAY_COLOR} />;
       case 'wallet':
-        return (
-          <Ionicons name="ios-wallet-outline" size={24} color={GRAY_COLOR} />
-        );
+        return <Ionicons name="ios-wallet-outline" size={24} color={GRAY_COLOR} />;
       default:
         break;
     }
@@ -129,17 +127,13 @@ export function InputComponent(props: InputIProps) {
         inputStyle={[styles.textInput, props.textInputStyle]}
         value={props.value}
         disabled={props.disabled}
-        disabledInputStyle={{color: BLACK_COLOR}}
+        disabledInputStyle={{ color: BLACK_COLOR }}
         secureTextEntry={props.isSecureText}
         // errorMessage={showErrorMessage ? props.errorMessage : ''}
         leftIcon={renderLeftIcon()}
         onBlur={() => (props.onBlur ? props.onBlur() : {})}
-        autoCapitalize={
-          props.autoCapitalize ? props.autoCapitalize : 'sentences'
-        }
-        keyboardType={
-          props.keyboardType != undefined ? props.keyboardType : 'default'
-        }
+        autoCapitalize={props.autoCapitalize ? props.autoCapitalize : 'sentences'}
+        keyboardType={props.keyboardType != undefined ? props.keyboardType : 'default'}
         rightIcon={
           props.errorMessage ? (
             <View style={styles.rightIconView}>
@@ -174,27 +168,23 @@ export function InputComponent(props: InputIProps) {
           setInputValue(newText);
           props.setStateValue(newText);
         }}
-        containerStyle={[
-          props.style,
-          {height: props.height ? props.height : 55},
-        ]}
+        containerStyle={[props.style, { height: props.height ? props.height : 55 }]}
         inputContainerStyle={props.inputContainerStyle}
       />
       {showErrorMessage && (
-        <Animated.View
-          style={{height: animationValue, justifyContent: 'center'}}>
+        <Animated.View style={{ height: animationValue, justifyContent: 'center' }}>
           <Text style={styles.errorStyle}>{props.errorMessage}</Text>
         </Animated.View>
       )}
 
-      {props.strengthMessage && (
+      {props.strengthMessage != '' && (
         <Animated.View
           style={{
             flexDirection: 'row',
             paddingTop: 3,
             paddingBottom: 10,
           }}>
-          <Text style={[styles.strenghtMsgstyle, {color: GRAY_COLOR}]}>
+          <Text style={[styles.strenghtMsgstyle, { color: GRAY_COLOR }]}>
             {`Password Strength:  `}
           </Text>
 

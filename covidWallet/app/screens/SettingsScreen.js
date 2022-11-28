@@ -4,25 +4,16 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { getVersion } from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-import {
-  AppColors,
-  BLACK_COLOR,
-  GRAY_COLOR,
-  GREEN_COLOR,
-  PRIMARY_COLOR,
-  WHITE_COLOR,
-} from '../theme/Colors';
+import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
 import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
 import { showAskDialog, showMessage, showOKDialog } from '../helpers/Toast';
 import ConstantsList from '../helpers/ConfigApp';
-import ZignSecModal from '../components/ZignSecModal';
 import { useAppDispatch, useAppSelector } from '../store';
 import { updateUser } from '../store/auth';
 import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
 import useDevelopment from '../hooks/useDevelopment';
-import { clearAll } from '../store/utils';
-import { deleteUserAccount } from '../store/auth/thunk';
+import { clearAll, deleteAccountAndClearAll } from '../store/utils';
 
 export default function SettingsScreen(props) {
   // Constants
@@ -39,7 +30,6 @@ export default function SettingsScreen(props) {
   const [isBioEnable, setBioEnable] = useState(false);
   const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(autoAcceptConnection);
   const [version, setVersion] = useState(null);
-  const [showZignSecModal, setZignSecModal] = useState(false);
 
   useEffect(() => {
     const updatevalues = async () => {
@@ -89,24 +79,23 @@ export default function SettingsScreen(props) {
     setIsAcceptConnectionEnabled(value);
   };
 
-  const logoutUser = async () => {
-    const pCode = await getItem(ConstantsList.PIN_CODE);
-    saveItem(ConstantsList.PIN_CODE, pCode);
-    clearAll(dispatch);
-  };
-
   const onLogoutPressed = async () => {
-    showAskDialog('Are you sure?', 'Are you sure you want to log out?', logoutUser, () => {}, 'Ok');
+    showAskDialog(
+      'Are you sure?',
+      'Are you sure you want to log out?',
+      async () => {
+        const pCode = await getItem(ConstantsList.PIN_CODE);
+        saveItem(ConstantsList.PIN_CODE, pCode);
+        clearAll(dispatch);
+      },
+      () => {},
+      'Ok'
+    );
   };
 
   // when user will click on edit profile screen
   const _onEditProfileClick = () => {
     props.navigation.navigate('ProfileScreen', { initDeleteAccount });
-  };
-
-  // on Scan Document click
-  const _onScanDocumentClick = () => {
-    setZignSecModal(true);
   };
 
   const initDeleteAccount = () => {
@@ -118,26 +107,11 @@ export default function SettingsScreen(props) {
       }
     );
 
-    dispatch(deleteUserAccount());
-
-    setTimeout(() => {
-      // logout user
-      logoutUser();
-    }, 1000);
+    deleteAccountAndClearAll(dispatch);
   };
 
   return (
     <View style={styles._mainContainer}>
-      <ZignSecModal
-        isVisible={showZignSecModal}
-        onContinueClick={() => {
-          setZignSecModal(false);
-        }}
-        onLaterClick={() => {
-          setZignSecModal(false);
-        }}
-      />
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles._list}

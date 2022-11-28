@@ -6,27 +6,27 @@ import TextComponent from '../components/TextComponent';
 import GreenPrimaryButton from '../components/GreenPrimaryButton';
 import messaging from '@react-native-firebase/messaging';
 import { useAppDispatch, useAppSelector } from '../store';
-import { updateIsAuthorized, updateUser } from '../store/auth';
-import { selectTempVar, selectToken, selectUser } from '../store/auth/selectors';
-import { fetchToken } from '../store/auth/thunk';
+import { updateIsAuthorized, updateToken, updateUser } from '../store/auth';
+import { selectToken } from '../store/auth/selectors';
+import { AuthenticateUser } from './auth/utils';
 
 const img = require('../assets/images/notifications.png');
 
-function NotifyMeScreen() {
+function NotifyMeScreen(props) {
+  // Constants
+  const user = props.route.params.user;
   const dispatch = useAppDispatch();
-  // Selectors
-  const tempUser = useAppSelector(selectTempVar);
-  const token = useAppSelector(selectToken);
 
+  // Selectors
+  const token = useAppSelector(selectToken);
   // States
-  const [clicked, setClicked] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (clicked) {
+    if (token) {
       dispatch(updateIsAuthorized(true));
     }
-  }, [clicked, token, dispatch]);
+  }, [token, dispatch]);
 
   async function enableNotifications() {
     setLoading(true);
@@ -61,10 +61,17 @@ function NotifyMeScreen() {
       }
     }
 
-    await dispatch(updateUser({ ...tempUser, isNew: false }));
-    await dispatch(fetchToken({ secret: undefined }));
-    setLoading(false);
-    setClicked(true);
+    let data = {
+      isNew: false,
+      id: user.userId,
+      walletSecret: user.secret,
+      type: user.type ? user.type : undefined,
+      auto_accept_connection: true,
+      status: user.status ? user.status : undefined,
+    };
+    dispatch(updateUser({ data }));
+    let freshToken = await AuthenticateUser(user.userId, user.secret, true);
+    dispatch(updateToken(freshToken));
   }
 
   return (

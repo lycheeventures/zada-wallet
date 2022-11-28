@@ -5,6 +5,7 @@ export interface IUserState {
   walletSecret: string | undefined;
   type: 'demo' | undefined;
   auto_accept_connection: boolean;
+  status: 'deleted' | 'inactive' | undefined;
 }
 export interface IAuthState {
   status: IStatus;

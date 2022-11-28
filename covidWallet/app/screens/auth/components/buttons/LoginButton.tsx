@@ -4,26 +4,20 @@ import { GREEN_COLOR } from '../../../../theme/Colors';
 
 interface INProps {
   onPress: () => void;
-  activeOption: 'register' | 'login';
+  screen: 'register' | 'login';
 }
 
 const LoginButton = (props: INProps) => {
   return (
     <TouchableOpacity onPress={props.onPress}>
       <Image
-        // onPress={() => {
-        //   selectionOnPress('login');
-        // }}
-        style={[
-          styles.imageStyle,
-          { tintColor: props.activeOption == 'login' ? GREEN_COLOR : 'grey' },
-        ]}
+        style={[styles.imageStyle, { tintColor: props.screen == 'login' ? GREEN_COLOR : 'grey' }]}
         source={require('../../../../assets/images/user.png')}
       />
       <Text style={styles.textStyle}>Login</Text>
       <View
         style={{
-          borderBottomColor: props.activeOption == 'login' ? GREEN_COLOR : 'grey',
+          borderBottomColor: props.screen == 'login' ? GREEN_COLOR : 'grey',
           borderBottomWidth: 4,
         }}
       />

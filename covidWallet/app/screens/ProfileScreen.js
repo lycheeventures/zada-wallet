@@ -392,7 +392,7 @@ const ProfileScreen = (props) => {
   const deleteAccount = () => {
     // Check if email exist.
     if (!emailRegex.test(email)) {
-      showMessage(
+      _showAlert(
         'Zada Wallet',
         'Please set your EMAIL in order to continue with account deletion.'
       );
