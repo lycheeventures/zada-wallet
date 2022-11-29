@@ -27,7 +27,6 @@ import RegisterButton from './components/buttons/RegisterButton';
 import LoginButton from './components/buttons/LoginButton';
 import PhoneInputComponent from './components/PhoneInputComponent';
 import GoogleRecaptcha from './components/GoogleRecaptcha';
-import { validate } from '../../helpers/validations/validate';
 
 const { width } = Dimensions.get('window');
 
