@@ -50,7 +50,7 @@ const LoginScreen = ({
 
   // States
   const [phone, setPhone] = useState('');
-  const [phoneError, setPhoneError] = useState('');
+  const [phoneError, setPhoneError] = useState('Please enter phone number.');
   const [secret, setSecret] = useState('');
   const [secretError, setSecretError] = useState('');
   const [secureSecret, setSecureSecret] = useState(true);
@@ -82,7 +82,12 @@ const LoginScreen = ({
   const login = async () => {
     Keyboard.dismiss();
     if (networkStatus === 'connected') {
-      let passwordErr = validate('password', secret);
+      // We only use length check to support previous account password. They have password with less than 6 characters.
+      // let passwordErr = validate('password', secret);
+      let passwordErr = '';
+      if (secret.length < 1) {
+        passwordErr = 'Password length should be 1 to 50 characters';
+      }
       setSecretError(passwordErr);
       if (passwordErr !== '') return;
 
