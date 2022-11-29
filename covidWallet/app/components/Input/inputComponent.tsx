@@ -43,7 +43,7 @@ interface InputIProps {
 }
 
 export function InputComponent(props: InputIProps) {
-  //const [secureInputValue, setSecureInputValue] = useState(props.isSecureText);
+  const { strengthMessage = '' } = props;
   const [inputValue, setInputValue] = useState('');
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
@@ -57,10 +57,10 @@ export function InputComponent(props: InputIProps) {
   };
 
   useEffect(() => {
-    setShowStrenghtMessage(props.strengthMessage != '' ? true : false);
-    strengthMessageColor(props.strengthMessage);
+    setShowStrenghtMessage(strengthMessage != '' ? true : false);
+    strengthMessageColor(strengthMessage);
     toggleShowStrengthMessage();
-  }, [props.strengthMessage]);
+  }, [strengthMessage]);
 
   const [animationValue, setAnimationValue] = useState(new Animated.Value(0));
 
@@ -177,7 +177,7 @@ export function InputComponent(props: InputIProps) {
         </Animated.View>
       )}
 
-      {props.strengthMessage != '' && (
+      {strengthMessage != '' && (
         <Animated.View
           style={{
             flexDirection: 'row',
@@ -194,7 +194,7 @@ export function InputComponent(props: InputIProps) {
               //  paddingRight: 16,
               color: messageColor,
             }}>
-            {props.strengthMessage}
+            {strengthMessage}
           </Text>
         </Animated.View>
       )}
