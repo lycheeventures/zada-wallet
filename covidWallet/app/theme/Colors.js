@@ -15,4 +15,6 @@ export const AppColors = {
   BLUE: '#2870da',
   GRAY: '#708090',
   WHITE: 'white',
+  BLACK: 'black',
+  GREEN_COLOR: '#19cb94',
 };
