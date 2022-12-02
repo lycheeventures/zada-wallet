@@ -63,7 +63,6 @@ const IntroScreen = (props: INProps) => {
           width: 10,
           height: 10,
           borderRadius: 5,
-          marginHorizontal: 8,
           backgroundColor: AppColors.PRIMARY,
         }}
         inactiveDotStyle={
