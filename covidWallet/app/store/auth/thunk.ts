@@ -36,15 +36,15 @@ export const loginUser = createAsyncThunk(
             navigation: navigationRef,
             user: { ...data, secret: secret },
           });
-        } else {
-          navigationRef.navigate('MultiFactorScreen', {
-            from: 'Login',
-            user: { ...data, secret: secret },
-          });
+          dispatch(updateAuthStatus('idle'));
+          return;
         }
-      } else {
-        _showAlert('ZADA Wallet', 'Invalid password or user is not verified!');
       }
+
+      navigationRef.navigate('MultiFactorScreen', {
+        from: 'Login',
+        user: { ...data, secret: secret },
+      });
       dispatch(updateAuthStatus('idle'));
     }
     return data.success;
