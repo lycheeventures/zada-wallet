@@ -145,8 +145,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode 124
-        versionName "1.3.2(8)"
+        versionCode 125
+        versionName "1.3.4(1)"
 
         setProperty("archivesBaseName", "ZADA-V-$versionName")
         missingDimensionStrategy 'react-native-camera', 'general'
