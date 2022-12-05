@@ -69,7 +69,7 @@ function NotifyMeScreen(props) {
       auto_accept_connection: true,
       status: user.status ? user.status : undefined,
     };
-    dispatch(updateUser({ data }));
+    dispatch(updateUser({ ...data }));
     let freshToken = await AuthenticateUser(user.userId, user.secret, true);
     dispatch(updateToken(freshToken));
   }
