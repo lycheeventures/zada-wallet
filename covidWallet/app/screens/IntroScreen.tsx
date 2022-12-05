@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { View, Image, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import Carousel, { Pagination } from 'react-native-snap-carousel';
+import Carousel, { Pagination } from 'react-native-snap-carousel-v4';
 import { AppColors } from '../theme/Colors';
 
 interface INProps {
@@ -10,6 +10,7 @@ type ItemType = { image: number; title: string; text: string; text2?: string };
 interface ISlideProps {
   item: ItemType;
   index: number;
+  dataIndex: number;
 }
 
 const img1 = require('../assets/images/walkthrough1.png');
@@ -103,6 +104,8 @@ const IntroScreen = (props: INProps) => {
           ref={carouselRef}
           data={Slides}
           layout={'default'}
+          useScrollView
+          disableIntervalMomentum={true}
           renderItem={renderItem}
           sliderWidth={sliderWidth}
           itemWidth={itemWidth}

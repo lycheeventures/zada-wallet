@@ -93,7 +93,7 @@
     "react-native-sha256": "^1.4.8",
     "react-native-share": "^7.3.9",
     "react-native-simple-radio-button": "^2.7.4",
-    "react-native-snap-carousel": "^3.9.1",
+    "react-native-snap-carousel-v4": "^1.0.1",
     "react-native-splash-screen": "^3.2.0",
     "react-native-svg": "^12.1.1",
     "react-native-swipe-list-view": "^3.2.9",
