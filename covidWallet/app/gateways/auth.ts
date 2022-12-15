@@ -161,6 +161,24 @@ export async function registerDeviceToken(devicePlatform: string, devicePushToke
   }
 }
 
+// Unregister device token.
+export async function unRegisterDeviceToken(devicePlatform: string) {
+  try {
+    let obj = {
+      platform: devicePlatform,
+    };
+
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/disableNotifications',
+      data: obj,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function createWallet(token: string) {
   try {
     let headers = {

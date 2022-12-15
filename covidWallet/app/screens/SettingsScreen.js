@@ -6,14 +6,16 @@ import Icon from 'react-native-vector-icons/AntDesign';
 
 import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
-import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
+import { BIOMETRIC_ENABLED, APP_VERSION, PIN_CODE } from '../helpers/ConfigApp';
 import { showAskDialog, showMessage, showOKDialog } from '../helpers/Toast';
-import ConstantsList from '../helpers/ConfigApp';
 import { useAppDispatch, useAppSelector } from '../store';
 import { updateUser } from '../store/auth';
-import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
-import useDevelopment from '../hooks/useDevelopment';
+import { changeAppStatus } from '../store/app';
 import { clearAll, deleteAccountAndClearAll } from '../store/utils';
+import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
+import { selectAppStatus } from '../store/app/selectors';
+import useDevelopment from '../hooks/useDevelopment';
+import OverlayLoader from '../components/OverlayLoader';
 
 export default function SettingsScreen(props) {
   // Constants
@@ -22,6 +24,7 @@ export default function SettingsScreen(props) {
   // Selectors
   const autoAcceptConnection = useAppSelector(selectAutoAcceptConnection);
   const user = useAppSelector(selectUser);
+  const appStatus = useAppSelector(selectAppStatus);
 
   // hooks
   const { longPressCount, pressCount, buttonPressed, developmentMode, setDevelopmentMode } =
@@ -33,7 +36,7 @@ export default function SettingsScreen(props) {
 
   useEffect(() => {
     const updatevalues = async () => {
-      let appVersion = JSON.parse((await getItem(ConstantsList.APP_VERSION)) || null);
+      let appVersion = JSON.parse((await getItem(APP_VERSION)) || null);
 
       let biometric = JSON.parse((await getItem(BIOMETRIC_ENABLED)) || 'false');
 
@@ -74,7 +77,6 @@ export default function SettingsScreen(props) {
   };
 
   const _toggleAcceptConnection = (value) => {
-    // saveItem(ConstantsList.AUTO_ACCEPT_CONNECTION, JSON.stringify(value));
     dispatch(updateUser({ ...user, auto_accept_connection: value }));
     setIsAcceptConnectionEnabled(value);
   };
@@ -84,8 +86,9 @@ export default function SettingsScreen(props) {
       'Are you sure?',
       'Are you sure you want to log out?',
       async () => {
-        const pCode = await getItem(ConstantsList.PIN_CODE);
-        saveItem(ConstantsList.PIN_CODE, pCode);
+        dispatch(changeAppStatus('loading'));
+        const pCode = await getItem(PIN_CODE);
+        saveItem(PIN_CODE, pCode);
         clearAll(dispatch);
       },
       () => {},
@@ -107,11 +110,13 @@ export default function SettingsScreen(props) {
       }
     );
 
+    dispatch(changeAppStatus('loading'));
     deleteAccountAndClearAll(dispatch);
   };
 
   return (
     <View style={styles._mainContainer}>
+      {appStatus === 'loading' && <OverlayLoader text="Logging out..." />}
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles._list}
