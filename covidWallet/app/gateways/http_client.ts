@@ -164,10 +164,9 @@ const setup = (store: any) => {
         }
         // Error handling
         if (!axios.isCancel(error)) {
-          // on cancel.
+          // Error message handling.
+          handleErrorMessage(error);
         }
-        // Error message handling.
-        handleErrorMessage(error);
         
         return Promise.reject(error);
       } else {
