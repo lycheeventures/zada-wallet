@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '../store';
 import { updateIsAuthorized, updateToken, updateUser } from '../store/auth';
 import { selectToken } from '../store/auth/selectors';
 import { AuthenticateUser } from './auth/utils';
+import { changeAppStatus } from '../store/app';
 
 const img = require('../assets/images/notifications.png');
 
@@ -72,6 +73,7 @@ function NotifyMeScreen(props) {
     dispatch(updateUser({ ...data }));
     let freshToken = await AuthenticateUser(user.userId, user.secret, true);
     dispatch(updateToken(freshToken));
+    dispatch(changeAppStatus('idle'));
   }
 
   return (
