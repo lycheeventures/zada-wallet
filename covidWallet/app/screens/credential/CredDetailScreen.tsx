@@ -50,6 +50,7 @@ const CredDetailScreen = (props: IProps) => {
 
   // States
   const [showQRModal, setShowQRModal] = useState(false);
+  const [qrCode, setQRCode] = useState({});
   const [isGenerating, setGenerating] = useState(false);
   const [isGeneratingPDF, setGeneratingPDF] = useState(false);
 
@@ -93,17 +94,17 @@ const CredDetailScreen = (props: IProps) => {
         </View>
       ),
     });
-  });
+
+    // Generate QR Code
+    generateQRCode();
+  }, []);
 
   // Functions
   async function onSuccess() {
     dispatch(removeCredentials(data.credentialId));
   }
 
-  // Make and Share PDF
-  async function sharePDF() {
-    setGeneratingPDF(true);
-
+  async function generateQRCode() {
     let encryptionKey = '';
     let hash = '';
 
@@ -130,6 +131,18 @@ const CredDetailScreen = (props: IProps) => {
         await decryptAES256CBC(encryptedCred, encryptionKey);
       }
     }
+
+    setQRCode({
+      credentialId: data.credentialId,
+      key: encryptionKey,
+      type: 'cred_ver',
+      version: 2,
+    });
+  }
+
+  // Make and Share PDF
+  async function sharePDF() {
+    setGeneratingPDF(true);
 
     // Ordering data
     const orderedData = Object.keys(data.values)
@@ -163,15 +176,9 @@ const CredDetailScreen = (props: IProps) => {
     let template = await getCredentialTemplate(data.schemaId, data.definitionId);
 
     // Making QR data.
-    let qrData = {
-      credentialId: data.credentialId,
-      key: encryptionKey,
-      type: 'cred_ver',
-      version: 2,
-    };
     let qrUrl = await new Promise(async (resolve, reject) => {
       await fetch(
-        'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + JSON.stringify(qrData)
+        'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + JSON.stringify(qrCode)
       ).then(async (resp) => {
         let blob = await resp.blob();
 
@@ -205,7 +212,7 @@ const CredDetailScreen = (props: IProps) => {
     // Generating and sharing pdf
     let result = await generatePDF(htmlStr);
     const shareOptions = {
-      title: 'Certificate',
+      title: 'Credential',
       url: result.url,
     };
     try {
@@ -308,15 +315,13 @@ const CredDetailScreen = (props: IProps) => {
 
         {isGeneratingPDF && <OverlayLoader text="Generating credential PDF..." />}
 
-        {data.qrCode !== undefined && (
-          <CredQRModal
-            isVisible={showQRModal}
-            onCloseClick={() => {
-              setShowQRModal(false);
-            }}
-            qrCode={data.qrCode}
-          />
-        )}
+        <CredQRModal
+          isVisible={showQRModal}
+          onCloseClick={() => {
+            setShowQRModal(false);
+          }}
+          qrCode={qrCode}
+        />
 
         <View style={styles.topContainer}>
           <DetailCard
