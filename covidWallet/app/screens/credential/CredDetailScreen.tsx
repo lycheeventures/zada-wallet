@@ -94,7 +94,9 @@ const CredDetailScreen = (props: IProps) => {
         </View>
       ),
     });
+  }, [qrCode]);
 
+  useEffect(() => {
     // Generate QR Code
     generateQRCode();
   }, []);
