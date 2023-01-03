@@ -8,11 +8,13 @@ export const GREEN_COLOR = '#19cb94';
 export const YELLOW_COLOR = '#FFA500';
 export const BACKGROUND_COLOR = '#e4e2de';
 
-
-
 // New Way
 export const AppColors = {
-    PRIMARY: "#001871",
-    BLUE: "#2870da",
-    GRAY: "#708090"
-} 
+  PRIMARY: '#001871',
+  DANGER: '#f32013',
+  BLUE: '#2870da',
+  GRAY: '#708090',
+  WHITE: 'white',
+  BLACK: 'black',
+  GREEN_COLOR: '#19cb94',
+};

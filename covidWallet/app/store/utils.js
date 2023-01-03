@@ -4,8 +4,13 @@ import { resetLocalStorage, resetSecureItems } from '../helpers/utils';
 import { resetAuth } from './auth';
 import { resetConnection } from './connections';
 import { resetCredential } from './credentials';
-import { resetApp } from './app';
+import { changeAppStatus, resetApp } from './app';
 import { resetAction } from './actions';
+import { resetCache } from './app/thunk';
+import { deleteUserAccount } from './auth/thunk';
+import { persistor } from '.';
+import { AuthAPI } from '../gateways';
+import { Platform } from 'react-native';
 
 export const createEncryptor = ({ secretKey }) =>
   createTransform(
@@ -41,11 +46,30 @@ export const createEncryptor = ({ secretKey }) =>
   );
 
 export const clearAll = async (dispatch) => {
+  await AuthAPI.unRegisterDeviceToken(Platform.OS);
   resetLocalStorage();
-  await resetSecureItems();
-  dispatch(resetAuth());
+  resetSecureItems();
   dispatch(resetAction());
   dispatch(resetConnection());
   dispatch(resetCredential());
+  dispatch(resetCache());
   dispatch(resetApp());
+  dispatch(resetAuth());
+  dispatch(changeAppStatus('idle'));
+  persistor.purge();
+};
+
+export const deleteAccountAndClearAll = async (dispatch) => {
+  await AuthAPI.unRegisterDeviceToken(Platform.OS);
+  resetLocalStorage();
+  resetSecureItems();
+  dispatch(resetAction());
+  dispatch(resetConnection());
+  dispatch(resetCredential());
+  dispatch(resetCache());
+  dispatch(resetApp());
+  await dispatch(deleteUserAccount()).unwrap();
+  dispatch(resetAuth());
+  dispatch(changeAppStatus('idle'));
+  persistor.purge();
 };

@@ -20,7 +20,7 @@ import { AuthStackParamList } from '../../navigation/types';
 
 import ConstantsList from '../../helpers/ConfigApp';
 import { saveItem, getItem } from '../../helpers/Storage';
-import { showNetworkMessage, _showAlert } from '../../helpers/Toast';
+import { showAskDialog, showNetworkMessage, _showAlert } from '../../helpers/Toast';
 import { nameRegex, validateLength, validatePasswordStrength } from '../../helpers/validation';
 import { _fetchingAppData } from '../../helpers/AppData';
 import { _handleAxiosError } from '../../helpers/AxiosResponse';
@@ -28,11 +28,14 @@ import { _handleAxiosError } from '../../helpers/AxiosResponse';
 import { _registerUserAPI } from '../../gateways/auth';
 
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
-import {
-  selectAuthStatus,
-} from '../../store/auth/selectors';
+import { selectAuthStatus } from '../../store/auth/selectors';
 import { selectNetworkStatus } from '../../store/app/selectors';
-import { createWallet, loginUser, registerUser } from '../../store/auth/thunk';
+import {
+  createWallet,
+  loginUser,
+  reactivateUserAccount,
+  registerUser,
+} from '../../store/auth/thunk';
 import { updateTempVar } from '../../store/auth';
 
 import HeadingComponent from '../../components/HeadingComponent';
@@ -170,11 +173,24 @@ const AuthScreen = ({
           secretPhrase: secret,
         };
 
-        await dispatch(
+        let resp = await dispatch(
           registerUser({ name: data.name, phone: data.phone, secret: data.secretPhrase })
         ).unwrap();
 
-        navigation.navigate('MultiFactorScreen', { from: 'Register' });
+        if (resp?.status === 'inactive') {
+          showAskDialog(
+            'Re-activate Account',
+            'Do you want to re-activate your account?',
+            () => reactivateAccount(phone.trim(), resp, 'register'),
+            () => {},
+            'Re-activate',
+            'default',
+            'Cancel',
+            'destructive'
+          );
+        } else {
+          navigateToScreen('register');
+        }
       }
     } catch (e) {
       console.log(e);
@@ -195,15 +211,47 @@ const AuthScreen = ({
       })
     );
 
-    if (resp?.token) {
-      await authenticateUserToken(resp?.type, resp?.token);
+    if (resp?.status === 'inactive') {
+      showAskDialog(
+        'Re-activate Account',
+        'Do you want to re-activate your account?',
+        () => reactivateAccount(phone.trim(), resp, 'login'),
+        () => {},
+        'Re-activate',
+        'default',
+        'Cancel',
+        'destructive'
+      );
     } else {
-      // Checking if type is 'demo'.
-      if (resp?.type === 'demo') {
-        navigation.replace('SecurityScreen', { navigation });
+      navigateToScreen('login', resp);
+    }
+  };
+
+  // Reactive account and then handle navigation.
+  const reactivateAccount = async (phone: string, data: any, key: 'login' | 'register') => {
+    let resp = await dispatch(reactivateUserAccount({ phone })).unwrap();
+    if (resp?.success) {
+      navigateToScreen(data, key);
+    } else {
+      _showAlert('Zada Error', 'Something went wrong!');
+    }
+  };
+
+  // Navigation handling.
+  const navigateToScreen = async (key: 'login' | 'register', resp?: any) => {
+    if (key === 'login') {
+      if (resp?.token) {
+        await authenticateUserToken(resp?.type, resp?.token);
       } else {
-        navigation.navigate('MultiFactorScreen', { from: 'Login' });
+        // Checking if type is 'demo'.
+        if (resp?.type === 'demo') {
+          navigation.replace('SecurityScreen', { navigation });
+        } else {
+          navigation.navigate('MultiFactorScreen', { from: 'Login' });
+        }
       }
+    } else {
+      navigation.navigate('MultiFactorScreen', { from: 'Register' });
     }
   };
 

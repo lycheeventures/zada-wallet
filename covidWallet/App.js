@@ -19,11 +19,9 @@ const App = () => {
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
         <StatusBar barStyle="light-content" backgroundColor={PRIMARY_COLOR} />
         <BootstrapPersistance>
-          {(clearPersistor) => (
-            <View style={styles.viewStyle}>
-              <RootNavigator clearPersistor={clearPersistor} />
-            </View>
-          )}
+          <View style={styles.viewStyle}>
+            <RootNavigator />
+          </View>
         </BootstrapPersistance>
       </ErrorBoundary>
     </NetworkContext>

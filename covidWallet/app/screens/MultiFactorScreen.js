@@ -8,7 +8,6 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
-import Config from 'react-native-config';
 import {
   PRIMARY_COLOR,
   BACKGROUND_COLOR,
@@ -20,28 +19,20 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import HeadingComponent from '../components/HeadingComponent';
 import ConstantsList from '../helpers/ConfigApp';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { saveItem, getItem } from '../helpers/Storage';
+import { saveItem } from '../helpers/Storage';
 import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
-import { AuthenticateUser } from '../helpers/Authenticate';
 import { validateOTP, _resendOTPAPI } from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
-import { updateUser } from '../store/auth';
-import { useAppDispatch, useAppSelector } from '../store';
-import { selectTempVar } from '../store/auth/selectors';
+import { useAppSelector } from '../store';
 import { selectNetworkStatus } from '../store/app/selectors';
-import { fetchToken } from '../store/auth/thunk';
 
 const { width } = Dimensions.get('window');
 
 function MultiFactorScreen(props) {
-  const dispatch = useAppDispatch();
-  // Selectors
-  const tempUser = useAppSelector(selectTempVar);
   const networkStatus = useAppSelector(selectNetworkStatus);
 
-  const fromScreen = props.route.params.from;
+  const user = props.route.params.user;
   const [phoneConfirmationCode, setPhoneConfirmationCode] = useState('');
   const [progress, setProgress] = useState(false);
   const [isAuthenticated, setAuthentication] = useState(false);
@@ -55,8 +46,8 @@ function MultiFactorScreen(props) {
   const [phoneCodeLoading, setPhoneCodeLoading] = useState(false);
 
   useLayoutEffect(() => {
-    _resendOTPAPI(tempUser.id, 'phone');
-  }, [tempUser.id]);
+    _resendOTPAPI(user.userId, 'phone');
+  }, [user.userId]);
 
   // Effect for phone code countdown
   React.useEffect(() => {
@@ -90,21 +81,12 @@ function MultiFactorScreen(props) {
   const validate = async () => {
     try {
       if (networkStatus === 'connected') {
-        let result = await validateOTP(phoneConfirmationCode, tempUser.id);
+        let result = await validateOTP(phoneConfirmationCode, user.userId);
 
         if (result.data.success) {
-          // Updating user in store.
-          dispatch(updateUser({ ...tempUser, id: result.data.userId }));
-
           // Setting auth count to zero for disabling recaptcha.
           await saveItem(ConstantsList.AUTH_COUNT, JSON.stringify(0));
-
-          if (fromScreen === 'Register') {
-            await dispatch(fetchToken({ secret: tempUser.walletSecret }));
-          } else {
-            await dispatch(fetchToken({ secret: undefined }));
-          }
-          props.navigation.replace('SecurityScreen');
+          props.navigation.replace('SecurityScreen', { user });
         } else {
           showMessage('ZADA Wallet', result.data.error);
         }
@@ -123,7 +105,7 @@ function MultiFactorScreen(props) {
     try {
       if (networkStatus === 'connected') {
         setPhoneCodeLoading(true);
-        const result = await _resendOTPAPI(tempUser.id, 'phone');
+        const result = await _resendOTPAPI(user.userId, 'phone');
         if (result.data.success) {
           setPhoneTimeout(false);
           setPhoneMins(1);

@@ -15,12 +15,14 @@ import ConstantsList from '../helpers/ConfigApp';
 
 const img = require('../assets/images/security.png');
 
-const SecurityScreen = ({
-  navigation,
-}: {
+interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
-}) => {
-
+  route: any;
+}
+const SecurityScreen = (props: INProps) => {
+  // Constants
+  const user = props.route.params.user;
+  const navigation = props.navigation;
   // States
   const [isSensorAvailable, checkSensor] = useState(false);
   const [isSuccessful, checkSecureIDAuth] = useState(false);
@@ -112,7 +114,7 @@ const SecurityScreen = ({
   }
 
   const nextHandler = () => {
-    navigation.navigate('NotifyMeScreen');
+    navigation.navigate('NotifyMeScreen', { user });
   };
 
   const _setPinCode = async () => {
@@ -160,7 +162,7 @@ const SecurityScreen = ({
       );
       setPincode('');
       setConfirmPincode('');
-      navigation.navigate('NotifyMeScreen');
+      navigation.navigate('NotifyMeScreen', { user });
     } catch (error) {
       showMessage('Zada Wallet', error?.toString());
     }
