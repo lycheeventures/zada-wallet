@@ -22,7 +22,6 @@ import {
   fetch_all_groups,
   remove_all_credentials_group,
 } from '../../../helpers/Credential_Groups';
-import useNetwork from '../../../hooks/useNetwork';
 import ActionButton from 'react-native-action-button';
 import {
   BLACK_COLOR,
@@ -39,10 +38,14 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import EditGroupModal from './EditGroupModal';
 import { _handleAxiosError } from '../../../helpers/AxiosResponse';
 import { get_local_issue_date, parse_date_time } from '../../../helpers/time';
-import { useAppSelector } from '../../../store';
+import { useAppDispatch, useAppSelector } from '../../../store';
 import { selectCredentials } from '../../../store/credentials/selectors';
+import { updateCredential } from '../../../store/credentials';
 
 const CredentialGroups = (props) => {
+  // Constants
+  const dispatch = useAppDispatch();
+
   // Selectors
   const credentials = useAppSelector(selectCredentials.selectAll);
 
@@ -58,7 +61,7 @@ const CredentialGroups = (props) => {
   const [selectedEditGroup, setSelectedEditGroup] = useState([]);
 
   const toggleModal = (v) => {
-    props.navigation.navigate('DetailsScreen', {
+    props.navigation.navigate('CredDetailScreen', {
       data: v,
     });
   };
@@ -73,6 +76,10 @@ const CredentialGroups = (props) => {
       <Transition.Out type="fade" durationMs={200} />
     </Transition.Together>
   );
+
+  const updateBackgroundImage = (credentialId, background_url) => {
+    dispatch(updateCredential({ id: credentialId, changes: { backgroundImage: background_url } }));
+  };
 
   const _searchInputHandler = (searchText) => {
     setSearch(searchText);
@@ -356,6 +363,8 @@ const CredentialGroups = (props) => {
                               key={credIndex.toString()}
                               style={styles._credentialsCardContainer}>
                               <CredentialsCard
+                                updateBackgroundImage={updateBackgroundImage}
+                                item={item}
                                 schemeId={cred['schemaId']}
                                 card_title={cred.name}
                                 card_type={cred.type}
@@ -442,6 +451,8 @@ const CredentialGroups = (props) => {
                               key={credIndex.toString()}
                               style={styles._credentialsCardContainer}>
                               <CredentialsCard
+                                updateBackgroundImage={updateBackgroundImage}
+                                item={cred}
                                 schemeId={cred['schemaId']}
                                 card_title={cred.name}
                                 card_type={cred.type}

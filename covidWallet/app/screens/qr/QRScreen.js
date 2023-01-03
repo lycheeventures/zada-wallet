@@ -7,27 +7,14 @@ import ActionDialog from '../../components/Dialogs/ActionDialog';
 import FailureModal from './components/FailureModal';
 import SuccessModal from './components/SuccessModal';
 import { useAppDispatch, useAppSelector } from '../../store';
-import {
-  selectConnectionActions,
-  selectCredentialActions,
-  selectVerificationActions,
-} from '../../store/actions/selectors';
-import ConstantsList, { AUTO_ACCEPT_CONNECTION } from '../../helpers/ConfigApp';
-import {
-  getType,
-  handleCredVerification,
-  handleQRConnectionRequest,
-  handleQRLogin,
-} from './utils';
+import ConstantsList from '../../helpers/ConfigApp';
+import { getType, handleCredVerification, handleQRConnectionRequest, handleQRLogin } from './utils';
 import { VerificationAPI } from '../../gateways';
 import { showOKDialog, _showAlert } from '../../helpers/Toast';
-import {
-  selectConnections,
-  selectConnectionsStatus,
-} from '../../store/connections/selectors';
-import { getItem } from '../../helpers/Storage';
+import { selectConnections, selectConnectionsStatus } from '../../store/connections/selectors';
 import { acceptConnection } from '../../store/connections/thunk';
 import { addAction } from '../../store/actions';
+import { selectAutoAcceptConnection } from '../../store/auth/selectors';
 
 const defaultCredState = { type: 'none', credentials: [] };
 
@@ -38,6 +25,7 @@ const QRScreen = ({ route, navigation }) => {
   // Selectors
   const connections = useAppSelector(selectConnections.selectAll);
   const connectionStatus = useAppSelector(selectConnectionsStatus);
+  const auto_accept_connection = useAppSelector(selectAutoAcceptConnection);
 
   // States
   const [scan, setScan] = useState(true);
@@ -172,9 +160,7 @@ const QRScreen = ({ route, navigation }) => {
 
           let data = await handleQRConnectionRequest(qrJSON.metadata, qrJSON);
 
-          let connectionExists = connections.find(
-            (x) => x.name === data.organizationName
-          );
+          let connectionExists = connections.find((x) => x.name === data.organizationName);
           if (connectionExists) {
             showOKDialog(
               'ZADA',
@@ -186,9 +172,6 @@ const QRScreen = ({ route, navigation }) => {
 
           // Make a new connection
           // Check auto_acceptance from local storage
-          let auto_accept_connection = JSON.parse(
-            (await getItem(AUTO_ACCEPT_CONNECTION)) || 'false'
-          );
 
           if (!auto_accept_connection) {
             dispatch(addAction(qrJSON));
@@ -324,13 +307,9 @@ const QRScreen = ({ route, navigation }) => {
             </View>
           }
           onRead={_handleQRScan}
-          topContent={
-            <Text style={styles.textBold}>Point your camera to a QR code to scan</Text>
-          }
+          topContent={<Text style={styles.textBold}>Point your camera to a QR code to scan</Text>}
           bottomContent={
-            <TouchableOpacity
-              style={styles.buttonTouchable}
-              onPress={navigateToMainScreen}>
+            <TouchableOpacity style={styles.buttonTouchable} onPress={navigateToMainScreen}>
               <Text style={styles.buttonText}>Cancel Scan</Text>
             </TouchableOpacity>
           }

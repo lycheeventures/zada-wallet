@@ -1,6 +1,11 @@
 export interface ICredentialState {
   status: 'idle' | 'loading' | 'pending' | 'succeeded' | 'failed';
-  error: string | undefined;
+  error: {
+    code?: string | undefined;
+    message?: string | undefined;
+    name?: string | undefined;
+    stack?: any;
+  };
 }
 
 export interface ICredentialObjectValues {

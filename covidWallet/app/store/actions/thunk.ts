@@ -3,7 +3,6 @@ import { RootState } from '..';
 import { CredentialAPI, VerificationAPI } from '../../gateways';
 import ConstantsList from '../../helpers/ConfigApp';
 import { IConnectionObject } from '../connections/interface';
-import { ICredentialObject } from '../credentials/interface';
 
 export const fetchActions = createAsyncThunk(
   'actions/fetchActions',
@@ -14,6 +13,7 @@ export const fetchActions = createAsyncThunk(
       const connArr = Object.values(connection.entities) as IConnectionObject[];
 
       const response = await CredentialAPI.get_all_credentials_offers();
+
       let offers = response.data.offers;
       let actions = {
         success: response.data.success,

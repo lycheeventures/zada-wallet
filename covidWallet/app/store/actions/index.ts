@@ -1,12 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { RootState } from '..';
 import { IActionState } from './interface';
-import { ActionAdapter } from './selectors';
+import { ActionAdapter, selectActions } from './selectors';
 import { fetchActions } from './thunk';
 
 // State initialization
 export const ActionState: IActionState = {
   status: 'loading',
-  error: undefined,
+  error: {
+    code: undefined,
+    message: undefined,
+    name: undefined,
+    stack: undefined,
+  },
 };
 
 // Slice
@@ -19,6 +25,10 @@ export const slice = createSlice({
 
     changeActionStatus(state, action) {
       state.status = action.payload;
+    },
+    resetAction: () => {
+      console.log(ActionAdapter.getInitialState(ActionState));
+      return ActionAdapter.getInitialState(ActionState);
     },
   },
   extraReducers: (builder) => {
@@ -39,12 +49,12 @@ export const slice = createSlice({
     builder.addCase(fetchActions.rejected, (state, action) => {
       // Handle the rejected result
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
   },
 });
 
 // Exporting Actions
-export const { changeActionStatus, addAction, deleteAction } = slice.actions;
+export const { changeActionStatus, addAction, deleteAction, resetAction } = slice.actions;
 
 export { slice as ActionSlice };

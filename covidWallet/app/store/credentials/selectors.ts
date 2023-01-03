@@ -2,7 +2,7 @@ import { createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '..';
 import { ICredentialObject } from './interface';
 
-export const credentialAdapter = createEntityAdapter({
+export const CredentialAdapter = createEntityAdapter({
   selectId: (action: ICredentialObject) => action.credentialId,
 });
 
@@ -13,17 +13,11 @@ export const selectCredentialsStatus = (state: RootState) => state.credential.st
 export const selectCredentialsError = (state: RootState) => state.credential.error;
 
 // Select all credentials
-export const selectCredentials = credentialAdapter.getSelectors(
-  (s: RootState) => s.credential
-);
+export const selectCredentials = CredentialAdapter.getSelectors((s: RootState) => s.credential);
 
 // Select sorted array
-export const selectSortedCredentials = createSelector(
-  selectCredentials.selectAll,
-  (cred) =>
-    cred.sort(
-      (a, b) => new Date(a.issuedAtUtc).getTime() - new Date(b.issuedAtUtc).getTime()
-    )
+export const selectSortedCredentials = createSelector(selectCredentials.selectAll, (cred) =>
+  cred.sort((a, b) => new Date(a.issuedAtUtc).getTime() - new Date(b.issuedAtUtc).getTime())
 );
 
 export const selectSearchedCredentials = createSelector(

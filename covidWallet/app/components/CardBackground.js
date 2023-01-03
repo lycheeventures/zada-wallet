@@ -1,27 +1,34 @@
-import axios from 'axios';
 import * as React from 'react';
-import {View, Text, StyleSheet, Image, ActivityIndicator} from 'react-native';
-import {ZADA_S3_BASE_URL} from '../helpers/ConfigApp';
-import useNetwork from '../hooks/useNetwork';
-import {BLACK_COLOR, WHITE_COLOR} from '../theme/Colors';
+import { View, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { ZADA_S3_BASE_URL } from '../helpers/ConfigApp';
+import { useAppSelector } from '../store';
+import { selectNetworkStatus } from '../store/app/selectors';
+import { BLACK_COLOR, WHITE_COLOR } from '../theme/Colors';
 
 const CARD_BG = require('../assets/images/card-bg.png');
 
 function CardBackground(props) {
-  const {isConnected} = useNetwork();
-  const [backgroundImage, setBakcgroundImage] = React.useState(CARD_BG);
+  const { updateBackgroundImage, item } = props;
+  const networkStatus = useAppSelector(selectNetworkStatus);
+  const [backgroundImage, setBackgroundImage] = React.useState(CARD_BG);
   const [loading, setLoading] = React.useState(true);
   const [isUrl, setUrl] = React.useState(false);
 
   React.useEffect(() => {
-    _checkForImageInS3();
+    if (item?.backgroundImage === undefined) {
+      _checkForImageInS3();
+    } else {
+      setLoading(false);
+      setBackgroundImage(item.backgroundImage);
+      setUrl(true);
+    }
   }, []);
 
   const _checkForImageInS3 = () => {
     try {
-      if (!isConnected) {
+      if (networkStatus === 'disconnected') {
         setLoading(false);
-        setBakcgroundImage(CARD_BG);
+        setBackgroundImage(CARD_BG);
         setUrl(false);
         return;
       }
@@ -29,23 +36,27 @@ function CardBackground(props) {
 
       let schemeId = props.schemeId.replace(/:/g, '.');
 
-      const result = axios
-        .get(`${ZADA_S3_BASE_URL}/${schemeId}.png`)
+      fetch(`${ZADA_S3_BASE_URL}/${schemeId}.png`)
         .then((res) => {
           if (res.status === 200) {
-            setBakcgroundImage(`${ZADA_S3_BASE_URL}/${schemeId}.png`);
+            updateBackgroundImage(item.credentialId, `${ZADA_S3_BASE_URL}/${schemeId}.png`);
+            // background_image={{ uri: item.backgroundImage }}
+            setBackgroundImage(`${ZADA_S3_BASE_URL}/${schemeId}.png`);
             setUrl(true);
+            setLoading(false);
+          } else {
+            setUrl(false);
+            setBackgroundImage(CARD_BG);
             setLoading(false);
           }
         })
         .catch((error) => {
           setUrl(false);
           setLoading(false);
-          //setBakcgroundImage(`${ZADA_S3_BASE_URL}/default.png`);
         });
     } catch (error) {
       setUrl(false);
-      setBakcgroundImage(CARD_BG);
+      setBackgroundImage(CARD_BG);
       setLoading(false);
     }
   };
@@ -65,7 +76,7 @@ function CardBackground(props) {
       ) : (
         <>
           <Image
-            source={isUrl ? {uri: backgroundImage} : backgroundImage}
+            source={isUrl ? { uri: backgroundImage } : backgroundImage}
             style={styles._frontLayer}
           />
           {props.children}

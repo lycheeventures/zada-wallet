@@ -1,25 +1,32 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ICredentialState } from './interface';
 import { fetchCredentials, removeCredentials } from './thunk';
-import { credentialAdapter } from './selectors';
+import { CredentialAdapter } from './selectors';
 
 // State initialization
 export const CredentialState: ICredentialState = {
   status: 'loading',
-  error: undefined,
+  error: {
+    code: undefined,
+    message: undefined,
+    name: undefined,
+    stack: undefined,
+  },
 };
 
 export const slice = createSlice({
   name: 'credential',
-  initialState: credentialAdapter.getInitialState(CredentialState),
+  initialState: CredentialAdapter.getInitialState(CredentialState),
   reducers: {
-    addCredential: credentialAdapter.addOne,
-    addCredentials: credentialAdapter.addMany,
-    deleteCredential: credentialAdapter.removeOne,
+    addCredential: CredentialAdapter.addOne,
+    addCredentials: CredentialAdapter.addMany,
+    updateCredential: CredentialAdapter.updateOne,
+    deleteCredential: CredentialAdapter.removeOne,
 
     changeCredentialStatus(state, action) {
       state.status = action.payload;
     },
+    resetCredential: () => CredentialAdapter.getInitialState(CredentialState),
   },
   extraReducers: (builder) => {
     builder.addCase(fetchCredentials.pending, (state, action) => {
@@ -29,13 +36,13 @@ export const slice = createSlice({
     });
     builder.addCase(fetchCredentials.fulfilled, (state, action) => {
       if (action.payload.success) {
-        credentialAdapter.upsertMany(state, action.payload.credentials);
+        CredentialAdapter.upsertMany(state, action.payload.credentials);
         state.status = 'idle';
       }
     });
     builder.addCase(fetchCredentials.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
 
     // Remove Credentials
@@ -49,13 +56,19 @@ export const slice = createSlice({
     });
     builder.addCase(removeCredentials.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action?.error?.message;
+      state.error = action?.error;
     });
   },
 });
 
 // Exporting Actions
-export const { changeCredentialStatus, addCredential, deleteCredential } = slice.actions;
+export const {
+  changeCredentialStatus,
+  addCredential,
+  updateCredential,
+  deleteCredential,
+  resetCredential,
+} = slice.actions;
 
 // export const {
 //     selectAll: selectAllCredentials,
