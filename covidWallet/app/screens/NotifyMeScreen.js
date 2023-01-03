@@ -1,24 +1,35 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { PRIMARY_COLOR } from '../theme/Colors';
 import ImageBoxComponent from '../components/ImageBoxComponent';
 import TextComponent from '../components/TextComponent';
-import { AuthContext } from '../Navigation';
 import GreenPrimaryButton from '../components/GreenPrimaryButton';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import { useAppDispatch, useAppSelector } from '../store';
+import { updateIsAuthorized, updateUser } from '../store/auth';
+import { selectTempVar, selectToken, selectUser } from '../store/auth/selectors';
+import { fetchToken } from '../store/auth/thunk';
 
 const img = require('../assets/images/notifications.png');
 
 function NotifyMeScreen() {
+  const dispatch = useAppDispatch();
+  // Selectors
+  const tempUser = useAppSelector(selectTempVar);
+  const token = useAppSelector(selectToken);
 
-  const { isFirstTimeFunction } = React.useContext(AuthContext);
+  // States
+  const [clicked, setClicked] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (clicked) {
+      dispatch(updateIsAuthorized(true));
+    }
+  }, [clicked, token, dispatch]);
 
   async function enableNotifications() {
+    setLoading(true);
 
     // ask for notification permission
     const authorizationStatus = await messaging().hasPermission();
@@ -29,42 +40,36 @@ function NotifyMeScreen() {
         alert: true,
       });
       if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
-        console.log("Notification Permission => Authorized");
+        console.log('Notification Permission => Authorized');
       } else if (authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL) {
-        console.log("Notification Permission => Provisional");
+        console.log('Notification Permission => Provisional');
       } else {
-        console.log("Notification Permission => Disabled");
+        console.log('Notification Permission => Disabled');
       }
-    }
-    else {
+    } else {
       const authorizationStatus = await messaging().requestPermission({
         sound: true,
         badge: true,
         alert: true,
       });
       if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
-        console.log("Notification Permission => Authorized");
+        console.log('Notification Permission => Authorized');
       } else if (authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL) {
-        console.log("Notification Permission => Provisional");
+        console.log('Notification Permission => Provisional');
       } else {
-        console.log("Notification Permission => Disabled");
+        console.log('Notification Permission => Disabled');
       }
     }
 
-    await AsyncStorage.setItem('isfirstTime', 'false').then(() => {
-      isFirstTimeFunction();
-    });
+    await dispatch(updateUser({ ...tempUser, isNew: false }));
+    await dispatch(fetchToken({ secret: undefined }));
+    setLoading(false);
+    setClicked(true);
   }
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <View
-        style={{
-          flex: 4,
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-        }}>
+    <View style={styles.viewStyle}>
+      <View style={styles.textViewStyle}>
         <Text style={styles.TextContainerHead}>Get notified</Text>
         <TextComponent
           onboarding={true}
@@ -72,11 +77,12 @@ function NotifyMeScreen() {
           such as when you recieve a new digital certificate."
         />
       </View>
-      <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={styles.imageViewStyle}>
         <ImageBoxComponent source={img} />
       </View>
-      <View style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={styles.buttonViewStyle}>
         <GreenPrimaryButton
+          loading={loading}
           text="ENABLE NOTIFICATIONS"
           nextHandler={enableNotifications}
         />
@@ -85,6 +91,15 @@ function NotifyMeScreen() {
   );
 }
 const styles = StyleSheet.create({
+  viewStyle: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  textViewStyle: {
+    flex: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+  },
+  imageViewStyle: { flex: 2, alignItems: 'center', justifyContent: 'center' },
+  buttonViewStyle: { flex: 3, alignItems: 'center', justifyContent: 'center' },
   TextContainerEnd: {
     alignItems: 'center',
     justifyContent: 'center',

@@ -101,6 +101,25 @@ const getUserCurrentAuth = async () => {
     }
 };
 
+export const isJWTExp = (jwt) => {
+    try {
+        let nowUnixEpoch = Math.round(Date.now() / 1000);
+        if (jwt !== null) {
+            let expUnixEpoch = jwt.exp;
+            if ((expUnixEpoch - nowUnixEpoch) <= 120) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 const getIsAuthExpired = async () => {
     try {
         let nowUnixEpoch = Math.round(Date.now() / 1000);

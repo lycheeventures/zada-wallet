@@ -1,12 +1,9 @@
 import http_client from './http_client';
-import { AuthenticateUser } from '../helpers/Authenticate';
 import {
   analytics_log_accept_verification_request,
   analytics_log_reject_verification_request,
   analytics_log_submit_connectionless_verification_request,
 } from '../helpers/analytics';
-import { ZADA_AUTH_TEST } from '../helpers/ConfigApp';
-import { getToken } from './auth';
 
 // Get All Verification Proposals API
 export async function get_all_verification_proposals() {
@@ -14,9 +11,6 @@ export async function get_all_verification_proposals() {
     const result = await http_client({
       method: 'GET',
       url: '/api/credential/get_all_verification_proposals',
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
-      },
     });
     return result;
   } catch (error) {
@@ -35,9 +29,6 @@ export async function get_all_credentials_for_verification(verificationId: strin
       method: 'GET',
       url: '/api/credential/get_all_credentials_for_verification',
       params: obj,
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
-      },
     });
     return result;
   } catch (error) {
@@ -56,9 +47,6 @@ export async function get_all_credentials_connectionless_verification(metadata: 
       method: 'GET',
       url: '/api/credential/get_all_credentials_connectionless_verification',
       params: obj,
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
-      },
     });
     return result;
   } catch (error) {
@@ -79,16 +67,10 @@ export async function submit_verification_connectionless(
       credentialId,
     };
 
-    let headers = {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + (await getToken()),
-    };
-
     const result = await http_client({
       method: 'POST',
       url: '/api/credential/submit_verification_connectionless',
       data: obj,
-      headers,
     });
 
     // Google Analytics
@@ -107,16 +89,10 @@ export async function delete_verification(verificationId: string) {
       verificationId,
     };
 
-    let headers = {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + (await getToken()),
-    };
-
     const result = await http_client({
       method: 'POST',
       url: '/api/credential/delete_verification',
       data: obj,
-      headers,
     });
 
     // Google Analytics
@@ -142,16 +118,10 @@ export async function submit_verification(
       policyName,
     };
 
-    let headers = {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + (await getToken()),
-    };
-
     const result = await http_client({
       method: 'POST',
       url: '/api/credential/submit_verification',
       data: obj,
-      headers,
     });
 
     // Google Analytics
@@ -179,9 +149,6 @@ export async function submit_cold_verification(
         signature,
         tenantId,
         keyVersion,
-      },
-      headers: {
-        Authorization: 'Bearer ' + (await getToken()),
       },
     });
     return result;

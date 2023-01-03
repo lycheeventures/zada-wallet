@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { AppState } from 'react-native';
 import { BIOMETRIC_ENABLED } from '../helpers/ConfigApp';
@@ -14,7 +14,6 @@ const useBiometric = () => {
 
     // States
     const [authStatus, setAuthStatus] = useState(false);
-
 
     // UseEffects
     useEffect(() => {

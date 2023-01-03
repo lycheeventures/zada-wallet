@@ -1,32 +1,27 @@
-import React, {useEffect, useState} from 'react';
-import {
-  AlertIOS,
-  StyleSheet,
-  View,
-  Text,
-  Alert,
-  Platform,
-  TurboModuleRegistry,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, Alert, Platform } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import {BACKGROUND_COLOR} from '../theme/Colors';
+import { BACKGROUND_COLOR } from '../theme/Colors';
+import { AuthStackParamList } from '../navigation/types';
 import ImageBoxComponent from '../components/ImageBoxComponent';
 import TextComponent from '../components/TextComponent';
 import GreenPrimaryButton from '../components/GreenPrimaryButton';
 import PincodeModal from '../components/Modal/PincodeModal';
-import {pincodeRegex} from '../helpers/validation';
-import {showMessage} from '../helpers/Toast';
-import {saveItem} from '../helpers/Storage';
+import { pincodeRegex } from '../helpers/validation';
+import { showMessage } from '../helpers/Toast';
+import { saveItem } from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
-import { useAppDispatch } from '../store';
-import { fetchToken } from '../store/auth/thunk';
 
 const img = require('../assets/images/security.png');
 
-function SecurityScreen({navigation}) {
-  // Constants
-  const dispatch = useAppDispatch();
+const SecurityScreen = ({
+  navigation,
+}: {
+  navigation: NativeStackNavigationProp<AuthStackParamList>;
+}) => {
 
+  // States
   const [isSensorAvailable, checkSensor] = useState(false);
   const [isSuccessful, checkSecureIDAuth] = useState(false);
 
@@ -40,16 +35,13 @@ function SecurityScreen({navigation}) {
 
   useEffect(() => {
     isSecureIDAvailable();
-    dispatch(fetchToken());
   }, []);
 
   function enableSecureID() {
-
     if (isSensorAvailable) {
       if (Platform.OS === 'ios') {
         FingerprintScanner.authenticate({
-          description:
-            'Scan your fingerprint on the device scanner to continue',
+          description: 'Scan your fingerprint on the device scanner to continue',
         })
           .then(() => {
             checkSecureIDAuth(true);
@@ -59,11 +51,6 @@ function SecurityScreen({navigation}) {
           })
           .catch((error) => {
             setShowPinCodeModal(true);
-            // if (Platform.OS === 'ios') {
-            //   Alert.alert('Failed to Authenticate Secure ID');
-            // } else {
-            //   Alert.alert('Secure ID Authentication Failed', error.message);
-            // }
           });
       } else {
         if (requiresLegacyAuthentication()) {
@@ -98,19 +85,11 @@ function SecurityScreen({navigation}) {
       title: 'Log in with Secure ID to continue',
     })
       .then(() => {
-        // this.props.handlePopupDismissedLegacy();
-
         checkSecureIDAuth(true);
-        // nextHandler();
       })
       .catch((error) => {
         //set OTP also
         setShowPinCodeModal(true);
-        // if (Platform.OS === 'ios') {
-        //   AlertIOS.alert('Failed to Authenticate Secure ID');
-        // } else {
-        //   Alert.alert('Secure ID Authentication Failed', error.message);
-        // }
         checkSecureIDAuth(false);
       });
   }
@@ -128,11 +107,6 @@ function SecurityScreen({navigation}) {
       })
       .catch((error) => {
         setShowPinCodeModal(true);
-        // if (Platform.OS === 'ios') {
-        //   AlertIOS.alert('Failed to Authenticate Secure ID');
-        // } else {
-        //   Alert.alert('Secure ID Authentication Failed', error.message);
-        // }
         checkSecureIDAuth(false);
       });
   }
@@ -169,9 +143,9 @@ function SecurityScreen({navigation}) {
     if (pincode != confirmPincode) {
       showMessage(
         'Zada Wallet',
-        'Pincode and confirm pincode are not same. Please check them carefully',
+        'Pincode and confirm pincode are not same. Please check them carefully'
       );
-      return
+      return;
     }
 
     // Saving pincode in async
@@ -182,13 +156,13 @@ function SecurityScreen({navigation}) {
       setShowPinCodeModal(false);
       showMessage(
         'Zada Wallet',
-        'Your pincode is set successfully. Please keep it safe and secure.',
+        'Your pincode is set successfully. Please keep it safe and secure.'
       );
       setPincode('');
       setConfirmPincode('');
       navigation.navigate('NotifyMeScreen');
     } catch (error) {
-      showMessage('Zada Wallet', error.toString());
+      showMessage('Zada Wallet', error?.toString());
     }
   };
 
@@ -205,7 +179,6 @@ function SecurityScreen({navigation}) {
           flex: 4,
           alignItems: 'center',
           justifyContent: 'center',
-          textAlign: 'center',
         }}>
         <Text style={styles.TextContainerHead}>Be Secure</Text>
 
@@ -215,27 +188,24 @@ function SecurityScreen({navigation}) {
                 your account will be compromised in case your phone is lost or stolen."
         />
       </View>
-      <View style={{flex: 2, alignItems: 'center', justifyContent: 'center'}}>
+      <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBoxComponent source={img} />
       </View>
-      <View style={{flex: 3, alignItems: 'center', justifyContent: 'center'}}>
-        <GreenPrimaryButton
-          text="ENABLE SECURE ID"
-          nextHandler={enableSecureID}
-        />
+      <View style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}>
+        <GreenPrimaryButton text="ENABLE SECURE ID" nextHandler={enableSecureID} />
       </View>
-      
+
       {/* PinCode Modal */}
       <PincodeModal
         isVisible={showPincodeModal}
         pincode={pincode}
-        onPincodeChange={(text) => {
+        onPincodeChange={(text: string) => {
           setPincode(text);
           if (text.length == 0) setPincodeError('');
         }}
         pincodeError={pincodeError}
         confirmPincode={confirmPincode}
-        onConfirmPincodeChange={(text) => {
+        onConfirmPincodeChange={(text: string) => {
           setConfirmPincode(text);
           if (text.length == 0) setConfirmPincodeError('');
         }}
@@ -247,7 +217,7 @@ function SecurityScreen({navigation}) {
       />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   TextContainerHead: {
@@ -259,10 +229,5 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
 });
-
-SecurityScreen.defaultProps = {
-  isSensorAvailable: false,
-  isSuccessful: false,
-};
 
 export default SecurityScreen;

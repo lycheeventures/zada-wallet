@@ -15,12 +15,13 @@ import { showNetworkMessage, _showAlert } from '../helpers/Toast';
 import BackButton from '../components/Buttons/BackButton';
 import { _sendPasswordResetAPI } from '../gateways/auth';
 import { analytics_log_reset_password } from '../helpers/analytics';
-import useNetwork from '../hooks/useNetwork';
 import { _handleAxiosError } from '../helpers/AxiosResponse';
+import { useAppSelector } from '../store';
+import { selectNetworkStatus } from '../store/app/selectors';
 
 const ForgotPasswordScreen = ({ navigation }) => {
 
-    const { isConnected } = useNetwork();
+    const networkStatus = useAppSelector(selectNetworkStatus);
     const [phone, setPhone] = useState('');
     const phoneInput = useRef(null);
     const [isLoading, setLoading] = useState(false);
@@ -28,7 +29,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
     // Send reset password link to inputted phone
     const _onSendClick = async () => {
         try {
-            if (isConnected) {
+            if (networkStatus === 'connected') {
                 // Check if phone number is valid
                 const checkValid = phoneInput.current?.isValidNumber(phone);
                 if (!checkValid) {
