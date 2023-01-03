@@ -19,6 +19,10 @@ var timeFormats = [
   "YYYY-MM-DD[T]HH:mm:ss",
   "MM-DD-YYYY[T]HH:mm:ss",
   "DD-MM-YYYY[T]HH:mm:ss",
+  // without ss[z]
+  "YYYY-MM-DD[T]HH:mm",
+  "MM-DD-YYYY[T]HH:mm",
+  "DD-MM-YYYY[T]HH:mm",
   // with forward slash
   "YYYY/MM/DD HH:mm:ss",
   "MM/DD/YYYY HH:mm:ss",
