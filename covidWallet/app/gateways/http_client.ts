@@ -15,6 +15,7 @@ const url_arr = [
   '/api/register',
   '/api/resend_codes',
   '/api/recover',
+  '/api/reactivate',
   '/api/validateOTPs',
   '/api/wallet/create',
 ];
@@ -163,10 +164,9 @@ const setup = (store: any) => {
         }
         // Error handling
         if (!axios.isCancel(error)) {
-          // on cancel.
+          // Error message handling.
+          handleErrorMessage(error);
         }
-        // Error message handling.
-        handleErrorMessage(error);
         
         return Promise.reject(error);
       } else {

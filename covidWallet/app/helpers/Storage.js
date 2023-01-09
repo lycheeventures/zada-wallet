@@ -19,6 +19,19 @@ export const getPassCode = async () => {
   }
 };
 
+export const saveItemInLocalStorage = async (key, value) => {
+  return await AsyncStorage.setItem(key, JSON.stringify(value));
+};
+
+export const getItemFromLocalStorage = async (key) => {
+  try {
+    let value = await AsyncStorage.getItem(key);
+    return JSON.parse(value);
+  } catch (e) {
+    return null;
+  }
+};
+
 export const saveItem = async (key, value) => {
   return await AsyncStorage.setItem(key, value);
 };

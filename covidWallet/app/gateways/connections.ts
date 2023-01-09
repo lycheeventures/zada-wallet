@@ -67,7 +67,7 @@ export async function invalidateCache() {
   try {
     const result = await http_client({
       method: 'POST',
-      url: '/api/credential/invalidate_cache',
+      url: '/api/connection/invalidate_cache',
     });
     return result;
   } catch (error) {
