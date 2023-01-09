@@ -1,24 +1,33 @@
 import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { btoa, atob } from 'react-native-quick-base64';
 
-export const capitalizeFirstLetter = (str) => {
+export const capitalizeFirstLetter = (str: string) => {
   if (!str) {
     str = '';
   }
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export const sortValuesByKey = (values) => {
+export const sortValuesByKey = (values: any) => {
   return Object.keys(values)
     .sort()
-    .reduce((obj, key) => {
+    .reduce((obj: any, key) => {
       obj[key] = values[key];
       return obj;
     }, {});
 };
 
+export const convertStringToBase64 = (str: string) => {
+  return btoa(str);
+};
+
+export const convertBase64ToString = (str: string) => {
+  return atob(str);
+};
+
 // Get secure items from storage.
-export const getSecureItems = async (key) => {
+export const getSecureItems = async () => {
   try {
     // Retrieve the credentials
     let credentials = await Keychain.getInternetCredentials('Server');
@@ -31,7 +40,7 @@ export const getSecureItems = async (key) => {
 };
 
 // Store secure items in storage.
-export const storeSecureItems = async (key, value) => {
+export const storeSecureItems = async (key: string, value: any) => {
   try {
     value = JSON.stringify(value);
     await Keychain.setInternetCredentials('Server', key, value);

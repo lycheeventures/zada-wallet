@@ -208,10 +208,49 @@ export const fetch_signature_by_cred_id = async (credentialId: string, values: O
   }
 };
 
-export async function get_credential_template(credDef: string) {
+export async function get_encrypted_credential(credentialId: string, hash: string) {
   try {
     let params = {
-      credDef,
+      credentialId,
+      hash,
+    };
+    const result = await http_client({
+      method: 'GET',
+      url: '/api/credential/get_encrypted_credential',
+      params,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function save_encrypted_credential(
+  credentialId: string,
+  encryptedString: string,
+  hash: string
+) {
+  try {
+    let data = {
+      credentialId,
+      encryptedString,
+      hash: hash,
+    };
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/credential/save_encrypted_credential',
+      data,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function get_credential_template(name: string) {
+  try {
+    let params = {
+      fileName: name,
     };
     const result = await http_client({
       method: 'GET',

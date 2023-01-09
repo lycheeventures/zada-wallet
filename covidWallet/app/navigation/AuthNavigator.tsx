@@ -7,18 +7,25 @@ import { AuthStack } from './types';
 // Screens
 import IntroScreen from '../screens/IntroScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
-import AuthScreen from '../screens/auth/AuthScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import PassCodeContainer from '../containers/PassCodeContainer';
 import SecureidContainer from '../containers/SecureIdContainer';
 import NotifyMeScreen from '../screens/NotifyMeScreen';
 import SecurityScreen from '../screens/SecurityScreen';
 import MultiFactorScreen from '../screens/MultiFactorScreen';
+import RegistrationScreen from '../screens/auth/RegistrationScreen';
+import LoginScreen from '../screens/auth/LoginScreen';
 
 const navigationAnimation =
   Platform.OS == 'ios'
     ? TransitionPresets.DefaultTransition
     : TransitionPresets.RevealFromBottomAndroid;
+
+const fadeNavigationConfig = ({ current }) => ({
+  cardStyle: {
+    opacity: current.progress,
+  },
+});
 
 const AuthNavigator = () => {
   return (
@@ -33,7 +40,16 @@ const AuthNavigator = () => {
         name="WelcomeScreen"
         component={WelcomeScreen}
       />
-      <AuthStack.Screen options={{ headerShown: false }} name="AuthScreen" component={AuthScreen} />
+      <AuthStack.Screen
+        options={{ headerShown: false, cardStyleInterpolator: fadeNavigationConfig }}
+        name="RegistrationScreen"
+        component={RegistrationScreen}
+      />
+      <AuthStack.Screen
+        options={{ headerShown: false, cardStyleInterpolator: fadeNavigationConfig }}
+        name="LoginScreen"
+        component={LoginScreen}
+      />
       <AuthStack.Screen
         options={{ headerShown: false }}
         name="ForgotPasswordScreen"

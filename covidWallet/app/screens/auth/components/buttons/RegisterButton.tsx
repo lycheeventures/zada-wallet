@@ -4,7 +4,7 @@ import { GREEN_COLOR } from '../../../../theme/Colors';
 
 interface INProps {
   onPress: () => void;
-  activeOption: 'register' | 'login';
+  screen: 'register' | 'login';
 }
 
 const RegisterButton = (props: INProps) => {
@@ -13,14 +13,14 @@ const RegisterButton = (props: INProps) => {
       <Image
         style={[
           styles.imageStyle,
-          { tintColor: props.activeOption == 'register' ? GREEN_COLOR : 'grey' },
+          { tintColor: props.screen == 'register' ? GREEN_COLOR : 'grey' },
         ]}
         source={require('../../../../assets/images/register.png')}
       />
       <Text style={styles.textStyle}>Register Account</Text>
       <View
         style={{
-          borderBottomColor: props.activeOption == 'register' ? GREEN_COLOR : 'grey',
+          borderBottomColor: props.screen == 'register' ? GREEN_COLOR : 'grey',
           borderBottomWidth: 4,
         }}
       />

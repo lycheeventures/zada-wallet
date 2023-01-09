@@ -6,13 +6,17 @@ import { ICredentialObject } from '../store/credentials/interface';
 export type AuthStackParamList = {
   IntroScreen: undefined;
   WelcomeScreen: undefined;
-  AuthScreen: undefined;
+  RegistrationScreen: undefined;
+  LoginScreen: undefined;
   ForgotPasswordScreen: undefined;
-  MultiFactorScreen: { from: 'Register' | 'Login' };
+  MultiFactorScreen: { from: 'Register' | 'Login'; user: Object };
   PassCodeContainer: undefined;
-  SecurityScreen: { navigation: NativeStackNavigationProp<AuthStackParamList> };
+  SecurityScreen: {
+    navigation: NativeStackNavigationProp<AuthStackParamList>;
+    user: Object;
+  };
   SecureidContainer: undefined;
-  NotifyMeScreen: undefined;
+  NotifyMeScreen: { user: Object };
 };
 
 export type MainStackParamList = {
@@ -22,7 +26,6 @@ export type MainStackParamList = {
   AboutUs: undefined;
   ProfileScreen: undefined;
   CredDetailScreen: { data: ICredentialObject };
-  AuthScreen: undefined;
   QRScreen: undefined;
 };
 

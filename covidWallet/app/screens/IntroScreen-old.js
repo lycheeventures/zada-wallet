@@ -48,10 +48,13 @@ function IntroScreen({ navigation }) {
           scrollEnabled={false}>
           {Slides.map((item, index) => {
             let imageStyle = styles.swiperImage;
+            if (index === 0) {
+              imageStyle = styles.swiperImage0;
+            }
             return (
               <View style={styles.slide1} key={'id' + index}>
                 <View style={styles.imageViewStyle}>
-                  <Image resizeMode="cover" style={imageStyle} source={item.image} />
+                  <Image resizeMode="center" style={imageStyle} source={item.image} />
                 </View>
                 <View style={styles.textViewStyle}>
                   <Text style={styles.swiperTitle}>{item.title}</Text>
@@ -120,6 +123,11 @@ const styles = StyleSheet.create({
 
   swiperImage: {
     width: 280,
+    height: 250,
+    backgroundColor: 'white',
+  },
+  swiperImage0: {
+    width: 200,
     height: 250,
     backgroundColor: 'white',
   },

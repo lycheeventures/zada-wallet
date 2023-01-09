@@ -1,93 +1,53 @@
-import jwt_decode from 'jwt-decode';
-import { RootState } from '..';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AuthAPI, throwErrorIfExist } from '../../gateways';
 import { navigationRef } from '../../navigation/utils';
-import { updateTempVar } from '.';
-import { storeSecureItems } from '../../helpers/utils';
-
-export const fetchToken = createAsyncThunk(
-  'auth/fetchToken',
-  async (
-    args: { secret: string | undefined; tempUserId?: string | undefined },
-    { getState, dispatch }
-  ) => {
-    try {
-      // Current State
-      let { secret, tempUserId } = args;
-      let { auth } = getState() as RootState;
-      let userId = auth.user.id || '';
-
-      // If userid is passed
-      if (tempUserId) {
-        userId = tempUserId;
-      }
-
-      let walletSecret;
-      if (secret != undefined) {
-        walletSecret = secret;
-      } else {
-        walletSecret = auth.user.walletSecret ? auth.user.walletSecret : '';
-      }
-
-      let response = await AuthAPI.authenticate(userId, walletSecret);
-      if (response.data.success) {
-        // saving token in secure storage
-        await storeSecureItems('TOKEN', response.data.token);
-
-        const decodedAuthToken = jwt_decode(response.data.token);
-        if (decodedAuthToken?.dub?.length) {
-          return response.data;
-        } else {
-          await dispatch(createWallet(response.data.token));
-        }
-      } else {
-        throw 'Authentication failed!';
-      }
-    } catch (e) {
-      throwErrorIfExist(e);
-    }
-  }
-);
+import { updateAuthStatus } from '.';
+import { showAskDialog, _showAlert } from '../../helpers';
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async (args: { phone: string; secret: string }) => {
-    try {
-      let { phone, secret } = args;
-      let response = await AuthAPI.login(phone, secret);
-      let data = {
-        success: undefined,
-        userId: undefined,
-        walletSecret: secret,
-        type: undefined,
-        token: undefined,
-        verified: undefined,
-      };
+  async (args: { phone: string; secret: string }, { dispatch }) => {
+    let { phone, secret } = args;
+    let response = await AuthAPI.login(phone, secret);
+    let data = response?.data;
 
-      // If success then authenticate user.
-      if (response?.data.success) {
-        data = {
-          success: response?.data.success,
-          userId: response?.data.userId,
-          walletSecret: secret,
-          type: response?.data.type,
-          verified: response?.data.verified,
-          token: undefined,
-        };
-        if (response?.data.verified) {
-          let authResp = await AuthAPI.authenticate(response?.data.userId, secret);
-          data = {
-            ...data,
-            token: authResp.data.token,
-          };
+    // Check status
+    if (data.status != undefined) {
+      if (data.status === 'deleted') {
+        // deleted user.
+      } else if (data.status === 'inactive') {
+        showAskDialog(
+          'Re-activate Account',
+          'Do you want to re-activate your account?',
+          () => dispatch(reactivateUserAccount({ phone })),
+          () => {
+            dispatch(updateAuthStatus('idle'));
+          },
+          'Re-activate',
+          'default',
+          'Cancel',
+          'destructive'
+        );
+      }
+    } else {
+      if (data.verified) {
+        if (data.type === 'demo') {
+          navigationRef.navigate('SecurityScreen', {
+            navigation: navigationRef,
+            user: { ...data, secret: secret },
+          });
+          dispatch(updateAuthStatus('idle'));
+          return;
         }
       }
 
-      return data;
-    } catch (e) {
-      throwErrorIfExist(e);
+      navigationRef.navigate('MultiFactorScreen', {
+        from: 'Login',
+        user: { ...data, secret: secret },
+      });
+      dispatch(updateAuthStatus('idle'));
     }
+    return data.success;
   }
 );
 
@@ -97,24 +57,19 @@ export const registerUser = createAsyncThunk(
     try {
       let { name, phone, secret } = args;
       let response = await AuthAPI._registerUserAPI(name, phone, secret);
-      let data = response.data;
-      // Handling new and unverified user.
-      if (!data.verified) {
-        await dispatch(
-          updateTempVar({
-            isNew: true,
-            type: data.type,
-            id: data.userId,
-            walletSecret: secret,
-            auto_accept_connection: true,
-          })
-        );
+      let data = response?.data;
+      if (data.status == 'inactive') {
+        _showAlert('ZADA Wallet', 'User already exist!');
+        dispatch(updateAuthStatus('idle'));
+        return;
       }
 
-      return {
-        success: data.success,
-        type: data.type,
-      };
+      navigationRef.navigate('MultiFactorScreen', {
+        from: 'Register',
+        user: { ...data, secret: secret },
+      });
+
+      return response.data;
     } catch (e) {
       throwErrorIfExist(e);
     }
@@ -128,3 +83,28 @@ export const createWallet = createAsyncThunk('auth/createWallet', async (token: 
     throwErrorIfExist(e);
   }
 });
+
+export const reactivateUserAccount = createAsyncThunk(
+  'auth/reactivateUserAccount',
+  async (args: { phone: string }) => {
+    try {
+      let { phone } = args;
+      let response = await AuthAPI.reactivateAccount(phone);
+      return response?.data;
+    } catch (e) {
+      throwErrorIfExist(e);
+    }
+  }
+);
+
+export const deleteUserAccount = createAsyncThunk(
+  'auth/deleteUserAccount',
+  async (args: { phone: string }) => {
+    try {
+      let response = await AuthAPI.deleteAccount();
+      return response?.data;
+    } catch (e) {
+      throwErrorIfExist(e);
+    }
+  }
+);
