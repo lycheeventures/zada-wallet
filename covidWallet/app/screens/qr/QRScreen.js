@@ -10,12 +10,12 @@ import SuccessModal from './components/SuccessModal';
 import { useAppDispatch, useAppSelector } from '../../store';
 import ConstantsList from '../../helpers/ConfigApp';
 import { getType, handleCredVerification, handleQRConnectionRequest, handleQRLogin } from './utils';
-import { VerificationAPI } from '../../gateways';
-import { showOKDialog, _showAlert } from '../../helpers/Toast';
+import { CredentialAPI, VerificationAPI } from '../../gateways';
+import { showAskDialog, showOKDialog, _showAlert } from '../../helpers/Toast';
 import { selectConnections, selectConnectionsStatus } from '../../store/connections/selectors';
 import { acceptConnection } from '../../store/connections/thunk';
 import { addAction } from '../../store/actions';
-import { selectAutoAcceptConnection } from '../../store/auth/selectors';
+import { selectAutoAcceptConnection, selectUser } from '../../store/auth/selectors';
 
 const defaultCredState = { type: 'none', credentials: [] };
 
@@ -27,6 +27,7 @@ const QRScreen = ({ route, navigation }) => {
   const connections = useAppSelector(selectConnections.selectAll);
   const connectionStatus = useAppSelector(selectConnectionsStatus);
   const auto_accept_connection = useAppSelector(selectAutoAcceptConnection);
+  const user = useAppSelector(selectUser);
 
   // States
   const [scan, setScan] = useState(true);
@@ -153,7 +154,30 @@ const QRScreen = ({ route, navigation }) => {
         try {
           qrJSON = JSON.parse(e.data);
         } catch (error) {
-          throw 'Not a valid ZADA QR';
+          let isUrl = e.data.startsWith('https://');
+          if (isUrl) {
+            //  Sending Link
+            setScan(false);
+            showAskDialog(
+              'ZADA',
+              'Do you want to receive this as credential?',
+              async () => {
+                let resp = await CredentialAPI.submit_url_scheme(e.data, user.phone);
+                if (resp.data.success) {
+                  showOKDialog('ZADA', 'You will receive credential soon!', navigateToMainScreen);
+                  return;
+                } else {
+                  navigateToMainScreen();
+                  throw 'Not a valid ZADA QR';
+                }
+              },
+              navigateToMainScreen
+            );
+            return;
+          } else {
+            navigateToMainScreen();
+            throw 'Not a valid ZADA QR';
+          }
         }
 
         if (qrJSON.type === ConstantsList.CONN_REQ) {

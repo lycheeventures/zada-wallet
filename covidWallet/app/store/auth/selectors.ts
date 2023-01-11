@@ -13,7 +13,6 @@ export const trueSelector = createSelector([], () => true);
 export const selectToken = (s: RootState) => s.auth.token;
 
 export const selectUser = (s: RootState) => s.auth.user;
-export const selectTempVar = (state: RootState) => state.auth.tempVar;
 
 export const selectAutoAcceptConnection = (state: RootState) =>
   state.auth.user.auto_accept_connection;
