@@ -11,11 +11,12 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import ConstantsList from '../../helpers/ConfigApp';
 import { getType, handleCredVerification, handleQRConnectionRequest, handleQRLogin } from './utils';
 import { VerificationAPI } from '../../gateways';
-import { showOKDialog, _showAlert } from '../../helpers/Toast';
+import { showNetworkMessage, showOKDialog, _showAlert } from '../../helpers/Toast';
 import { selectConnections, selectConnectionsStatus } from '../../store/connections/selectors';
 import { acceptConnection } from '../../store/connections/thunk';
 import { addAction } from '../../store/actions';
 import { selectAutoAcceptConnection } from '../../store/auth/selectors';
+import { selectNetworkStatus } from '../../store/app/selectors';
 
 const defaultCredState = { type: 'none', credentials: [] };
 
@@ -27,6 +28,7 @@ const QRScreen = ({ route, navigation }) => {
   const connections = useAppSelector(selectConnections.selectAll);
   const connectionStatus = useAppSelector(selectConnectionsStatus);
   const auto_accept_connection = useAppSelector(selectAutoAcceptConnection);
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
   // States
   const [scan, setScan] = useState(true);
@@ -120,6 +122,12 @@ const QRScreen = ({ route, navigation }) => {
   const _handleQRScan = useCallback(
     async (e, isLink) => {
       try {
+        // Return if internet is unavailable
+        if (networkStatus === 'disconnected') {
+          showNetworkMessage();
+          navigateToMainScreen();
+          return;
+        }
         if (!isLink) {
           let type = getType(e.data);
 
@@ -206,7 +214,7 @@ const QRScreen = ({ route, navigation }) => {
         console.log(error);
       }
     },
-    [auto_accept_connection, connections, dispatch, navigateToMainScreen]
+    [auto_accept_connection, connections, dispatch, navigateToMainScreen, networkStatus]
   );
 
   // Accept modal handler

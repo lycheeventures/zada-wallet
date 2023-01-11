@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { Platform } from 'react-native';
+import Share from 'react-native-share';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import { CredentialAPI } from '../../gateways';
 import { parse_date_time } from '../../helpers';
@@ -16,6 +17,20 @@ export const generatePDF = async (html: any) => {
   let file = await RNHTMLtoPDF.convert(options);
 
   return { url: Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath };
+};
+
+// Generating and sharing pdf
+export const sharePDF = async (htmlStr: any) => {
+  let result = await generatePDF(htmlStr);
+  const shareOptions = {
+    title: 'Credential',
+    url: result.url,
+  };
+  try {
+    await Share.open(shareOptions);
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getCredentialTemplate = async (schemaId: string, credDef: string) => {
