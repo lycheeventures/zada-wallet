@@ -6,6 +6,7 @@ import { ResponseCodesEnum } from '../enums';
 import { showOKDialog, _showAlert } from '../helpers';
 import { clearAll } from '../store/utils';
 import { store } from '../store';
+import { navigationRef } from '../navigation/utils';
 
 // Exception List
 const exceptionList = ['The specified key does not exist.'];
@@ -16,6 +17,7 @@ const SERVER_TIMEOUT = 'The operation could not be completed. Please try again!'
 const INVALID_TOKEN = 'Your Session has expired. Please login again.';
 const INVALID_PARAMS = 'Invalid parameters!';
 const ALREADY_EXIST = 'Already exist in database';
+const QR_ERROR = 'Not a valid ZADA QR';
 
 export function throwErrorIfExist(error: any) {
   if (error?.response?.data.error) {
@@ -58,6 +60,12 @@ export function handleErrorMessage(error: any) {
     return;
   }
 
+  if (error.response.data.error === 'Unsupported URL!') {
+    showOKDialog('ZADA', QR_ERROR, async () => navigationRef.navigate('MainScreen'));
+    return;
+  }
+
+  console.log('showing error => ', error.response.data)
   _showAlert('Error', error.response.data.error);
 }
 

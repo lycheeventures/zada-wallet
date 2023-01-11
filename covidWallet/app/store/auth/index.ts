@@ -18,14 +18,7 @@ export const AuthState: IAuthState = {
     isNew: true,
     id: undefined,
     walletSecret: undefined,
-    type: undefined,
-    auto_accept_connection: true,
-    status: undefined,
-  },
-  tempVar: {
-    isNew: true,
-    id: undefined,
-    walletSecret: undefined,
+    phone: undefined,
     type: undefined,
     auto_accept_connection: true,
     status: undefined,
@@ -49,11 +42,6 @@ const slice = createSlice({
     updateUser: (state, action: PayloadAction<IUserState | undefined>) => {
       if (action.payload) {
         state.user = action.payload;
-      }
-    },
-    updateTempVar: (state, action) => {
-      if (action.payload) {
-        state.tempVar = action.payload;
       }
     },
     resetAuth: () => AuthState,
@@ -116,7 +104,6 @@ const slice = createSlice({
 export const {
   updateToken,
   updateUser,
-  updateTempVar,
   updateAuthStatus,
   updateIsAuthorized,
   resetAuth,

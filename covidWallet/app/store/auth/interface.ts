@@ -3,6 +3,7 @@ export interface IUserState {
   isNew: boolean;
   id: Partial<string | undefined>;
   walletSecret: string | undefined;
+  phone: string | undefined,
   type: 'demo' | undefined;
   auto_accept_connection: boolean;
   status: 'deleted' | 'inactive' | undefined;
@@ -18,5 +19,4 @@ export interface IAuthState {
   };
   token: string | undefined;
   user: IUserState;
-  tempVar: IUserState;
 }

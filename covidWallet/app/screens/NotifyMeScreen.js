@@ -66,6 +66,7 @@ function NotifyMeScreen(props) {
       isNew: false,
       id: user.userId,
       walletSecret: user.secret,
+      phone: user.phone,
       type: user.type ? user.type : undefined,
       auto_accept_connection: true,
       status: user.status ? user.status : undefined,

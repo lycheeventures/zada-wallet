@@ -34,7 +34,7 @@ export const loginUser = createAsyncThunk(
         if (data.type === 'demo') {
           navigationRef.navigate('SecurityScreen', {
             navigation: navigationRef,
-            user: { ...data, secret: secret },
+            user: { ...data, phone, secret: secret },
           });
           dispatch(updateAuthStatus('idle'));
           return;
@@ -43,7 +43,7 @@ export const loginUser = createAsyncThunk(
 
       navigationRef.navigate('MultiFactorScreen', {
         from: 'Login',
-        user: { ...data, secret: secret },
+        user: { ...data, phone, secret: secret },
       });
       dispatch(updateAuthStatus('idle'));
     }
@@ -66,7 +66,7 @@ export const registerUser = createAsyncThunk(
 
       navigationRef.navigate('MultiFactorScreen', {
         from: 'Register',
-        user: { ...data, secret: secret },
+        user: { ...data, phone, secret: secret },
       });
 
       return response.data;
