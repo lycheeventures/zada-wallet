@@ -13,6 +13,7 @@ import {
   parse_date_time,
   showAskDialog,
   showMessage,
+  showNetworkMessage,
   _showAlert,
 } from '../../helpers';
 import { useAppDispatch, useAppSelector } from '../../store';
@@ -33,6 +34,7 @@ import {
 import { getItemFromLocalStorage, saveItemInLocalStorage } from '../../helpers/Storage';
 import { get_encrypted_credential, save_encrypted_credential } from '../../gateways/credentials';
 import { convertStringToBase64 } from '../../helpers/utils';
+import { selectNetworkStatus } from '../../store/app/selectors';
 
 interface IProps {
   route: any;
@@ -47,6 +49,7 @@ const CredDetailScreen = (props: IProps) => {
 
   // Selectors
   const credentialStatus = useAppSelector(selectCredentialsStatus);
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
   // States
   const [showQRModal, setShowQRModal] = useState(false);
@@ -106,10 +109,22 @@ const CredDetailScreen = (props: IProps) => {
     dispatch(removeCredentials(data.credentialId));
   }
 
+  const openQRModal = async (bool: boolean) => {
+    if (networkStatus === 'disconnected') {
+      showNetworkMessage();
+      return;
+    }
+
+    // Else generate QR code and open QR modal.
+    if (Object.keys(qrCode).length < 1) {
+      await generateQRCode();
+    }
+    setShowQRModal(bool);
+  };
+
   async function generateQRCode() {
     let encryptionKey = '';
     let hash = '';
-
     let isPDFAlreadyGenerated = await getItemFromLocalStorage(data.credentialId);
     if (!isPDFAlreadyGenerated) {
       encryptionKey = generateRandomSecret(64);
@@ -334,7 +349,7 @@ const CredDetailScreen = (props: IProps) => {
                 : undefined
             }
             organizationName={data.organizationName}
-            setShowQRModal={setShowQRModal}
+            setShowQRModal={openQRModal}
           />
         </View>
 
