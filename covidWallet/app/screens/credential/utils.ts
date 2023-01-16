@@ -61,7 +61,7 @@ export const getCredentialTemplate = async (schemaId: string, credDef: string) =
 export const replacePlaceHolders = (htmlStr: string, data: any, credentialDetails: any) => {
   Object.keys(data).forEach((e, i) => {
     htmlStr = htmlStr.replaceAll(
-      'placeholder_' + e.replaceAll(' ', '_').trim(),
+      '[placeholder_' + e.replaceAll(' ', '_').trim() + ']',
       parse_date_time(data[e])
     );
   });
