@@ -100,16 +100,13 @@ const CredDetailScreen = (props: IProps) => {
 
   useEffect(() => {
     // Generate QR Code
-    if (networkStatus === 'connected') {
-      if (Object.keys(qrCode).length < 1) {
-        generateQRCode();
-      }
+    if (Object.keys(qrCode).length < 1) {
+      generateQRCode();
     }
   }, [networkStatus]);
 
   // Functions
   async function generateQRCode() {
-    console.log('generateQRCode networkStatus => ', networkStatus);
     let encryptionKey = '';
     let hash = '';
     let isPDFAlreadyGenerated = await getItemFromLocalStorage(data.credentialId);
@@ -127,14 +124,17 @@ const CredDetailScreen = (props: IProps) => {
       saveItemInLocalStorage(data.credentialId, obj);
     } else {
       encryptionKey = isPDFAlreadyGenerated.key;
-      hash = isPDFAlreadyGenerated.hash;
-      let resp = await get_encrypted_credential(data.credentialId, hash);
-      if (resp.data.sucess) {
-        let encryptedCred = resp.data.credential.encryptedCredential;
-        // decrypting
-        await decryptAES256CBC(encryptedCred, encryptionKey);
-      }
     }
+    //  else {
+    //   encryptionKey = isPDFAlreadyGenerated.key;
+    //   hash = isPDFAlreadyGenerated.hash;
+    //   let resp = await get_encrypted_credential(data.credentialId, hash);
+    //   if (resp.data.sucess) {
+    //     let encryptedCred = resp.data.credential.encryptedCredential;
+    //     // decrypting
+    //     await decryptAES256CBC(encryptedCred, encryptionKey);
+    //   }
+    // }
 
     setQRCode({
       credentialId: data.credentialId,
@@ -229,11 +229,6 @@ const CredDetailScreen = (props: IProps) => {
   };
 
   const openQRModal = async (bool: boolean) => {
-    if (networkStatus === 'disconnected') {
-      showNetworkMessage();
-      return;
-    }
-    // Else open QR modal.
     setShowQRModal(bool);
   };
 
