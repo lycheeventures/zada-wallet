@@ -3,19 +3,18 @@ import { Dimensions, View, Text } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import QRCode from 'react-native-qrcode-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Share from 'react-native-share';
-import Config from 'react-native-config';
 
 import { BACKGROUND_COLOR, BLACK_COLOR, GRAY_COLOR, WHITE_COLOR } from '../../theme/Colors';
-import { generatePDF, getCredentialTemplate, replacePlaceHolders } from './utils';
+import { getCredentialTemplate, replacePlaceHolders, sharePDF } from './utils';
 import {
   get_local_issue_date,
   parse_date_time,
   showAskDialog,
   showMessage,
+  showNetworkMessage,
   _showAlert,
 } from '../../helpers';
-import { useAppDispatch, useAppSelector } from '../../store';
+import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import { selectCredentialsStatus } from '../../store/credentials/selectors';
 
 import OverlayLoader from '../../components/OverlayLoader';
@@ -33,6 +32,7 @@ import {
 import { getItemFromLocalStorage, saveItemInLocalStorage } from '../../helpers/Storage';
 import { get_encrypted_credential, save_encrypted_credential } from '../../gateways/credentials';
 import { convertStringToBase64 } from '../../helpers/utils';
+import { selectNetworkStatus } from '../../store/app/selectors';
 
 interface IProps {
   route: any;
@@ -42,11 +42,12 @@ interface IProps {
 const CredDetailScreen = (props: IProps) => {
   // Constants
   const data = props.route.params.data; // Credential
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch<AppDispatch>();
   const viewShotRef = useRef(null);
 
   // Selectors
   const credentialStatus = useAppSelector(selectCredentialsStatus);
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
   // States
   const [showQRModal, setShowQRModal] = useState(false);
@@ -55,6 +56,7 @@ const CredDetailScreen = (props: IProps) => {
   const [isGeneratingPDF, setGeneratingPDF] = useState(false);
 
   // Hooks
+  // Prevent screenshot
   usePreventScreenshot({ navigation: props.navigation });
 
   // Useeffects
@@ -65,13 +67,13 @@ const CredDetailScreen = (props: IProps) => {
     }
   }, [credentialStatus, props.navigation]);
 
-  // Setting delete Icon
+  // Setting header Icons
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
           <MaterialIcons
-            onPress={() => sharePDF()}
+            onPress={() => createAndSharePDF()}
             style={styles.headerRightIcon}
             size={25}
             name="share"
@@ -94,22 +96,19 @@ const CredDetailScreen = (props: IProps) => {
         </View>
       ),
     });
-  }, [qrCode]);
+  }, [qrCode, networkStatus]);
 
   useEffect(() => {
     // Generate QR Code
-    generateQRCode();
-  }, []);
+    if (Object.keys(qrCode).length < 1) {
+      generateQRCode();
+    }
+  }, [networkStatus]);
 
   // Functions
-  async function onSuccess() {
-    dispatch(removeCredentials(data.credentialId));
-  }
-
   async function generateQRCode() {
     let encryptionKey = '';
     let hash = '';
-
     let isPDFAlreadyGenerated = await getItemFromLocalStorage(data.credentialId);
     if (!isPDFAlreadyGenerated) {
       encryptionKey = generateRandomSecret(64);
@@ -125,14 +124,17 @@ const CredDetailScreen = (props: IProps) => {
       saveItemInLocalStorage(data.credentialId, obj);
     } else {
       encryptionKey = isPDFAlreadyGenerated.key;
-      hash = isPDFAlreadyGenerated.hash;
-      let resp = await get_encrypted_credential(data.credentialId, hash);
-      if (resp.data.sucess) {
-        let encryptedCred = resp.data.credential.encryptedCredential;
-        // decrypting
-        await decryptAES256CBC(encryptedCred, encryptionKey);
-      }
     }
+    //  else {
+    //   encryptionKey = isPDFAlreadyGenerated.key;
+    //   hash = isPDFAlreadyGenerated.hash;
+    //   let resp = await get_encrypted_credential(data.credentialId, hash);
+    //   if (resp.data.sucess) {
+    //     let encryptedCred = resp.data.credential.encryptedCredential;
+    //     // decrypting
+    //     await decryptAES256CBC(encryptedCred, encryptionKey);
+    //   }
+    // }
 
     setQRCode({
       credentialId: data.credentialId,
@@ -143,159 +145,96 @@ const CredDetailScreen = (props: IProps) => {
   }
 
   // Make and Share PDF
-  async function sharePDF() {
+  const createAndSharePDF = async () => {
+    // Return if internet is unavailable
+    if (networkStatus === 'disconnected') {
+      showNetworkMessage();
+      return;
+    }
+
     setGeneratingPDF(true);
+    try {
+      // Ordering data
+      const orderedData = Object.keys(data.values)
+        .sort()
+        .reduce((obj: any, key) => {
+          obj[key] = data.values[key];
+          return obj;
+        }, {});
 
-    // Ordering data
-    const orderedData = Object.keys(data.values)
-      .sort()
-      .reduce((obj: any, key) => {
-        obj[key] = data.values[key];
-        return obj;
-      }, {});
-
-    // Making html to be injected later as {key: value} pair.
-    let credentialDetails = Object.keys(orderedData).map((key, index) => {
-      let value = orderedData[key];
-      value = parse_date_time(value);
-      if (index % 3 === 0) {
-        return `
+      // Making html to be injected later as {key: value} pair.
+      let credentialDetails = Object.keys(orderedData).map((key, index) => {
+        let value = orderedData[key];
+        value = parse_date_time(value);
+        if (index % 3 === 0) {
+          return `
         <tr>
         <td class="tds">
           <p class="pt">${key}: <strong>${value}</strong></p>
         </td>`;
-      } else if ((index - 1) % 3 === 2) {
-        return `</tr>`;
-      } else {
-        return `
+        } else if ((index - 1) % 3 === 2) {
+          return `</tr>`;
+        } else {
+          return `
         <td class="tds">
           <p class="pt">${key}: <strong>${value}</strong></p>
         </td>`;
-      }
-    });
-
-    // Getting template
-    let template = await getCredentialTemplate(data.schemaId, data.definitionId);
-
-    // Making QR data.
-    let qrUrl = await new Promise(async (resolve, reject) => {
-      await fetch(
-        'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + JSON.stringify(qrCode)
-      ).then(async (resp) => {
-        let blob = await resp.blob();
-
-        resolve(
-          new Promise((resolve, reject) => {
-            let reader = new FileReader();
-            reader.onload = (event) => {
-              let base64String = event.target?.result;
-              resolve(base64String);
-            };
-            reader.readAsDataURL(blob);
-          })
-        );
+        }
       });
-    });
 
-    // Injecting data into template
-    let htmlStr = template.file;
-    htmlStr = replacePlaceHolders(
-      htmlStr,
-      {
-        ...orderedData,
-        qrUrl,
-        logo: data.imageUrl,
-        type: data.type,
-        organizationName: data.organizationName,
-      },
-      credentialDetails
-    );
+      // Getting template
+      let template = await getCredentialTemplate(data.schemaId, data.definitionId);
 
-    // Generating and sharing pdf
-    let result = await generatePDF(htmlStr);
-    const shareOptions = {
-      title: 'Credential',
-      url: result.url,
-    };
-    try {
+      // Making QR data.
+      let qrUrl = await new Promise(async (resolve, reject) => {
+        await fetch(
+          'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + JSON.stringify(qrCode)
+        ).then(async (resp) => {
+          let blob = await resp.blob();
+
+          resolve(
+            new Promise((resolve, reject) => {
+              let reader = new FileReader();
+              reader.onload = (event) => {
+                let base64String = event.target?.result;
+                resolve(base64String);
+              };
+              reader.readAsDataURL(blob);
+            })
+          );
+        });
+      });
+
+      // Injecting data into template
+      let htmlStr = template.file;
+      htmlStr = replacePlaceHolders(
+        htmlStr,
+        {
+          ...orderedData,
+          qrUrl,
+          logo: data.imageUrl,
+          type: data.type,
+          organizationName: data.organizationName,
+        },
+        credentialDetails
+      );
+
+      // Share PDF
+      await sharePDF(htmlStr);
       setGeneratingPDF(false);
-      await Share.open(shareOptions);
     } catch (error) {
       setGeneratingPDF(false);
       console.log('error', error);
     }
+  };
+
+  const openQRModal = async (bool: boolean) => {
+    setShowQRModal(bool);
+  };
+
+  async function onSuccess() {
+    dispatch(removeCredentials(data.credentialId));
   }
-  // // Make and Share PDF
-  // async function sharePDF() {
-  //   if (data.type === 'Authentication') {
-  //     _showAlert('Zada Wallet', 'You cannot share this type of Credential.');
-  //     return;
-  //   }
-
-  //   setGeneratingPDF(true);
-
-  //   // Getting hidden screenshot of QR.
-  //   let qrUrl = await viewShotRef.current?.capture();
-
-  //   // Ordering data
-  //   const orderedData = Object.keys(data.values)
-  //     .sort()
-  //     .reduce((obj: any, key) => {
-  //       obj[key] = data.values[key];
-  //       return obj;
-  //     }, {});
-
-  //   // Making html to be injected later as {key: value} pair.
-  //   let credentialDetails = Object.keys(orderedData).map((key, index) => {
-  //     let value = orderedData[key];
-  //     value = parse_date_time(value);
-  //     if (index % 3 === 0) {
-  //       return `
-  //       <tr>
-  //       <td class="tds">
-  //         <p class="pt">${key}: <strong>${value}</strong></p>
-  //       </td>`;
-  //     } else if ((index - 1) % 3 === 2) {
-  //       return `</tr>`;
-  //     } else {
-  //       return `
-  //       <td class="tds">
-  //         <p class="pt">${key}: <strong>${value}</strong></p>
-  //       </td>`;
-  //     }
-  //   });
-
-  //   // Getting template
-  //   let template = await getCredentialTemplate(data.schemaId, data.definitionId);
-
-  //   // Injecting data into template
-  //   let htmlStr = template.file;
-  //   htmlStr = replacePlaceHolders(
-  //     htmlStr,
-  //     {
-  //       ...orderedData,
-  //       qrUrl: qrUrl,
-  //       logo: data.imageUrl,
-  //       type: data.type,
-  //       organizationName: data.organizationName,
-  //     },
-  //     credentialDetails
-  //   );
-
-  //   // Generating and sharing pdf
-  //   let result = await generatePDF(htmlStr);
-  //   const shareOptions = {
-  //     title: 'Certificate',
-  //     url: result.url,
-  //   };
-  //   try {
-  //     setGeneratingPDF(false);
-  //     await Share.open(shareOptions);
-  //   } catch (error) {
-  //     setGeneratingPDF(false);
-  //     console.log('error', error);
-  //   }
-  // }
 
   return (
     <View style={styles.mainContainer}>
@@ -334,7 +273,7 @@ const CredDetailScreen = (props: IProps) => {
                 : undefined
             }
             organizationName={data.organizationName}
-            setShowQRModal={setShowQRModal}
+            setShowQRModal={openQRModal}
           />
         </View>
 
