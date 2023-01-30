@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 import { useAppDispatch } from '../store';
 import { updateNetworkStatus } from '../store/app';
