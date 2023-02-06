@@ -1,5 +1,14 @@
-import React, { useRef, useState } from 'react';
-import { View, Image, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  Linking,
+  Alert,
+} from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel-v4';
 import { AppColors } from '../theme/Colors';
 
@@ -47,9 +56,51 @@ const Slides = [
 const IntroScreen = (props: INProps) => {
   // States
   const [activeSlide, setActiveSlide] = useState(0);
+  const [deepLink, setDeepLink] = useState(false);
 
   // Refs
   const carouselRef = useRef(null);
+
+  useEffect(() => {
+    // Setting listener for deeplink
+    let deepEvent: any = undefined;
+    if (!deepLink) {
+      deepEvent = Linking.addEventListener('url', ({ url }) => {
+        getUrl(url);
+      });
+    }
+    return () => deepEvent && Linking.removeAllListeners('url');
+  }, []);
+
+  const getUrl = async (url: string) => {
+    let initialUrl = '';
+    if (url != undefined) {
+      initialUrl = url;
+    } else {
+      let initialUrl = await Linking.getInitialURL();
+    }
+    if (initialUrl === null) {
+      setDeepLink(true);
+      return;
+    } else {
+      const parsed = initialUrl.split('/');
+      var item = {
+        type: '',
+        metadata: '',
+      };
+      item['type'] = parsed[2];
+      item['metadata'] = parsed[3];
+      setDeepLink(true);
+
+      if (item['type'] === 'recovery') {
+        props.navigation.navigate('ResetPasswordScreen', { metadata: item['metadata'] });
+      }
+    }
+
+    if (initialUrl.includes('Details')) {
+      Alert.alert(initialUrl);
+    }
+  };
 
   const nextHandler = () => {
     props.navigation.navigate('WelcomeScreen');
