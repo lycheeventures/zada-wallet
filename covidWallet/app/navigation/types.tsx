@@ -9,6 +9,7 @@ export type AuthStackParamList = {
   RegistrationScreen: undefined;
   LoginScreen: undefined;
   ForgotPasswordScreen: undefined;
+  ResetPasswordScreen: { metadata: string };
   MultiFactorScreen: { from: 'Register' | 'Login'; user: Object };
   PassCodeContainer: undefined;
   SecurityScreen: {

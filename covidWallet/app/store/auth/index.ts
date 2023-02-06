@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { _showAlert } from '../../helpers';
 import { IAuthState, IUserState } from './interface';
-import { loginUser, reactivateUserAccount, registerUser } from './thunk';
+import { loginUser, reactivateUserAccount, registerUser, resetUserPassword } from './thunk';
 
 // State initialization
 export const AuthState: IAuthState = {
@@ -92,6 +92,23 @@ const slice = createSlice({
       state.status = 'failed';
       state.error = action?.error;
     });
+
+     // Reset Password.
+     builder.addCase(resetUserPassword.pending, (state, action) => {
+      if (state.status === 'idle') {
+        state.status = 'pending';
+      }
+    });
+    builder.addCase(resetUserPassword.fulfilled, (state, action) => {
+      if (action.payload?.success) {
+        state.status = 'succeeded';
+      }
+    });
+    builder.addCase(resetUserPassword.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action?.error;
+    });
+
 
     // Account re-activation
     builder.addCase(reactivateUserAccount.pending, (state, action) => {

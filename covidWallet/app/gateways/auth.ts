@@ -93,6 +93,23 @@ export const _sendPasswordResetAPI = async (phone: string) => {
   }
 };
 
+// Send password reset link
+export const resetPassword = async (password: string, metadata: string) => {
+  try {
+    const result = await http_client({
+      method: 'POST',
+      url: 'api/resetPassword',
+      data: {
+        password,
+        metadata,
+      },
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // api to fetch user profile data
 export const _fetchProfileAPI = async () => {
   try {

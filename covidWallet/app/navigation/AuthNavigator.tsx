@@ -8,6 +8,7 @@ import { AuthStack } from './types';
 import IntroScreen from '../screens/IntroScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import ResetPasswordScreen from '../screens/auth/ResetPasswordScreen';
 import PassCodeContainer from '../containers/PassCodeContainer';
 import SecureidContainer from '../containers/SecureIdContainer';
 import NotifyMeScreen from '../screens/NotifyMeScreen';
@@ -54,6 +55,11 @@ const AuthNavigator = () => {
         options={{ headerShown: false }}
         name="ForgotPasswordScreen"
         component={ForgotPasswordScreen}
+      />
+      <AuthStack.Screen
+        options={{ headerShown: false }}
+        name="ResetPasswordScreen"
+        component={ResetPasswordScreen}
       />
       <AuthStack.Screen
         options={{ headerShown: false }}

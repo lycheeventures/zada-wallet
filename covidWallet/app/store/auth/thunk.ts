@@ -108,3 +108,20 @@ export const deleteUserAccount = createAsyncThunk(
     }
   }
 );
+
+export const resetUserPassword = createAsyncThunk(
+  'auth/resetUserPassword',
+  async (args: { password: string; confirmPassword: string; metadata: string }) => {
+    try {
+      let { password, confirmPassword, metadata } = args;
+      let response = await AuthAPI.resetPassword(password, confirmPassword, metadata);
+      if (response?.data.success) {
+        _showAlert('Password Changed!', 'Your password has been changed successfully!');
+        navigationRef.goBack();
+      }
+      return response?.data;
+    } catch (e) {
+      throwErrorIfExist(e);
+    }
+  }
+);
