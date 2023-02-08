@@ -69,7 +69,7 @@ const IntroScreen = (props: INProps) => {
         getUrl(url);
       });
     }
-    return () => deepEvent && Linking.removeAllListeners('url');
+    return () => deepEvent && deepEvent;
   }, []);
 
   const getUrl = async (url: string) => {
