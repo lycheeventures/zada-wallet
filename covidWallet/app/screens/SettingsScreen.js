@@ -34,6 +34,11 @@ export default function SettingsScreen(props) {
   const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(autoAcceptConnection);
   const [version, setVersion] = useState(null);
 
+  // Set App Status to idle on load.
+  useEffect(() => {
+    dispatch(changeAppStatus('idle'));
+  }, [dispatch]);
+
   useEffect(() => {
     const updatevalues = async () => {
       let appVersion = JSON.parse((await getItem(APP_VERSION)) || null);
