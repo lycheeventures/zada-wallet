@@ -88,8 +88,8 @@ const IntroScreen = (props: INProps) => {
         type: '',
         metadata: '',
       };
-      item['type'] = parsed[2];
-      item['metadata'] = parsed[3];
+      item['type'] = parsed[3];
+      item['metadata'] = parsed[4];
       setDeepLink(true);
 
       if (item['type'] === 'recovery') {
@@ -184,10 +184,10 @@ const styles = StyleSheet.create({
     height: '70%',
   },
   primaryButton: {
-    borderColor: AppColors.GREEN_COLOR,
+    borderColor: AppColors.GREEN,
     borderWidth: 2,
     borderRadius: 20,
-    backgroundColor: AppColors.GREEN_COLOR,
+    backgroundColor: AppColors.GREEN,
     paddingTop: 10,
     paddingLeft: 20,
     paddingBottom: 10,

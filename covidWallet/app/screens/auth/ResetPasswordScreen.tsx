@@ -65,7 +65,7 @@ const ResetPasswordScreen = ({ route, navigation }) => {
     }
 
     // Execute API
-    dispatch(resetUserPassword({ password: secret, confirmPassword: confirmSecret, metadata }));
+    dispatch(resetUserPassword({ password: secret, metadata }));
   };
 
   return (

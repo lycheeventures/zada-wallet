@@ -109,15 +109,32 @@ export const deleteUserAccount = createAsyncThunk(
   }
 );
 
+export const validateUserOTP = createAsyncThunk(
+  'auth/validateUserOTP',
+  async (args: { code: string; userId: string; phone: string }) => {
+    try {
+      let { code, userId, phone } = args;
+      let response = await AuthAPI.validateOTP(code, userId, phone);
+      if (response?.data.success) {
+        navigationRef.navigate('ResetPasswordScreen', { metadata: response?.data.token });
+      }
+      return response?.data;
+    } catch (e) {
+      console.log('error => ', e);
+      throwErrorIfExist(e);
+    }
+  }
+);
+
 export const resetUserPassword = createAsyncThunk(
   'auth/resetUserPassword',
-  async (args: { password: string; confirmPassword: string; metadata: string }) => {
+  async (args: { password: string; metadata: string }) => {
     try {
-      let { password, confirmPassword, metadata } = args;
-      let response = await AuthAPI.resetPassword(password, confirmPassword, metadata);
+      let { password, metadata } = args;
+      let response = await AuthAPI.resetPassword(password, metadata);
       if (response?.data.success) {
         _showAlert('Password Changed!', 'Your password has been changed successfully!');
-        navigationRef.goBack();
+        navigationRef.navigate('LoginScreen');
       }
       return response?.data;
     } catch (e) {

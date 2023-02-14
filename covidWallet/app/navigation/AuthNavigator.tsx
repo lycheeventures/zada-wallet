@@ -16,6 +16,7 @@ import SecurityScreen from '../screens/SecurityScreen';
 import MultiFactorScreen from '../screens/MultiFactorScreen';
 import RegistrationScreen from '../screens/auth/RegistrationScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
+import OTPScreen from '../screens/otp/OTPScreen';
 
 const navigationAnimation =
   Platform.OS == 'ios'
@@ -66,6 +67,7 @@ const AuthNavigator = () => {
         name="MultiFactorScreen"
         component={MultiFactorScreen}
       />
+      <AuthStack.Screen options={{ headerShown: false }} name="OTPScreen" component={OTPScreen} />
       <AuthStack.Screen
         options={{ headerShown: false }}
         name="PassCodeContainer"

@@ -5,16 +5,21 @@ import PhoneInput from 'react-native-phone-number-input';
 import HeadingComponent from '../components/HeadingComponent';
 import { BACKGROUND_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
 import SimpleButton from '../components/Buttons/SimpleButton';
-import { showNetworkMessage, _showAlert } from '../helpers/Toast';
+import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
 import BackButton from '../components/Buttons/BackButton';
-import { _sendPasswordResetAPI } from '../gateways/auth';
-import { analytics_log_reset_password } from '../helpers/analytics';
-import { useAppSelector } from '../store';
+import { useAppDispatch, useAppSelector } from '../store';
 import { selectNetworkStatus } from '../store/app/selectors';
+import { AuthAPI } from '../gateways';
+import { validateUserOTP } from '../store/auth/thunk';
 
 const { width } = Dimensions.get('window');
+// KEYBOARD AVOIDING VIEW
+const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
+const keyboardBehaviour = Platform.OS === 'ios' ? 'padding' : null;
 
 const ForgotPasswordScreen = ({ navigation }) => {
+  // Constants
+  const dispatch = useAppDispatch();
   const networkStatus = useAppSelector(selectNetworkStatus);
   const [phone, setPhone] = useState('');
   const phoneInput = useRef(null);
@@ -30,20 +35,11 @@ const ForgotPasswordScreen = ({ navigation }) => {
           _showAlert('Zada Wallet', 'Please enter a valid phone number.');
           return;
         }
-
-        setLoading(true);
-
-        const result = await _sendPasswordResetAPI(phone);
-        if (result.data.success) {
-          analytics_log_reset_password();
-
-          navigation.goBack();
-          _showAlert('Zada Wallet', 'A password reset link has been sent to your number');
-        } else {
-          _showAlert('Zada Wallet', result.data.error);
-        }
-
-        setLoading(false);
+        navigation.navigate('OTPScreen', {
+          headingText: 'Multi Factor Authentication to keep you safe!',
+          sendCode,
+          validateCode,
+        });
       } else {
         setLoading(false);
         showNetworkMessage();
@@ -53,9 +49,35 @@ const ForgotPasswordScreen = ({ navigation }) => {
     }
   };
 
-  // KEYBOARD AVOIDING VIEW
-  const keyboardVerticalOffset = Platform.OS == 'ios' ? 100 : 0;
-  const keyboardBehaviour = Platform.OS == 'ios' ? 'padding' : null;
+  // Reset Password
+  const sendCode = async () => {
+    try {
+      if (networkStatus === 'connected') {
+        const result = await AuthAPI._resendOTPAPI(undefined, phone.trim(), 'phone');
+        if (result.data.success) {
+        } else {
+          _showAlert('Zada Wallet', result.data.error.toString());
+        }
+      } else {
+        showNetworkMessage();
+      }
+    } catch (error) {
+      _showAlert('Zada Wallet', error.toString());
+    }
+  };
+
+  // Validate OTP
+  const validateCode = async (code) => {
+    try {
+      if (networkStatus === 'connected') {
+        dispatch(validateUserOTP({ code, userId: undefined, phone }));
+      } else {
+        showNetworkMessage();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <View
@@ -114,7 +136,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
             loaderColor={WHITE_COLOR}
             onPress={_onSendClick}
             width={250}
-            title="SEND RESET LINK"
+            title="SEND CODE"
             titleColor={WHITE_COLOR}
             buttonColor={GREEN_COLOR}
             style={{
