@@ -8,6 +8,7 @@ import { AuthStack } from './types';
 import IntroScreen from '../screens/IntroScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import ResetPasswordScreen from '../screens/auth/ResetPasswordScreen';
 import PassCodeContainer from '../containers/PassCodeContainer';
 import SecureidContainer from '../containers/SecureIdContainer';
 import NotifyMeScreen from '../screens/NotifyMeScreen';
@@ -15,6 +16,7 @@ import SecurityScreen from '../screens/SecurityScreen';
 import MultiFactorScreen from '../screens/MultiFactorScreen';
 import RegistrationScreen from '../screens/auth/RegistrationScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
+import OTPScreen from '../screens/otp/OTPScreen';
 
 const navigationAnimation =
   Platform.OS == 'ios'
@@ -57,9 +59,15 @@ const AuthNavigator = () => {
       />
       <AuthStack.Screen
         options={{ headerShown: false }}
+        name="ResetPasswordScreen"
+        component={ResetPasswordScreen}
+      />
+      <AuthStack.Screen
+        options={{ headerShown: false }}
         name="MultiFactorScreen"
         component={MultiFactorScreen}
       />
+      <AuthStack.Screen options={{ headerShown: false }} name="OTPScreen" component={OTPScreen} />
       <AuthStack.Screen
         options={{ headerShown: false }}
         name="PassCodeContainer"

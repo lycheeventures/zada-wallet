@@ -9,7 +9,9 @@ export type AuthStackParamList = {
   RegistrationScreen: undefined;
   LoginScreen: undefined;
   ForgotPasswordScreen: undefined;
+  ResetPasswordScreen: { metadata: string };
   MultiFactorScreen: { from: 'Register' | 'Login'; user: Object };
+  OTPScreen: { headingText: string; sendCode: () => void; validateOTP: () => void };
   PassCodeContainer: undefined;
   SecurityScreen: {
     navigation: NativeStackNavigationProp<AuthStackParamList>;
