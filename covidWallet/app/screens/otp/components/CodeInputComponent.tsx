@@ -1,27 +1,30 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, ActivityIndicator } from 'react-native';
-import { _showAlert } from '../../../helpers';
+import { AuthAPI } from '../../../gateways';
+import { showNetworkMessage, _showAlert } from '../../../helpers';
+import { useAppSelector } from '../../../store';
+import { selectNetworkStatus } from '../../../store/app/selectors';
 import { AppColors } from '../../../theme/Colors';
 
 interface INProps {
-  sendCode: () => void;
   setCode: (code: string) => void;
+  phone: string;
 }
 
 const CodeInputComponent = (props: INProps) => {
   // Constant
-  const { setCode, sendCode } = props;
+  const { setCode, phone } = props;
+
+  // Selectors
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
   // States
   const [phoneMins, setPhoneMins] = useState(0);
-  const [phoneSecs, setPhoneSecs] = useState(59);
-  const [phoneTimeout, setPhoneTimeout] = useState(false);
+  const [phoneSecs, setPhoneSecs] = useState(0);
+  const [sendButtonText, setSendButtonText] = useState('Send Code');
+  const [phoneTimeout, setPhoneTimeout] = useState(true);
 
   const [phoneCodeLoading, setPhoneCodeLoading] = useState(false);
-
-  React.useEffect(() => {
-    sendCode();
-  }, []);
 
   // Effect for phone code countdown
   React.useEffect(() => {
@@ -44,11 +47,32 @@ const CodeInputComponent = (props: INProps) => {
   });
 
   // Function
-  const resendCode = () => {
+  const resendCode = async () => {
     setPhoneMins(1);
     setPhoneSecs(59);
     setPhoneTimeout(false);
-    sendCode();
+    await sendCode();
+    setSendButtonText('Send Again');
+  };
+
+  // Reset Password
+  const sendCode = async () => {
+    try {
+      if (networkStatus === 'connected') {
+        setPhoneCodeLoading(true);
+        const result = await AuthAPI._resendOTPAPI(undefined, phone, 'phone');
+        if (result.data.success) {
+          return;
+        } else {
+          _showAlert('Zada Wallet', result.data.error.toString());
+        }
+        setPhoneCodeLoading(false);
+      } else {
+        showNetworkMessage();
+      }
+    } catch (error: any) {
+      setPhoneCodeLoading(false);
+    }
   };
 
   return (
@@ -71,7 +95,7 @@ const CodeInputComponent = (props: INProps) => {
       {phoneTimeout ? (
         !phoneCodeLoading ? (
           <Text onPress={resendCode} style={styles._expireText}>
-            Send Again
+            {sendButtonText}
           </Text>
         ) : (
           <ActivityIndicator
