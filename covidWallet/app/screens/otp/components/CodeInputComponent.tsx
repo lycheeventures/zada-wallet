@@ -13,7 +13,7 @@ const CodeInputComponent = (props: INProps) => {
   const { setCode, sendCode } = props;
 
   // States
-  const [phoneMins, setPhoneMins] = useState(1);
+  const [phoneMins, setPhoneMins] = useState(0);
   const [phoneSecs, setPhoneSecs] = useState(59);
   const [phoneTimeout, setPhoneTimeout] = useState(false);
 
@@ -43,6 +43,14 @@ const CodeInputComponent = (props: INProps) => {
     return () => clearInterval(interval);
   });
 
+  // Function
+  const resendCode = () => {
+    setPhoneMins(1);
+    setPhoneSecs(59);
+    setPhoneTimeout(false);
+    sendCode();
+  };
+
   return (
     <View
       style={{
@@ -62,7 +70,7 @@ const CodeInputComponent = (props: INProps) => {
       </View>
       {phoneTimeout ? (
         !phoneCodeLoading ? (
-          <Text onPress={sendCode} style={styles._expireText}>
+          <Text onPress={resendCode} style={styles._expireText}>
             Send Again
           </Text>
         ) : (

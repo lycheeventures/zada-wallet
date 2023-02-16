@@ -209,9 +209,12 @@ const QRScreen = ({ route, navigation }) => {
           dispatch(acceptConnection(qrJSON.metadata));
         }
       } catch (error) {
-        _showAlert('ZADA Wallet', error);
+        if (error?.response?.status === 404) {
+          console.log('error');
+        } else {
+          _showAlert('ZADA Wallet', error);
+        }
         navigateToMainScreen();
-        console.log(error);
       }
     },
     [auto_accept_connection, connections, dispatch, navigateToMainScreen, networkStatus]

@@ -7,13 +7,13 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
 import { BIOMETRIC_ENABLED, APP_VERSION, PIN_CODE } from '../helpers/ConfigApp';
-import { showAskDialog, showMessage, showOKDialog } from '../helpers/Toast';
+import { showAskDialog, showMessage, showNetworkMessage, showOKDialog } from '../helpers/Toast';
 import { useAppDispatch, useAppSelector } from '../store';
 import { updateUser } from '../store/auth';
 import { changeAppStatus } from '../store/app';
 import { clearAll, deleteAccountAndClearAll } from '../store/utils';
 import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
-import { selectAppStatus } from '../store/app/selectors';
+import { selectAppStatus, selectNetworkStatus } from '../store/app/selectors';
 import useDevelopment from '../hooks/useDevelopment';
 import OverlayLoader from '../components/OverlayLoader';
 
@@ -25,6 +25,7 @@ export default function SettingsScreen(props) {
   const autoAcceptConnection = useAppSelector(selectAutoAcceptConnection);
   const user = useAppSelector(selectUser);
   const appStatus = useAppSelector(selectAppStatus);
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
   // hooks
   const { longPressCount, pressCount, buttonPressed, developmentMode, setDevelopmentMode } =
@@ -87,6 +88,11 @@ export default function SettingsScreen(props) {
   };
 
   const onLogoutPressed = async () => {
+    if (networkStatus === 'disconnected') {
+      showNetworkMessage();
+      return;
+    }
+
     showAskDialog(
       'Are you sure?',
       'Are you sure you want to log out?',
