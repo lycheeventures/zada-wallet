@@ -45,8 +45,10 @@ export const createEncryptor = ({ secretKey }) =>
     }
   );
 
-export const clearAll = async (dispatch) => {
-  await AuthAPI.unRegisterDeviceToken(Platform.OS);
+export const clearAll = async (dispatch, type) => {
+  if (type && type !== 'timeout') {
+    await AuthAPI.unRegisterDeviceToken(Platform.OS);
+  }
   resetLocalStorage();
   resetSecureItems();
   dispatch(resetAction());
