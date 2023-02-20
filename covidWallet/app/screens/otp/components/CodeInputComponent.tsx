@@ -61,9 +61,7 @@ const CodeInputComponent = (props: INProps) => {
       if (networkStatus === 'connected') {
         setPhoneCodeLoading(true);
         const result = await AuthAPI._resendOTPAPI(undefined, phone, 'phone');
-        if (result.data.success) {
-          return;
-        } else {
+        if (!result.data.success) {
           _showAlert('Zada Wallet', result.data.error.toString());
         }
         setPhoneCodeLoading(false);

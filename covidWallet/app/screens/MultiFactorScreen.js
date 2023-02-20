@@ -117,9 +117,7 @@ function MultiFactorScreen(props) {
       if (networkStatus === 'connected') {
         setPhoneCodeLoading(true);
         const result = await AuthAPI._resendOTPAPI(user.userId, undefined, 'phone');
-        if (result.data.success) {
-          return;
-        } else {
+        if (!result.data.success) {
           _showAlert('Zada Wallet', result.data.error.toString());
         }
         setPhoneCodeLoading(false);
