@@ -164,9 +164,13 @@ function ActionsScreen({ navigation }) {
       const requestJson = JSON.parse(JSON.stringify(item));
       setDeepLink(true);
 
-      navigation.navigate('QRScreen', {
-        request: requestJson,
-      });
+      if (item['type'] === 'connection_request') {
+        navigation.navigate('QRScreen', {
+          request: requestJson,
+        });
+      } else {
+        _showAlert('Zada Wallet', 'Invalid URL');
+      }
     }
 
     if (initialUrl.includes('Details')) {

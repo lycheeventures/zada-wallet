@@ -46,7 +46,7 @@ function MultiFactorScreen(props) {
   const [phoneCodeLoading, setPhoneCodeLoading] = useState(false);
 
   useLayoutEffect(() => {
-    _resendOTPAPI(user.userId, 'phone');
+    _resendOTPAPI(user.userId, undefined, 'phone');
   }, [user.userId]);
 
   // Effect for phone code countdown
@@ -105,7 +105,7 @@ function MultiFactorScreen(props) {
     try {
       if (networkStatus === 'connected') {
         setPhoneCodeLoading(true);
-        const result = await _resendOTPAPI(user.userId, 'phone');
+        const result = await _resendOTPAPI(user.userId, undefined, 'phone');
         if (result.data.success) {
           setPhoneTimeout(false);
           setPhoneMins(1);

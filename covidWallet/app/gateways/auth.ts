@@ -61,15 +61,16 @@ export const _registerUserAPI = async (name: string, phone: string, secretPhrase
 };
 
 // resend otp code api
-export const _resendOTPAPI = async (userID: string, type: string) => {
+export const _resendOTPAPI = async (
+  userId: string | undefined,
+  phone: string | undefined,
+  type: string
+) => {
   try {
     const result = await http_client({
       method: 'POST',
       url: '/api/resend_codes',
-      data: {
-        userId: userID,
-        type: type,
-      },
+      data: { userId, phone, type },
     });
     return result;
   } catch (error) {
@@ -85,6 +86,23 @@ export const _sendPasswordResetAPI = async (phone: string) => {
       url: '/api/recover',
       data: {
         phone,
+      },
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Send password reset link
+export const resetPassword = async (password: string, metadata: string) => {
+  try {
+    const result = await http_client({
+      method: 'POST',
+      url: 'api/resetPassword',
+      data: {
+        password,
+        metadata,
       },
     });
     return result;
@@ -121,11 +139,12 @@ export const _updateProfileAPI = async (data: Object) => {
 };
 
 // Validate OTP
-export async function validateOTP(phoneConfirmationCode: string, userId: string) {
+export async function validateOTP(code: string, userId: string, phone: string) {
   try {
     let obj = {
-      otpsms: phoneConfirmationCode,
+      otpsms: code,
       userId: userId,
+      phone: phone,
     };
 
     const result = await http_client({

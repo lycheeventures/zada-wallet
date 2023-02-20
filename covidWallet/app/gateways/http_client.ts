@@ -15,6 +15,7 @@ const url_arr = [
   '/api/register',
   '/api/resend_codes',
   '/api/recover',
+  'api/resetPassword',
   '/api/reactivate',
   '/api/validateOTPs',
   '/api/wallet/create',
