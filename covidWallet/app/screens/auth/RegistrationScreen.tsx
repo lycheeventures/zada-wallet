@@ -18,7 +18,6 @@ import ConstantsList from '../../helpers/ConfigApp';
 import { saveItem, getItem } from '../../helpers/Storage';
 import { showNetworkMessage, _showAlert } from '../../helpers/Toast';
 import { validatePasswordStrength } from '../../helpers/validation';
-import { _fetchingAppData } from '../../helpers/AppData';
 import { _handleAxiosError } from '../../helpers/AxiosResponse';
 
 import { _registerUserAPI } from '../../gateways/auth';
