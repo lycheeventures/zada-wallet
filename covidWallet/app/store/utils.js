@@ -1,4 +1,4 @@
-import createTransform from 'redux-persist/es/createTransform';
+import { createTransform } from 'reduxjs-toolkit-persist';
 import CryptoJS from 'react-native-crypto-js';
 import { resetLocalStorage, resetSecureItems } from '../helpers/utils';
 import { resetAuth } from './auth';

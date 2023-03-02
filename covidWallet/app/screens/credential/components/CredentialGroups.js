@@ -20,7 +20,6 @@ import {
   delete_credential_group,
   edit_credential_group,
   fetch_all_groups,
-  remove_all_credentials_group,
 } from '../../../helpers/Credential_Groups';
 import ActionButton from 'react-native-action-button';
 import {
@@ -62,7 +61,7 @@ const CredentialGroups = (props) => {
 
   const toggleModal = (v) => {
     props.navigation.navigate('CredDetailScreen', {
-      data: v,
+      credentialId: v.credentialId,
     });
   };
 

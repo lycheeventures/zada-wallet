@@ -15,6 +15,15 @@ export const selectCredentialsError = (state: RootState) => state.credential.err
 // Select all credentials
 export const selectCredentials = CredentialAdapter.getSelectors((s: RootState) => s.credential);
 
+// Select all credentials
+export const selectSingleCredential = createSelector(
+  (state: RootState) => state.credential.entities,
+  (_: RootState, credentialId: string) => credentialId,
+  (entities, credentialId) => {
+    return entities[credentialId];
+  }
+);
+
 // Select sorted array
 export const selectSortedCredentials = createSelector(selectCredentials.selectAll, (cred) =>
   cred.sort((a, b) => new Date(a.issuedAtUtc).getTime() - new Date(b.issuedAtUtc).getTime())

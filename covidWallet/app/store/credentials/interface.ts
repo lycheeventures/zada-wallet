@@ -35,10 +35,16 @@ export interface ICredentialObject {
   definitionId: string;
   issuedAtUtc: Date;
   schemaId: string;
+  imageUrl: string;
   state: string;
   values: ICredentialObjectValues;
   type: string;
+  qrCode: {
+    d: string;
+    i: string;
+    type: string;
+    v: Number;
+  };
   organizationName?: string;
-  qrCode?: {};
   selected?: boolean;
 }
