@@ -1,9 +1,16 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, Dimensions } from 'react-native';
 
-const { width } = Dimensions.get('screen');
+interface INProps {
+  text: string;
+  backgroundColor?: string;
+  loaderColor?: string;
+  textColor?: string;
+}
 
-const OverlayLoader = ({ text }) => {
+const { width } = Dimensions.get('screen');
+const OverlayLoader = (props: INProps) => {
+  const { text, backgroundColor, loaderColor, textColor } = props;
   return (
     <View
       style={{
@@ -20,16 +27,16 @@ const OverlayLoader = ({ text }) => {
         style={{
           width: width - 150,
           padding: 10,
-          backgroundColor: 'rgba(0,0,0,0.8)',
+          backgroundColor: backgroundColor ? backgroundColor : 'rgba(0,0,0,0.8)',
           borderRadius: 10,
         }}>
-        <ActivityIndicator color={'#fff'} size={'small'} />
+        <ActivityIndicator color={loaderColor ? loaderColor : '#fff'} size={'small'} />
         {text && (
           <Text
             style={{
               fontSize: 12,
               marginTop: 5,
-              color: 'white',
+              color: textColor ? textColor : 'white',
               textAlign: 'center',
             }}>
             {text}

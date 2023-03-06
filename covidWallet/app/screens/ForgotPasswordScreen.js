@@ -5,11 +5,10 @@ import PhoneInput from 'react-native-phone-number-input';
 import HeadingComponent from '../components/HeadingComponent';
 import { BACKGROUND_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
 import SimpleButton from '../components/Buttons/SimpleButton';
-import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
+import { showNetworkMessage, _showAlert } from '../helpers/Toast';
 import BackButton from '../components/Buttons/BackButton';
 import { useAppDispatch, useAppSelector } from '../store';
 import { selectNetworkStatus } from '../store/app/selectors';
-import { AuthAPI } from '../gateways';
 import { validateUserOTP } from '../store/auth/thunk';
 
 const { width } = Dimensions.get('window');
@@ -37,7 +36,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
         }
         navigation.navigate('OTPScreen', {
           headingText: 'Multi Factor Authentication to keep you safe!',
-          sendCode,
+          phone: phone.trim(),
           validateCode,
         });
       } else {
@@ -46,23 +45,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
       }
     } catch (error) {
       setLoading(false);
-    }
-  };
-
-  // Reset Password
-  const sendCode = async () => {
-    try {
-      if (networkStatus === 'connected') {
-        const result = await AuthAPI._resendOTPAPI(undefined, phone.trim(), 'phone');
-        if (result.data.success) {
-        } else {
-          _showAlert('Zada Wallet', result.data.error.toString());
-        }
-      } else {
-        showNetworkMessage();
-      }
-    } catch (error) {
-      _showAlert('Zada Wallet', error.toString());
     }
   };
 
@@ -136,7 +118,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
             loaderColor={WHITE_COLOR}
             onPress={_onSendClick}
             width={250}
-            title="SEND CODE"
+            title="Continue"
             titleColor={WHITE_COLOR}
             buttonColor={GREEN_COLOR}
             style={{

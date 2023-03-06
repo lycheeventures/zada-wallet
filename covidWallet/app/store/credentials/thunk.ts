@@ -1,10 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { deleteCredential } from '.';
+import { deleteCredential, updateCredential } from '.';
 import { RootState } from '..';
 import { CredentialAPI } from '../../gateways';
 import { delete_credential_from_groups } from '../../helpers/Credential_Groups';
 import { IConnectionObject } from '../connections/interface';
-import { ICredentialObject } from './interface';
+import { ICredentialObject, ICredentialObjectValues } from './interface';
 
 // Fetching credentials
 export const fetchCredentials = createAsyncThunk(
@@ -13,8 +13,8 @@ export const fetchCredentials = createAsyncThunk(
     try {
       // Current State
       const currentState = getState.getState() as RootState;
-      const credentials = currentState.credential.entities;
       const connections = currentState.connection.entities;
+      const credentials = currentState.credential.entities;
 
       // Getting all credentials from database.
       const response = await CredentialAPI.get_all_credentials();
@@ -26,19 +26,21 @@ export const fetchCredentials = createAsyncThunk(
 
       for (let i = 0; i < credArr.length; i++) {
         let cred = credArr[i];
+
+        let credentialFromCurrentState = Object.values(credentials).find(
+          (x) => x?.credentialId == cred.credentialId
+        );
+
+        let qrCode = undefined;
+        // Set v3 QR Code if already present in store.
+        if (credentialFromCurrentState?.qrCode?.v === 3) {
+          qrCode = credentialFromCurrentState.qrCode;
+        }
+
         // Finding connection from store.
         let item: IConnectionObject | undefined = Object.values(connections).find(
           (c) => c?.connectionId == cred.connectionId
         );
-
-        // Finding credential from store.
-        let credItem = Object.values(credentials).find((x) => x?.credentialId == cred.credentialId);
-
-        // Adding QR Code.
-        let qrCode = credItem?.qrCode;
-        if (qrCode == undefined) {
-          qrCode = await get_qr_credentials(cred.credentialId, cred.values);
-        }
 
         let obj = {
           ...cred,
@@ -93,14 +95,56 @@ export const removeCredentials = createAsyncThunk(
   }
 );
 
-const get_qr_credentials = async (credentialId?: string, values?: {}) => {
-  try {
-    // Return if null
-    if (!credentialId || !values) return undefined;
+// Compressing credentials
+export const compressCredentials = createAsyncThunk(
+  'credential/compressCredentials',
+  async (credentialId: string, { getState, dispatch }) => {
+    try {
+      // Current State
+      let currentState = getState() as RootState;
+      const credentials = currentState.credential.entities;
 
-    let qrResult = await CredentialAPI.fetch_signature_by_cred_id(credentialId, values);
-    return qrResult.success ? qrResult.qrcode : undefined;
-  } catch (e) {
-    throw e;
+      let credObj = Object.values(credentials).find((x) => x?.credentialId == credentialId);
+
+      // Return if credObj is undefined.
+      if (!credObj) {
+        return { success: true };
+      }
+
+      // Return if
+      // QR is not undefined as v3 still needs to be generated &&
+      // QR version === 3 i.e credential is already generated.
+      if (credObj.qrCode !== undefined) {
+        if (credObj?.qrCode.v === 3) {
+          return { success: true };
+        }
+      }
+
+      // Making QR code.
+      const orderedData = Object.keys(credObj.values)
+        .sort()
+        .reduce((obj: any, key) => {
+          obj[key] = credObj?.values[key as keyof ICredentialObjectValues];
+          return obj;
+        }, {});
+      let qrObj = {
+        d: Object.values(orderedData),
+        id: credentialId,
+      };
+
+      let result = await CredentialAPI.compress_credential_qr(qrObj);
+      if (result.data.success) {
+        let newQRObj = {
+          d: result.data.compressed,
+          v: 3,
+          type: 'cv',
+          i: 'zada',
+        };
+        dispatch(updateCredential({ id: credentialId, changes: { qrCode: newQRObj } }));
+      }
+      return { success: true };
+    } catch (e) {
+      throw e;
+    }
   }
-};
+);

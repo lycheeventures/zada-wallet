@@ -13,8 +13,10 @@ const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
 
   // Functions
   const handleQRPress = () => {
-    analytics_log_show_cred_qr();
-    setShowQRModal(true);
+    if (item.type !== 'Authentication') {
+      analytics_log_show_cred_qr();
+      setShowQRModal(true);
+    }
   };
 
   // Issuer LOGO
@@ -31,7 +33,7 @@ const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
   };
 
   return (
-    <TouchableComponent style={{ overflow: 'hidden' }} onPress={handleQRPress}>
+    <TouchableComponent touchableStyle={styles.touchableCardStyle} onPress={handleQRPress}>
       <CardBackground
         item={item}
         schemeId={item.schemaId}
@@ -62,14 +64,16 @@ const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
             </View>
           </View>
           <View>
-            <View style={styles.touchableStyle}>
-              <View style={styles.touchableContainerStyle}>
-                <Image
-                  source={require('../../../assets/images/qr-code.png')}
-                  style={styles.topContainerImage}
-                />
+            {item.type !== 'Authentication' && (
+              <View style={styles.touchableStyle}>
+                <View style={styles.touchableContainerStyle}>
+                  <Image
+                    source={require('../../../assets/images/qr-code.png')}
+                    style={styles.topContainerImage}
+                  />
+                </View>
               </View>
-            </View>
+            )}
           </View>
         </View>
       </CardBackground>
@@ -82,6 +86,9 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     borderRadius: 8,
+  },
+  touchableCardStyle: {
+    overflow: 'hidden',
   },
   imageStyle: {
     width: '100%',
