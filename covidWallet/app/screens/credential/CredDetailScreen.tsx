@@ -165,6 +165,12 @@ const CredDetailScreen = (props: IProps) => {
   };
 
   const openQRModal = async (bool: boolean) => {
+    if (networkStatus === 'disconnected') {
+      if (data?.qrCode === undefined) {
+        showNetworkMessage();
+        return;
+      }
+    }
     setShowQRModal(bool);
   };
 
