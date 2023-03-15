@@ -92,7 +92,6 @@
     "react-native-securerandom": "^1.0.1",
     "react-native-sha256": "^1.4.8",
     "react-native-share": "^7.3.9",
-    "react-native-simple-radio-button": "^2.7.4",
     "react-native-snap-carousel-v4": "^1.0.1",
     "react-native-splash-screen": "^3.2.0",
     "react-native-svg": "^12.1.1",
@@ -105,8 +104,8 @@
     "react-native-webview": "^11.22.2",
     "react-redux": "^8.0.2",
     "redux": "^4.2.0",
-    "redux-persist": "^6.0.0",
     "redux-persist-transform-encrypt": "^4.0.0",
+    "reduxjs-toolkit-persist": "^7.2.1",
     "validator": "^13.7.0"
   },
   "devDependencies": {

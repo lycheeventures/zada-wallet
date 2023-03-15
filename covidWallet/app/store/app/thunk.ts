@@ -3,8 +3,8 @@ import { ConnectionAPI, CredentialAPI, throwErrorIfExist } from '../../gateways'
 
 export const resetCache = createAsyncThunk('auth/resetCache', async () => {
   try {
-    await CredentialAPI.invalidateCache();
-    await ConnectionAPI.invalidateCache();
+    ConnectionAPI.invalidateCache();
+    CredentialAPI.invalidateCache();
   } catch (e) {
     throwErrorIfExist(e);
   }

@@ -120,7 +120,6 @@ export const validateUserOTP = createAsyncThunk(
       }
       return response?.data;
     } catch (e) {
-      console.log('error => ', e);
       throwErrorIfExist(e);
     }
   }

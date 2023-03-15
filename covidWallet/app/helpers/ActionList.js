@@ -1,10 +1,8 @@
-import React, { useContext, useEffect } from 'react';
 import { showMessage } from './Toast';
 import { AuthenticateUser } from './Authenticate';
 import ConstantsList, { ZADA_AUTH_TEST } from './ConfigApp';
 import { getItem, saveItem } from './Storage';
 import { get_credential } from '../gateways/credentials';
-import { get_all_verification_proposals } from '../gateways/verifications';
 
 export const addCredentialToActionList = async (credentialID) => {
   let resp = await AuthenticateUser();
@@ -43,48 +41,15 @@ export const addCredentialToActionList = async (credentialID) => {
   }
 };
 
-export const addVerificationToActionList = async (credentialID) => {
-  try {
-    let result = await get_all_verification_proposals();
-
-    if (result.data.success) {
-      let verifications = result.data.verifications;
-
-      if (verifications.length === 0) return;
-
-      let verification_arr = [];
-      for (let i = 0; i < verifications.length; i++) {
-        // Adding Image and Name to array.
-        verification_arr.push(await addImageAndNameFromConnectionList(verifications[i]));
-
-        // Adding type to verification request.
-        verification_arr[i]['type'] = ConstantsList.VER_REQ;
-      }
-
-      // Save Verification Request.
-      await saveItem(ConstantsList.VER_REQ, JSON.stringify(verification_arr));
-
-      if (
-        verifications[0].organizationName &&
-        verifications[0].organizationName == ZADA_AUTH_TEST
-      )
-        return { isZadaAuth: true, data: verifications[0] };
-      else return { isZadaAuth: false, data: null };
-    } else {
-      showMessage('ZADA Wallet', result.data.message);
-    }
-  } catch (e) {
-    console.log(e);
-  }
-};
-
 // Search and add Image and Name attr to Object
 export async function addImageAndNameFromConnectionList(obj) {
   let conn = await getItem(ConstantsList.CONNECTIONS);
-  if (conn == null) return null;
+  if (conn == null) {
+    return null;
+  }
   let parseConn = JSON.parse(conn);
   parseConn.forEach((e) => {
-    if (e.connectionId == obj.connectionId) {
+    if (e.connectionId === obj.connectionId) {
       obj.imageUrl = e.imageUrl;
       obj.organizationName = e.name;
     }
@@ -123,7 +88,7 @@ export function getActionText(v) {
 function ifExist(arr, credentialID) {
   let exist = false;
   arr.forEach((e) => {
-    if (e.credentialId == credentialID) {
+    if (e.credentialId === credentialID) {
       exist = true;
     }
   });

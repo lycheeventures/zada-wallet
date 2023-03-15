@@ -1,8 +1,8 @@
-import { Buffer } from 'buffer';
 import queryString from 'query-string';
+import { CredentialAPI } from '../../gateways';
 import { get_encrypted_credential } from '../../gateways/credentials';
 import { decryptAES256CBC, performSHA256 } from '../../helpers/crypto';
-import { sortValuesByKey } from '../../helpers/utils';
+import { convertBase64ToString, convertStringToBase64, sortValuesByKey } from '../../helpers/utils';
 
 export const getType = (str) => {
   if (str) {
@@ -35,8 +35,24 @@ export const handleQRLogin = async (loginQRData) => {
 export const handleCredVerification = async (credQrData) => {
   try {
     let credValues = {};
-    // spliting hash and credentialId from QR data.
-    if (credQrData.version === 2) {
+    let signature = '';
+    let tenantId = '';
+    let keyVersion = '';
+
+    // Handling v3
+    if (credQrData.v === 3) {
+      // Getting compressed credentials from database.
+      let resp = await CredentialAPI.get_credential_qr(credQrData.d);
+      if (resp.data.success) {
+        credValues = convertBase64ToString(resp.data.decompressed);
+        signature = resp.data.signature;
+        tenantId = resp.data.tenantId;
+        keyVersion = resp.data.keyVersion;
+      }
+    }
+
+    // Handling v2
+    else if (credQrData.version === 2) {
       let credentialId = credQrData.credentialId;
       let key = credQrData.key;
 
@@ -52,21 +68,26 @@ export const handleCredVerification = async (credQrData) => {
 
       // Decrypting encrypted credentials
       let base64Data = await decryptAES256CBC(credQrData.encryptedCredential, key);
-      credValues = Buffer.from(base64Data, 'base64').toString();
+      credValues = convertBase64ToString(base64Data);
+      signature = credQrData.signature;
+      tenantId = credQrData.tenantId;
+      keyVersion = credQrData.keyVersion;
     } else {
-      // Handling old implementation
-      credValues = Buffer.from(credQrData.data, 'base64').toString();
+      // Handling v1
+      credValues = convertBase64ToString(credQrData.data);
+      signature = credQrData.signature;
+      tenantId = credQrData.tenantId;
+      keyVersion = credQrData.keyVersion;
     }
 
     credValues = JSON.parse(credValues);
     var sortedValues = sortValuesByKey(credValues);
-
     return {
       credential: {
-        data: Buffer.from(JSON.stringify(sortedValues)).toString('base64'),
-        signature: credQrData.signature,
-        tenantId: credQrData.tenantId,
-        keyVersion: credQrData.keyVersion,
+        data: convertStringToBase64(JSON.stringify(sortedValues)),
+        signature: signature,
+        tenantId: tenantId,
+        keyVersion: keyVersion,
       },
       sortedValues,
     };
@@ -81,7 +102,7 @@ export const handleQRConnectionRequest = async (inviteID, qrJSON) => {
     let response = await fetch(baseURL + inviteID);
     const parsed = queryString.parse(response.url, true);
     let urlData = Object.values(parsed)[0];
-    var data = JSON.parse(Buffer.from(urlData, 'base64').toString());
+    var data = JSON.parse(convertBase64ToString(urlData));
 
     qrJSON.organizationName = data.label;
     qrJSON.imageUrl = data.imageUrl;

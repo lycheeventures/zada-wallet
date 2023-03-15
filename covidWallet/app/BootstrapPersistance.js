@@ -2,7 +2,7 @@ import React from 'react';
 import { EncryptionGate } from './EncryptionGate';
 import StoreGate from './StoreGate';
 import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
+import { PersistGate } from 'reduxjs-toolkit-persist/integration/react';
 
 const BootstrapPersistance = ({ children }) => {
   return (

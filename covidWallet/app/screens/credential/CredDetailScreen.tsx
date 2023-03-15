@@ -14,25 +14,17 @@ import {
   showNetworkMessage,
   _showAlert,
 } from '../../helpers';
-import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
-import { selectCredentialsStatus } from '../../store/credentials/selectors';
+import { AppDispatch, RootState, useAppDispatch, useAppSelector } from '../../store';
+import { selectCredentialsStatus, selectSingleCredential } from '../../store/credentials/selectors';
 
 import OverlayLoader from '../../components/OverlayLoader';
 import CredQRModal from './components/CredQRModal';
 import DetailCard from './components/DetailCard';
 import RenderValues from '../../components/RenderValues';
 import usePreventScreenshot from '../../hooks/usePreventScreenshot';
-import { removeCredentials } from '../../store/credentials/thunk';
-import {
-  decryptAES256CBC,
-  encryptAES256CBC,
-  generateRandomSecret,
-  performSHA256,
-} from '../../helpers/crypto';
-import { getItemFromLocalStorage, saveItemInLocalStorage } from '../../helpers/Storage';
-import { get_encrypted_credential, save_encrypted_credential } from '../../gateways/credentials';
-import { convertStringToBase64 } from '../../helpers/utils';
+import { compressCredentials, removeCredentials } from '../../store/credentials/thunk';
 import { selectNetworkStatus } from '../../store/app/selectors';
+import { ICredentialObject } from '../../store/credentials/interface';
 
 interface IProps {
   route: any;
@@ -41,7 +33,11 @@ interface IProps {
 
 const CredDetailScreen = (props: IProps) => {
   // Constants
-  const data = props.route.params.data; // Credential
+  const credentialId = props.route.params.credentialId;
+  const data = useAppSelector((state: RootState) =>
+    selectSingleCredential(state, credentialId)
+  ) as ICredentialObject; // Credential Object
+
   const dispatch = useAppDispatch<AppDispatch>();
   const viewShotRef = useRef(null);
 
@@ -51,8 +47,7 @@ const CredDetailScreen = (props: IProps) => {
 
   // States
   const [showQRModal, setShowQRModal] = useState(false);
-  const [qrCode, setQRCode] = useState({});
-  const [isGenerating, setGenerating] = useState(false);
+  const [isGenerating, setGenerating] = useState(data?.qrCode === undefined ? true : false);
   const [isGeneratingPDF, setGeneratingPDF] = useState(false);
 
   // Hooks
@@ -66,6 +61,14 @@ const CredDetailScreen = (props: IProps) => {
       props.navigation.goBack();
     }
   }, [credentialStatus, props.navigation]);
+
+  useEffect(() => {
+    if (data.credentialId) {
+      if (data?.qrCode === undefined || data?.qrCode?.v !== 3) {
+        dispatch(compressCredentials(data.credentialId));
+      } else if (isGenerating) setGenerating(false);
+    }
+  }, [showQRModal, data?.qrCode]);
 
   // Setting header Icons
   useLayoutEffect(() => {
@@ -96,53 +99,7 @@ const CredDetailScreen = (props: IProps) => {
         </View>
       ),
     });
-  }, [qrCode, networkStatus]);
-
-  useEffect(() => {
-    // Generate QR Code
-    if (Object.keys(qrCode).length < 1) {
-      generateQRCode();
-    }
   }, [networkStatus]);
-
-  // Functions
-  async function generateQRCode() {
-    let encryptionKey = '';
-    let hash = '';
-    let isPDFAlreadyGenerated = await getItemFromLocalStorage(data.credentialId);
-    if (!isPDFAlreadyGenerated) {
-      encryptionKey = generateRandomSecret(64);
-      // Hash from key.
-      hash = await performSHA256(encryptionKey);
-      let obj = {
-        key: encryptionKey,
-        hash,
-      };
-      let valuesInBase64 = convertStringToBase64(JSON.stringify(data.values));
-      let str = await encryptAES256CBC(valuesInBase64, encryptionKey);
-      save_encrypted_credential(data.credentialId, str, hash);
-      saveItemInLocalStorage(data.credentialId, obj);
-    } else {
-      encryptionKey = isPDFAlreadyGenerated.key;
-    }
-    //  else {
-    //   encryptionKey = isPDFAlreadyGenerated.key;
-    //   hash = isPDFAlreadyGenerated.hash;
-    //   let resp = await get_encrypted_credential(data.credentialId, hash);
-    //   if (resp.data.sucess) {
-    //     let encryptedCred = resp.data.credential.encryptedCredential;
-    //     // decrypting
-    //     await decryptAES256CBC(encryptedCred, encryptionKey);
-    //   }
-    // }
-
-    setQRCode({
-      credentialId: data.credentialId,
-      key: encryptionKey,
-      type: 'cred_ver',
-      version: 2,
-    });
-  }
 
   // Make and Share PDF
   const createAndSharePDF = async () => {
@@ -151,7 +108,6 @@ const CredDetailScreen = (props: IProps) => {
       showNetworkMessage();
       return;
     }
-
     setGeneratingPDF(true);
     try {
       // Ordering data
@@ -161,49 +117,30 @@ const CredDetailScreen = (props: IProps) => {
           obj[key] = data.values[key];
           return obj;
         }, {});
-
       // Making html to be injected later as {key: value} pair.
       let credentialDetails = Object.keys(orderedData).map((key, index) => {
         let value = orderedData[key];
         value = parse_date_time(value);
         if (index % 3 === 0) {
           return `
-        <tr>
-        <td class="tds">
-          <p class="pt">${key}: <strong>${value}</strong></p>
-        </td>`;
+          <tr>
+          <td class="tds">
+            <p class="pt">${key}: <strong>${value}</strong></p>
+          </td>`;
         } else if ((index - 1) % 3 === 2) {
           return `</tr>`;
         } else {
           return `
-        <td class="tds">
-          <p class="pt">${key}: <strong>${value}</strong></p>
-        </td>`;
+          <td class="tds">
+            <p class="pt">${key}: <strong>${value}</strong></p>
+          </td>`;
         }
       });
-
       // Getting template
       let template = await getCredentialTemplate(data.schemaId, data.definitionId);
 
-      // Making QR data.
-      let qrUrl = await new Promise(async (resolve, reject) => {
-        await fetch(
-          'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + JSON.stringify(qrCode)
-        ).then(async (resp) => {
-          let blob = await resp.blob();
-
-          resolve(
-            new Promise((resolve, reject) => {
-              let reader = new FileReader();
-              reader.onload = (event) => {
-                let base64String = event.target?.result;
-                resolve(base64String);
-              };
-              reader.readAsDataURL(blob);
-            })
-          );
-        });
-      });
+      // Capturing QR image using viewshot library.
+      let qrUrl = await viewShotRef?.current?.capture();
 
       // Injecting data into template
       let htmlStr = template.file;
@@ -218,7 +155,6 @@ const CredDetailScreen = (props: IProps) => {
         },
         credentialDetails
       );
-
       // Share PDF
       await sharePDF(htmlStr);
       setGeneratingPDF(false);
@@ -229,6 +165,12 @@ const CredDetailScreen = (props: IProps) => {
   };
 
   const openQRModal = async (bool: boolean) => {
+    if (networkStatus === 'disconnected') {
+      if (data?.qrCode === undefined) {
+        showNetworkMessage();
+        return;
+      }
+    }
     setShowQRModal(bool);
   };
 
@@ -240,19 +182,19 @@ const CredDetailScreen = (props: IProps) => {
     <View style={styles.mainContainer}>
       {/* hidden QRCODE */}
       <View style={{ position: 'absolute', top: '5%', left: '5%' }}>
-        <ViewShot ref={viewShotRef} options={{ fileName: 'QRCode', format: 'png', quality: 0.9 }}>
-          <QRCode
-            value={data.qrCode}
-            backgroundColor={BACKGROUND_COLOR}
-            size={Dimensions.get('window').width * 0.7}
-            ecl="L"
-          />
-        </ViewShot>
+        {data.qrCode !== undefined && (
+          <ViewShot ref={viewShotRef} options={{ fileName: 'QRCode', format: 'png', quality: 0.9 }}>
+            <QRCode
+              value={JSON.stringify(data.qrCode)}
+              backgroundColor={BACKGROUND_COLOR}
+              size={Dimensions.get('window').width * 0.7}
+              ecl="L"
+            />
+          </ViewShot>
+        )}
       </View>
       <View style={styles.innerContainer}>
         {credentialStatus === 'pending' && <OverlayLoader text="Deleting credential..." />}
-
-        {isGenerating && <OverlayLoader text="Generating credential QR..." />}
 
         {isGeneratingPDF && <OverlayLoader text="Generating credential PDF..." />}
 
@@ -261,7 +203,8 @@ const CredDetailScreen = (props: IProps) => {
           onCloseClick={() => {
             setShowQRModal(false);
           }}
-          qrCode={qrCode}
+          isGenerating={isGenerating}
+          data={data.qrCode}
         />
 
         <View style={styles.topContainer}>

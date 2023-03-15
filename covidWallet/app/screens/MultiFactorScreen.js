@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -21,13 +21,17 @@ import HeadingComponent from '../components/HeadingComponent';
 import ConstantsList from '../helpers/ConfigApp';
 import { saveItem } from '../helpers/Storage';
 import { showMessage, showNetworkMessage, _showAlert } from '../helpers/Toast';
-import { validateOTP, _resendOTPAPI } from '../gateways/auth';
+import { validateOTP } from '../gateways/auth';
 import SimpleButton from '../components/Buttons/SimpleButton';
-import { _handleAxiosError } from '../helpers/AxiosResponse';
 import { useAppSelector } from '../store';
 import { selectNetworkStatus } from '../store/app/selectors';
+import { AuthAPI } from '../gateways';
 
 const { width } = Dimensions.get('window');
+
+// KEYBOARD AVOIDING VIEW
+const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
+const keyboardBehaviour = Platform.OS === 'ios' ? 'padding' : null;
 
 function MultiFactorScreen(props) {
   const networkStatus = useAppSelector(selectNetworkStatus);
@@ -41,13 +45,10 @@ function MultiFactorScreen(props) {
   // Countdown
   const [phoneMins, setPhoneMins] = useState(1);
   const [phoneSecs, setPhoneSecs] = useState(59);
-  const [phoneTimeout, setPhoneTimeout] = useState(false);
+  const [phoneTimeout, setPhoneTimeout] = useState(true);
+  const [sendButtonText, setSendButtonText] = useState('Send Code');
 
   const [phoneCodeLoading, setPhoneCodeLoading] = useState(false);
-
-  useLayoutEffect(() => {
-    _resendOTPAPI(user.userId, undefined, 'phone');
-  }, [user.userId]);
 
   // Effect for phone code countdown
   React.useEffect(() => {
@@ -72,6 +73,8 @@ function MultiFactorScreen(props) {
   const submit = () => {
     if (phoneConfirmationCode === '') {
       showMessage('ZADA Wallet', 'Fill the empty fields');
+    } else if (phoneConfirmationCode.length < 6) {
+      showMessage('ZADA Wallet', 'Please enter 6-digit code.');
     } else {
       setProgress(true);
       validate();
@@ -96,36 +99,35 @@ function MultiFactorScreen(props) {
       setProgress(false);
     } catch (error) {
       setProgress(false);
-      _handleAxiosError(error);
     }
   };
 
-  // Funcion to resend phone code
-  const _reSendPhoneCode = async () => {
+  // Function
+  const resendCode = async () => {
+    setPhoneMins(1);
+    setPhoneSecs(59);
+    setPhoneTimeout(false);
+    await sendCode();
+    setSendButtonText('Send Again');
+  };
+
+  // Reset Password
+  const sendCode = async () => {
     try {
       if (networkStatus === 'connected') {
         setPhoneCodeLoading(true);
-        const result = await _resendOTPAPI(user.userId, undefined, 'phone');
-        if (result.data.success) {
-          setPhoneTimeout(false);
-          setPhoneMins(1);
-          setPhoneSecs(59);
-        } else {
+        const result = await AuthAPI._resendOTPAPI(user.userId, undefined, 'phone');
+        if (!result.data.success) {
           _showAlert('Zada Wallet', result.data.error.toString());
         }
+        setPhoneCodeLoading(false);
       } else {
         showNetworkMessage();
       }
-      setPhoneCodeLoading(false);
     } catch (error) {
       setPhoneCodeLoading(false);
-      _showAlert('Zada Wallet', error.toString());
     }
   };
-
-  // KEYBOARD AVOIDING VIEW
-  const keyboardVerticalOffset = Platform.OS == 'ios' ? 100 : 0;
-  const keyboardBehaviour = Platform.OS == 'ios' ? 'padding' : null;
 
   return (
     <View
@@ -188,8 +190,8 @@ function MultiFactorScreen(props) {
                   </View>
                   {phoneTimeout ? (
                     !phoneCodeLoading ? (
-                      <Text onPress={_reSendPhoneCode} style={styles._expireText}>
-                        Send Again
+                      <Text onPress={resendCode} style={styles._expireText}>
+                        {sendButtonText}
                       </Text>
                     ) : (
                       <ActivityIndicator

@@ -10,6 +10,7 @@ import SimpleButton from '../../components/Buttons/SimpleButton';
 import HeadingComponent from '../../components/HeadingComponent';
 import CodeInputComponent from './components/CodeInputComponent';
 import { selectAuthStatus } from '../../store/auth/selectors';
+import { showMessage } from '../../helpers';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -24,7 +25,7 @@ const { width } = Dimensions.get('window');
 
 function OTPScreen(props: INProps) {
   // Constants
-  const { headingText, sendCode, validateCode } = props.route.params;
+  const { headingText, phone, validateCode } = props.route.params;
 
   // Selectors
   const authStatus = useAppSelector(selectAuthStatus);
@@ -34,7 +35,13 @@ function OTPScreen(props: INProps) {
 
   // Functions
   const _handleOnContinuePress = () => {
-    validateCode(code);
+    if (code === '') {
+      showMessage('ZADA Wallet', 'Fill the empty fields');
+    } else if (code.length < 6) {
+      showMessage('ZADA Wallet', 'Please enter 6-digit code.');
+    } else {
+      validateCode(code);
+    }
   };
 
   return (
@@ -66,7 +73,7 @@ function OTPScreen(props: INProps) {
             </Text>
             <View>
               {/* Phone Confirmation Code */}
-              <CodeInputComponent setCode={setCode} sendCode={sendCode} />
+              <CodeInputComponent setCode={setCode} phone={phone} />
 
               <Text style={styles.textView}>
                 Please wait until 2 minutes for the code. If you will not receive then you will be

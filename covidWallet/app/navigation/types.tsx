@@ -27,7 +27,7 @@ export type MainStackParamList = {
   ContactUs: undefined;
   AboutUs: undefined;
   ProfileScreen: undefined;
-  CredDetailScreen: { data: ICredentialObject };
+  CredDetailScreen: { credentialId: string };
   QRScreen: undefined;
 };
 
