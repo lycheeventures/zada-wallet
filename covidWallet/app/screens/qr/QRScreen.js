@@ -130,29 +130,58 @@ const QRScreen = ({ route, navigation }) => {
         }
         if (!isLink) {
           let type = getType(e.data);
+          let credObj = {};
 
-          // Connection Request
-          if (type === 'connectionless_verification') {
-            let res = await handleQRLogin(JSON.parse(e.data));
-            setCredentialData({
-              type: 'connectionless_verification',
-              credentials: res.credential,
-            });
-            return;
-          }
-
-          // Credential Request
-          if (type === 'cred_ver') {
-            let credObj = await handleCredVerification(JSON.parse(e.data));
-            if (credObj) {
-              // Setting values
-              setValues(credObj.sortedValues);
-              setCredentialData({
-                type: 'cred_ver',
-                credentials: credObj.credential,
-              });
+          switch (type) {
+            // handling connectionless verification
+            case 'connectionless_verification':
+              try {
+                let res = await handleQRLogin(JSON.parse(e.data));
+                setCredentialData({
+                  type: 'connectionless_verification',
+                  credentials: res.credential,
+                });
+              } catch (err) {
+                throw 'Not a valid ZADA QR';
+              }
               return;
-            }
+
+            // handling credential verification for v1 & v2 QR
+            case 'cred_ver':
+              try {
+                credObj = await handleCredVerification(JSON.parse(e.data));
+                if (credObj) {
+                  // Setting values
+                  setValues(credObj.sortedValues);
+                  setCredentialData({
+                    type: 'cred_ver',
+                    credentials: credObj.credential,
+                  });
+                }
+              } catch (err) {
+                throw 'Not a valid ZADA QR';
+              }
+              return;
+
+            // handling credential verification for v3 QR
+            case 'cv':
+              try {
+                credObj = await handleCredVerification(JSON.parse(e.data));
+                if (credObj) {
+                  // Setting values
+                  setValues(credObj.sortedValues);
+                  setCredentialData({
+                    type: 'cred_ver',
+                    credentials: credObj.credential,
+                  });
+                }
+              } catch (err) {
+                console.log('err => ', err);
+                throw 'Not a valid ZADA QR';
+              }
+              return;
+            default:
+              console.log('Case not supported!');
           }
         }
 

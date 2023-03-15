@@ -1,4 +1,4 @@
-import createTransform from 'redux-persist/es/createTransform';
+import { createTransform } from 'reduxjs-toolkit-persist';
 import CryptoJS from 'react-native-crypto-js';
 import { resetLocalStorage, resetSecureItems } from '../helpers/utils';
 import { resetAuth } from './auth';
@@ -54,7 +54,7 @@ export const clearAll = async (dispatch, type) => {
   dispatch(resetAction());
   dispatch(resetConnection());
   dispatch(resetCredential());
-  dispatch(resetCache());
+  await dispatch(resetCache());
   dispatch(resetApp());
   dispatch(resetAuth());
   dispatch(changeAppStatus('idle'));
@@ -68,7 +68,7 @@ export const deleteAccountAndClearAll = async (dispatch) => {
   dispatch(resetAction());
   dispatch(resetConnection());
   dispatch(resetCredential());
-  dispatch(resetCache());
+  await dispatch(resetCache());
   dispatch(resetApp());
   await dispatch(deleteUserAccount()).unwrap();
   dispatch(resetAuth());

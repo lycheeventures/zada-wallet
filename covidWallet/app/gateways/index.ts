@@ -54,7 +54,14 @@ export function handleErrorMessage(error: any) {
   if (exceptionList.includes(error.response.data.error)) return;
 
   if (error.response.data.error === 'Invalid Token!') {
-    showOKDialog('Session Timeout', INVALID_TOKEN, () => clearAll(store.dispatch, "timeout"));
+    showOKDialog('Session Timeout', INVALID_TOKEN, () => clearAll(store.dispatch, 'timeout'));
+    return;
+  }
+
+  let errorMessage = error.response.data.message;
+
+  if (errorMessage && errorMessage.length > 1) {
+    _showAlert('Error', error.response.data.message);
     return;
   }
 

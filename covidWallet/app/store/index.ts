@@ -1,15 +1,16 @@
 import { useDispatch, useSelector } from 'react-redux';
 import {
   persistReducer,
+  persistStore,
   FLUSH,
   REHYDRATE,
   PAUSE,
   PERSIST,
   PURGE,
   REGISTER,
-  Persistor,
-} from 'redux-persist';
-import persistStore from 'redux-persist/es/persistStore';
+} from 'reduxjs-toolkit-persist';
+import autoMergeLevel1 from 'reduxjs-toolkit-persist/lib/stateReconciler/autoMergeLevel1';
+import { Persistor } from 'reduxjs-toolkit-persist/lib/types';
 import { configureStore, combineReducers, Store } from '@reduxjs/toolkit';
 import { AuthSlice } from './auth';
 import { CredentialSlice } from './credentials';
@@ -43,18 +44,20 @@ const functionForGettingStoreType = (preloadedState = {}) => {
 // Generating store.
 export const generateStore = (encryptionKey: { isFresh: boolean; key: string }) => {
   const encryptionTransform = createEncryptor({ secretKey: encryptionKey.key });
+
   const rootPersistConfig = {
     key: 'root',
     storage: AsyncStorage,
-    version: 1,
+    version: 2,
     blacklist: ['auth'],
     transforms: [encryptionTransform],
+    stateReconciler: autoMergeLevel1,
   };
 
   const authPersistConfig = {
     key: 'auth',
     storage: AsyncStorage,
-    version: 1,
+    version: 2,
     blacklist: ['status'],
     transforms: [encryptionTransform],
   };

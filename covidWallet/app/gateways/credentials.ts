@@ -1,13 +1,10 @@
 import http_client from './http_client';
 import { Buffer } from 'buffer';
-import ConstantsList from '../helpers/ConfigApp';
 import {
   analytics_log_accept_credential_request,
   analytics_log_credential_delete,
   analytics_log_reject_credential_request,
 } from '../helpers/analytics';
-import { saveItem } from '../helpers/Storage';
-import { get_all_connections } from './connections';
 
 // Get Specific Credential
 export async function get_credential(credentialID: string) {
@@ -33,51 +30,6 @@ export async function get_all_credentials() {
   } catch (error) {
     throw error;
   }
-}
-
-export async function get_all_qr_credentials() {
-  try {
-    // Fetching Connections
-    const connectionResult = await get_all_connections();
-    let connections = connectionResult.data.connections;
-
-    // Fetching Credentials
-    const credentialResult = await get_all_credentials();
-    let credentials = credentialResult.data.credentials;
-
-    let CredArr: any = [];
-    if (credentials.length && connections.length) {
-      for (let i = 0; i < credentials.length; ++i) {
-        let cred = credentials[i];
-        let item = connections.find((c: any) => c.connectionId == cred.connectionId);
-        let qrResult = await fetch_signature_by_cred_id(cred.credentialId, cred.values);
-        if (item !== undefined || null) {
-          let obj = {
-            ...cred,
-            imageUrl: item.imageUrl,
-            organizationName: item.name,
-            qrCode: qrResult.success ? qrResult.qrcode : undefined,
-            type:
-              cred.values != undefined && cred.values.Type != undefined
-                ? cred.values.Type
-                : (cred.values != undefined || cred.values != null) &&
-                  cred.values['Vaccine Name'] != undefined &&
-                  cred.values['Vaccine Name'].length != 0 &&
-                  cred.values['Dose'] != undefined &&
-                  cred.values['Dose'].length != 0
-                ? 'COVIDpass (Vaccination)'
-                : 'Digital Certificate',
-          };
-          CredArr.push(obj);
-        }
-      }
-      await saveItem(ConstantsList.CREDENTIALS, JSON.stringify(CredArr));
-      await saveItem(ConstantsList.CONNECTIONS, JSON.stringify(connections));
-    } else {
-      await saveItem(ConstantsList.CREDENTIALS, JSON.stringify(CredArr));
-      await saveItem(ConstantsList.CONNECTIONS, JSON.stringify(connections));
-    }
-  } catch (error) {}
 }
 
 // Accept Crendentials API
@@ -163,18 +115,33 @@ export async function get_signature(credentialId: string) {
 }
 
 // Generate signature
-export async function generate_credential_qr(credentialId: string) {
+export async function get_credential_qr(data: string) {
   try {
     const result = await http_client({
       method: 'GET',
       url: '/api/credential/get_credential_qr',
       params: {
-        credentialId: credentialId,
+        data,
       },
     });
     return result;
   } catch (error) {
-    console.log('error => ', error);
+    throw error;
+  }
+}
+
+// Compress data for QR
+export async function compress_credential_qr(jsonData: Object) {
+  try {
+    const result = await http_client({
+      method: 'GET',
+      url: '/api/credential/compress_credential_qr',
+      params: {
+        data: JSON.stringify(jsonData),
+      },
+    });
+    return result;
+  } catch (error) {
     throw error;
   }
 }
@@ -194,7 +161,7 @@ export const fetch_signature_by_cred_id = async (credentialId: string, values: O
         signature: result.data.signature,
         tenantId: result.data.tenantId,
         keyVersion: result.data.keyVersion,
-        type: 'cred_ver',
+        type: 'cv',
       };
       return {
         success: true,
