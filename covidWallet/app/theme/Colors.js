@@ -11,10 +11,11 @@ export const BACKGROUND_COLOR = '#e4e2de';
 // New Way
 export const AppColors = {
   PRIMARY: '#001871',
-  BACKGROUND: "#e4e2de",
+  BACKGROUND: '#e4e2de',
   DANGER: '#f32013',
   BLUE: '#2870da',
   GRAY: '#708090',
+  DISABLED_COLOR: '#dddddd60',
   WHITE: 'white',
   BLACK: 'black',
   GREEN: '#19cb94',

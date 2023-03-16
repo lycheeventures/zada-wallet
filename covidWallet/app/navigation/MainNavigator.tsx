@@ -27,6 +27,7 @@ const MainNavigator = () => {
   // Hooks
   const { oneTimeAuthentication } = useBiometric();
 
+  const backIcon = Platform.OS === 'ios' ? 'chevron-left' : 'arrow-back';
   return (
     <MainStack.Navigator screenOptions={{ ...navigationAnimation }} initialRouteName="MainScreen">
       <MainStack.Screen
@@ -75,7 +76,7 @@ const MainNavigator = () => {
               }}
               style={styles.headerRightIcon}
               size={30}
-              name="arrow-back"
+              name={backIcon}
             />
           ),
         })}
@@ -92,7 +93,7 @@ const MainNavigator = () => {
               }}
               style={styles.headerRightIcon}
               size={30}
-              name="arrow-back"
+              name={backIcon}
             />
           ),
         })}
@@ -110,7 +111,7 @@ const MainNavigator = () => {
               }}
               style={styles.headerRightIcon}
               size={30}
-              name="arrow-back"
+              name={backIcon}
             />
           ),
         })}
@@ -128,7 +129,7 @@ const MainNavigator = () => {
               }}
               style={styles.headerRightIcon}
               size={30}
-              name="arrow-back"
+              name={backIcon}
             />
           ),
         })}
