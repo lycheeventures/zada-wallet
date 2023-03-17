@@ -183,6 +183,7 @@ PODS:
   - lottie-react-native (3.5.0):
     - lottie-ios (~> 3.1.8)
     - React
+  - Mobilisten (5.3.0)
   - nanopb (2.30908.0):
     - nanopb/decode (= 2.30908.0)
     - nanopb/encode (= 2.30908.0)
@@ -556,6 +557,9 @@ PODS:
     - React-Core
   - RNVectorIcons (6.6.0):
     - React
+  - RNZohoSalesIQ (5.3.0):
+    - Mobilisten (= 5.3.0)
+    - React
   - UMAppLoader (2.2.0)
   - UMCore (7.1.2)
   - UMReactNativeAdapter (6.3.9):
@@ -659,6 +663,7 @@ DEPENDENCIES:
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - RNZohoSalesIQ (from `../node_modules/react-native-zohosalesiq-mobilisten/ios`)
   - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
   - "UMCore (from `../node_modules/@unimodules/core/ios`)"
   - "UMReactNativeAdapter (from `../node_modules/@unimodules/react-native-adapter/ios`)"
@@ -688,6 +693,7 @@ SPEC REPOS:
     - GoogleDataTransport
     - GoogleUtilities
     - libevent
+    - Mobilisten
     - nanopb
     - OpenSSL-Universal
     - PromisesObjC
@@ -826,6 +832,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
+  RNZohoSalesIQ:
+    :path: "../node_modules/react-native-zohosalesiq-mobilisten/ios"
   UMAppLoader:
     :path: "../node_modules/unimodules-app-loader/ios"
   UMCore:
@@ -871,6 +879,7 @@ SPEC CHECKSUMS:
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   lottie-ios: 48fac6be217c76937e36e340e2d09cf7b10b7f5f
   lottie-react-native: 1fb4ce21d6ad37dab8343eaff8719df76035bd93
+  Mobilisten: 5a4c0bb50bbf9c9b29e39aa988bfb3a458cf0a3c
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
   Permission-Camera: 4c0b610b46391c85d2d50f1446d98b4103b14b5a
@@ -928,6 +937,7 @@ SPEC CHECKSUMS:
   RNShare: a5dc3b9c53ddc73e155b8cd9a94c70c91913c43c
   RNSVG: ecd661f380a07ba690c9c5929c475a44f432d674
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
+  RNZohoSalesIQ: 8f174b9df4808445fa4a2626eda9c84f87c91616
   UMAppLoader: db2dae4bc3085e21f56d6d9cf7783d08c5999af4
   UMCore: ad33bbda30dee343a248e3696f30502092d9842d
   UMReactNativeAdapter: c10564ac78d5117d448b75b87862173deb043ec5
