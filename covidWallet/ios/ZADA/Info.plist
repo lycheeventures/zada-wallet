@@ -56,12 +56,16 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>ZADA Wallet needs camera access so that you can easily scan ZADA generated QRCode to handle connection and credentails requests</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>ZADA Wallet needs to use your location to update your location on map while using inbuild chat feature.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>ZADA Wallet requires Secure ID access to allows you quick and secure access.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow ZADA to use Microphone?</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>ZADA Wallet needs photos access so that you can easily browse ZADA generated QRCode to handle connection and credentails requests</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>ZADA Wallet needs access to store photos/videos to your photo library.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
