@@ -9,7 +9,12 @@ import FailureModal from './components/FailureModal';
 import SuccessModal from './components/SuccessModal';
 import { useAppDispatch, useAppSelector } from '../../store';
 import ConstantsList from '../../helpers/ConfigApp';
-import { getType, handleCredVerification, handleQRConnectionRequest, handleQRLogin } from './utils';
+import {
+  getType,
+  handleCredVerification,
+  handleQRConnectionRequest,
+  makeVerificationObject,
+} from './utils';
 import { VerificationAPI } from '../../gateways';
 import { showNetworkMessage, showOKDialog, _showAlert } from '../../helpers/Toast';
 import { selectConnections, selectConnectionsStatus } from '../../store/connections/selectors';
@@ -17,6 +22,7 @@ import { acceptConnection } from '../../store/connections/thunk';
 import { addAction } from '../../store/actions';
 import { selectAutoAcceptConnection } from '../../store/auth/selectors';
 import { selectNetworkStatus } from '../../store/app/selectors';
+import { convertStringToBase64 } from '../../helpers/utils';
 
 const defaultCredState = { type: 'none', credentials: [] };
 
@@ -128,15 +134,35 @@ const QRScreen = ({ route, navigation }) => {
           navigateToMainScreen();
           return;
         }
+
         if (!isLink) {
           let type = getType(e.data);
           let credObj = {};
 
+          if (type.startsWith('agency://')) {
+            type = 'agency';
+          }
           switch (type) {
+            // Handling agency
+            case 'agency':
+              setScan(false);
+              setProgress(true);
+              setDialogTitle('Please wait...');
+
+              let base64 = convertStringToBase64(e.data);
+              let result = await VerificationAPI.send_request_to_agency(base64);
+              if (result.data.success) {
+                let res = await makeVerificationObject(result.data.verification);
+                setCredentialData({
+                  type: 'connectionless_verification',
+                  credentials: res.credential,
+                });
+              }
+              return;
             // handling connectionless verification
             case 'connectionless_verification':
               try {
-                let res = await handleQRLogin(JSON.parse(e.data));
+                let res = await makeVerificationObject(JSON.parse(e.data));
                 setCredentialData({
                   type: 'connectionless_verification',
                   credentials: res.credential,
