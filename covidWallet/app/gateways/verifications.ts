@@ -156,3 +156,19 @@ export async function submit_cold_verification(
     throw error;
   }
 }
+
+// Send request to agency.
+export async function send_request_to_agency(data: String) {
+  try {
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/credential/url_request_handler',
+      data: {
+        data,
+      },
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
