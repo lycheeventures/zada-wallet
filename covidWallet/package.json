@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "/": "Development:",
-    "ios:dev": "react-native run-ios --scheme \"reactNativeMultiEnvDev\"",
+    "ios:dev": "react-native run-ios --simulator='iPhone 14 Pro' --scheme \"reactNativeMultiEnvDev\"",
     "ios:prod": "react-native run-ios --scheme \"reactNativeMultiEnv\"",
     "ios:12m": "npm run ios:dev --simulator='iPhone 12 mini' --scheme \"reactNativeMultiEnvDev\"",
     "android:dev": "adb reverse tcp:8081 tcp:8081 && react-native run-android --variant Debug",
@@ -79,7 +79,7 @@
     "react-native-notifications": "^4.3.1",
     "react-native-pager-view": "^5.4.9",
     "react-native-parsed-text": "0.0.22",
-    "react-native-permissions": "^3.0.5",
+    "react-native-permissions": "3.6.1",
     "react-native-phone-number-input": "^2.1.0",
     "react-native-prevent-screenshots": "^1.0.0",
     "react-native-qrcode-scanner": "^1.4.1",
