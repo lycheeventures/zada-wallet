@@ -5,7 +5,13 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import { RecaptchaHandles } from 'react-native-recaptcha-that-works';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { GREEN_COLOR, WHITE_COLOR, PRIMARY_COLOR, BACKGROUND_COLOR } from '../../theme/Colors';
+import {
+  GREEN_COLOR,
+  WHITE_COLOR,
+  PRIMARY_COLOR,
+  BACKGROUND_COLOR,
+  AppColors,
+} from '../../theme/Colors';
 import { AuthStackParamList } from '../../navigation/types';
 import ConstantsList from '../../helpers/ConfigApp';
 import { getItem } from '../../helpers/Storage';
@@ -26,6 +32,7 @@ import RegisterButton from './components/buttons/RegisterButton';
 import LoginButton from './components/buttons/LoginButton';
 import PhoneInputComponent from './components/PhoneInputComponent';
 import GoogleRecaptcha from './components/GoogleRecaptcha';
+import ChatBubble from '../../components/Chat/chatBubble';
 
 const { width } = Dimensions.get('window');
 
@@ -196,6 +203,9 @@ const LoginScreen = ({
 
         {/* Recaptcha */}
         <GoogleRecaptcha recaptchaRef={recaptchaRef} onVerify={login} />
+        <View style={styles.chatBubbleViewStyle}>
+          <ChatBubble iconColor={AppColors.PRIMARY} backgroundColor={AppColors.WHITE} />
+        </View>
       </KeyboardAwareScrollView>
     </View>
   );
@@ -238,6 +248,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
+  },
+  chatBubbleViewStyle: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    marginBottom: 50,
+    marginRight: 18,
+    alignSelf: 'flex-end',
+    justifyContent: 'flex-end',
   },
 });
 

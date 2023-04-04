@@ -34,9 +34,10 @@ interface IProps {
 const CredDetailScreen = (props: IProps) => {
   // Constants
   const credentialId = props.route.params.credentialId;
-  const data = useAppSelector((state: RootState) =>
-    selectSingleCredential(state, credentialId)
-  ) as ICredentialObject; // Credential Object
+  const data =
+    (useAppSelector((state: RootState) =>
+      selectSingleCredential(state, credentialId)
+    ) as ICredentialObject) || {}; // Credential Object
 
   const dispatch = useAppDispatch<AppDispatch>();
   const viewShotRef = useRef(null);
@@ -208,16 +209,18 @@ const CredDetailScreen = (props: IProps) => {
         />
 
         <View style={styles.topContainer}>
-          <DetailCard
-            item={data}
-            issue_date={
-              data.values['Issue Time']
-                ? get_local_issue_date(data.values['Issue Time'])
-                : undefined
-            }
-            organizationName={data.organizationName}
-            setShowQRModal={openQRModal}
-          />
+          {Object.keys(data).length > 0 && (
+            <DetailCard
+              item={data}
+              issue_date={
+                data?.values['Issue Time']
+                  ? get_local_issue_date(data.values['Issue Time'])
+                  : undefined
+              }
+              organizationName={data.organizationName}
+              setShowQRModal={openQRModal}
+            />
+          )}
         </View>
 
         <RenderValues
@@ -231,7 +234,7 @@ const CredDetailScreen = (props: IProps) => {
           inputTextWeight={'normal'}
           inputTextSize={16}
           labelColor={BLACK_COLOR}
-          values={data.values}
+          values={data?.values ? data?.values : {}}
         />
       </View>
     </View>

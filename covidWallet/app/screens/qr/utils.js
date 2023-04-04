@@ -16,11 +16,11 @@ export const getType = (str) => {
   }
 };
 
-export const handleQRLogin = async (loginQRData) => {
+export const makeVerificationObject = async (data) => {
   try {
     let availableCredentials = {
-      metadata: loginQRData.metadata,
-      type: loginQRData.type,
+      metadata: data.metadata,
+      type: data.type,
       imageUrl: require('../../assets/images/qr-code.png'),
       organizationName: 'ZADA Verification',
     };
