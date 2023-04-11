@@ -153,11 +153,17 @@ const QRScreen = ({ route, navigation }) => {
               let result = await VerificationAPI.send_request_to_agency(base64);
               if (result.data.success) {
                 let res = await makeVerificationObject(result.data.verification);
-                setCredentialData({
-                  type: 'connectionless_verification',
-                  credentials: res.credential,
-                });
+                setTimeout(() => {
+                  setCredentialData({
+                    type: 'connectionless_verification',
+                    credentials: res.credential,
+                  });
+                }, 600);
               }
+
+              setScan(false);
+              setProgress(false);
+              setDialogTitle('');
               return;
             // handling connectionless verification
             case 'connectionless_verification':

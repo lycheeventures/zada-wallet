@@ -20,8 +20,6 @@
 		2DCD954D1E0B4F2C00145EB5 /* ZADATests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ZADATests.m */; };
 		330E119450E848CA9CF6B0C1 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D069A740F95423C838CD4CE /* Poppins-Regular.ttf */; };
 		6A059EFFC038403EB8221FC1 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CF924E663F2747058B1A324C /* Poppins-Bold.ttf */; };
-		998C9C0329DC2711009BFE75 /* ForceBridgingFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998C9C0229DC2711009BFE75 /* ForceBridgingFile.swift */; };
-		998C9C0429DC2711009BFE75 /* ForceBridgingFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998C9C0229DC2711009BFE75 /* ForceBridgingFile.swift */; };
 		C147D1A6282B90E40080C82F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = C147D1A5282B90E30080C82F /* assets */; };
 		C186A484282A43CA00A8F262 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
 		D28FBECF67394B063DA4565D /* libPods-ZADA-ZADATests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A6F09E88AFF2C2E44173F7D2 /* libPods-ZADA-ZADATests.a */; };
@@ -78,7 +76,6 @@
 		993E9C01F7D1FE9261C1CB38 /* Pods-ZADA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZADA.release.xcconfig"; path = "Target Support Files/Pods-ZADA/Pods-ZADA.release.xcconfig"; sourceTree = "<group>"; };
 		998C9C0029DC2711009BFE75 /* ZADA-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZADA-Bridging-Header.h"; sourceTree = "<group>"; };
 		998C9C0129DC2711009BFE75 /* ZADA-tvOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZADA-tvOS-Bridging-Header.h"; sourceTree = "<group>"; };
-		998C9C0229DC2711009BFE75 /* ForceBridgingFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ForceBridgingFile.swift; path = ../../../../../../ForceBridgingFile.swift; sourceTree = "<group>"; };
 		9F04713D5DBCCC0A4814B473 /* libPods-ZADA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZADA.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2F44DE0AD14480A810B5B99 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		A6F09E88AFF2C2E44173F7D2 /* libPods-ZADA-ZADATests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZADA-ZADATests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -167,7 +164,6 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				998C9C0229DC2711009BFE75 /* ForceBridgingFile.swift */,
 				998C9C0029DC2711009BFE75 /* ZADA-Bridging-Header.h */,
 				998C9C0129DC2711009BFE75 /* ZADA-tvOS-Bridging-Header.h */,
 			);
@@ -721,7 +717,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				998C9C0329DC2711009BFE75 /* ForceBridgingFile.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
@@ -731,7 +726,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				998C9C0429DC2711009BFE75 /* ForceBridgingFile.swift in Sources */,
 				2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */,
 				2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */,
 			);
@@ -777,7 +771,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EFCCD2E5A6B952F7C8AF1358 /* Pods-ZADA-ZADATests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -801,7 +794,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 82AA0802A0236FB90CCF4BCA /* Pods-ZADA-ZADATests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = ZADATests/Info.plist;
@@ -827,7 +819,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZADA/ZADA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = L66ZW85V2S;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -842,7 +834,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.4.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -867,7 +859,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZADA/ZADA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = L66ZW85V2S;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -878,7 +870,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.4.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -957,7 +949,6 @@
 		2D02E4991E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -984,7 +975,6 @@
 		2D02E49A1E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;

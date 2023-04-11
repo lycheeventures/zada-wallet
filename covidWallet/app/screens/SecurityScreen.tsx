@@ -47,8 +47,6 @@ const SecurityScreen = (props: INProps) => {
         })
           .then(() => {
             checkSecureIDAuth(true);
-            nextHandler();
-
             setShowPinCodeModal(true);
           })
           .catch((error) => {
@@ -68,7 +66,7 @@ const SecurityScreen = (props: INProps) => {
   }
 
   function requiresLegacyAuthentication() {
-    return Platform.Version < 23;
+    return Platform.Version < '23';
   }
 
   function isSecureIDAvailable() {
@@ -88,6 +86,8 @@ const SecurityScreen = (props: INProps) => {
     })
       .then(() => {
         checkSecureIDAuth(true);
+        //set OTP also
+        setShowPinCodeModal(true);
       })
       .catch((error) => {
         //set OTP also
@@ -103,7 +103,6 @@ const SecurityScreen = (props: INProps) => {
     })
       .then(() => {
         checkSecureIDAuth(true);
-        nextHandler();
         //set OTP also
         setShowPinCodeModal(true);
       })
@@ -162,7 +161,7 @@ const SecurityScreen = (props: INProps) => {
       );
       setPincode('');
       setConfirmPincode('');
-      navigation.navigate('NotifyMeScreen', { user });
+      nextHandler();
     } catch (error) {
       showMessage('Zada Wallet', error?.toString());
     }
@@ -212,9 +211,6 @@ const SecurityScreen = (props: INProps) => {
           if (text.length == 0) setConfirmPincodeError('');
         }}
         confirmPincodeError={confirmPincodeError}
-        onCloseClick={() => {
-          setShowPinCodeModal(!showPincodeModal);
-        }}
         onContinueClick={_setPinCode}
       />
     </View>
