@@ -1,14 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Pressable,
-  Animated,
-  Keyboard,
-} from 'react-native';
-import { RED_COLOR } from '../../theme/Colors';
+import { View, Text, TextInput, StyleSheet, Pressable, Animated, Keyboard } from 'react-native';
+import { AppColors, RED_COLOR } from '../../theme/Colors';
 
 interface INProps {
   onPincodeChange: (text: string) => {};
@@ -74,8 +66,19 @@ const InputPinComponent = (props: INProps) => {
         : style.inputContainer;
 
     return (
-      <View key={idx} style={[containerStyle, { marginLeft: idx == 3 ? 30 : 14 }]}>
-        <Text style={style.inputText}>{digit === ' ' ? '*' : digit}</Text>
+      <View key={idx} style={[containerStyle, { marginLeft: 14 }]}>
+        {digit === ' ' ? (
+          <View
+            style={{
+              height: 10,
+              width: 10,
+              borderRadius: 5,
+              backgroundColor: AppColors.WHITE,
+            }}
+          />
+        ) : (
+          <Text style={style.inputText}>{digit}</Text>
+        )}
       </View>
     );
   };
@@ -114,10 +117,6 @@ const style = StyleSheet.create({
   inputsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderRadius: 4,
-    borderColor: '#cccccc',
   },
   inputContainer: {
     alignItems: 'center',
@@ -129,8 +128,12 @@ const style = StyleSheet.create({
     borderColor: '#0f5181',
   },
   inputText: {
-    fontSize: 16,
-    // color: 'black',
+    fontSize: 24,
+    color: AppColors.WHITE,
+    textAlign: 'center',
+    height: 30,
+    width: 30,
+    borderRadius: 15,
   },
   hiddenCodeInput: {
     position: 'absolute',

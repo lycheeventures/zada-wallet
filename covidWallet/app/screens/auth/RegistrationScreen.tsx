@@ -11,6 +11,7 @@ import {
   GRAY_COLOR,
   PRIMARY_COLOR,
   BACKGROUND_COLOR,
+  AppColors,
 } from '../../theme/Colors';
 import { AuthStackParamList } from '../../navigation/types';
 
@@ -35,6 +36,7 @@ import LoginButton from './components/buttons/LoginButton';
 import GoogleRecaptcha from './components/GoogleRecaptcha';
 import PhoneInputComponent from './components/PhoneInputComponent';
 import { validate } from '../../helpers/validations/validate';
+import ChatBubble from '../../components/Chat/chatBubble';
 
 const { width } = Dimensions.get('window');
 
@@ -237,6 +239,9 @@ const RegistrationScreen = ({
         </View>
         {/* Recaptcha */}
         <GoogleRecaptcha recaptchaRef={recaptchaRef} onVerify={register} />
+        <View style={styles.chatBubbleViewStyle}>
+          <ChatBubble iconColor={AppColors.PRIMARY} backgroundColor={AppColors.WHITE} />
+        </View>
       </KeyboardAwareScrollView>
     </View>
   );
@@ -275,6 +280,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
+  },
+  chatBubbleViewStyle: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    marginBottom: 50,
+    marginRight: 18,
+    alignSelf: 'flex-end',
+    justifyContent: 'flex-end',
   },
 });
 

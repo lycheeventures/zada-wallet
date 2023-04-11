@@ -3,19 +3,16 @@ import {
   StyleSheet,
   Text,
   View,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Animated,
   Dimensions,
   Pressable,
+  Easing,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import {
-  BACKGROUND_COLOR,
-  BLACK_COLOR,
-  GREEN_COLOR,
-  WHITE_COLOR,
-} from '../../theme/Colors';
+import { AppColors } from '../../theme/Colors';
 import TouchableComponent from '../Buttons/TouchableComponent';
 import InputPinComponent from '../Input/InputPinComponent';
 
@@ -37,32 +34,53 @@ const PincodeModal = ({
   // States
   const [type, setType] = useState('PC');
   const [animatedValue] = useState(new Animated.Value(0));
-  const [buttonBackgroundValue, setButtonBackgroundValue] = useState(
-    new Animated.Value(0)
-  );
-  const [mark, setMark] = useState(false);
+  const [animateNextBtnValue, setAnimateNextBtnValue] = useState(new Animated.Value(0));
+  const [animateDoneBtnValue, setAnimateDoneBtnValue] = useState(new Animated.Value(0));
+  const [animateBackgroundValue, setAnimateBackgroundValue] = useState(new Animated.Value(0));
+  const [animateLeftValue, setAnimateLeftValue] = useState(new Animated.Value(0));
+  const [animateFade, setAnimateFade] = useState(new Animated.Value(1));
+  const [disabled, setDisabled] = useState(true);
 
   // UseEffects
   useEffect(() => {
     if (pincode.length === 6) {
-      setTimeout(() => {
-        _handleContinueClick();
-        setMark(false);
-        setButtonBackgroundValue(new Animated.Value(0));
-      }, 1000);
-
-      setMark(true);
+      Animated.timing(animateNextBtnValue, {
+        toValue: 100,
+        duration: 300,
+      }).start();
+      setDisabled(false);
+    } else {
+      Animated.timing(animateNextBtnValue, {
+        toValue: 100,
+        duration: 300,
+      }).start();
+      setAnimateNextBtnValue(new Animated.Value(0));
+      setAnimateBackgroundValue(new Animated.Value(0));
+      setDisabled(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pincode]);
 
+  // UseEffects
   useEffect(() => {
-    if (mark) {
-      Animated.timing(buttonBackgroundValue, {
-        toValue: 100,
-        duration: 500,
-      }).start();
+    if (confirmPincode) {
+      if (confirmPincode.length === 6) {
+        Animated.timing(animateDoneBtnValue, {
+          toValue: 100,
+          duration: 300,
+        }).start();
+        setDisabled(false);
+      } else {
+        Animated.timing(animateDoneBtnValue, {
+          toValue: 100,
+          duration: 300,
+        }).start();
+        setAnimateDoneBtnValue(new Animated.Value(0));
+        setDisabled(true);
+      }
     }
-  }, [mark, buttonBackgroundValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [confirmPincode]);
 
   useEffect(() => {
     if (pincodeError !== '' || confirmPincodeError !== '') {
@@ -77,22 +95,18 @@ const PincodeModal = ({
       Animated.timing(animatedValue, {
         toValue: 10,
         duration: 50,
-        useNativeDriver: true,
       }),
       Animated.timing(animatedValue, {
         toValue: -10,
         duration: 50,
-        useNativeDriver: true,
       }),
       Animated.timing(animatedValue, {
         toValue: 10,
         duration: 50,
-        useNativeDriver: true,
       }),
       Animated.timing(animatedValue, {
         toValue: 0,
         duration: 50,
-        useNativeDriver: true,
       }),
     ]).start();
   }, [animatedValue]);
@@ -107,7 +121,37 @@ const PincodeModal = ({
 
     // Handling Pincode Setting
     if (type === 'PC' && pincode.length === 6) {
-      setType('CPC');
+      setDisabled(true);
+
+      Animated.sequence([
+        Animated.sequence([
+          Animated.timing(animateFade, {
+            toValue: 0,
+            duration: 100,
+            easing: Easing.linear,
+          }),
+          Animated.timing(animateLeftValue, {
+            toValue: 500,
+            duration: 0,
+            easing: Easing.linear,
+          }),
+        ]),
+        Animated.parallel([
+          Animated.timing(animateFade, {
+            toValue: 1,
+            duration: 150,
+            easing: Easing.linear,
+          }),
+          Animated.timing(animateLeftValue, {
+            toValue: 0,
+            duration: 150,
+            easing: Easing.linear,
+          }),
+        ]),
+      ]).start();
+      setTimeout(() => {
+        setType('CPC');
+      }, 100);
       return;
     }
     if (confirmPincode.length === 6) {
@@ -123,121 +167,182 @@ const PincodeModal = ({
 
   // Handle back button
   const _handleBackPress = () => {
-    onPincodeChange('');
-    onConfirmPincodeChange('');
-    setType('PC');
+    Animated.sequence([
+      Animated.sequence([
+        Animated.timing(animateFade, {
+          toValue: 0,
+          duration: 100,
+          easing: Easing.linear,
+        }),
+        Animated.timing(animateLeftValue, {
+          toValue: -500,
+          duration: 0,
+          easing: Easing.linear,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.timing(animateFade, {
+          toValue: 1,
+          duration: 150,
+          easing: Easing.linear,
+        }),
+        Animated.timing(animateLeftValue, {
+          toValue: 0,
+          duration: 150,
+          easing: Easing.linear,
+        }),
+      ]),
+    ]).start();
+
+    setTimeout(() => {
+      onPincodeChange('');
+      onConfirmPincodeChange('');
+      setType('PC');
+    }, 100);
   };
 
   // Render
-  const renderTopLeftButton = (title, func) => (
+  const renderTopLeftButton = (title, onPress) => (
     <Pressable
       android_ripple={{ borderless: false }}
-      onPress={func}
+      onPress={onPress}
       underlayColor={'#00000000'}
       style={styles.backButtonStyle}>
-      <Text style={[styles._btnTitle, { color: BLACK_COLOR, fontWeight: 'bold' }]}>
-        {title}
-      </Text>
+      {Platform.OS === 'ios' ? (
+        <Image
+          source={require('../../assets/images/back-ios-white.png')}
+          style={styles.backImageStyle}
+        />
+      ) : (
+        <Image
+          source={require('../../assets/images/back-android-white.png')}
+          style={styles.backImageStyle}
+        />
+      )}
     </Pressable>
   );
 
   const renderVerifyView = () => {
     return (
-      <>
+      <View style={styles._mainContainer}>
         {renderTopLeftButton('Cancel', () => {
           onCloseClick();
         })}
-        <Text style={styles._infoText}>
-          Please enter your 6 digit pincode to verify request
-        </Text>
-        <Animated.View
-          style={[
-            styles.pincodeViewStyle,
-            { transform: [{ translateX: animatedValue }] },
-          ]}>
-          <InputPinComponent
-            onPincodeChange={onPincodeChange}
-            pincodeError={pincodeError}
-          />
-        </Animated.View>
-        <View style={styles._btnContainer}>
-          <TouchableComponent
-            onPress={onContinueClick}
-            underlayColor={BLACK_COLOR}
-            style={[styles._button, { backgroundColor: '#28282B' }]}>
-            <Text style={styles._btnTitle}>CONTINUE</Text>
-          </TouchableComponent>
+        <View style={styles.textImageContainer}>
+          <Image source={require('../../assets/images/lock.png')} style={styles.lockImageStyle} />
+          <Text style={styles._infoText}>VERIFY</Text>
+          <Text style={styles._infoSubText}>
+            Please enter your 6 digit pincode to verify request
+          </Text>
         </View>
-      </>
+
+        <Animated.View
+          style={[styles.pincodeViewStyle, { transform: [{ translateX: animatedValue }] }]}>
+          <InputPinComponent onPincodeChange={onPincodeChange} pincodeError={pincodeError} />
+        </Animated.View>
+        <TouchableComponent
+          disabled={disabled}
+          style={styles._button}
+          onPress={onContinueClick}
+          underlayColor={AppColors.BLUE}>
+          <Animated.View
+            style={[
+              styles._button,
+              {
+                backgroundColor: animateNextBtnValue.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: [AppColors.DISABLED_COLOR, AppColors.WHITE],
+                }),
+              },
+            ]}>
+            <Text style={styles._btnTitle}>CONTINUE</Text>
+          </Animated.View>
+        </TouchableComponent>
+      </View>
     );
   };
 
   const renderView = () => {
-    if (type === 'CPC') {
-      return (
-        <>
-          {renderTopLeftButton('Back', _handleBackPress)}
-          <Text style={styles._infoText}>Please confirm PIN Again.</Text>
-          <Animated.View
-            style={[
-              styles.pincodeViewStyle,
-              { transform: [{ translateX: animatedValue }] },
-            ]}>
-            <InputPinComponent
-              onPincodeChange={onConfirmPincodeChange}
-              pincodeError={confirmPincodeError}
-            />
-          </Animated.View>
-          <View style={styles._btnContainer}>
+    return (
+      <Animated.View
+        style={[styles._mainContainer, { opacity: animateFade, left: animateLeftValue }]}>
+        {type === 'CPC' ? (
+          <>
+            {renderTopLeftButton('Back', _handleBackPress)}
+            <View style={styles.textImageContainer}>
+              <Image
+                source={require('../../assets/images/lock.png')}
+                style={styles.lockImageStyle}
+              />
+              <Text style={styles._infoText}>Please confirm PIN Again.</Text>
+              <Text style={styles._infoSubText}>
+                Re-enter PIN that you have entered on previous screen.
+              </Text>
+            </View>
+            <Animated.View
+              style={[styles.pincodeViewStyle, { transform: [{ translateX: animatedValue }] }]}>
+              <InputPinComponent
+                onPincodeChange={onConfirmPincodeChange}
+                pincodeError={confirmPincodeError}
+              />
+            </Animated.View>
             <TouchableComponent
+              disabled={disabled}
+              style={styles._button}
               onPress={_handleContinueClick}
-              underlayColor={BLACK_COLOR}
-              style={[styles._button, { backgroundColor: '#28282B' }]}>
-              <Text style={styles._btnTitle}>CONTINUE</Text>
-            </TouchableComponent>
-          </View>
-        </>
-      );
-    } else {
-      return (
-        <>
-          <Text style={styles._infoText}>Enter a new six-digit PIN.</Text>
-          <Animated.View
-            style={[
-              styles.pincodeViewStyle,
-              { transform: [{ translateX: animatedValue }] },
-            ]}>
-            <InputPinComponent
-              onPincodeChange={onPincodeChange}
-              pincodeError={pincodeError}
-            />
-          </Animated.View>
-          <View style={styles._btnContainer}>
-            <TouchableComponent
-              onPress={_handleContinueClick}
-              underlayColor={BLACK_COLOR}
-              // style={[
-              //   ,
-              //   { backgroundColor: mark ? GREEN_COLOR : '#28282B' },
-              // ]}
-            >
+              underlayColor={AppColors.BLUE}>
               <Animated.View
                 style={[
                   styles._button,
                   {
-                    backgroundColor: buttonBackgroundValue.interpolate({
+                    backgroundColor: animateDoneBtnValue.interpolate({
                       inputRange: [0, 100],
-                      outputRange: ['#28282B', GREEN_COLOR],
+                      outputRange: [AppColors.DISABLED_COLOR, AppColors.WHITE],
                     }),
                   },
                 ]}>
-                <Text style={styles._btnTitle}>Next</Text>
+                <Text style={styles._btnTitle}>CONTINUE</Text>
               </Animated.View>
             </TouchableComponent>
-          </View>
-        </>
-      );
-    }
+          </>
+        ) : (
+          <>
+            <View style={styles.textImageContainer}>
+              <Image
+                source={require('../../assets/images/lock.png')}
+                style={styles.lockImageStyle}
+              />
+              <Text style={styles._infoText}>Enter a new six-digit PIN.</Text>
+              <Text style={styles._infoSubText}>This pin is required when sharing your data</Text>
+            </View>
+            <Animated.View
+              style={[styles.pincodeViewStyle, { transform: [{ translateX: animatedValue }] }]}>
+              <InputPinComponent onPincodeChange={onPincodeChange} pincodeError={pincodeError} />
+            </Animated.View>
+            <View style={styles._btnContainer}>
+              <TouchableComponent
+                disabled={disabled}
+                style={styles._button}
+                onPress={_handleContinueClick}
+                underlayColor={AppColors.BLUE}>
+                <Animated.View
+                  style={[
+                    styles._button,
+                    {
+                      backgroundColor: animateNextBtnValue.interpolate({
+                        inputRange: [0, 100],
+                        outputRange: [AppColors.DISABLED_COLOR, AppColors.WHITE],
+                      }),
+                    },
+                  ]}>
+                  <Text style={styles._btnTitle}>Next</Text>
+                </Animated.View>
+              </TouchableComponent>
+            </View>
+          </>
+        )}
+      </Animated.View>
+    );
   };
 
   return (
@@ -245,18 +350,27 @@ const PincodeModal = ({
       isVisible={isVisible}
       animationIn={'fadeInLeft'}
       animationOut={'fadeOutRight'}
-      animationInTiming={500}
-      animationOutTiming={500}
+      animationInTiming={250}
+      animationOutTiming={250}
       style={{ margin: 0 }}>
       <View style={{ flex: 1 }}>
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingViewStyle}
           keyboardShouldPersistTaps="always"
           contentContainerStyle={{ flex: 1 }}
-          behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
-          <View style={[styles._mainContainer, { backgroundColor: BACKGROUND_COLOR }]}>
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <Animated.View
+            style={[
+              styles._mainContainer,
+              {
+                backgroundColor: animateBackgroundValue.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: [AppColors.PRIMARY, AppColors.PRIMARY],
+                }),
+              },
+            ]}>
             {modalType === 'verify' ? renderVerifyView() : renderView()}
-          </View>
+          </Animated.View>
         </KeyboardAvoidingView>
       </View>
     </Modal>
@@ -268,48 +382,75 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-around',
+    width: '100%',
   },
   keyboardAvoidingViewStyle: {
     flex: 1,
+  },
+  textImageContainer: {
+    alignItems: 'center',
+  },
+  lockImageStyle: {
+    marginBottom: 8,
+    height: 100,
+    width: 100,
   },
   _infoText: {
     textAlign: 'center',
     paddingHorizontal: 20,
     fontSize: 18,
-    marginTop: '20%',
+    marginTop: 8,
+    fontFamily: 'Poppins-Bold',
+    color: AppColors.WHITE,
+  },
+  _infoSubText: {
+    paddingHorizontal: 20,
+    textAlign: 'center',
+    marginTop: 8,
+    fontSize: 12,
     fontFamily: 'Poppins-Regular',
-    color: BLACK_COLOR,
+    color: AppColors.WHITE,
   },
-  pincodeViewStyle: {
-    marginTop: 24,
-  },
+  pincodeViewStyle: {},
   _btnContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginVertical: 20,
+    borderRadius: 25,
   },
   _button: {
-    width: width - 100,
+    width: 250,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 20,
-    borderWidth: 1,
-    borderRadius: 4,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   _btnTitle: {
     fontSize: 14,
-    fontFamily: 'Poppins-Regular',
-    color: WHITE_COLOR,
+    fontFamily: 'Poppins-Bold',
+    color: AppColors.BLACK_COLOR,
+  },
+  backImageStyle: {
+    resizeMode: 'contain',
+    height: 18,
+    width: 18,
   },
   backButtonStyle: {
     padding: 8,
     paddingLeft: 12,
     paddingRight: 12,
     position: 'absolute',
-    top: 35,
+    top: 40,
     left: 16,
   },
 });
