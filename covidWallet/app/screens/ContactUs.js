@@ -1,14 +1,10 @@
 import * as React from 'react';
-import {
-  View,
-  Text,
-  Linking,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-import {
-  PRIMARY_COLOR,
-} from '../theme/Colors';
+import { View, Text, Linking, StyleSheet, ScrollView } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import TouchableComponent from '../components/Buttons/TouchableComponent';
+import { AppColors } from '../theme/Colors';
+import { ZohoSalesIQOpenChat } from '../components/Chat/utils';
 
 function ContactUs() {
   return (
@@ -22,35 +18,61 @@ function ContactUs() {
         contentContainerStyle={styles.contentContainer}>
         <View style={styles.centerView}>
           <Text style={styles.MainText}>
-            For questions and support, don’t hesitate to contact us on any of
-            the following:
+            For questions and support, don’t hesitate to contact us on any of the following:
           </Text>
         </View>
 
-        <View style={{}}>
-          <Text
-            style={[styles.ItemText, {color: PRIMARY_COLOR}]}
-            onPress={() => {
-              Linking.openURL('tel://+959765606651');
-            }}>
-            Phone: +959765606651
-          </Text>
+        <View>
+          <View style={styles.flexRow}>
+            <TouchableComponent
+              onPress={() => {
+                Linking.openURL('tel://+959765606651');
+              }}
+              addShadow={true}>
+              <View style={styles.callViewStyle}>
+                <MaterialIcons name="phone" size={35} color={AppColors.WHITE} />
+                <Text style={[styles.ItemText, { color: AppColors.WHITE }]}>Call Us</Text>
+              </View>
+            </TouchableComponent>
 
-          <Text
-            style={[styles.ItemText, {color: PRIMARY_COLOR}]}
-            onPress={() => {
-              Linking.openURL('mailto:help@zada.io');
-            }}>
-            Email: help@zada.io
-          </Text>
+            <TouchableComponent
+              onPress={() => {
+                Linking.openURL('mailto:help@zada.io');
+              }}
+              addShadow={true}>
+              <View style={styles.callViewStyle}>
+                <MaterialIcons name="mail" size={35} color={AppColors.WHITE} />
+                <Text style={[styles.ItemText, { color: AppColors.WHITE }]}>Email</Text>
+              </View>
+            </TouchableComponent>
+          </View>
+          <View style={styles.flexRow}>
+            <TouchableComponent
+              onPress={() => {
+                Linking.openURL('http://m.me/zadamyanmar');
+              }}
+              addShadow={true}>
+              <View style={styles.callViewStyle}>
+                <MaterialCommunityIcons
+                  name="facebook-messenger"
+                  size={35}
+                  color={AppColors.WHITE}
+                />
+                <Text style={[styles.ItemText, { color: AppColors.WHITE }]}>Facebook</Text>
+              </View>
+            </TouchableComponent>
 
-          <Text
-            style={[styles.ItemText, {color: PRIMARY_COLOR}]}
-            onPress={() => {
-              Linking.openURL('http://m.me/zadamyanmar');
-            }}>
-            Facebook messenger: m.me/zadamyanmar
-          </Text>
+            <TouchableComponent
+              onPress={() => {
+                ZohoSalesIQOpenChat();
+              }}
+              addShadow={true}>
+              <View style={styles.callViewStyle}>
+                <MaterialCommunityIcons name="chat-processing" size={35} color={AppColors.WHITE} />
+                <Text style={[styles.ItemText, { color: AppColors.WHITE }]}>Chat Now!</Text>
+              </View>
+            </TouchableComponent>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -61,15 +83,28 @@ const styles = StyleSheet.create({
   MainContainer: {
     flex: 1,
   },
+  flexRow: {
+    flexDirection: 'row',
+    marginLeft: 8,
+    marginRight: 8,
+    marginBottom: 32,
+    justifyContent: 'space-around',
+  },
   contentContainer: {
-    alignItems: 'center',
     justifyContent: 'center',
   },
-
+  callViewStyle: {
+    width: 150,
+    height: 150,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: AppColors.BLUE,
+    borderRadius: 4,
+  },
   centerView: {
     marginVertical: 25,
     marginLeft: 15,
-    marginRight:8,
+    marginRight: 8,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -91,6 +126,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  chatBubbleViewStyle: {
+    flex: 1,
+    marginBottom: 50,
+    marginRight: 18,
+    alignSelf: 'flex-end',
+    justifyContent: 'flex-end',
   },
 });
 export default ContactUs;
