@@ -15,14 +15,16 @@ import {
   handleQRConnectionRequest,
   makeVerificationObject,
 } from './utils';
-import { VerificationAPI } from '../../gateways';
-import { showNetworkMessage, showOKDialog, _showAlert } from '../../helpers/Toast';
+import { CredentialAPI, VerificationAPI } from '../../gateways';
+import { showAskDialog, showNetworkMessage, showOKDialog, _showAlert } from '../../helpers/Toast';
 import { selectConnections, selectConnectionsStatus } from '../../store/connections/selectors';
 import { acceptConnection } from '../../store/connections/thunk';
 import { addAction } from '../../store/actions';
-import { selectAutoAcceptConnection } from '../../store/auth/selectors';
+import { selectAutoAcceptConnection, selectUser } from '../../store/auth/selectors';
 import { selectNetworkStatus } from '../../store/app/selectors';
 import { convertStringToBase64 } from '../../helpers/utils';
+import { clearAllAndLogout } from '../../store/utils';
+import { addConnection } from '../../store/connections';
 
 const defaultCredState = { type: 'none', credentials: [] };
 
@@ -31,6 +33,7 @@ const QRScreen = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
 
   // Selectors
+  const user = useAppSelector(selectUser);
   const connections = useAppSelector(selectConnections.selectAll);
   const connectionStatus = useAppSelector(selectConnectionsStatus);
   const auto_accept_connection = useAppSelector(selectAutoAcceptConnection);
@@ -208,7 +211,6 @@ const QRScreen = ({ route, navigation }) => {
                   });
                 }
               } catch (err) {
-                console.log('err => ', err);
                 throw 'Not a valid ZADA QR';
               }
               return;
@@ -222,7 +224,50 @@ const QRScreen = ({ route, navigation }) => {
         try {
           qrJSON = JSON.parse(e.data);
         } catch (error) {
-          throw 'Not a valid ZADA QR';
+          let isUrl = e.data.startsWith('https://');
+          if (isUrl) {
+            setScan(false);
+            /// check if user.phone is available  or not and if not then show dialog to re-login the app.
+            if (!user.phone) {
+              showAskDialog(
+                'ZADA',
+                'You need to re-login the app to continue!',
+                () => {
+                  dispatch(clearAllAndLogout());
+                },
+                navigateToMainScreen,
+                'logout'
+              );
+              return;
+            }
+            // Sending Link
+            showAskDialog(
+              'ZADA',
+              'Do you want to receive this as credential?',
+              async () => {
+                setScan(false);
+                setProgress(true);
+                setDialogTitle('Please wait...');
+                let resp = await CredentialAPI.submit_url_scheme(e.data, user.phone);
+                if (resp.data.success) {
+                  // create connection if not exists
+                  if (resp.data.connection) {
+                    dispatch(addConnection(resp.data.connection));
+                  }
+                  showOKDialog('ZADA', 'You will receive credential soon!', navigateToMainScreen);
+                  return;
+                } else {
+                  navigateToMainScreen();
+                  throw 'Not a valid ZADA QR';
+                }
+              },
+              navigateToMainScreen
+            );
+            return;
+          } else {
+            navigateToMainScreen();
+            throw 'Not a valid ZADA QR';
+          }
         }
 
         if (qrJSON.type === ConstantsList.CONN_REQ) {
