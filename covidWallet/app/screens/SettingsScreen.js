@@ -11,7 +11,7 @@ import { showAskDialog, showMessage, showNetworkMessage, showOKDialog } from '..
 import { useAppDispatch, useAppSelector } from '../store';
 import { updateUser } from '../store/auth';
 import { changeAppStatus } from '../store/app';
-import { clearAll, deleteAccountAndClearAll } from '../store/utils';
+import { clearAllAndLogout, deleteAccountAndClearAll } from '../store/utils';
 import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors';
 import { selectAppStatus, selectNetworkStatus } from '../store/app/selectors';
 import useDevelopment from '../hooks/useDevelopment';
@@ -100,7 +100,7 @@ export default function SettingsScreen(props) {
         dispatch(changeAppStatus('loading'));
         const pCode = await getItem(PIN_CODE);
         saveItem(PIN_CODE, pCode);
-        clearAll(dispatch);
+        clearAllAndLogout(dispatch);
       },
       () => {},
       'Ok'

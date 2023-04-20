@@ -4,8 +4,9 @@ import * as ConnectionAPI from './connections';
 import * as VerificationAPI from './verifications';
 import { ResponseCodesEnum } from '../enums';
 import { showOKDialog, _showAlert } from '../helpers';
-import { clearAll } from '../store/utils';
+import { clearAllAndLogout } from '../store/utils';
 import { store } from '../store';
+import { navigationRef } from '../navigation/utils';
 
 // Exception List
 const exceptionList = ['The specified key does not exist.'];
@@ -16,6 +17,7 @@ const SERVER_TIMEOUT = 'The operation could not be completed. Please try again!'
 const INVALID_TOKEN = 'Your Session has expired. Please login again.';
 const INVALID_PARAMS = 'Invalid parameters!';
 const ALREADY_EXIST = 'Already exist in database';
+const QR_ERROR = 'Not a valid ZADA QR';
 
 export function throwErrorIfExist(error: any) {
   if (error?.response?.data.error) {
@@ -54,7 +56,12 @@ export function handleErrorMessage(error: any) {
   if (exceptionList.includes(error.response.data.error)) return;
 
   if (error.response.data.error === 'Invalid Token!') {
-    showOKDialog('Session Timeout', INVALID_TOKEN, () => clearAll(store.dispatch, 'timeout'));
+    showOKDialog('Session Timeout', INVALID_TOKEN, () => clearAllAndLogout(store.dispatch, 'timeout'));
+    return;
+  }
+
+  if (error.response.data.error === 'Unsupported URL!') {
+    showOKDialog('ZADA', QR_ERROR, async () => navigationRef.navigate('MainScreen'));
     return;
   }
 
