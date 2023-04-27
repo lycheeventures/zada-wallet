@@ -243,16 +243,6 @@ export default function SettingsScreen(props) {
           style={styles._appVersion}>{`Version ${
           version == undefined || version === null ? getVersion().toString() : version.version
         }`}</Text>
-        <Text style={styles.footerText}>
-          In Collaboration with&nbsp;
-          <Text
-            style={{ color: PRIMARY_COLOR }}
-            onPress={() => {
-              Linking.openURL('https://trust.net.pk/');
-            }}>
-            TrustNet Pakistan
-          </Text>
-        </Text>
       </View>
     </View>
   );
@@ -305,22 +295,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontFamily: 'Poppins-Regular',
     fontWeight: 'bold',
+    marginBottom: 10,
+    paddingBottom: 10,
   },
   footer: {
     justifyContent: 'center',
     textAlign: 'center',
     alignContent: 'center',
-  },
-  footerText: {
-    textAlign: 'center',
-    color: 'black',
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-    paddingTop: 5,
-    fontSize: 14,
-    marginHorizontal: 10,
-    marginBottom: 10,
-    fontFamily: 'Poppins-Regular',
   },
   devTextStyle: {
     textAlign: 'center',
