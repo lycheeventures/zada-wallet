@@ -230,6 +230,23 @@ export async function get_credential_template(name: string) {
   }
 }
 
+export async function submit_url_scheme(url: string, phone: string) {
+  try {
+    let data = {
+      phone,
+      url,
+    };
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/credential/submit_url_scheme',
+      data,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function invalidateCache() {
   try {
     const result = await http_client({
