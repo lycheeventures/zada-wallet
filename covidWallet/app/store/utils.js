@@ -45,7 +45,8 @@ export const createEncryptor = ({ secretKey }) =>
     }
   );
 
-export const clearAll = async (dispatch, type) => {
+/// Write a function that will clear all the data from the store and logout the user
+export const clearAllAndLogout = async (dispatch, type) => {
   if (type && type !== 'timeout') {
     await AuthAPI.unRegisterDeviceToken(Platform.OS);
   }

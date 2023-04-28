@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { Notifications, Registered, RegistrationError } from 'react-native-notifications';
-import { useAppDispatch } from '../store';
+import { AppDispatch, useAppDispatch } from '../store';
 import { fetchActions } from '../store/actions/thunk';
 import { AuthAPI } from '../gateways';
 import { getItem, saveItem } from '../helpers/Storage';
 import ConstantList from '../helpers/ConfigApp';
+import { fetchConnections } from '../store/connections/thunk';
 
 const useNotification = () => {
   // Constants
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch<AppDispatch>();
 
   // Registering Notifications.
   useEffect(() => {
@@ -38,6 +39,7 @@ const useNotification = () => {
     Notifications.events().registerNotificationReceivedForeground(
       (notification: any, completion) => {
         if (notification?.payload) {
+          dispatch(fetchConnections());
           dispatch(fetchActions());
         }
         completion({ alert: true, sound: true, badge: true });
@@ -49,6 +51,7 @@ const useNotification = () => {
     // Notification open handler when app is in background
     Notifications.events().registerNotificationOpened((notification: any, completion) => {
       if (notification?.payload) {
+        dispatch(fetchConnections());
         dispatch(fetchActions());
       }
       completion();
@@ -58,6 +61,7 @@ const useNotification = () => {
     Notifications.getInitialNotification()
       .then((notification) => {
         if (notification?.payload) {
+          dispatch(fetchConnections());
           dispatch(fetchActions());
         }
       })
