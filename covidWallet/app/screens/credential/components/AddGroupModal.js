@@ -62,42 +62,47 @@ const AddGroupModal = ({
     setSearch(searchText);
   };
 
-  const renderItem = ({ item, index }) => (
-    <Pressable
-      style={{ marginBottom: 5 }}
-      onPress={() => {
-        let credIndex = creds.findIndex((c) => c.credentialId === item.credentialId);
-        creds[credIndex].selected = !creds[credIndex].selected;
-        setSearch('');
-        setCreds([...creds]);
-      }}>
-      <CredentialsCard
-        updateBackgroundImage={updateBackgroundImage}
-        item={item}
-        schemeId={item['schemaId']}
-        card_title={item.name}
-        card_type={item.type}
-        issuer={item.organizationName}
-        card_user=""
-        date={
-          item.values['Issue Time'] ? get_local_issue_date(item.values['Issue Time']) : undefined
-        }
-        card_logo={{ uri: item.imageUrl }}
-      />
-      {item.selected && (
-        <FeatherIcon
-          name="check"
-          size={30}
-          color={GREEN_COLOR}
-          style={{
-            position: 'absolute',
-            top: -5,
-            right: -5,
-          }}
+  const renderItem = ({ item, index }) => {
+    let date = item.values['Issue Time']
+      ? get_local_issue_date(item.values['Issue Time'])
+      : item.issuedAtUtc
+      ? get_local_issue_date(item.issuedAtUtc)
+      : undefined;
+    return (
+      <Pressable
+        style={{ marginBottom: 5 }}
+        onPress={() => {
+          let credIndex = creds.findIndex((c) => c.credentialId === item.credentialId);
+          creds[credIndex].selected = !creds[credIndex].selected;
+          setSearch('');
+          setCreds([...creds]);
+        }}>
+        <CredentialsCard
+          updateBackgroundImage={updateBackgroundImage}
+          item={item}
+          schemeId={item['schemaId']}
+          card_title={item.name}
+          card_type={item.type}
+          issuer={item.organizationName}
+          card_user=""
+          date={date}
+          card_logo={{ uri: item.imageUrl }}
         />
-      )}
-    </Pressable>
-  );
+        {item.selected && (
+          <FeatherIcon
+            name="check"
+            size={30}
+            color={GREEN_COLOR}
+            style={{
+              position: 'absolute',
+              top: -5,
+              right: -5,
+            }}
+          />
+        )}
+      </Pressable>
+    );
+  };
 
   return (
     <Modal
