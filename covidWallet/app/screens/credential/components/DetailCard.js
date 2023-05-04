@@ -41,13 +41,19 @@ const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
         <View style={styles.issueDateViewStyle}>
           {issue_date && (
             <>
-              <Text style={styles.issueDateLabelStyle}>Issue Date</Text>
-              <Text style={styles.issueTextStyle}>{issue_date}</Text>
+              <Text maxFontSizeMultiplier={1.5} style={styles.issueDateLabelStyle}>
+                Issue Date
+              </Text>
+              <Text maxFontSizeMultiplier={1.5} style={styles.issueTextStyle}>
+                {issue_date}
+              </Text>
             </>
           )}
         </View>
         <View style={styles.issueTextContainerStyle}>
-          <Text style={styles.typeTextStyle}>{item?.type}</Text>
+          <Text maxFontSizeMultiplier={1.2} style={styles.typeTextStyle}>
+            {item?.type}
+          </Text>
         </View>
         <View style={styles._bottomContainer}>
           <View style={styles._bottomInsideContainer}>
@@ -55,8 +61,13 @@ const DetailCard = ({ item, issue_date, organizationName, setShowQRModal }) => {
             <View style={styles._cardInfoContainer}>
               {organizationName && (
                 <View>
-                  <Text style={styles.card_small_text}>Issued by</Text>
-                  <Text numberOfLines={2} style={[styles.card_small_text, { fontWeight: 'bold' }]}>
+                  <Text maxFontSizeMultiplier={1.5} style={styles.card_small_text}>
+                    Issued by
+                  </Text>
+                  <Text
+                    maxFontSizeMultiplier={1.5}
+                    numberOfLines={2}
+                    style={[styles.card_small_text, { fontWeight: 'bold' }]}>
                     {organizationName}
                   </Text>
                 </View>

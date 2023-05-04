@@ -36,7 +36,9 @@ const CredentialsScreen = (props) => {
                 },
               ]}
               onPress={() => setIndex(i)}>
-              <Text style={[styles._tabText]}>{route.title}</Text>
+              <Text maxFontSizeMultiplier={1.3} style={[styles._tabText]}>
+                {route.title}
+              </Text>
             </TouchableOpacity>
           );
         })}

@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   _row: {
     width: '100%',
-    height: Dimensions.get('screen').height * 0.06,
+    minHeight: Dimensions.get('screen').height * 0.06,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
