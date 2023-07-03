@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { View, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import { ZADA_S3_BASE_URL } from '../helpers/ConfigApp';
 import { useAppSelector } from '../store';
 import { selectNetworkStatus } from '../store/app/selectors';
-import { BLACK_COLOR, WHITE_COLOR } from '../theme/Colors';
+import { AppColors, BLACK_COLOR } from '../theme/Colors';
+import AnimatedLoading from './Animations/AnimatedLoading';
 
 const CARD_BG = require('../assets/images/card-bg.png');
 
@@ -64,15 +65,23 @@ function CardBackground(props) {
   return (
     <View style={styles._mainContainer}>
       {loading ? (
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <ActivityIndicator size="small" color={WHITE_COLOR} />
-        </View>
+        <>
+          <View
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 16,
+              backgroundColor: AppColors.GRAY,
+            }}>
+            <AnimatedLoading type={'Bounce'} color={AppColors.GRAY} style={{ borderRadius: 16 }} />
+          </View>
+          {props.children}
+        </>
       ) : (
         <>
           <Image

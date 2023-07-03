@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Alert, Platform } from 'react-native';
+import { StyleSheet, View, Text, Platform } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { BACKGROUND_COLOR } from '../theme/Colors';
@@ -17,12 +17,11 @@ const img = require('../assets/images/security.png');
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
-  route: any;
 }
 const SecurityScreen = (props: INProps) => {
   // Constants
-  const user = props.route.params.user;
   const navigation = props.navigation;
+
   // States
   const [isSensorAvailable, checkSensor] = useState(false);
   const [isSuccessful, checkSecureIDAuth] = useState(false);
@@ -113,7 +112,7 @@ const SecurityScreen = (props: INProps) => {
   }
 
   const nextHandler = () => {
-    navigation.navigate('NotifyMeScreen', { user });
+    navigation.navigate('NotifyMeScreen');
   };
 
   const _setPinCode = async () => {
@@ -197,22 +196,26 @@ const SecurityScreen = (props: INProps) => {
       </View>
 
       {/* PinCode Modal */}
-      <PincodeModal
-        isVisible={showPincodeModal}
-        pincode={pincode}
-        onPincodeChange={(text: string) => {
-          setPincode(text);
-          if (text.length == 0) setPincodeError('');
-        }}
-        pincodeError={pincodeError}
-        confirmPincode={confirmPincode}
-        onConfirmPincodeChange={(text: string) => {
-          setConfirmPincode(text);
-          if (text.length == 0) setConfirmPincodeError('');
-        }}
-        confirmPincodeError={confirmPincodeError}
-        onContinueClick={_setPinCode}
-      />
+      {showPincodeModal && (
+        <PincodeModal
+          modalType={'normal'}
+          onCloseClick={() => setShowPinCodeModal(false)}
+          isVisible={showPincodeModal}
+          pincode={pincode}
+          onPincodeChange={(text: string) => {
+            setPincode(text);
+            if (text.length == 0) setPincodeError('');
+          }}
+          pincodeError={pincodeError}
+          confirmPincode={confirmPincode}
+          onConfirmPincodeChange={(text: string) => {
+            setConfirmPincode(text);
+            if (text.length == 0) setConfirmPincodeError('');
+          }}
+          confirmPincodeError={confirmPincodeError}
+          onContinueClick={_setPinCode}
+        />
+      )}
     </View>
   );
 };

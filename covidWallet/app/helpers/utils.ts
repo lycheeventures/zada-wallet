@@ -62,5 +62,8 @@ export const resetSecureItems = async () => {
 };
 
 export const resetLocalStorage = async () => {
-  AsyncStorage.clear();
+  let allKeys = (await AsyncStorage.getAllKeys()) as string[];
+  let index = allKeys.indexOf('isAppSetupComplete');
+  allKeys.splice(index, 1);
+  AsyncStorage.multiRemove(allKeys)
 };

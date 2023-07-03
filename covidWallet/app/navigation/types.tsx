@@ -1,24 +1,27 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ICredentialObject } from '../store/credentials/interface';
+import { IConnectionList } from '../store/connections/interface';
 
 export type AuthStackParamList = {
+  PreferenceScreen: undefined;
   IntroScreen: undefined;
   WelcomeScreen: undefined;
   RegistrationScreen: undefined;
   LoginScreen: undefined;
   ForgotPasswordScreen: undefined;
+  RecoveryPhraseScreen: undefined;
   ResetPasswordScreen: { metadata: string };
-  MultiFactorScreen: { from: 'Register' | 'Login'; user: Object };
-  OTPScreen: { headingText: string; sendCode: () => void; validateOTP: () => void };
+  ConsentScreen: undefined;
+  PhoneNumberScreen: undefined;
+  VerifyOTPScreen: undefined;
   PassCodeContainer: undefined;
   SecurityScreen: {
     navigation: NativeStackNavigationProp<AuthStackParamList>;
-    user: Object;
   };
   SecureidContainer: undefined;
-  NotifyMeScreen: { user: Object };
+  NotifyMeScreen: undefined;
+  ConnectionListScreen: { connections: IConnectionList[] };
 };
 
 export type MainStackParamList = {

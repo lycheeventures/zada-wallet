@@ -1,13 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { _showAlert } from '../../helpers';
 import { IAuthState, IUserState } from './interface';
-import {
-  loginUser,
-  reactivateUserAccount,
-  registerUser,
-  resetUserPassword,
-  validateUserOTP,
-} from './thunk';
+import { reactivateUserAccount, resetUserPassword, sendOTP, validateUserOTP } from './thunk';
 
 // State initialization
 export const AuthState: IAuthState = {
@@ -26,6 +20,8 @@ export const AuthState: IAuthState = {
     walletSecret: undefined,
     phone: undefined,
     type: undefined,
+    country: undefined,
+    language: undefined,
     auto_accept_connection: true,
     status: undefined,
   },
@@ -53,40 +49,6 @@ const slice = createSlice({
     resetAuth: () => AuthState,
   },
   extraReducers: (builder) => {
-    // Login.
-    builder.addCase(loginUser.pending, (state, action) => {
-      if (state.status === 'idle') {
-        state.status = 'pending';
-      }
-    });
-    builder.addCase(loginUser.fulfilled, (state, action) => {
-      if (action.payload?.success) {
-        state.status = 'succeeded';
-        state.user.type = action.payload?.type;
-      }
-    });
-    builder.addCase(loginUser.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action?.error;
-    });
-
-    // Register.
-    builder.addCase(registerUser.pending, (state, action) => {
-      if (state.status === 'idle') {
-        state.status = 'pending';
-      }
-    });
-    builder.addCase(registerUser.fulfilled, (state, action) => {
-      if (action.payload?.success) {
-        state.status = 'succeeded';
-        state.user.type = action.payload.type;
-      }
-    });
-    builder.addCase(registerUser.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action?.error;
-    });
-
     // Validate OTP
     builder.addCase(validateUserOTP.pending, (state, action) => {
       if (state.status === 'idle') {
@@ -95,10 +57,31 @@ const slice = createSlice({
     });
     builder.addCase(validateUserOTP.fulfilled, (state, action) => {
       if (action.payload?.success) {
+        state.user.id = action.payload.userId;
+        state.token = action.payload.token;
         state.status = 'succeeded';
       }
     });
     builder.addCase(validateUserOTP.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action?.error;
+    });
+
+    // Send OTP
+    builder.addCase(sendOTP.pending, (state, action) => {
+      if (state.status === 'idle') {
+        state.status = 'pending';
+      }
+    });
+    builder.addCase(sendOTP.fulfilled, (state, action) => {
+      if (action.payload?.success) {
+        if (action.payload?.type === 'demo') {
+          state.token = action.payload.token;
+          state.status = 'succeeded';
+        }
+      }
+    });
+    builder.addCase(sendOTP.rejected, (state, action) => {
       state.status = 'failed';
       state.error = action?.error;
     });
@@ -139,12 +122,7 @@ const slice = createSlice({
 });
 
 // Exporting Actions
-export const {
-  updateToken,
-  updateUser,
-  updateAuthStatus,
-  updateIsAuthorized,
-  resetAuth,
-} = slice.actions;
+export const { updateToken, updateUser, updateAuthStatus, updateIsAuthorized, resetAuth } =
+  slice.actions;
 
 export { slice as AuthSlice };
