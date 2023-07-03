@@ -1,10 +1,14 @@
+import { CountryCode } from 'react-native-country-picker-modal';
+
 export type IStatus = 'idle' | 'loading' | 'pending' | 'succeeded' | 'failed';
 export interface IUserState {
   isNew: boolean;
   id: Partial<string | undefined>;
   walletSecret: string | undefined;
-  phone: string | undefined,
+  phone: string | undefined;
   type: 'demo' | undefined;
+  country: CountryCode | undefined;
+  language: string | undefined;
   auto_accept_connection: boolean;
   status: 'deleted' | 'inactive' | undefined;
 }

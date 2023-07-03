@@ -27,6 +27,18 @@ export const acceptConnection = createAsyncThunk(
   }
 );
 
+export const acceptMultipleConnection = createAsyncThunk(
+  'connection/acceptMultipleConnection',
+  async (metadata: string[]) => {
+    try {
+      let response = await ConnectionAPI.accept_multiple_connection(metadata);
+      return response.data;
+    } catch (e: any) {
+      throw e;
+    }
+  }
+);
+
 export const removeConnection = createAsyncThunk(
   'connection/removeConnection',
   async (connId: string, { dispatch, getState }) => {

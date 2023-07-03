@@ -178,16 +178,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: AppColors.WHITE,
+    backgroundColor: AppColors.TRANSPARENT,
   },
   containerSwiper: {
     height: '70%',
   },
   primaryButton: {
-    borderColor: AppColors.GREEN,
+    borderColor: AppColors.PRIMARY,
     borderWidth: 2,
     borderRadius: 20,
-    backgroundColor: AppColors.GREEN,
+    backgroundColor: AppColors.PRIMARY,
     paddingTop: 10,
     paddingLeft: 20,
     paddingBottom: 10,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: AppColors.WHITE,
+    backgroundColor: AppColors.TRANSPARENT,
   },
   imageViewStyle: {
     flex: 1,
@@ -220,12 +220,12 @@ const styles = StyleSheet.create({
   swiperImage1: {
     width: 280,
     height: 220,
-    backgroundColor: 'white',
+    backgroundColor: AppColors.TRANSPARENT,
   },
   swiperImage: {
     width: 280,
     height: 240,
-    backgroundColor: 'white',
+    backgroundColor: AppColors.TRANSPARENT,
   },
   textViewStyle: {
     flex: 0.9,

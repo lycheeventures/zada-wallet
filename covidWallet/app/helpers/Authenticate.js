@@ -149,7 +149,7 @@ export const AuthenticateUser = async (forceAuthenticate) => {
         if (isAuthExpired || forceAuthenticate) {
             let walletSecret = await getItem(ConstantsList.WALLET_SECRET);
             let userID = await getItem(ConstantsList.USER_ID);
-            return await fetch(Config.API_URL + `/api/authenticate`, {
+            return await fetch(Config.API_URL + `/api/v1/authenticate`, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
