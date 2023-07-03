@@ -1,10 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Animated, Keyboard } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  Keyboard,
+  InteractionManager,
+} from 'react-native';
 import { AppColors, RED_COLOR } from '../../theme/Colors';
 
 interface INProps {
-  onPincodeChange: (text: string) => {};
+  onPincodeChange: (text: string) => void;
   pincodeError: string;
+  OTP?: boolean;
+  emptyComponent?: () => React.JSX.Element;
+  filledComponent?: (digit: string) => React.JSX.Element;
 }
 
 const CODE_LENGTH = 6;
@@ -12,39 +23,40 @@ const CODE_LENGTH = 6;
 const InputPinComponent = (props: INProps) => {
   // Constants
   const codeDigitsArray = new Array(CODE_LENGTH).fill(0);
-  const { pincodeError, onPincodeChange } = props;
+  const { pincodeError, onPincodeChange, OTP, emptyComponent, filledComponent } = props;
 
   // States
   const [code, setCode] = useState('');
   const [containerIsFocused, setContainerIsFocused] = useState(false);
-  const [keyboardStatus, setKeyboardStatus] = useState(undefined);
+  const [textIsFocused, setTextIsFocused] = useState(false);
 
   // Refs
   const ref = useRef<TextInput>(null);
 
   useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
-      ref?.current?.focus();
-    });
-    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-      ref?.current?.blur();
-    });
-
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
+    handleOnPress();
   }, []);
+
   // Functions
   const handleOnPress = () => {
-    setContainerIsFocused(true);
-    ref?.current?.focus();
+    InteractionManager.runAfterInteractions(() => {
+      if (ref.current) {
+        ref.current.focus();
+        setTextIsFocused(true);
+        setContainerIsFocused(true);
+      }
+    });
   };
 
   const handleOnBlur = () => {
-    setContainerIsFocused(false);
-    ref?.current?.blur();
+    InteractionManager.runAfterInteractions(() => {
+      if (ref.current) {
+        setContainerIsFocused(false);
+        ref?.current?.blur();
+      }
+    });
   };
+
   const handleCodeChange = (text: string) => {
     setCode(text);
     onPincodeChange(text);
@@ -65,22 +77,30 @@ const InputPinComponent = (props: INProps) => {
         ? { ...style.inputContainer, ...style.inputContainerFocused }
         : style.inputContainer;
 
-    return (
-      <View key={idx} style={[containerStyle, { marginLeft: 14 }]}>
-        {digit === ' ' ? (
-          <View
-            style={{
-              height: 10,
-              width: 10,
-              borderRadius: 5,
-              backgroundColor: AppColors.WHITE,
-            }}
-          />
-        ) : (
-          <Text style={style.inputText}>{digit}</Text>
-        )}
-      </View>
-    );
+    if (emptyComponent && filledComponent) {
+      return (
+        <View key={idx} style={[containerStyle, { marginLeft: 14 }]}>
+          {digit === ' ' ? emptyComponent() : filledComponent(digit)}
+        </View>
+      );
+    } else {
+      return (
+        <View key={idx} style={[containerStyle, { marginLeft: 14 }]}>
+          {digit === ' ' ? (
+            <View
+              style={{
+                height: 10,
+                width: 10,
+                borderRadius: 5,
+                backgroundColor: AppColors.WHITE,
+              }}
+            />
+          ) : (
+            <Text style={style.inputText}>{digit}</Text>
+          )}
+        </View>
+      );
+    }
   };
 
   return (
@@ -89,13 +109,14 @@ const InputPinComponent = (props: INProps) => {
         {codeDigitsArray.map(toDigitInput)}
       </Pressable>
       <TextInput
+        autoFocus={textIsFocused}
+        textContentType="oneTimeCode"
         ref={ref}
         value={code}
         onChangeText={handleCodeChange}
-        onSubmitEditing={handleOnBlur}
-        keyboardType="phone-pad"
+        onBlur={handleOnBlur}
+        keyboardType="numeric"
         returnKeyType="done"
-        textContentType="oneTimeCode"
         maxLength={CODE_LENGTH}
         style={style.hiddenCodeInput}
       />

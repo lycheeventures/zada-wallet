@@ -11,6 +11,7 @@ import {
   Pressable,
   Easing,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
 import { AppColors } from '../../theme/Colors';
 import TouchableComponent from '../Buttons/TouchableComponent';
@@ -31,6 +32,9 @@ const PincodeModal = ({
   confirmPincodeError,
   onConfirmPincodeChange,
 }) => {
+  // Constants
+  const insets = useSafeAreaInsets();
+
   // States
   const [type, setType] = useState('PC');
   const [animatedValue] = useState(new Animated.Value(0));
@@ -47,12 +51,14 @@ const PincodeModal = ({
       Animated.timing(animateNextBtnValue, {
         toValue: 100,
         duration: 300,
+        useNativeDriver: false,
       }).start();
       setDisabled(false);
     } else {
       Animated.timing(animateNextBtnValue, {
         toValue: 100,
         duration: 300,
+        useNativeDriver: false,
       }).start();
       setAnimateNextBtnValue(new Animated.Value(0));
       setAnimateBackgroundValue(new Animated.Value(0));
@@ -68,12 +74,14 @@ const PincodeModal = ({
         Animated.timing(animateDoneBtnValue, {
           toValue: 100,
           duration: 300,
+          useNativeDriver: false,
         }).start();
         setDisabled(false);
       } else {
         Animated.timing(animateDoneBtnValue, {
           toValue: 100,
           duration: 300,
+          useNativeDriver: false,
         }).start();
         setAnimateDoneBtnValue(new Animated.Value(0));
         setDisabled(true);
@@ -81,35 +89,6 @@ const PincodeModal = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmPincode]);
-
-  useEffect(() => {
-    if (pincodeError !== '' || confirmPincodeError !== '') {
-      startShake();
-    }
-  }, [pincodeError, confirmPincodeError, startShake]);
-
-  // Functions
-  // Shake Animation
-  const startShake = useCallback(() => {
-    Animated.sequence([
-      Animated.timing(animatedValue, {
-        toValue: 10,
-        duration: 50,
-      }),
-      Animated.timing(animatedValue, {
-        toValue: -10,
-        duration: 50,
-      }),
-      Animated.timing(animatedValue, {
-        toValue: 10,
-        duration: 50,
-      }),
-      Animated.timing(animatedValue, {
-        toValue: 0,
-        duration: 50,
-      }),
-    ]).start();
-  }, [animatedValue]);
 
   // Handle continue button
   const _handleContinueClick = () => {
@@ -129,11 +108,13 @@ const PincodeModal = ({
             toValue: 0,
             duration: 100,
             easing: Easing.linear,
+            useNativeDriver: false,
           }),
           Animated.timing(animateLeftValue, {
             toValue: 500,
             duration: 0,
             easing: Easing.linear,
+            useNativeDriver: false,
           }),
         ]),
         Animated.parallel([
@@ -141,11 +122,13 @@ const PincodeModal = ({
             toValue: 1,
             duration: 150,
             easing: Easing.linear,
+            useNativeDriver: false,
           }),
           Animated.timing(animateLeftValue, {
             toValue: 0,
             duration: 150,
             easing: Easing.linear,
+            useNativeDriver: false,
           }),
         ]),
       ]).start();
@@ -173,11 +156,13 @@ const PincodeModal = ({
           toValue: 0,
           duration: 100,
           easing: Easing.linear,
+          useNativeDriver: false,
         }),
         Animated.timing(animateLeftValue, {
           toValue: -500,
           duration: 0,
           easing: Easing.linear,
+          useNativeDriver: false,
         }),
       ]),
       Animated.parallel([
@@ -185,11 +170,13 @@ const PincodeModal = ({
           toValue: 1,
           duration: 150,
           easing: Easing.linear,
+          useNativeDriver: false,
         }),
         Animated.timing(animateLeftValue, {
           toValue: 0,
           duration: 150,
           easing: Easing.linear,
+          useNativeDriver: false,
         }),
       ]),
     ]).start();
@@ -236,10 +223,9 @@ const PincodeModal = ({
           </Text>
         </View>
 
-        <Animated.View
-          style={[styles.pincodeViewStyle, { transform: [{ translateX: animatedValue }] }]}>
+        <View>
           <InputPinComponent onPincodeChange={onPincodeChange} pincodeError={pincodeError} />
-        </Animated.View>
+        </View>
         <TouchableComponent
           disabled={disabled}
           style={styles._button}
@@ -279,13 +265,12 @@ const PincodeModal = ({
                 Re-enter PIN that you have entered on previous screen.
               </Text>
             </View>
-            <Animated.View
-              style={[styles.pincodeViewStyle, { transform: [{ translateX: animatedValue }] }]}>
+            <View>
               <InputPinComponent
                 onPincodeChange={onConfirmPincodeChange}
                 pincodeError={confirmPincodeError}
               />
-            </Animated.View>
+            </View>
             <TouchableComponent
               disabled={disabled}
               style={styles._button}
@@ -315,10 +300,9 @@ const PincodeModal = ({
               <Text style={styles._infoText}>Enter a new six-digit PIN.</Text>
               <Text style={styles._infoSubText}>This pin is required when sharing your data</Text>
             </View>
-            <Animated.View
-              style={[styles.pincodeViewStyle, { transform: [{ translateX: animatedValue }] }]}>
+            <View>
               <InputPinComponent onPincodeChange={onPincodeChange} pincodeError={pincodeError} />
-            </Animated.View>
+            </View>
             <View style={styles._btnContainer}>
               <TouchableComponent
                 disabled={disabled}
@@ -352,25 +336,17 @@ const PincodeModal = ({
       animationOut={'fadeOutRight'}
       animationInTiming={250}
       animationOutTiming={250}
-      style={{ margin: 0 }}>
-      <View style={{ flex: 1 }}>
+      style={{ margin: 0, backgroundColor: AppColors.PRIMARY }}>
+      <View style={{ flex: 1, paddingTop: insets.top }}>
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingViewStyle}
           keyboardShouldPersistTaps="always"
           contentContainerStyle={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <Animated.View
-            style={[
-              styles._mainContainer,
-              {
-                backgroundColor: animateBackgroundValue.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [AppColors.PRIMARY, AppColors.PRIMARY],
-                }),
-              },
-            ]}>
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+          <View style={styles._mainContainer}>
             {modalType === 'verify' ? renderVerifyView() : renderView()}
-          </Animated.View>
+          </View>
         </KeyboardAvoidingView>
       </View>
     </Modal>
@@ -383,6 +359,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     width: '100%',
+    backgroundColor: AppColors.PRIMARY,
   },
   keyboardAvoidingViewStyle: {
     flex: 1,
@@ -411,7 +388,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: AppColors.WHITE,
   },
-  pincodeViewStyle: {},
   _btnContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -450,7 +426,7 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 12,
     position: 'absolute',
-    top: 40,
+    top: 8,
     left: 16,
   },
 });

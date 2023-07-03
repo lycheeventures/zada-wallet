@@ -1,294 +1,251 @@
-import React, { useRef, useState } from 'react';
-import { Keyboard, Platform } from 'react-native';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import { RecaptchaHandles } from 'react-native-recaptcha-that-works';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import React, { useEffect, useState } from 'react';
 import {
-  GREEN_COLOR,
-  WHITE_COLOR,
-  GRAY_COLOR,
-  PRIMARY_COLOR,
-  BACKGROUND_COLOR,
-  AppColors,
-} from '../../theme/Colors';
-import { AuthStackParamList } from '../../navigation/types';
-
-import ConstantsList from '../../helpers/ConfigApp';
-import { saveItem, getItem } from '../../helpers/Storage';
-import { showNetworkMessage, _showAlert } from '../../helpers/Toast';
-import { validatePasswordStrength } from '../../helpers/validation';
-import { _handleAxiosError } from '../../helpers/AxiosResponse';
-
-import { _registerUserAPI } from '../../gateways/auth';
-
-import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
-import { selectAuthStatus } from '../../store/auth/selectors';
-import { selectNetworkStatus } from '../../store/app/selectors';
-import { registerUser } from '../../store/auth/thunk';
-
-import HeadingComponent from '../../components/HeadingComponent';
+  View,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Dimensions,
+  Platform,
+  Keyboard,
+} from 'react-native';
 import { InputComponent } from '../../components/Input/inputComponent';
-import SimpleButton from '../../components/Buttons/SimpleButton';
-import RegisterButton from './components/buttons/RegisterButton';
-import LoginButton from './components/buttons/LoginButton';
-import GoogleRecaptcha from './components/GoogleRecaptcha';
-import PhoneInputComponent from './components/PhoneInputComponent';
+import { AppColors } from '../../theme/Colors';
+import FadeView from '../../components/FadeView';
 import { validate } from '../../helpers/validations/validate';
-import ChatBubble from '../../components/Chat/chatBubble';
+import { _showAlert, showNetworkMessage } from '../../helpers';
+import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
+import { updateUserProfile } from '../../store/auth/thunk';
+import { selectNetworkStatus } from '../../store/app/selectors';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthStackParamList } from '../../navigation/types';
+import { selectToken, selectUser } from '../../store/auth/selectors';
+import { ConnectionAPI } from '../../gateways';
+import { AuthenticateUser } from './utils';
+import { updateToken } from '../../store/auth';
+import AnimatedLoading from '../../components/Animations/AnimatedLoading';
+import { Button } from 'react-native-elements';
+import PrimaryButton from '../../components/Buttons/PrimaryButton';
 
-const { width } = Dimensions.get('window');
-
-const RegistrationScreen = ({
-  navigation,
-}: {
+interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
-}) => {
+}
+
+const { width, height } = Dimensions.get('window');
+
+const RegistrationScreen = (props: INProps) => {
   // Constants
-  // KEYBOARD AVOIDING VIEW
-  const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
-  const keyboardBehaviour = Platform.OS === 'ios' ? 'padding' : null;
-
-  // Redux
   const dispatch = useAppDispatch<AppDispatch>();
+
   // Selectors
-  const status = useAppSelector(selectAuthStatus);
   const networkStatus = useAppSelector(selectNetworkStatus);
+  const token = useAppSelector(selectToken);
+  const user = useAppSelector(selectUser);
 
-  // States
-  const [name, setName] = useState('');
-  const [nameError, setNameError] = useState('');
-  const [phone, setPhone] = useState('');
-  const [phoneError, setPhoneError] = useState('Please enter phone number.');
-  const [secret, setSecret] = useState('');
-  const [secretError, setSecretError] = useState('');
-  const [secureSecret, setSecureSecret] = useState(true);
-  const [strengthMessage, setStrengthMessage] = useState<'Strong' | 'Medium' | 'Weak' | ''>('');
-  const [authCount, setAuthCount] = useState(0);
+  const [values, setValues] = useState({ name: '', email: '' });
+  const [error, setError] = useState({
+    email: '',
+    name: '',
+  });
+  const [loading, setLoading] = useState(false);
 
-  // Refs
-  const phoneInputRef = useRef(null);
-  const recaptchaRef = useRef<RecaptchaHandles>(null);
-
-  // Toggling for password
-  const _toggleSecureSecretEntry = () => {
-    setSecureSecret(!secureSecret);
-  };
-
-  React.useEffect(() => {
-    const getCount = async () => {
-      const authCount = JSON.parse((await getItem(ConstantsList.AUTH_COUNT)) | 0);
-      setAuthCount(authCount);
-    };
-    getCount();
-  }, []);
-
-  const resetState = () => {
-    setName('');
-    setPhone('');
-    setSecret('');
-  };
-
-  const register = async () => {
-    try {
-      Keyboard.dismiss();
-      if (networkStatus === 'connected') {
-        let nameErr = validate('name', name);
-        let passwordErr = validate('password', secret);
-        setNameError(nameErr);
-        setSecretError(passwordErr);
-        if (nameErr !== '' || passwordErr !== '') return;
-
-        // Phone validation
-        if (phoneError != '') {
-          _showAlert('Zada Wallet', phoneError);
-          return;
-        }
-
-        let data = {
-          name: name,
-          phone: phone.trim(),
-          secretPhrase: secret,
-        };
-        dispatch(registerUser({ name: data.name, phone: data.phone, secret: data.secretPhrase }));
-
-        // Increament authentication count.
-        await saveItem(ConstantsList.AUTH_COUNT, JSON.stringify(authCount + 1));
-        setAuthCount((authCount) => authCount + 1);
-      } else {
-        showNetworkMessage();
-      }
-    } catch (e) {
-      console.log(e);
+  const handleSubmit = () => {
+    // Return if network is unavailable
+    if (networkStatus != 'connected') {
+      showNetworkMessage();
+      return;
     }
+
+    if (error.email.length !== 0 && values.email.length > 0) {
+      _showAlert('ZADA', error.email + error.name);
+      return;
+    }
+    if (error.name.length !== 0) {
+      _showAlert('ZADA', error.email + error.name);
+      return;
+    }
+
+    // Handle login logic here
+    setLoading(true);
+    dispatch(
+      updateUserProfile({
+        name: values.name.toLowerCase(),
+        email: values.email.toLowerCase(),
+        country: user.country?.toLowerCase(),
+        language: user.language?.toLowerCase(),
+      })
+    )
+      .unwrap()
+      .then(async (res) => {
+        let result = await ConnectionAPI.get_ConnectionList(user.country?.toLowerCase());
+        if (result.data.success) {
+          
+          // Generating wallet if does not exist
+          let newToken = await AuthenticateUser(token, true);
+          dispatch(updateToken(newToken));
+
+          // Navigating
+          if (result.data.connections.length === 0) {
+            props.navigation.navigate('SecurityScreen', { navigation: props.navigation });
+          } else {
+            props.navigation.navigate('ConnectionListScreen', {
+              connections: result.data.connections,
+            });
+          }
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+      });
   };
 
-  // Rendering Login and Register buttons.
-  const renderAuthButtons = () => (
-    <View style={styles.headerContainer}>
-      {/* Register Button */}
-      <RegisterButton
-        screen="register"
-        onPress={() => {
-          navigation.navigate('RegistrationScreen');
-        }}
-      />
-
-      {/* Login Button */}
-      <LoginButton
-        screen="register"
-        onPress={() => {
-          navigation.navigate('LoginScreen');
-          resetState();
-        }}
-      />
-    </View>
-  );
+  const _handleChangeText = (key: 'email' | 'name', value: string) => {
+    setValues({ ...values, [key]: value });
+    if (key === 'email' && value.length < 1) {
+      setError({ ...error, email: '' });
+      return;
+    }
+    setError({ ...error, [key]: validate(key, value) });
+  };
 
   return (
-    <View
-      pointerEvents={status === 'pending' ? 'none' : 'auto'}
-      style={styles.topViewContainerStyle}>
-      <KeyboardAwareScrollView
-        behavior={keyboardBehaviour}
-        keyboardVerticalOffset={keyboardVerticalOffset}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
-        <View style={styles.topViewStyle}>
-          <View style={{ marginLeft: 50, marginRight: 50 }}>
-            <HeadingComponent text="Let's Get Started!" />
-          </View>
+    <FadeView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+          <View style={styles.headingTextContainer}></View>
+          <View style={styles.container}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.headingText}>Hello</Text>
+              <Text style={styles.subHeadingText}>Create a new account</Text>
+            </View>
 
-          {/* Auth Buttons */}
-          {renderAuthButtons()}
-
-          <View>
-            <View>
+            <View style={styles.formContainer}>
               <InputComponent
                 type={'default'}
-                placeholderText="Full Name (Official Name)"
-                errorMessage={nameError}
-                value={name}
+                leftIconName={'user'}
+                placeholderText="Full Name (Official Name) *"
+                errorMessage={error.name}
+                value={values.name}
                 isSecureText={false}
                 inputContainerStyle={styles.inputView}
-                setStateValue={setName}
+                setStateValue={(text: string) => _handleChangeText('name', text)}
               />
-            </View>
-
-            {/* Phone input component */}
-            <PhoneInputComponent
-              inputRef={phoneInputRef}
-              phone={phone}
-              setPhone={setPhone}
-              setPhoneError={setPhoneError}
-            />
-
-            <Text style={styles.secretMessage}>Password (please save in safe place)</Text>
-            <View>
               <InputComponent
-                type={'secret'}
-                toggleSecureEntry={_toggleSecureSecretEntry}
-                placeholderText="Password"
-                errorMessage={secretError}
-                value={secret}
-                keyboardType="default"
-                isSecureText={secureSecret}
                 autoCapitalize={'none'}
+                type={'default'}
+                keyboardType={'email-address'}
+                leftIconName={'mail'}
+                placeholderText="Email (Optional)"
+                errorMessage={error.email}
+                value={values.email}
+                isSecureText={false}
                 inputContainerStyle={styles.inputView}
-                strengthMessage={strengthMessage}
-                setStateValue={(text: string) => {
-                  setSecret(text.replace(',', ''));
-                  const msg = validatePasswordStrength(text);
-                  setStrengthMessage(msg);
-                  if (text.length < 1) {
-                    setSecretError('Password is required.');
-                  } else {
-                    setSecretError('');
-                  }
-                }}
+                style={{ marginTop: 26 }}
+                setStateValue={(text: string) => _handleChangeText('email', text)}
               />
             </View>
 
-            <Text
-              style={{
-                color: GRAY_COLOR,
-                fontFamily: 'Poppins-Regular',
-                marginLeft: 20,
-                fontSize: 12,
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-                marginTop: 10,
-                marginRight: 20,
-              }}>
-              We need your details as your ZADA WALLET will be based on it. We are not going to send
-              you ads or spam email, or sell your information to a 3rd party.
-            </Text>
-            <SimpleButton
-              loaderColor={WHITE_COLOR}
-              isLoading={status === 'pending'}
-              onPress={authCount >= 3 ? recaptchaRef.current?.open : register}
-              width={250}
-              title="Continue"
-              titleColor={WHITE_COLOR}
-              buttonColor={GREEN_COLOR}
-              style={{ marginVertical: 20, alignSelf: 'center' }}
+            <PrimaryButton
+              onPress={handleSubmit}
+              icon={{
+                name: 'arrow-forward',
+                color: AppColors.WHITE,
+              }}
+              buttonStyle={{
+                alignSelf: 'flex-end',
+                borderRadius: 50,
+                width: 60,
+                height: 60,
+                backgroundColor: AppColors.PRIMARY,
+              }}
             />
           </View>
-        </View>
-        {/* Recaptcha */}
-        <GoogleRecaptcha recaptchaRef={recaptchaRef} onVerify={register} />
-        <View style={styles.chatBubbleViewStyle}>
-          <ChatBubble iconColor={AppColors.PRIMARY} backgroundColor={AppColors.WHITE} />
-        </View>
-      </KeyboardAwareScrollView>
-    </View>
+        </KeyboardAvoidingView>
+
+        {loading && <AnimatedLoading type="FadingCircleAlt" color={AppColors.PRIMARY} />}
+      </View>
+    </FadeView>
   );
 };
 
 const styles = StyleSheet.create({
-  topViewContainerStyle: {
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
+
+  headingTextContainer: {
+    position: 'absolute',
+    top: 24,
+    left: 24,
+  },
+  headingText: {
+    fontSize: 40,
+    fontFamily: 'Poppins-Bold',
+  },
+  subHeadingText: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Bold',
+    color: AppColors.PRIMARY,
+  },
+  logoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  logoText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  formContainer: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: PRIMARY_COLOR,
   },
-  topViewStyle: {
-    backgroundColor: BACKGROUND_COLOR,
-    alignContent: 'center',
-    width: width - 40,
-    justifyContent: 'space-around',
-    borderRadius: 10,
-  },
+  // input: {
+  //   backgroundColor: '#fff',
+  //   borderRadius: 8,
+  //   height: 40,
+  //   marginBottom: 16,
+  //   paddingHorizontal: 16,
+  // },
   inputView: {
-    backgroundColor: WHITE_COLOR,
-    borderRadius: 10,
-    width: '94%',
+    backgroundColor: AppColors.WHITE,
+    borderRadius: 4,
+    width: width * 0.7,
+    borderBottomWidth: 1,
+    borderColor: AppColors.GRAY,
     marginLeft: 10,
     height: 45,
     marginTop: 8,
     paddingLeft: 16,
-    borderBottomWidth: 0,
   },
-  secretMessage: {
-    marginTop: 15,
-    marginLeft: 24,
-    color: 'grey',
-  },
-  headerContainer: {
-    justifyContent: 'space-around',
-    flexDirection: 'row',
+  loginButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 8,
+    height: 40,
+    justifyContent: 'center',
     alignItems: 'center',
-    flexWrap: 'wrap',
   },
-  chatBubbleViewStyle: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    marginBottom: 50,
-    marginRight: 18,
-    alignSelf: 'flex-end',
-    justifyContent: 'flex-end',
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  footerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#777',
   },
 });
 

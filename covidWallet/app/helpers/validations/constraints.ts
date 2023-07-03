@@ -5,7 +5,7 @@ export const constraints = {
     },
     error: {
       message:
-        'Please enter a name between 2-1000 alphabetical characters long. No numbers or special characters.',
+        'Please enter a name between 2-200 alphabetical characters long. No numbers or special characters.',
     },
   },
   password: {

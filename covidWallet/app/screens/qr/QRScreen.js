@@ -346,7 +346,6 @@ const QRScreen = ({ route, navigation }) => {
         e.credentialId
       );
 
-      console.log('setting progress to false!');
       setProgress(false);
       setCredentialData(defaultCredState);
       showOKDialog('ZADA', 'Submitted Successfully!', navigateToMainScreen);

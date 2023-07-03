@@ -11,14 +11,15 @@ let isRefreshing = false;
 let failedQueue: any = [];
 const url_arr = [
   '/api/login',
-  '/api/authenticate',
+  '/api/v1/authenticate',
   '/api/register',
-  '/api/resend_codes',
+  '/api/v1/resend_codes',
   '/api/recover',
   'api/resetPassword',
   '/api/reactivate',
-  '/api/validateOTPs',
+  '/api/v1/validateOTPs',
   '/api/wallet/create',
+  '/api/get_user_status',
 ];
 // Api request Queue machanism, if authorization token has expired.
 const processQueue = (error: any, token = null) => {
@@ -126,18 +127,17 @@ const setup = (store: any) => {
           isRefreshing = true;
 
           let state = store.getState() as RootState;
-          let { id: userId, walletSecret } = state.auth.user;
+          let { token } = state.auth;
           // Fetch token
           return new Promise((resolve, reject) => {
-            fetch(Config.API_URL + '/api/authenticate', {
+            fetch(Config.API_URL + '/api/v1/authenticate', {
               method: 'POST',
               headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                userId,
-                secretPhrase: walletSecret,
+                token,
               }),
             })
               .then((response) => response.json())

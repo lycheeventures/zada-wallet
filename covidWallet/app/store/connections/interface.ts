@@ -28,3 +28,18 @@ export interface IConnectionObject {
   theirDid: string;
   theirKey: string;
 }
+
+export interface IConnectionList {
+  _id: string;
+  createdAt: string;
+  default: boolean;
+  checked: boolean;
+  description: string;
+  genre: [];
+  image: string;
+  metadata: string;
+  name: string;
+  priority: number;
+  status: 'enabled' | 'disabled';
+  updatedAt: string;
+}

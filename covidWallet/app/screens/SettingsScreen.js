@@ -4,7 +4,7 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { getVersion } from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
+import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, WHITE_COLOR } from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
 import { BIOMETRIC_ENABLED, APP_VERSION, PIN_CODE } from '../helpers/ConfigApp';
 import { showAskDialog, showMessage, showNetworkMessage, showOKDialog } from '../helpers/Toast';

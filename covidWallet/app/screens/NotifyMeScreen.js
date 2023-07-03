@@ -7,27 +7,23 @@ import GreenPrimaryButton from '../components/GreenPrimaryButton';
 import messaging from '@react-native-firebase/messaging';
 import { useAppDispatch, useAppSelector } from '../store';
 import { updateIsAuthorized, updateToken, updateUser } from '../store/auth';
-import { selectToken } from '../store/auth/selectors';
+import { selectToken, selectUser } from '../store/auth/selectors';
 import { AuthenticateUser } from './auth/utils';
-import { changeAppStatus } from '../store/app';
+import { changeAppStatus, updateAppSetupComplete } from '../store/app';
+import { saveItemInLocalStorage } from '../helpers/Storage';
 
 const img = require('../assets/images/notifications.png');
 
 function NotifyMeScreen(props) {
   // Constants
-  const user = props.route.params.user;
   const dispatch = useAppDispatch();
 
   // Selectors
   const token = useAppSelector(selectToken);
+  const user = useAppSelector(selectUser);
+
   // States
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (token) {
-      dispatch(updateIsAuthorized(true));
-    }
-  }, [token, dispatch]);
 
   async function enableNotifications() {
     setLoading(true);
@@ -71,9 +67,13 @@ function NotifyMeScreen(props) {
       auto_accept_connection: true,
       status: user.status ? user.status : undefined,
     };
+
     dispatch(updateUser({ ...data }));
-    let freshToken = await AuthenticateUser(user.userId, user.secret, true);
+    let freshToken = await AuthenticateUser(token);
     dispatch(updateToken(freshToken));
+    saveItemInLocalStorage('isAppSetupComplete', true);
+    dispatch(updateIsAuthorized(true));
+    dispatch(updateAppSetupComplete(true));
     dispatch(changeAppStatus('idle'));
   }
 
