@@ -1,16 +1,19 @@
 import React from 'react';
 import PhoneInput from 'react-native-phone-number-input';
 import { AppColors } from '../../../theme/Colors';
+import { CountryCode } from 'react-native-country-picker-modal';
 
 interface INProps {
+  defaultCountry: CountryCode;
   inputRef: React.RefObject<PhoneInput>;
   setPhoneError: Function;
   phone: string;
   setPhone: Function;
+  autofocus?: boolean;
 }
 
 const PhoneInputComponent = (props: INProps) => {
-  const { inputRef, setPhoneError, phone, setPhone } = props;
+  const { defaultCountry, autofocus, inputRef, setPhoneError, phone, setPhone } = props;
 
   const onChangeText = (text: string) => {
     setPhone(text);
@@ -37,8 +40,9 @@ const PhoneInputComponent = (props: INProps) => {
   return (
     <PhoneInput
       ref={inputRef}
+      autoFocus={autofocus}
       defaultValue={phone}
-      defaultCode="MM"
+      defaultCode={defaultCountry}
       layout="second"
       containerStyle={{
         flexDirection: 'row',
@@ -53,7 +57,7 @@ const PhoneInputComponent = (props: INProps) => {
       textInputStyle={{ fontSize: 14, height: 45 }}
       countryPickerButtonStyle={{
         width: 65,
-        borderRightColor: '00000040',
+        borderRightColor: '#ddd',
         borderRightWidth: 0.5,
       }}
       textContainerStyle={{

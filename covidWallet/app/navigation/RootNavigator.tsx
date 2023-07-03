@@ -7,8 +7,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import VersionModal from '../components/VersionModal';
 import useInit from '../hooks/useInit';
 import AppConfig from '../helpers/ConfigApp';
-import { saveItem } from '../helpers/Storage';
-import { useAppSelector } from '../store';
+import { getItemFromLocalStorage, saveItem } from '../helpers/Storage';
+import { AppDispatch, useAppSelector } from '../store';
 import { selectNetworkStatus } from '../store/app/selectors';
 import LoadingScreen from '../screens/LoadingScreen';
 import { selectIsAuthorized } from '../store/auth/selectors';
@@ -16,6 +16,8 @@ import MainNavigator from './MainNavigator';
 import AuthNavigator from './AuthNavigator';
 import useNetwork from '../hooks/useNetwork';
 import { navigationRef } from './utils';
+import { updateAppSetupComplete } from '../store/app';
+import { useAppDispatch } from '../store/index-old';
 
 const Stack = createStackNavigator();
 const RootNavigator = () => {
@@ -23,6 +25,7 @@ const RootNavigator = () => {
   const linking = {
     prefixes: ['https://zadanetwork.com', 'zada://'], //npx uri-scheme open https://zadanetwork.com/connection_request/abcd --android
   };
+  const dispatch = useAppDispatch<AppDispatch>();
 
   // Selectors
   const networkStatus = useAppSelector(selectNetworkStatus);
@@ -42,6 +45,8 @@ const RootNavigator = () => {
     (async () => {
       setMessageIndex(0);
       SplashScreen.hide();
+      let isAppSetupComplete = await getItemFromLocalStorage('isAppSetupComplete');
+      dispatch(updateAppSetupComplete(isAppSetupComplete));
       if (networkStatus === 'connected') {
         const version = await checkVersion();
         if (version.needsUpdate) {

@@ -4,7 +4,7 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { getVersion } from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme/Colors';
+import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, WHITE_COLOR } from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
 import { BIOMETRIC_ENABLED, APP_VERSION, PIN_CODE } from '../helpers/ConfigApp';
 import { showAskDialog, showMessage, showNetworkMessage, showOKDialog } from '../helpers/Toast';
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   _row: {
     width: '100%',
-    height: Dimensions.get('screen').height * 0.06,
+    minHeight: Dimensions.get('screen').height * 0.06,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

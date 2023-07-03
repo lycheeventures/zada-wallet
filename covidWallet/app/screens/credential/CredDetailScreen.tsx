@@ -215,6 +215,8 @@ const CredDetailScreen = (props: IProps) => {
               issue_date={
                 data?.values['Issue Time']
                   ? get_local_issue_date(data.values['Issue Time'])
+                  : data.issuedAtUtc
+                  ? get_local_issue_date(data.issuedAtUtc)
                   : undefined
               }
               organizationName={data.organizationName}
