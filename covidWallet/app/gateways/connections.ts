@@ -4,6 +4,23 @@ import {
 } from '../helpers/analytics';
 import http_client from './http_client';
 
+// Get All Connections List
+export async function get_ConnectionList(countryCode: string | undefined) {
+  try {
+    const result = await http_client({
+      method: 'GET',
+      url: '/api/connection/get_connectionlist',
+      params: {
+        countryCode,
+      },
+    });
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 // Get All Connections
 export async function get_all_connections() {
   try {
@@ -34,6 +51,30 @@ export async function accept_connection(metadata: string) {
 
     // Google Analytics
     analytics_log_accept_connection_request();
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Accept Connection
+export async function accept_multiple_connection(metadata: string[]) {
+  try {
+    let baseURL = 'https://trinsic.studio/url/';
+    metadata.forEach((e, i) => {
+      metadata[i] = baseURL + e;
+    });
+
+    let obj = {
+      inviteUrl: metadata,
+    };
+
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/connection/accept_multiple_connections',
+      data: obj,
+    });
 
     return result;
   } catch (error) {

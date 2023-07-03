@@ -5,7 +5,9 @@ import { BLACK_COLOR } from '../theme/Colors';
 function CertificateCard(props) {
   return (
     <View style={styles._detailsView}>
-      <Text style={styles._cardTitle}>{props.card_type}</Text>
+      <Text maxFontSizeMultiplier={1.5} style={styles._cardTitle}>
+        {props.card_type}
+      </Text>
 
       <View style={styles._bottomContainer}>
         {props.card_logo && props.card_logo.uri !== '' && (
@@ -18,15 +20,25 @@ function CertificateCard(props) {
             }}>
             {props.issuer && (
               <>
-                <Text style={styles.card_small_text}>Issued by</Text>
-                <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>{props.issuer}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.card_small_text}>
+                  Issued by
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={1.2}
+                  style={[styles.card_small_text, { fontWeight: 'bold' }]}>
+                  {props.issuer}
+                </Text>
               </>
             )}
           </View>
           {props.date ? (
             <View>
-              <Text style={styles.card_small_text}>Issued Time</Text>
-              <Text style={[styles.card_small_text, { fontWeight: 'bold' }]}>{props.date}</Text>
+              <Text maxFontSizeMultiplier={1.2} style={styles.card_small_text}>
+                Issued Date
+              </Text>
+              <Text maxFontSizeMultiplier={2} style={[styles.card_small_text, { fontWeight: 'bold', maxWidth: 100 }]}>
+                {props.date}
+              </Text>
             </View>
           ) : null}
         </View>

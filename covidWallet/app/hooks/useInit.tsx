@@ -19,12 +19,15 @@ import { changeConnectionStatus } from '../store/connections';
 import { selectAuthStatus, selectToken } from '../store/auth/selectors';
 import { updateAuthStatus, updateIsAuthorized } from '../store/auth';
 import { ConnectionAPI, CredentialAPI } from '../gateways';
+import { checkIfWalletExist } from '../screens/auth/utils';
+import { selectAppSetupComplete } from '../store/app/selectors';
 
 const useInit = () => {
   // Constants
   const dispatch = useAppDispatch<AppDispatch>();
 
   // Selectors
+  const isAppSetupComplete = useAppSelector(selectAppSetupComplete);
   const token = useAppSelector(selectToken);
   const connections = useAppSelector(selectConnections.selectAll);
   const authStatus = useAppSelector(selectAuthStatus);
@@ -57,12 +60,19 @@ const useInit = () => {
   // Whenever token gets updated.
   useEffect(() => {
     if (token) {
-      // Invalidating cache.
-      ConnectionAPI.invalidateCache();
-      CredentialAPI.invalidateCache();
+      if (!isAppSetupComplete) {
+        return;
+      } else {
+        let walletExist = checkIfWalletExist(token);
+        if (walletExist) {
+          // Invalidating cache.
+          ConnectionAPI.invalidateCache();
+          CredentialAPI.invalidateCache();
 
-      // Fetching Connections
-      dispatch(fetchConnections());
+          // Fetching Connections
+          dispatch(fetchConnections());
+        }
+      }
     } else {
       dispatch(changeConnectionStatus('idle'));
     }
@@ -70,10 +80,16 @@ const useInit = () => {
 
   const startApp = async () => {
     if (token) {
-      setMessageIndex(3);
-      // Update isAuthorized!
-      dispatch(updateIsAuthorized(true));
-      dispatch(changeConnectionStatus('idle'));
+      let walletExist = checkIfWalletExist(token);
+      if (!walletExist) {
+        dispatch(changeConnectionStatus('idle'));
+      } else {
+        setMessageIndex(3);
+        if (isAppSetupComplete !== null) {
+          dispatch(updateIsAuthorized(true));
+          dispatch(changeConnectionStatus('idle'));
+        }
+      }
     } else {
       dispatch(changeConnectionStatus('idle'));
     }

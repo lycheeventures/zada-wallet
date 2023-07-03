@@ -7,7 +7,7 @@ export const performSHA256 = async (str: string) => {
 
 export const generateRandomSecret = (len: number) => {
   var result = '';
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz$&?@#%!0123456789';
   var charactersLength = characters.length;
   for (var i = 0; i < len; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));

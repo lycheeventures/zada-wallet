@@ -145,6 +145,7 @@ const MainNavigator = () => {
           },
           headerTitle: () => (
             <Text
+              maxFontSizeMultiplier={1.9}
               style={{
                 fontSize: 24,
                 color: BLACK_COLOR,

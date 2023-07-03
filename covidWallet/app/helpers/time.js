@@ -45,7 +45,7 @@ export const get_local_issue_time = (issueTime) => {
 export const get_local_issue_date = (issueTime) => {
   if (moment.utc(issueTime, dateFormats).isValid()) {
     return moment
-      .utc(issueTime, 'MM/DD/YYYY hh:mm:ss')
+      .utc(issueTime, timeFormats)
       .local()
       .format('YYYY-MM-DD')
       .toString();

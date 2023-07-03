@@ -56,7 +56,6 @@ export const clearAllAndLogout = async (dispatch, type) => {
   dispatch(resetConnection());
   dispatch(resetCredential());
   await dispatch(resetCache());
-  dispatch(resetApp());
   dispatch(resetAuth());
   dispatch(changeAppStatus('idle'));
   persistor.purge();
@@ -70,7 +69,6 @@ export const deleteAccountAndClearAll = async (dispatch) => {
   dispatch(resetConnection());
   dispatch(resetCredential());
   await dispatch(resetCache());
-  dispatch(resetApp());
   await dispatch(deleteUserAccount()).unwrap();
   dispatch(resetAuth());
   dispatch(changeAppStatus('idle'));

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Platform, TouchableHighlight, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Platform, TouchableHighlight, Pressable, StyleSheet } from 'react-native';
 
 const TouchableComponent = (props) => {
   const shadow = props.addShadow ? { ...styles.shadow } : undefined;
@@ -15,7 +15,7 @@ const TouchableComponent = (props) => {
   } else {
     return (
       <View style={{ borderRadius: 16, ...shadow, ...props.touchableStyle }}>
-        <Pressable android_ripple={{ borderless: false }} {...props}>
+        <Pressable {...props}>
           {props.children}
         </Pressable>
       </View>

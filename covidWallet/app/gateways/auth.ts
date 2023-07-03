@@ -22,15 +22,12 @@ export const login = async (phone: string, secret: string) => {
 };
 
 // authenticate user api
-export const authenticate = async (userID: String, secret: String) => {
+export const authenticate = async (prevToken: String) => {
   try {
     const result = await http_client({
       method: 'POST',
-      url: '/api/authenticate',
-      data: JSON.stringify({
-        userId: userID,
-        secretPhrase: secret,
-      }),
+      url: '/api/v1/authenticate',
+      data: { token: prevToken },
     });
 
     return result;
@@ -61,16 +58,12 @@ export const _registerUserAPI = async (name: string, phone: string, secretPhrase
 };
 
 // resend otp code api
-export const _resendOTPAPI = async (
-  userId: string | undefined,
-  phone: string | undefined,
-  type: string
-) => {
+export const _resendOTPAPI = async (phone: string, type: string, secret?: string) => {
   try {
     const result = await http_client({
       method: 'POST',
-      url: '/api/resend_codes',
-      data: { userId, phone, type },
+      url: '/api/v1/resend_codes',
+      data: { phone, type, secretPhrase: secret },
     });
     return result;
   } catch (error) {
@@ -139,21 +132,39 @@ export const _updateProfileAPI = async (data: Object) => {
 };
 
 // Validate OTP
-export async function validateOTP(code: string, userId: string, phone: string) {
+export async function validateOTP(phone: string, code: string) {
   try {
     let obj = {
+      phone: phone,
       otpsms: code,
-      userId: userId,
+    };
+
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/v1/validateOTPs',
+      data: obj,
+    });
+
+    analytics_log_verifies_otp();
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Get User Status
+export async function getUserStatus(phone: string) {
+  try {
+    let obj = {
       phone: phone,
     };
 
     const result = await http_client({
       method: 'POST',
-      url: '/api/validateOTPs',
+      url: '/api/get_user_status',
       data: obj,
     });
-
-    analytics_log_verifies_otp();
 
     return result;
   } catch (error) {

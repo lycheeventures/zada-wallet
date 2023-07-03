@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, ActivityIndicator } from 'react-native';
 import { AuthAPI } from '../../../gateways';
 import { showNetworkMessage, _showAlert } from '../../../helpers';
-import { useAppSelector } from '../../../store';
+import { AppDispatch, useAppDispatch, useAppSelector } from '../../../store';
 import { selectNetworkStatus } from '../../../store/app/selectors';
 import { AppColors } from '../../../theme/Colors';
+import { sendOTP } from '../../../store/auth/thunk';
 
 interface INProps {
   setCode: (code: string) => void;
@@ -14,6 +15,7 @@ interface INProps {
 const CodeInputComponent = (props: INProps) => {
   // Constant
   const { setCode, phone } = props;
+  const dispatch = useAppDispatch<AppDispatch>();
 
   // Selectors
   const networkStatus = useAppSelector(selectNetworkStatus);
@@ -26,25 +28,25 @@ const CodeInputComponent = (props: INProps) => {
 
   const [phoneCodeLoading, setPhoneCodeLoading] = useState(false);
 
-  // Effect for phone code countdown
-  React.useEffect(() => {
-    let interval = setInterval(() => {
-      let tempSec = phoneSecs - 1;
-      if (tempSec <= 0 && phoneMins > 0) {
-        setPhoneSecs(59);
-        setPhoneMins(phoneMins - 1);
-      } else if (tempSec <= 0 && phoneMins == 0) {
-        setPhoneSecs(0);
-        setPhoneMins(0);
-        clearInterval(interval);
-        setPhoneTimeout(true);
-      } else {
-        setPhoneSecs(tempSec);
-      }
-    }, 1000); //each count lasts for a second
-    //cleanup the interval on complete
-    return () => clearInterval(interval);
-  });
+  // // Effect for phone code countdown
+  // React.useEffect(() => {
+  //   let interval = setInterval(() => {
+  //     let tempSec = phoneSecs - 1;
+  //     if (tempSec <= 0 && phoneMins > 0) {
+  //       setPhoneSecs(59);
+  //       setPhoneMins(phoneMins - 1);
+  //     } else if (tempSec <= 0 && phoneMins == 0) {
+  //       setPhoneSecs(0);
+  //       setPhoneMins(0);
+  //       clearInterval(interval);
+  //       setPhoneTimeout(true);
+  //     } else {
+  //       setPhoneSecs(tempSec);
+  //     }
+  //   }, 1000); //each count lasts for a second
+  //   //cleanup the interval on complete
+  //   return () => clearInterval(interval);
+  // });
 
   // Function
   const resendCode = async () => {
@@ -59,12 +61,7 @@ const CodeInputComponent = (props: INProps) => {
   const sendCode = async () => {
     try {
       if (networkStatus === 'connected') {
-        setPhoneCodeLoading(true);
-        const result = await AuthAPI._resendOTPAPI(undefined, phone, 'phone');
-        if (!result.data.success) {
-          _showAlert('Zada Wallet', result.data.error.toString());
-        }
-        setPhoneCodeLoading(false);
+        dispatch(sendOTP({ phone }));
       } else {
         showNetworkMessage();
       }
@@ -76,20 +73,24 @@ const CodeInputComponent = (props: INProps) => {
   return (
     <View
       style={{
-        flexDirection: 'row',
         alignItems: 'center',
       }}>
       <View style={styles.inputView}>
         <TextInput
-          style={styles.TextInput}
-          placeholder="Phone Confirmation Code"
-          placeholderTextColor="grey"
+          autoFocus
+          textContentType="oneTimeCode"
+          autoComplete="sms-otp"
+          style={styles.TextInputStyle}
+          placeholder="000000"
+          maxLength={6}
+          placeholderTextColor={AppColors.LIGHT_GRAY}
           keyboardType="number-pad"
           onChangeText={(confirmationCode) => {
             setCode(confirmationCode);
           }}
         />
       </View>
+
       {phoneTimeout ? (
         !phoneCodeLoading ? (
           <Text onPress={resendCode} style={styles._expireText}>
@@ -115,30 +116,26 @@ const CodeInputComponent = (props: INProps) => {
 
 const styles = StyleSheet.create({
   inputView: {
-    backgroundColor: AppColors.WHITE,
     borderRadius: 10,
-    width: '65%',
+    width: '40%',
     height: 45,
     marginLeft: 10,
     marginTop: 8,
+    alignItems: 'center',
   },
-  TextInput: {
+  TextInputStyle: {
     height: 50,
-    flex: 1,
     padding: 10,
-    marginLeft: 5,
+    fontSize: 18,
+    color: AppColors.BLACK,
   },
   _countdownView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    marginTop: 10,
+    position: 'absolute',
+    borderWidth: 2,
+    padding: 10,
   },
   _countdown: {
     color: AppColors.PRIMARY,
-    marginLeft: 25,
-    marginTop: 10,
   },
   _expireText: {
     marginTop: 10,

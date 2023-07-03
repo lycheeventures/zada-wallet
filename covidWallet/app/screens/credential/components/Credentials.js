@@ -67,6 +67,11 @@ function Credentials(props) {
 
   // List Items
   const renderItem = ({ item, index }) => {
+    let date = item.values['Issue Time']
+      ? get_local_issue_date(item.values['Issue Time'])
+      : item.issuedAtUtc
+      ? get_local_issue_date(item.issuedAtUtc)
+      : undefined;
     return (
       <TouchableOpacity onPress={() => toggleModal(item)} activeOpacity={0.9}>
         <View style={styles.CredentialsCardContainer}>
@@ -78,11 +83,7 @@ function Credentials(props) {
               item={item}
               card_type={item.type}
               issuer={item.organizationName}
-              date={
-                item.values['Issue Time']
-                  ? get_local_issue_date(item.values['Issue Time'])
-                  : undefined
-              }
+              date={date}
               card_logo={{ uri: item.imageUrl }}
             />
           </CardBackground>

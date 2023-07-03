@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, Animated } from 'react-native';
-import { Input, Overlay, Divider } from 'react-native-elements';
+import { Input } from 'react-native-elements';
 import ConstantsList from '../../helpers/ConfigApp';
 
 import {
@@ -10,13 +10,12 @@ import {
   RED_COLOR,
   YELLOW_COLOR,
   GREEN_COLOR,
+  AppColors,
 } from '../../theme/Colors';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Foundation from 'react-native-vector-icons/Foundation';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
-// import Animated, {Easing} from 'react-native-reanimated';
 
 interface InputIProps {
   title?: string;
@@ -29,6 +28,7 @@ interface InputIProps {
   isSecureText?: boolean;
   toggleSecureEntry?: any;
   value?: any;
+  autoFocus?: boolean;
   keyboardType?: string;
   disabled?: boolean;
   setStateValue?: any;
@@ -69,9 +69,11 @@ export function InputComponent(props: InputIProps) {
       case 'key':
         return <Foundation name="key" size={24} color={GRAY_COLOR} />;
       case 'user':
-        return <AntDesign name={'user'} size={24} color={GRAY_COLOR} />;
+        return <AntDesign name={'user'} size={24} color={AppColors.PRIMARY} />;
       case 'wallet':
         return <Ionicons name="ios-wallet-outline" size={24} color={GRAY_COLOR} />;
+      case 'mail':
+        return <FontAwesome name="envelope-o" size={24} color={AppColors.PRIMARY} />;
       default:
         break;
     }
@@ -122,6 +124,7 @@ export function InputComponent(props: InputIProps) {
   return (
     <>
       <Input
+        autoFocus={props.autoFocus}
         maxFontSizeMultiplier={1}
         placeholder={props.placeholderText}
         inputStyle={[styles.textInput, props.textInputStyle]}
