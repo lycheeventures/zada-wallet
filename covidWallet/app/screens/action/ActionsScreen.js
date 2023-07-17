@@ -607,7 +607,7 @@ function ActionsScreen({ navigation }) {
 
   return (
     <View style={themeStyles.mainContainer}>
-      {showPincodeModal && (
+      {showConfirmModal && (
         <PincodeModal
           modalType={'verify'}
           isVisible={showConfirmModal}
