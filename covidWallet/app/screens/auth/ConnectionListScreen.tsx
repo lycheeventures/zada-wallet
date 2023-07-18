@@ -7,7 +7,6 @@ import { IConnectionList } from '../../store/connections/interface';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
-import { selectToken } from '../../store/auth/selectors';
 import { acceptMultipleConnection } from '../../store/connections/thunk';
 
 interface INProps {
@@ -18,9 +17,6 @@ const ConnectionListScreen = (props: INProps) => {
   // Constants
   const dispatch = useAppDispatch<AppDispatch>();
   const connections = props.route.params.connections;
-
-  // Selectors
-  const token = useAppSelector(selectToken);
 
   // State
   const [selectedItems, setSelectedItems] = useState<string[]>([]);

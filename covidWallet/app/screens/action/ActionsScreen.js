@@ -607,22 +607,24 @@ function ActionsScreen({ navigation }) {
 
   return (
     <View style={themeStyles.mainContainer}>
-      <PincodeModal
-        modalType={'verify'}
-        isVisible={showConfirmModal}
-        pincode={verifyPincode}
-        onPincodeChange={(text) => {
-          setVerifyPincode(text);
-          if (text.length === 0 || text === undefined) {
-            setVerifyPincodeError('');
-          }
-        }}
-        pincodeError={verifyPincodeError}
-        onCloseClick={() => {
-          setShowConfirmModal(!showConfirmModal);
-        }}
-        onContinueClick={_confirmingPincode}
-      />
+      {showConfirmModal && (
+        <PincodeModal
+          modalType={'verify'}
+          isVisible={showConfirmModal}
+          pincode={verifyPincode}
+          onPincodeChange={(text) => {
+            setVerifyPincode(text);
+            if (text.length === 0 || text === undefined) {
+              setVerifyPincodeError('');
+            }
+          }}
+          pincodeError={verifyPincodeError}
+          onCloseClick={() => {
+            setShowConfirmModal(!showConfirmModal);
+          }}
+          onContinueClick={_confirmingPincode}
+        />
+      )}
 
       {/* PinCode Modal */}
       {isPicodeChecked && (

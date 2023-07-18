@@ -418,25 +418,27 @@ const ProfileScreen = (props) => {
       keyboardVerticalOffset={keyboardVerticalOffset}
       style={styles._mainContainer}>
       {/* PinCode Modal */}
-      <PincodeModal
-        isVisible={showPincodeModal}
-        pincode={pincode}
-        onPincodeChange={(text) => {
-          setPincode(text);
-          if (text.length == 0) setPincodeError('');
-        }}
-        pincodeError={pincodeError}
-        confirmPincode={confirmPincode}
-        onConfirmPincodeChange={(text) => {
-          setConfirmPincode(text);
-          if (text.length == 0) setConfirmPincodeError('');
-        }}
-        confirmPincodeError={confirmPincodeError}
-        onCloseClick={() => {
-          setShowPinCodeModal(!showPincodeModal);
-        }}
-        onContinueClick={_setPinCode}
-      />
+      {showPincodeModal && (
+        <PincodeModal
+          isVisible={showPincodeModal}
+          pincode={pincode}
+          onPincodeChange={(text) => {
+            setPincode(text);
+            if (text.length == 0) setPincodeError('');
+          }}
+          pincodeError={pincodeError}
+          confirmPincode={confirmPincode}
+          onConfirmPincodeChange={(text) => {
+            setConfirmPincode(text);
+            if (text.length == 0) setConfirmPincodeError('');
+          }}
+          confirmPincodeError={confirmPincodeError}
+          onCloseClick={() => {
+            setShowPinCodeModal(!showPincodeModal);
+          }}
+          onContinueClick={_setPinCode}
+        />
+      )}
 
       {isLoading && <OverlayLoader text="Updating your profile..." />}
 
