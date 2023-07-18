@@ -21,8 +21,10 @@ function FlatCard(props) {
               />
             </View>
             <View style={styles.row2}>
-              <Text style={styles.heading}>{props.heading}</Text>
-              <Text style={styles.text}>{props.text}</Text>
+              <Text numberOfLines={2} style={styles.heading}>{props.heading}</Text>
+              <Text numberOfLines={3} style={styles.text}>
+                {props.text}
+              </Text>
             </View>
           </View>
         </TouchableComponent>
