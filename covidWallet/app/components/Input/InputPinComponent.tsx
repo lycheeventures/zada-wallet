@@ -34,7 +34,15 @@ const InputPinComponent = (props: INProps) => {
   const ref = useRef<TextInput>(null);
 
   useEffect(() => {
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      Keyboard.dismiss();
+    });
+
     handleOnPress();
+    return () => {
+      console.log('removing subs')
+      hideSubscription.remove();
+    };
   }, []);
 
   // Functions
@@ -136,17 +144,21 @@ const style = StyleSheet.create({
     justifyContent: 'center',
   },
   inputsContainer: {
+    // borderWidth:1,
+    // zIndex:100,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   inputContainer: {
+    borderWidth: 0.2,
+    borderColor: '#ffffff30',
     alignItems: 'center',
     width: 30,
     height: 50,
     justifyContent: 'center',
   },
   inputContainerFocused: {
-    borderColor: '#0f5181',
+    borderColor: AppColors.WHITE,
   },
   inputText: {
     fontSize: 24,

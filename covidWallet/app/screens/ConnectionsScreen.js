@@ -80,8 +80,6 @@ function ConnectionsScreen() {
   // Empty List Component
   const listEmptyComponent = () => (
     <EmptyList
-      // refreshing={status === 'loading'}
-      // onRefresh={fetchConnections}
       text="You have no connections yet."
       image={require('../assets/images/connectionsempty.png')}
     />

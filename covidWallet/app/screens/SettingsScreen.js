@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Linking, Switch, Dimensions, Platform } from 'react-native';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { StyleSheet, Text, View, Linking, Switch, Dimensions, Platform, TouchableOpacity } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { getVersion } from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 
@@ -185,6 +185,7 @@ export default function SettingsScreen(props) {
           onPress={longPressCount !== 3 ? () => {} : buttonPressed}>
           <Text style={[styles._rowHeading, { marginTop: 15 }]}>Support</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles._row}
