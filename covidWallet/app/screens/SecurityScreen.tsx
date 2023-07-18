@@ -84,12 +84,14 @@ const SecurityScreen = (props: INProps) => {
       title: 'Log in with Secure ID to continue',
     })
       .then(() => {
+        FingerprintScanner.release();
         checkSecureIDAuth(true);
         //set OTP also
         setShowPinCodeModal(true);
       })
       .catch((error) => {
         //set OTP also
+        FingerprintScanner.release();
         setShowPinCodeModal(true);
         checkSecureIDAuth(false);
       });
@@ -101,11 +103,13 @@ const SecurityScreen = (props: INProps) => {
       title: 'Log in with Secure ID to continue',
     })
       .then(() => {
+        FingerprintScanner.release();
         checkSecureIDAuth(true);
         //set OTP also
         setShowPinCodeModal(true);
       })
       .catch((error) => {
+        FingerprintScanner.release();
         setShowPinCodeModal(true);
         checkSecureIDAuth(false);
       });
