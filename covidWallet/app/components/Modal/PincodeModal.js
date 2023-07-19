@@ -37,7 +37,6 @@ const PincodeModal = ({
 
   // States
   const [type, setType] = useState('PC');
-  const [animatedValue] = useState(new Animated.Value(0));
   const [animateNextBtnValue, setAnimateNextBtnValue] = useState(new Animated.Value(0));
   const [animateDoneBtnValue, setAnimateDoneBtnValue] = useState(new Animated.Value(0));
   const [animateBackgroundValue, setAnimateBackgroundValue] = useState(new Animated.Value(0));
