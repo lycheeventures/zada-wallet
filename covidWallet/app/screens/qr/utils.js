@@ -102,7 +102,8 @@ export const handleQRConnectionRequest = async (inviteID, qrJSON) => {
     let urlData = response.data.policy.verificationRequestData
     var data = JSON.parse(convertBase64ToString(urlData));
 
-    qrJSON.organizationName = JSON.parse(convertBase64ToString(data.label));
+    let parsedLabel = JSON.parse(convertBase64ToString(data.label))
+    qrJSON.organizationName = parsedLabel.label;
     qrJSON.imageUrl = data.imageUrl;
     qrJSON.connectionId = data['@id'];
 
