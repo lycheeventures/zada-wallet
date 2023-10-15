@@ -365,8 +365,7 @@ function ActionsScreen({ navigation }) {
 
   const accept_verification_request = async (selectedItemObj, data) => {
     try {
-      let policyName = selectedItemObj.policy.attributes[0].policyName;
-
+      let policyName = selectedItemObj.policy.name;
       // Submit Verification Api call
       let result = await submit_verification(
         selectedItemObj.verificationId,

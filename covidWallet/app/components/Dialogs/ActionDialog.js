@@ -124,9 +124,8 @@ function ActionDialog(props) {
         if (props.data.type == VER_REQ || props.data.type == CONNLESS_VER_REQ) {
             val = selectedCred;
             props.data.credentialId = selectedCred.credentialId;
-            props.data.policyName = policyName
+            props.data.policyName = policyName ? policyName : props.data.policy.name
         }
-
         //Adding type.
         val.type = props.data.type;
         props.acceptModal(props.data);

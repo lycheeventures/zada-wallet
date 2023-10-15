@@ -176,7 +176,7 @@ const CredDetailScreen = (props: IProps) => {
   };
 
   async function onSuccess() {
-    dispatch(removeCredentials(data.credentialId));
+    dispatch(removeCredentials(data.correlationId));
   }
 
   return (

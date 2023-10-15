@@ -71,17 +71,17 @@ export const fetchCredentials = createAsyncThunk(
 // Removing credential
 export const removeCredentials = createAsyncThunk(
   'credential/removeCredentials',
-  async (credentialId: string, { getState, dispatch }) => {
+  async (correlationId: string, { getState, dispatch }) => {
     try {
       // Current State
       let { credential } = getState() as RootState;
       let credObj = credential.entities;
 
       // Delete credentials API call
-      await CredentialAPI.delete_credential(credentialId);
+      await CredentialAPI.delete_credential(correlationId);
 
       // Removing Credentials from local storage
-      let cred = Object.values(credObj).find((x) => x?.credentialId == credentialId);
+      let cred = Object.values(credObj).find((x) => x?.correlationId == correlationId);
       if (cred?.credentialId) {
         dispatch(deleteCredential(cred?.credentialId));
 
