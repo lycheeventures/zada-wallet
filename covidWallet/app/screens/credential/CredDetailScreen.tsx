@@ -64,9 +64,9 @@ const CredDetailScreen = (props: IProps) => {
   }, [credentialStatus, props.navigation]);
 
   useEffect(() => {
-    if (data.credentialId) {
+    if (data.threadId) {
       if (data?.qrCode === undefined || data?.qrCode?.v !== 3) {
-        dispatch(compressCredentials(data.credentialId));
+        dispatch(compressCredentials(data.threadId));
       } else if (isGenerating) setGenerating(false);
     }
   }, [showQRModal, data?.qrCode]);
@@ -176,7 +176,7 @@ const CredDetailScreen = (props: IProps) => {
   };
 
   async function onSuccess() {
-    dispatch(removeCredentials(data.correlationId));
+    dispatch(removeCredentials(data.credentialId));
   }
 
   return (

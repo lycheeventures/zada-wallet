@@ -48,11 +48,13 @@ const InputPinComponent = (props: INProps) => {
   // Functions
   const handleOnPress = () => {
     InteractionManager.runAfterInteractions(() => {
-      if (ref.current) {
-        ref.current.focus();
-        setTextIsFocused(true);
-        setContainerIsFocused(true);
-      }
+      setTimeout(() => {
+        if (ref.current) {
+          ref.current.focus();
+          setTextIsFocused(true);
+          setContainerIsFocused(true);
+        }
+      }, 600)
     });
   };
 

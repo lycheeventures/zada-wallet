@@ -110,19 +110,19 @@ const PreferenceScreen = (props: INProps) => {
               }}
               onClose={() => setIsCountryModalVisible(false)}
             />
-            <View>
+            <View style={{ flex: 0.7, justifyContent: "space-around" }}>
               <PrimaryButton
                 title={country?.label ? country.label : 'Select Country'}
                 onPress={() => setIsCountryModalVisible(true)}
                 disabled={false}
-                buttonStyle={{ backgroundColor: AppColors.WHITE }}
+                buttonStyle={{ backgroundColor: AppColors.WHITE, height: 50 }}
                 buttonTitleStyle={{ color: AppColors.PRIMARY }}
               />
               <PrimaryButton
                 title={language?.label ? language.label : 'Select Language'}
                 onPress={() => setIsLanguageModalVisible(true)}
                 disabled={false}
-                buttonStyle={{ backgroundColor: AppColors.WHITE, marginTop: 32 }}
+                buttonStyle={{ backgroundColor: AppColors.WHITE, height: 50 }}
                 buttonTitleStyle={{ color: AppColors.PRIMARY }}
               />
             </View>

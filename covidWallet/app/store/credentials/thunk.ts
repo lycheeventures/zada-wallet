@@ -71,17 +71,17 @@ export const fetchCredentials = createAsyncThunk(
 // Removing credential
 export const removeCredentials = createAsyncThunk(
   'credential/removeCredentials',
-  async (correlationId: string, { getState, dispatch }) => {
+  async (credentialId: string, { getState, dispatch }) => {
     try {
       // Current State
       let { credential } = getState() as RootState;
       let credObj = credential.entities;
 
       // Delete credentials API call
-      await CredentialAPI.delete_credential(correlationId);
+      await CredentialAPI.delete_credential(credentialId);
 
       // Removing Credentials from local storage
-      let cred = Object.values(credObj).find((x) => x?.correlationId == correlationId);
+      let cred = Object.values(credObj).find((x) => x?.credentialId == credentialId);
       if (cred?.credentialId) {
         dispatch(deleteCredential(cred?.credentialId));
 
@@ -98,13 +98,13 @@ export const removeCredentials = createAsyncThunk(
 // Compressing credentials
 export const compressCredentials = createAsyncThunk(
   'credential/compressCredentials',
-  async (credentialId: string, { getState, dispatch }) => {
+  async (threadId: string, { getState, dispatch }) => {
     try {
       // Current State
       let currentState = getState() as RootState;
       const credentials = currentState.credential.entities;
 
-      let credObj = Object.values(credentials).find((x) => x?.credentialId == credentialId);
+      let credObj = Object.values(credentials).find((x) => x?.threadId == threadId);
 
       // Return if credObj is undefined.
       if (!credObj) {
@@ -129,7 +129,8 @@ export const compressCredentials = createAsyncThunk(
         }, {});
       let qrObj = {
         d: Object.values(orderedData),
-        id: credentialId,
+        id: credObj.credentialId,
+        threadId,
       };
 
       let result = await CredentialAPI.compress_credential_qr(qrObj);
@@ -140,7 +141,7 @@ export const compressCredentials = createAsyncThunk(
           type: 'cv',
           i: 'zada',
         };
-        dispatch(updateCredential({ id: credentialId, changes: { qrCode: newQRObj } }));
+        dispatch(updateCredential({ id: credObj.credentialId, changes: { qrCode: newQRObj } }));
       }
       return { success: true };
     } catch (e) {

@@ -32,6 +32,7 @@ export interface ICredentialObject {
   connectionId: string;
   correlationId: string;
   credentialId: string;
+  threadId: string,
   definitionId: string;
   issuedAtUtc: Date;
   schemaId: string;

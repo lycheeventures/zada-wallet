@@ -18,6 +18,7 @@ const PrimaryButton = (props: INProps) => {
   const { title, onPress, buttonStyle, buttonTitleStyle, icon, disabled } = props;
   return (
     <Button
+      style={[styles._button, buttonStyle]}
       titleProps={{ numberOfLines: 1 }}
       title={title}
       disabled={disabled}

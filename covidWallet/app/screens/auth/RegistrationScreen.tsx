@@ -55,12 +55,22 @@ const RegistrationScreen = (props: INProps) => {
       return;
     }
 
-    if (error.email.length !== 0 && values.email.length > 0) {
-      _showAlert('ZADA', error.email + error.name);
+    let nameError = validate('name', values.name);
+    let emailError = ''
+    if (values.email.length > 0) {
+      emailError = validate('email', values.email);
+    }
+
+    // Setting Error
+    setError({ name: nameError, email: emailError });
+
+    if (nameError.length > 0) {
+      _showAlert('ZADA', nameError);
       return;
     }
-    if (error.name.length !== 0) {
-      _showAlert('ZADA', error.email + error.name);
+
+    if (emailError.length > 0) {
+      _showAlert('ZADA', emailError);
       return;
     }
 
@@ -77,8 +87,9 @@ const RegistrationScreen = (props: INProps) => {
       .unwrap()
       .then(async (res) => {
         let result = await ConnectionAPI.get_ConnectionList(user.country?.toLowerCase());
+        console.log('result => ', result.data);
         if (result.data.success) {
-          
+
           // Generating wallet if does not exist
           let newToken = await AuthenticateUser(token, true);
           dispatch(updateToken(newToken));
