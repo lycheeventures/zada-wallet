@@ -70,10 +70,10 @@ function NotifyMeScreen(props) {
 
     dispatch(updateUser({ ...data }));
     let freshToken = await AuthenticateUser(token);
+    dispatch(updateAppSetupComplete(true));
     dispatch(updateToken(freshToken));
     saveItemInLocalStorage('isAppSetupComplete', true);
     dispatch(updateIsAuthorized(true));
-    dispatch(updateAppSetupComplete(true));
     dispatch(changeAppStatus('idle'));
   }
 

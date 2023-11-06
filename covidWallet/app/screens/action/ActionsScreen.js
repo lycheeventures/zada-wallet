@@ -27,7 +27,6 @@ import { BLACK_COLOR, RED_COLOR, SECONDARY_COLOR } from '../../theme/Colors';
 import { getItem, saveItem } from '../../helpers/Storage';
 import ConstantsList, { CONN_REQ, CRED_OFFER, VER_REQ } from '../../helpers/ConfigApp';
 
-import { AuthenticateUser } from '../../helpers/Authenticate';
 import { showMessage, showAskDialog, _showAlert } from '../../helpers/Toast';
 import { biometricVerification } from '../../helpers/Biometric';
 import { getActionHeader } from '../../helpers/ActionList';
@@ -52,10 +51,10 @@ import {
   selectVerificationActions,
 } from '../../store/actions/selectors';
 import { deleteAction } from '../../store/actions';
-import { fetchCredentials } from '../../store/credentials/thunk';
 import { fetchConnections } from '../../store/connections/thunk';
 import { selectCredentials } from '../../store/credentials/selectors';
 import { selectNetworkStatus } from '../../store/app/selectors';
+import { addCredential } from '../../store/credentials/thunk';
 
 function ActionsScreen({ navigation }) {
   //Constants
@@ -125,7 +124,7 @@ function ActionsScreen({ navigation }) {
           [
             {
               text: 'Okay',
-              onPress: () => {},
+              onPress: () => { },
               style: 'cancel',
             },
           ],
@@ -290,12 +289,33 @@ function ActionsScreen({ navigation }) {
           // Accept credentials Api call.
           let result = await accept_credential(selectedItemObj.credentialId);
 
+          let cred_dict = result.data.credential;
+
+          let attributes = cred_dict.credential_proposal_dict.credential_proposal.attributes;
+
+          let values = {}
+          for (let item of attributes) {
+            values[item.name] = item.value;
+          }
+
+          let cred = {
+            acceptedAtUtc: cred_dict.updated_at,
+            connectionId: cred_dict.connection_id,
+            correlationId: cred_dict.credential_exchange_id,
+            credentialId: cred_dict.credential_exchange_id,
+            definitionId: cred_dict.credential_definition_id,
+            issuedAtUtc: cred_dict.created_at,
+            schemaId: cred_dict.schema_id,
+            state: 'Issued',
+            threadId: cred_dict.thread_id,
+            values,
+          };
+
           if (result.data.success) {
             // Delete Credential from list.
             dispatch(deleteAction(credObj.connectionId + credObj.credentialId));
 
-            // Fetch credentials
-            dispatch(fetchCredentials());
+            dispatch(addCredential(cred));
 
             setTimeout(() => {
               _showSuccessAlert('cred');
@@ -456,7 +476,7 @@ function ActionsScreen({ navigation }) {
       [
         {
           text: 'Okay',
-          onPress: () => {},
+          onPress: () => { },
           style: 'cancel',
         },
       ],
@@ -476,7 +496,7 @@ function ActionsScreen({ navigation }) {
       'Are you sure?',
       'Are you sure you want to delete this request?',
       () => rejectModal(item),
-      () => {}
+      () => { }
     );
   };
 

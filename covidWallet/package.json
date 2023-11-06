@@ -12,7 +12,7 @@
     "android:prod": "react-native run-android --variant Release",
     "//": "Build:",
     "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios/'",
-    "build:android": "rm ./android/app/src/main/assets/index.android.bundle && react-native bundle --platform android --dev false --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res",
+    "build:android": "rm -f ./android/app/src/main/assets/index.android.bundle && react-native bundle --platform android --dev false --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res",
     "build:android-debug": "npm-run-all -l build:android && pushd android && ./gradlew assembleDebug && popd",
     "build:android-release": "npm-run-all -l build:android && pushd android && ./gradlew assembleRelease && popd",
     "build:android-all": "npm-run-all -l clean:android build:android-debug build:android-release",

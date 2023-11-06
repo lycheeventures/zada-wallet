@@ -87,7 +87,6 @@ const RegistrationScreen = (props: INProps) => {
       .unwrap()
       .then(async (res) => {
         let result = await ConnectionAPI.get_ConnectionList(user.country?.toLowerCase());
-        console.log('result => ', result.data);
         if (result.data.success) {
 
           // Generating wallet if does not exist

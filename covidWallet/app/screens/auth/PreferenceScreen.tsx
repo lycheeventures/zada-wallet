@@ -110,7 +110,7 @@ const PreferenceScreen = (props: INProps) => {
               }}
               onClose={() => setIsCountryModalVisible(false)}
             />
-            <View style={{ flex: 0.7, justifyContent: "space-around" }}>
+            <View style={{ flex: 0.5, justifyContent: "space-around" }}>
               <PrimaryButton
                 title={country?.label ? country.label : 'Select Country'}
                 onPress={() => setIsCountryModalVisible(true)}

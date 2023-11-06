@@ -68,6 +68,47 @@ export const fetchCredentials = createAsyncThunk(
   }
 );
 
+export const addCredential = createAsyncThunk(
+  'credential/addCredential',
+  async (cred: ICredentialObject, { getState }) => {
+    // Current State
+    const currentState = getState() as RootState;
+    const connections = currentState.connection.entities;
+    const credentials = currentState.credential.entities;
+
+    let credObj = {
+      success: true,
+      credentials: Object.values(credentials) as any[],
+    };
+
+    // Finding connection from store.
+    let item: IConnectionObject | undefined = Object.values(connections).find(
+      (c) => c?.connectionId == cred.connectionId
+    );
+
+    let obj = {
+      ...cred,
+      imageUrl: item?.imageUrl ? item?.imageUrl : null,
+      organizationName: item?.name ? item?.name : null,
+      qrCode: undefined,
+      type:
+        cred.values != undefined && cred.values.Type != undefined
+          ? cred.values.Type
+          : (cred.values != undefined || cred.values != null) &&
+            cred.values['Vaccine Name'] != undefined &&
+            cred.values['Vaccine Name'].length != 0 &&
+            cred.values['Dose'] != undefined &&
+            cred.values['Dose'].length != 0
+          ? 'COVIDpass (Vaccination)'
+          : 'Digital Certificate',
+    };
+
+    credObj.credentials.push(obj);
+
+    return credObj;
+  }
+);
+
 // Removing credential
 export const removeCredentials = createAsyncThunk(
   'credential/removeCredentials',
