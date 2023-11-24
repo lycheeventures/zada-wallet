@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import { CredentialAPI, VerificationAPI } from '../../gateways';
+import { ConnectionAPI, CredentialAPI, VerificationAPI } from '../../gateways';
 import { get_encrypted_credential } from '../../gateways/credentials';
 import { decryptAES256CBC, performSHA256 } from '../../helpers/crypto';
 import { convertBase64ToString, convertStringToBase64, sortValuesByKey } from '../../helpers/utils';
@@ -96,10 +96,10 @@ export const handleCredVerification = async (credQrData) => {
   }
 };
 
-export const handleQRConnectionRequest = async (inviteID, qrJSON) => {
+export const handleQRConnectionRequest = async (connectionId, qrJSON) => {
   try {
-    let response = await VerificationAPI.get_policy(inviteID);
-    let urlData = response.data.policy.verificationRequestData
+    let response = await ConnectionAPI.get_connection_metadata(connectionId)
+    let urlData = response.data.connection.connectionRequestData
     var data = JSON.parse(convertBase64ToString(urlData));
 
     let parsedLabel = JSON.parse(convertBase64ToString(data.label))

@@ -12,7 +12,6 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
-import { Transition, Transitioning } from 'react-native-reanimated';
 import EmptyList from '../../../components/EmptyList';
 import PullToRefresh from '../../../components/PullToRefresh';
 import {
@@ -68,13 +67,6 @@ const CredentialGroups = (props) => {
   // Dropdown Animation
   const [currentIndex, setCurrentIndex] = useState(-1);
   const ref = useRef(null);
-  const transition = (
-    <Transition.Together>
-      <Transition.In type="fade" durationMs={200} />
-      <Transition.Change />
-      <Transition.Out type="fade" durationMs={200} />
-    </Transition.Together>
-  );
 
   const updateBackgroundImage = (credentialId, background_url) => {
     dispatch(updateCredential({ id: credentialId, changes: { backgroundImage: background_url } }));
@@ -220,7 +212,7 @@ const CredentialGroups = (props) => {
   );
 
   return (
-    <Transitioning.View ref={ref} transition={transition} style={styles._mainContainer}>
+    <View ref={ref} style={styles._mainContainer}>
       <AddGroupModal
         isVisible={showAddGroup}
         credentials={credentials}
@@ -492,7 +484,7 @@ const CredentialGroups = (props) => {
           setShowAddGroup(true);
         }}
       />
-    </Transitioning.View>
+    </View>
   );
 };
 

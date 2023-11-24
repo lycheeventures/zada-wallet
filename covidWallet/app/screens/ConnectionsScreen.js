@@ -70,7 +70,7 @@ function ConnectionsScreen() {
             onPress={() => onDeletePressed(item)}
             activeOpacity={0.8}
             style={[styles.swipeableViewStyle]}>
-            <MaterialCommunityIcons size={30} name="delete" padding={30} color={RED_COLOR} />
+            <MaterialCommunityIcons size={30} name="delete" color={RED_COLOR} />
           </TouchableOpacity>
         </Animated.View>
       </View>

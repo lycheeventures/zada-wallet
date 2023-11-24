@@ -1,3 +1,4 @@
+arrowParens: 'avoid',
 bracketSpacing: true
 endOfLine: auto
 bracketSameLine: true

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, PermissionsAndroid, Platform } from 'react-native';
 import { PRIMARY_COLOR } from '../theme/Colors';
 import ImageBoxComponent from '../components/ImageBoxComponent';
 import TextComponent from '../components/TextComponent';
@@ -25,37 +25,55 @@ function NotifyMeScreen(props) {
   // States
   const [loading, setLoading] = useState(false);
 
+  async function requestIOSNotificationPermission() {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async function requestAndroidNotificationPermission() {
+    try {
+      const status = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+      if (status === false) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          {
+            title: 'Notification Permission',
+            message:
+              'ZADA Wallet needs notification permission to ' +
+              'recieve credentials.',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          return true;
+        }
+
+        return false;
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
   async function enableNotifications() {
     setLoading(true);
 
+    let granted = false;
+
     // ask for notification permission
-    const authorizationStatus = await messaging().hasPermission();
-    if (authorizationStatus == messaging.AuthorizationStatus.AUTHORIZED) {
-      const authorizationStatus = await messaging().requestPermission({
-        sound: true,
-        badge: true,
-        alert: true,
-      });
-      if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
-        console.log('Notification Permission => Authorized');
-      } else if (authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL) {
-        console.log('Notification Permission => Provisional');
-      } else {
-        console.log('Notification Permission => Disabled');
-      }
+    if (Platform.OS === 'ios') {
+      granted = await requestIOSNotificationPermission();
     } else {
-      const authorizationStatus = await messaging().requestPermission({
-        sound: true,
-        badge: true,
-        alert: true,
-      });
-      if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
-        console.log('Notification Permission => Authorized');
-      } else if (authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL) {
-        console.log('Notification Permission => Provisional');
-      } else {
-        console.log('Notification Permission => Disabled');
-      }
+      granted = await requestAndroidNotificationPermission();
     }
 
     let data = {

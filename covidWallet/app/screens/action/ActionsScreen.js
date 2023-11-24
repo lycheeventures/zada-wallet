@@ -740,7 +740,6 @@ function ActionsScreen({ navigation }) {
                     <MaterialCommunityIcons
                       size={30}
                       name="delete"
-                      padding={30}
                       color={RED_COLOR}
                     />
                   </TouchableOpacity>
