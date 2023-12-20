@@ -28,7 +28,7 @@ const SelectModal = (props: INProps) => {
     setSearchText(text);
 
     // Filter the items based on the search text
-    const filteredItems = data.filter((item) =>
+    const filteredItems = data.filter(item =>
       item.label.toLowerCase().includes(text.toLowerCase())
     );
 

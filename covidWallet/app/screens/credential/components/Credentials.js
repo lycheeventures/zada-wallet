@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, StyleSheet, RefreshControl, FlatList } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { useTranslation } from 'react-i18next';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { themeStyles } from '../../../theme/Styles';
 import PullToRefresh from '../../../components/PullToRefresh';
@@ -26,6 +27,7 @@ function Credentials(props) {
   const [search, setSearch] = useState('');
 
   // Selectors
+  const { t } = useTranslation();
   const credentialStatus = useAppSelector(selectCredentialsStatus);
   const searchedCredentials = useAppSelector((state) => selectSearchedCredentials(state, search));
 
@@ -43,7 +45,7 @@ function Credentials(props) {
   // List Empty Component
   const emptyListComponent = () => (
     <EmptyList
-      text="There are no certificates in your wallet. Once you receive a certificate, it will show up here."
+      text={t('CredentialsScreen.all_certificates_empty_list_text')}
       image={require('../../../assets/images/credentialsempty.png')}
       style={styles.emptyListStyle}
     />
@@ -54,7 +56,7 @@ function Credentials(props) {
     () => (
       <View style={styles._searchContainer}>
         <TextInput
-          placeholder="Search"
+          placeholder={t('common.search')}
           value={search}
           onChangeText={setSearch}
           style={styles._searchInput}
@@ -70,8 +72,8 @@ function Credentials(props) {
     let date = item.values['Issue Time']
       ? get_local_issue_date(item.values['Issue Time'])
       : item.issuedAtUtc
-      ? get_local_issue_date(item.issuedAtUtc)
-      : undefined;
+        ? get_local_issue_date(item.issuedAtUtc)
+        : undefined;
     return (
       <TouchableOpacity onPress={() => toggleModal(item)} activeOpacity={0.9}>
         <View style={styles.CredentialsCardContainer}>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dimensions, FlatList, StyleSheet, View, SafeAreaView, Pressable } from 'react-native';
 import Modal from 'react-native-modal';
+import { useTranslation } from 'react-i18next';
 import {
   BACKGROUND_COLOR,
   WHITE_COLOR,
@@ -32,6 +33,9 @@ const AddGroupModal = ({
 }) => {
   // Constants
   const dispatch = useAppDispatch();
+
+  // Selectors
+  const { t } = useTranslation();
 
   // States
   const [search, setSearch] = useState('');
@@ -66,8 +70,8 @@ const AddGroupModal = ({
     let date = item.values['Issue Time']
       ? get_local_issue_date(item.values['Issue Time'])
       : item.issuedAtUtc
-      ? get_local_issue_date(item.issuedAtUtc)
-      : undefined;
+        ? get_local_issue_date(item.issuedAtUtc)
+        : undefined;
     return (
       <Pressable
         style={{ marginBottom: 5 }}
@@ -117,7 +121,7 @@ const AddGroupModal = ({
         margin: 0,
       }}>
       <SafeAreaView style={styles._mainContainer}>
-        <HeadingComponent text={`New Group`} />
+        <HeadingComponent text={t('CredentialsScreen.new_group')} />
 
         {/* Group Name */}
         <View
@@ -129,7 +133,7 @@ const AddGroupModal = ({
           <InputComponent
             type="default"
             height={45}
-            placeholderText="Group Name"
+            placeholderText={t('CredentialsScreen.group_name')}
             errorMessage={groupNameError}
             value={groupName}
             inputContainerStyle={styles._inputView}
@@ -147,7 +151,7 @@ const AddGroupModal = ({
           <InputComponent
             type="default"
             height={45}
-            placeholderText="Search Credential"
+            placeholderText={t('common.search')}
             value={search}
             inputContainerStyle={[styles._inputView, { marginTop: 10 }]}
             setStateValue={_searchInputHandler}
@@ -184,7 +188,7 @@ const AddGroupModal = ({
           <EmptyList
             onRefresh={onRefresh}
             refreshing={refreshing}
-            text="There are no certificates in your wallet. Once you receive a certificate, it will show up here."
+            text={t('CredentialsScreen.all_certificates_empty_list_text')}
             image={require('../../../assets/images/credentialsempty.png')}
             style={{
               marginTop: 20,
@@ -196,7 +200,7 @@ const AddGroupModal = ({
           onPress={() => {
             onCreateGroupClick(creds);
           }}
-          title="Create Group"
+          title={t('CredentialsScreen.create_group')}
           titleColor={WHITE_COLOR}
           buttonColor={GREEN_COLOR}
           style={{ marginTop: 20 }}
@@ -204,7 +208,7 @@ const AddGroupModal = ({
         <SimpleButton
           width={250}
           onPress={onCloseClick}
-          title="Close"
+          title={t('common.close')}
           titleColor={WHITE_COLOR}
           buttonColor={GRAY_COLOR}
           style={{ marginTop: 5 }}

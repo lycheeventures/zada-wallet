@@ -9,6 +9,7 @@ import {
   RefreshControl,
   Dimensions,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -62,6 +63,7 @@ function ActionsScreen({ navigation }) {
   const { width, height } = Dimensions.get('window');
 
   // Selectors
+  const { t } = useTranslation();
   const actions = useAppSelector(selectActions.selectAll);
   const actionEntities = useAppSelector(selectActions.selectEntities);
   const credentials = useAppSelector(selectCredentials.selectAll);
@@ -118,9 +120,10 @@ function ActionsScreen({ navigation }) {
     const _checkPermission = async () => {
       const authorizationStatus = await messaging().hasPermission();
       if (authorizationStatus !== messaging.AuthorizationStatus.AUTHORIZED) {
+        let message = t('ActionsScreen.notification_alert_message')
         Alert.alert(
           'Zada Wallet',
-          'Notifications are disabled. You will not be able to receive alerts for the actions. Pull down to refresh and receive the latest actions.',
+          message,
           [
             {
               text: 'Okay',
@@ -190,17 +193,17 @@ function ActionsScreen({ navigation }) {
     if (!isLoading) {
       if (v.type === CRED_OFFER) {
         setLoaderText(
-          'Please wait! we are receiving your certificate this may take around ~10 seconds...'
+          t('messages.receiving_certificate')
         );
         handleCredentialRequest();
       } else if (v.type === VER_REQ) {
         setLoaderText(
-          'Please wait! we are verifying your certificate this may take around ~10 seconds...'
+          t('messages.verifying_certificate')
         );
         handleVerificationRequests(v);
       } else if (v.type === CONN_REQ) {
         setLoaderText(
-          'Please wait! we are creating a connection this may take around ~10 seconds...'
+          t('messages.creating_connection')
         );
         handleConnectionRequest(v);
       }
@@ -264,10 +267,10 @@ function ActionsScreen({ navigation }) {
         // Connection is already exists
         setModalVisible(false);
         setIsLoading(false);
-        showMessage('ZADA Wallet', 'Connection is already accepted');
+        showMessage('ZADA Wallet', t('errors.accept_connection'));
       }
     } else {
-      showMessage('ZADA Wallet', 'Internet Connection is not available');
+      showMessage('ZADA Wallet', t('errors.invalid_internet'));
     }
   };
 
@@ -321,14 +324,14 @@ function ActionsScreen({ navigation }) {
               _showSuccessAlert('cred');
             }, 500);
           } else {
-            showMessage('ZADA Wallet', 'Invalid Credential Offer');
+            showMessage('ZADA Wallet', t('errors.invalid_credential_offer'));
           }
           setIsLoading(false);
         }
       } else {
         setModalVisible(false);
         setIsLoading(false);
-        showMessage('ZADA Wallet', 'Credential offer is already accepted');
+        showMessage('ZADA Wallet', t('errors.accept_credential_offer'));
       }
     } catch (e) {
       setModalVisible(false);
@@ -347,7 +350,7 @@ function ActionsScreen({ navigation }) {
     if (checkbiometric) {
       setModalVisible(false);
       setIsLoading(true);
-      setLoaderText('Submitting...');
+      setLoaderText(t('messages.submitting'));
 
       // Find cred action for deletion.
       let credObj = verificationActions.find(
@@ -394,7 +397,7 @@ function ActionsScreen({ navigation }) {
       );
 
       if (result.data.success) {
-        _showAlert('Zada Wallet', 'Verification request has been submitted successfully');
+        _showAlert('Zada Wallet', t('messages.success_verification_request_submit'));
       } else {
         showMessage('Zada', result.data.error);
       }
@@ -415,7 +418,7 @@ function ActionsScreen({ navigation }) {
 
     setModalVisible(false);
     setIsLoading(true);
-    setLoaderText('Deleting...');
+    setLoaderText(t('messages.deleting'));
 
     // Connection Action
     if (selectedItemObj.type === ConstantsList.CONN_REQ) {
@@ -466,9 +469,9 @@ function ActionsScreen({ navigation }) {
   // Function that will show alert on acceptance of connection and credential
   const _showSuccessAlert = (action) => {
     let message = '';
-    if (action == 'conn') message = 'Your connection is created successfully.';
-    else if (action == 'cred') message = 'You have received a certificate successfully.';
-    else if (action == 'ver') message = 'Your verification request is fulfilled successfully.';
+    if (action == 'conn') message = t('messages.success_connection');
+    else if (action == 'cred') message = t('messages.succcess_ceriificate');
+    else if (action == 'ver') message = t('messages.success_verification_request');
 
     Alert.alert(
       'Zada Wallet',
@@ -494,7 +497,7 @@ function ActionsScreen({ navigation }) {
   const onDeletePressed = (item) => {
     showAskDialog(
       'Are you sure?',
-      'Are you sure you want to delete this request?',
+      t('message.delete_request'),
       () => rejectModal(item),
       () => { }
     );
@@ -520,25 +523,25 @@ function ActionsScreen({ navigation }) {
 
   const _setPinCode = async () => {
     if (pincode.length == 0) {
-      setPincodeError('Pincode is required.');
+      setPincodeError(t('errors.required_pincode'));
       return;
     }
     setPincodeError('');
 
     if (!pincodeRegex.test(pincode)) {
-      setPincodeError('Pincode should contain only 6 digits.');
+      setPincodeError(t('errors.length_pincode', { max: 6 }));
       return;
     }
     setPincodeError('');
 
     if (confirmPincode.length == 0) {
-      setConfirmPincodeError('Confirm pincode is required.');
+      setConfirmPincodeError(t('errors.required_confirm_pincode'));
       return;
     }
     setConfirmPincodeError('');
 
     if (!pincodeRegex.test(confirmPincode)) {
-      setConfirmPincodeError('Confirm pincode should contain only 6 digits.');
+      setConfirmPincodeError(t('errors.length_confirm_pincode', { max: 6 }));
       return;
     }
     setConfirmPincodeError('');
@@ -546,7 +549,7 @@ function ActionsScreen({ navigation }) {
     if (pincode != confirmPincode) {
       showMessage(
         'Zada Wallet',
-        'Pincode and confirm pincode are not same. Please check them carefully'
+        t('errors.pincode_confirm_not_match')
       );
     }
 
@@ -569,13 +572,13 @@ function ActionsScreen({ navigation }) {
   const _confirmingPincode = async () => {
     // Length check
     if (verifyPincode.length === 0) {
-      setVerifyPincodeError('Pincode is required.');
+      setVerifyPincodeError(t('errors.required_pincode'));
       return;
     }
 
     // Regex
     if (!pincodeRegex.test(verifyPincode)) {
-      setVerifyPincodeError('Pincode should contain only 6 digits.');
+      setVerifyPincodeError(t('errors.length_pincode', { max: 6 }));
       return;
     }
 
@@ -590,18 +593,18 @@ function ActionsScreen({ navigation }) {
       let selectedItemObj = JSON.parse(selectedItem);
       if (dialogData == null) {
         if (!isLoading) {
-          setLoaderText('Deleting...');
+          setLoaderText(t('messages.deleting'));
 
           // Deleting Verification
           await delete_verification(selectedItemObj.verificationId);
 
-          _showAlert('Zada Wallet', 'Verification request has been rejected!');
+          _showAlert('Zada Wallet', t('errors.verification_request_rejected'));
 
           // Deleting Verification from action list
           dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
         }
       } else {
-        setLoaderText('Submitting...');
+        setLoaderText(t('message.submitting'));
 
         // Accept verification
         await accept_verification_request(selectedItemObj, dialogData);
@@ -612,7 +615,7 @@ function ActionsScreen({ navigation }) {
     } else {
       showMessage(
         'Zada Wallet',
-        'You entered incorrect pincode. Please check your pincode and try again'
+        t('errors.invalid_pincode')
       );
     }
     setDialogData(null);
@@ -670,7 +673,7 @@ function ActionsScreen({ navigation }) {
 
       <PullToRefresh isLoading={isLoading} />
 
-      <HeadingComponent text="Actions" />
+      <HeadingComponent text={t('common.actions')} />
 
       {isLoading ? <OverlayLoader text={loaderText} /> : null}
 
@@ -754,7 +757,7 @@ function ActionsScreen({ navigation }) {
         <EmptyList
           refreshing={actionStatus === 'loading'}
           onRefresh={refreshHandler}
-          text="There are no actions to complete, Please scan a QR code to either get a digital certificate or to prove it."
+          text={t('ActionsScreen.empty_list_text')}
           image={require('../../assets/images/action.png')}
           onPress={() => {
             navigation.navigate('QRScreen');

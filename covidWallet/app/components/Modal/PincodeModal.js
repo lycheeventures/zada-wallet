@@ -11,6 +11,7 @@ import {
   Pressable,
   Easing,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
 import { AppColors } from '../../theme/Colors';
@@ -34,6 +35,9 @@ const PincodeModal = ({
 }) => {
   // Constants
   const insets = useSafeAreaInsets();
+
+  // Selectors
+  const { t } = useTranslation();
 
   // States
   const [type, setType] = useState('PC');
@@ -259,9 +263,9 @@ const PincodeModal = ({
                 source={require('../../assets/images/lock.png')}
                 style={styles.lockImageStyle}
               />
-              <Text style={styles._infoText}>Please confirm PIN Again.</Text>
+              <Text style={styles._infoText}>{t('PincodeScreen.confirm_pin_title')}</Text>
               <Text style={styles._infoSubText}>
-                Re-enter PIN that you have entered on previous screen.
+              {t('PincodeScreen.confirm_pin_sub_title')}
               </Text>
             </View>
             <View>
@@ -296,8 +300,8 @@ const PincodeModal = ({
                 source={require('../../assets/images/lock.png')}
                 style={styles.lockImageStyle}
               />
-              <Text style={styles._infoText}>Enter a new six-digit PIN.</Text>
-              <Text style={styles._infoSubText}>This pin is required when sharing your data</Text>
+              <Text style={styles._infoText}>{t('PincodeScreen.title')}</Text>
+              <Text style={styles._infoSubText}>{t('PincodeScreen.sub_title')}</Text>
             </View>
             <View>
               <InputPinComponent onPincodeChange={onPincodeChange} pincodeError={pincodeError} />
@@ -318,7 +322,7 @@ const PincodeModal = ({
                       }),
                     },
                   ]}>
-                  <Text style={styles._btnTitle}>Next</Text>
+                  <Text style={styles._btnTitle}>{t('common.next')}</Text>
                 </Animated.View>
               </TouchableComponent>
             </View>

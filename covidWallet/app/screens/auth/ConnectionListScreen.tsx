@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { CheckBox, FAB } from 'react-native-elements';
 import { AppColors } from '../../theme/Colors';
 import FadeView from '../../components/FadeView';
@@ -14,6 +15,9 @@ interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
 }
 const ConnectionListScreen = (props: INProps) => {
+  // Selectors
+  const { t } = useTranslation();
+
   // Constants
   const dispatch = useAppDispatch<AppDispatch>();
   const connections = props.route.params.connections;
@@ -85,7 +89,7 @@ const ConnectionListScreen = (props: INProps) => {
           <View style={styles.logoContainer}>
             <Text style={styles.headingText}>Connections</Text>
             <Text style={styles.subHeadingText}>
-              Select connections to be connected automatically.
+              {t('ConnectionListScreen.title')}
             </Text>
           </View>
         </View>

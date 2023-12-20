@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, PermissionsAndroid, Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { PRIMARY_COLOR } from '../theme/Colors';
 import ImageBoxComponent from '../components/ImageBoxComponent';
 import TextComponent from '../components/TextComponent';
@@ -8,7 +9,7 @@ import messaging from '@react-native-firebase/messaging';
 import { useAppDispatch, useAppSelector } from '../store';
 import { updateIsAuthorized, updateToken, updateUser } from '../store/auth';
 import { selectToken, selectUser } from '../store/auth/selectors';
-import { AuthenticateUser } from './auth/utils';
+import { AuthenticateUser } from './utils';
 import { changeAppStatus, updateAppSetupComplete } from '../store/app';
 import { saveItemInLocalStorage } from '../helpers/Storage';
 
@@ -21,6 +22,7 @@ function NotifyMeScreen(props) {
   // Selectors
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
+  const { t } = useTranslation();
 
   // States
   const [loading, setLoading] = useState(false);
@@ -98,11 +100,10 @@ function NotifyMeScreen(props) {
   return (
     <View style={styles.viewStyle}>
       <View style={styles.textViewStyle}>
-        <Text style={styles.TextContainerHead}>Get notified</Text>
+        <Text style={styles.TextContainerHead}> {t('NotifyMeScreen.title')}</Text>
         <TextComponent
           onboarding={true}
-          text="We use push notifications to deliver messages for important events,
-          such as when you recieve a new digital certificate."
+          text={t('NotifyMeScreen.sub_title')}
         />
       </View>
       <View style={styles.imageViewStyle}>
@@ -111,7 +112,7 @@ function NotifyMeScreen(props) {
       <View style={styles.buttonViewStyle}>
         <GreenPrimaryButton
           loading={loading}
-          text="ENABLE NOTIFICATIONS"
+          text={t('NotifyMeScreen.enable_btn')}
           nextHandler={enableNotifications}
         />
       </View>
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     color: 'black',
     fontWeight: 'bold',
-    fontSize: 32,
+    fontSize: 28,
     flexDirection: 'column',
   },
 });

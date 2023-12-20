@@ -12,6 +12,7 @@ import { pincodeRegex } from '../helpers/validation';
 import { showMessage } from '../helpers/Toast';
 import { saveItem } from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
+import { useTranslation } from 'react-i18next';
 
 const img = require('../assets/images/security.png');
 
@@ -19,6 +20,9 @@ interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
 }
 const SecurityScreen = (props: INProps) => {
+  // Selectors
+  const { t } = useTranslation();
+
   // Constants
   const navigation = props.navigation;
 
@@ -155,12 +159,13 @@ const SecurityScreen = (props: INProps) => {
     // Saving pincode in async
     try {
       await saveItem(ConstantsList.PIN_CODE, pincode);
+      let message = t('PincodeScreen.alert_message');
 
       setIsPincode(true);
       setShowPinCodeModal(false);
       showMessage(
         'Zada Wallet',
-        'Your pincode is set successfully. Please keep it safe and secure.'
+        message,
       );
       setPincode('');
       setConfirmPincode('');
@@ -184,19 +189,18 @@ const SecurityScreen = (props: INProps) => {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Text style={styles.TextContainerHead}>Be Secure</Text>
+        <Text style={styles.TextContainerHead}>{t('SecurityScreen.title')}</Text>
 
         <TextComponent
           onboarding={true}
-          text="Using biometric and pincode security significantly reduces the chances
-                your account will be compromised in case your phone is lost or stolen."
+          text={t('SecurityScreen.sub_title')}
         />
       </View>
       <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBoxComponent source={img} />
       </View>
       <View style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}>
-        <GreenPrimaryButton text="ENABLE SECURE ID" nextHandler={enableSecureID} />
+        <GreenPrimaryButton text={t('SecurityScreen.enable_btn')} nextHandler={enableSecureID} />
       </View>
 
       {/* PinCode Modal */}

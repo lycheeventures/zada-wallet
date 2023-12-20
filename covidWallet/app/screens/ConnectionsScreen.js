@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
-  Alert,
   View,
   TouchableOpacity,
   Animated,
   StyleSheet,
   RefreshControl,
-  FlatList,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import { useTranslation } from 'react-i18next';
 
 import TextComponent from '../components/TextComponent';
 import FlatCard from '../components/FlatCard';
@@ -31,6 +30,7 @@ function ConnectionsScreen() {
   const dispatch = useAppDispatch();
 
   // Selectors
+  const { t } = useTranslation();
   const connections = useAppSelector(selectConnections.selectAll);
   const connectionStatus = useAppSelector(selectConnectionsStatus);
   const developmentMode = useAppSelector(selectDevelopmentMode);
@@ -44,7 +44,7 @@ function ConnectionsScreen() {
       'Are you sure you want to delete this connection?',
       'This will also delete all certificates issued by this connection.',
       () => onSuccessPress(e),
-      () => {}
+      () => { }
     );
   }
 
@@ -58,7 +58,7 @@ function ConnectionsScreen() {
     let header = rowData.item.name != undefined ? rowData.item.name : '';
     let subtitle =
       'The connection between you and ' + header.toLowerCase() + ' is secure and encrypted.';
-    return <FlatCard onPress={() => {}} imageURL={imgURI} heading={header} text={subtitle} />;
+    return <FlatCard onPress={() => { }} imageURL={imgURI} heading={header} text={subtitle} />;
   };
 
   const renderHiddenItem = ({ item, index }) => {
@@ -80,7 +80,7 @@ function ConnectionsScreen() {
   // Empty List Component
   const listEmptyComponent = () => (
     <EmptyList
-      text="You have no connections yet."
+      text={t('ConnectionsScreen.list_empty_text')}
       image={require('../assets/images/connectionsempty.png')}
     />
   );
@@ -88,7 +88,7 @@ function ConnectionsScreen() {
   return (
     <View style={themeStyles.mainContainer}>
       <PullToRefresh />
-      <HeadingComponent text="Connections" />
+      <HeadingComponent text={t('common.connections')} />
       {connectionStatus === 'pending' && <OverlayLoader text="Deleting connection..." />}
 
       <View

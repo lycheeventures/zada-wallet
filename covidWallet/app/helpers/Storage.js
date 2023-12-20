@@ -104,13 +104,11 @@ export const ls_updateCredentials = async () => {
 
 // Delete action by Connection ID.
 export const deleteActionByConnId = async (key, connID) => {
-  console.log('key, connID', key, connID);
   return getItem(key).then((action) => {
     let QRJsonList = JSON.parse(action);
 
     let newQRList = [];
     QRJsonList.forEach((element) => {
-      console.log('element', element);
       if (element.credentialId != connID) {
         newQRList.push(element);
       }

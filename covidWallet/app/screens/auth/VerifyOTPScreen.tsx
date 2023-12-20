@@ -19,6 +19,7 @@ import { AuthStackParamList } from '../../navigation/types';
 import AnimatedLoading from '../../components/Animations/AnimatedLoading';
 import InputPinComponent from '../../components/Input/InputPinComponent';
 import ResendCode from './components/ResendCode';
+import { useTranslation } from 'react-i18next';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -30,6 +31,7 @@ const VerifyOTPScreen = (props: INProps) => {
 
   // Selectors
   const user = useAppSelector(selectUser);
+  const { t } = useTranslation();
 
   // States
   const [code, setCode] = useState('');
@@ -142,9 +144,9 @@ const VerifyOTPScreen = (props: INProps) => {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
-        <Text style={styles.headingStyle}>We've just sent you a verification code</Text>
+        <Text style={styles.headingStyle}>{t('VerifyOTPScreen.title')}</Text>
         <Text style={styles.subheadingStyle}>
-          We just sent you the verification code to {user.phone}, please verify.
+          {t('VerifyOTPScreen.sub_title_1')} {user.phone}, {t('VerifyOTPScreen.sub_title_2')}
         </Text>
         <View style={styles.inputContainer}>
           <InputPinComponent
@@ -174,7 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headingStyle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: 'Poppins-Bold',
     color: AppColors.PRIMARY,
     paddingLeft: 16,

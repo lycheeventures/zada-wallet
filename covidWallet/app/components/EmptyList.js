@@ -5,13 +5,16 @@ import {
     ScrollView,
     RefreshControl
 } from 'react-native';
-
+import { useTranslation } from 'react-i18next';
 import { BACKGROUND_COLOR, BLACK_COLOR } from '../theme/Colors';
 import BorderButton from './BorderButton';
 import ImageBoxComponent from './ImageBoxComponent';
 import TextComponent from './TextComponent';
 
 const EmptyList = ({ refreshing, onRefresh, text, image, screen, onPress, style }) => {
+    // Selectors 
+    const { t } = useTranslation();
+
     return (
         <ScrollView
             showsVerticalScrollIndicator={false}
@@ -36,7 +39,7 @@ const EmptyList = ({ refreshing, onRefresh, text, image, screen, onPress, style 
                 <View style={styles.QRBtnContainer}>
                     <BorderButton
                         nextHandler={onPress}
-                        text="QR CODE"
+                        text={t('ActionsScreen.qr_code')}
                         color={BLACK_COLOR}
                         textColor={BLACK_COLOR}
                         backgroundColor={BACKGROUND_COLOR}

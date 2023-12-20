@@ -40,7 +40,6 @@ const InputPinComponent = (props: INProps) => {
 
     handleOnPress();
     return () => {
-      console.log('removing subs')
       hideSubscription.remove();
     };
   }, []);
@@ -125,7 +124,7 @@ const InputPinComponent = (props: INProps) => {
         value={code}
         onChangeText={handleCodeChange}
         onBlur={handleOnBlur}
-        keyboardType="numeric"
+        keyboardType="number-pad"
         returnKeyType="done"
         maxLength={CODE_LENGTH}
         style={style.hiddenCodeInput}

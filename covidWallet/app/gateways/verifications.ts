@@ -124,7 +124,6 @@ export async function submit_verification(
   policyName: string,
   organizationName: string
 ) {
-  console.log('submit_verification called...');
   try {
     let obj = {
       verificationId,

@@ -8,27 +8,32 @@ import {
   Platform,
   TouchableOpacity,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
-import { InputComponent } from '../components/Input/inputComponent';
-import OverlayLoader from '../components/OverlayLoader';
-import { _fetchProfileAPI, _updateProfileAPI } from '../gateways/auth';
-import { showAskDialog, showMessage, _showAlert } from '../helpers/Toast';
+import { InputComponent } from '../../components/Input/inputComponent';
+import OverlayLoader from '../../components/OverlayLoader';
+import { _fetchProfileAPI, _updateProfileAPI } from '../../gateways/auth';
+import { showAskDialog, showMessage, _showAlert } from '../../helpers/Toast';
 import {
   emailRegex,
   nameRegex,
   pincodeRegex,
   validateLength,
   validatePasswordStrength,
-} from '../helpers/validation';
-import { AppColors, BLACK_COLOR, GREEN_COLOR, SECONDARY_COLOR, WHITE_COLOR } from '../theme/Colors';
-import { getItem, saveItem } from '../helpers/Storage';
-import ConstantsList from '../helpers/ConfigApp';
-import SimpleButton from '../components/Buttons/SimpleButton';
-import EmailWarning from '../components/EmailWarning';
-import PincodeModal from '../components/Modal/PincodeModal';
-import { _handleAxiosError } from '../helpers/AxiosResponse';
+} from '../../helpers/validation';
+import { AppColors, BLACK_COLOR, SECONDARY_COLOR, WHITE_COLOR } from '../../theme/Colors';
+import { getItem, saveItem } from '../../helpers/Storage';
+import ConstantsList from '../../helpers/ConfigApp';
+import SimpleButton from '../../components/Buttons/SimpleButton';
+import EmailWarning from '../../components/EmailWarning';
+import PincodeModal from '../../components/Modal/PincodeModal';
+import { _handleAxiosError } from '../../helpers/AxiosResponse';
+import PrimaryButton from '../../components/Buttons/PrimaryButton';
 
 const ProfileScreen = (props) => {
+  // Selectors 
+  const { t } = useTranslation();
+
   const { initDeleteAccount } = props.route.params;
   const [isLoading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -113,7 +118,7 @@ const ProfileScreen = (props) => {
   const _onNameSave = async () => {
     if (!nameRegex.test(name)) {
       setNameError(
-        'Please enter a name between 2-1000 alphabetical characters long. No numbers or special characters.'
+        t('errors.length_name', { min: 2, max: 1000 })
       );
       return;
     }
@@ -129,7 +134,7 @@ const ProfileScreen = (props) => {
 
       const result = await _updateProfileAPI(data);
       if (result.data.success) {
-        _showAlert('Zada Wallet', 'Profile has been updated successfully');
+        _showAlert('Zada Wallet', t('success.updated_profile'));
         setDisableName(true);
       } else {
         _showAlert('Zada Wallet', result.data.error);
@@ -145,7 +150,7 @@ const ProfileScreen = (props) => {
   const _onEmailSave = async () => {
     // Check if email is valid
     if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address.');
+      setEmailError(t('errors.invalid_email'));
       return;
     }
     setEmailError('');
@@ -161,7 +166,7 @@ const ProfileScreen = (props) => {
 
       const result = await _updateProfileAPI(data);
       if (result.data.success) {
-        _showAlert('Zada Wallet', 'Profile has been updated successfully');
+        _showAlert('Zada Wallet', t('success.updated_profile'));
         setDisableEmail(true);
       } else {
         _showAlert('Zada Wallet', result.data.error);
@@ -196,42 +201,42 @@ const ProfileScreen = (props) => {
   // Function to update user password
   const _onUpdatePasswordClick = async () => {
     if (currPassword == '') {
-      setCurrPasswordError('Current password is required.');
+      setCurrPasswordError(t('errors.required_current_password'));
       return;
     }
 
     if (validateLength(currPassword, 1, 50)) {
-      setCurrPasswordError('Password length should be 1 to 50 characters');
+      setCurrPasswordError(t('errors.length_current_password', { min: 1, max: 50 }));
       return;
     }
     setCurrPasswordError('');
 
     if (newPassword == '') {
-      setNewPasswordError('New password is required.');
+      setNewPasswordError(t('errors.required_new_password'));
       return;
     }
 
     if (validateLength(newPassword, 6, 30)) {
-      setNewPasswordError('Password length should be 6 to 30 characters');
+      setNewPasswordError(t('errors.length_new_password', { min: 6, max: 30 }));
       return;
     }
 
     setNewPasswordError('');
 
     if (rePassword == '') {
-      setRePasswordError('Confirm password is required.');
+      setRePasswordError(t('errors.required_confirm_password'));
       return;
     }
 
     if (validateLength(rePassword, 6, 30)) {
-      setRePasswordError('Password length should be 6 to 30 characters');
+      setRePasswordError(t('errors.length_confirm_password', { min: 6, max: 30 }));
       return;
     }
 
     setRePasswordError('');
 
     if (newPassword != rePassword) {
-      showMessage('Zada Wallet', 'New Password and Confirm Password should be same');
+      showMessage('Zada Wallet', t('errors.password_not_match'));
       return;
     }
 
@@ -247,7 +252,7 @@ const ProfileScreen = (props) => {
       const result = await _updateProfileAPI(data);
       if (result.data.success) {
         await saveItem(ConstantsList.WALLET_SECRET, newPassword.trim());
-        _showAlert('Zada Wallet', 'Password has been updated successfully');
+        _showAlert('Zada Wallet', t('success.updated_password'));
         setCurrPassword('');
         setNewPassword('');
         setRePassword('');
@@ -283,25 +288,25 @@ const ProfileScreen = (props) => {
 
   const _setPinCode = async () => {
     if (pincode.length == 0) {
-      setPincodeError('Pincode is required.');
+      setPincodeError(t('errors.required_pincode'));
       return;
     }
     setPincodeError('');
 
     if (!pincodeRegex.test(pincode)) {
-      setPincodeError('Pincode should contain only 6 digits.');
+      setPincodeError(t('errors.length_pincode', { max: 6 }));
       return;
     }
     setPincodeError('');
 
     if (confirmPincode.length == 0) {
-      setConfirmPincodeError('Confirm pincode is required.');
+      setConfirmPincodeError(t('errors.required_confirm_pincode'));
       return;
     }
     setConfirmPincodeError('');
 
     if (!pincodeRegex.test(confirmPincode)) {
-      setConfirmPincodeError('Confirm pincode should contain only 6 digits.');
+      setConfirmPincodeError(t('errors.length_confirm_pincode', { max: 6 }));
       return;
     }
     setConfirmPincodeError('');
@@ -309,7 +314,7 @@ const ProfileScreen = (props) => {
     if (pincode != confirmPincode) {
       showMessage(
         'Zada Wallet',
-        'Pincode and confirm pincode are not same. Please check them carefully'
+        t('errors.pincode_confirm_not_match')
       );
     }
 
@@ -321,7 +326,7 @@ const ProfileScreen = (props) => {
       setShowPinCodeModal(false);
       showMessage(
         'Zada Wallet',
-        'Your pincode is set successfully. Please keep it safe and secure.'
+        t('PincodeScreen.alert_message')
       );
       setPincode('');
       setConfirmPincode('');
@@ -332,43 +337,43 @@ const ProfileScreen = (props) => {
 
   const _updatePincode = async () => {
     if (oldPincode.length == 0) {
-      setOldPincodeError('Old pincode is required.');
+      setOldPincodeError(t('errors.required_old_pincode'));
       return;
     }
     setOldPincodeError('');
 
     if (!pincodeRegex.test(oldPincode)) {
-      setOldPincodeError('Old pincode should contain only 6 digits.');
+      setOldPincodeError(t('errors.length_old_pincode', { max: 6 }));
       return;
     }
     setOldPincodeError('');
 
     if (newPincode.length == 0) {
-      setNewPincodeError('New pincode is required.');
+      setNewPincodeError(setOldPincodeError(t('errors.required_new_pincode')));
       return;
     }
     setNewPincodeError('');
 
     if (!pincodeRegex.test(newPincode)) {
-      setNewPincodeError('New pincode should contain only 6 digits.');
+      setNewPincodeError(t('errors.length_new_pincode', { max: 6 }));
       return;
     }
     setNewPincodeError('');
 
     if (rePincode.length == 0) {
-      setRePincodeError('Confirm pincode is required.');
+      setRePincodeError(t('errors.required_confirm_pincode'));
       return;
     }
     setRePincodeError('');
 
     if (!pincodeRegex.test(rePincode)) {
-      setRePincodeError('Confirm pincode should contain only 6 digits.');
+      setRePincodeError(t('errors.length_confirm_pincode', { max: 6 }));
       return;
     }
     setRePincodeError('');
 
     if (newPincode != rePincode) {
-      showMessage('Zada Wallet', 'New pincode and confirm pincode should be same');
+      showMessage('Zada Wallet', t('errors.new_pincode_confirm_not_match'));
       return;
     }
 
@@ -377,12 +382,12 @@ const ProfileScreen = (props) => {
       const code = await getItem(ConstantsList.PIN_CODE);
       if (code == oldPincode) {
         await saveItem(ConstantsList.PIN_CODE, newPincode);
-        showMessage('Zada Wallet', 'Pincode is updated successfully.');
+        showMessage('Zada Wallet', t('success.updated_pincode'));
         setOldPincode('');
         setNewpincode('');
         setRepincode('');
       } else {
-        showMessage('Zada Wallet', 'You entered wrong old pincode. Please enter the correct.');
+        showMessage('Zada Wallet', t('errors.invalid_old_pincode'));
       }
     } catch (error) {
       showMessage('Zada Wallet', error.toString());
@@ -394,7 +399,7 @@ const ProfileScreen = (props) => {
     if (!emailRegex.test(email)) {
       _showAlert(
         'Zada Wallet',
-        'Please set your EMAIL in order to continue with account deletion.'
+        t('errors.required_account_deletion')
       );
       return;
     }
@@ -402,9 +407,9 @@ const ProfileScreen = (props) => {
     // Show dialog to confirm account deletion.
     showAskDialog(
       'Are you sure?',
-      'Do you want to DELETE your account ?',
+      t('message.delete_account'),
       () => initDeleteAccount(),
-      () => {},
+      () => { },
       'Delete',
       'destructive',
       'Cancel',
@@ -440,24 +445,24 @@ const ProfileScreen = (props) => {
         />
       )}
 
-      {isLoading && <OverlayLoader text="Updating your profile..." />}
+      {isLoading && <OverlayLoader text={t('messages.updating_profile')} />}
 
-      {profileLoading && <OverlayLoader text="Fetching your profile" />}
+      {profileLoading && <OverlayLoader text={t('messages.fetching_profile')} />}
       <ScrollView
         bounces={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles._scrollContainer}>
         {/* General Items */}
-        <Text style={styles._parent}>General</Text>
+        <Text style={styles._parent}>{t('ProfileScreen.general')}</Text>
 
         {/* Name */}
         <View style={styles._itemContainer}>
-          <Text style={styles._itemLabel}>Full Name (Official Name)</Text>
+          <Text style={styles._itemLabel}>{t('ProfileScreen.full_name')}</Text>
           <View style={styles._row}>
             <View style={{ width: '85%' }}>
               <InputComponent
                 height={45}
-                placeholderText="Name"
+                placeholderText={t('ProfileScreen.full_name')}
                 errorMessage={nameError}
                 value={name}
                 isSecureText={false}
@@ -481,12 +486,12 @@ const ProfileScreen = (props) => {
 
         {/* Email */}
         <View style={styles._itemContainer}>
-          <Text style={styles._itemLabel}>Email</Text>
+          <Text style={styles._itemLabel}>{t('ProfileScreen.email')}</Text>
           <View style={styles._row}>
             <View style={{ width: '85%' }}>
               <InputComponent
                 height={45}
-                placeholderText="Email"
+                placeholderText={t('ProfileScreen.email')}
                 errorMessage={emailError}
                 value={email}
                 isSecureText={false}
@@ -534,7 +539,7 @@ const ProfileScreen = (props) => {
         </View>
 
         <View style={styles._itemContainer}>
-          <Text style={styles._itemLabel}>Phone Number</Text>
+          <Text style={styles._itemLabel}>{t('ProfileScreen.phone_number')}</Text>
           <View style={styles._row}>
             <View style={{ width: '100%' }}>
               <InputComponent
@@ -544,7 +549,7 @@ const ProfileScreen = (props) => {
                 value={phone}
                 isSecureText={false}
                 inputContainerStyle={styles._inputView}
-                setStateValue={(text) => {}}
+                setStateValue={(text) => { }}
                 disabled={true}
               />
             </View>
@@ -552,7 +557,7 @@ const ProfileScreen = (props) => {
         </View>
 
         {/* Change Password */}
-        <Text style={styles._parent}>Change Password</Text>
+        <Text style={styles._parent}>{t('ProfileScreen.change_password')}</Text>
 
         {/* Current Password */}
         <View style={styles._itemContainer}>
@@ -561,7 +566,7 @@ const ProfileScreen = (props) => {
               height={45}
               type={'secret'}
               toggleSecureEntry={_toggleCurrPassSecurity}
-              placeholderText="Current password"
+              placeholderText={t('ProfileScreen.current_password')}
               errorMessage={currPasswordError}
               value={currPassword}
               keyboardType="default"
@@ -582,7 +587,7 @@ const ProfileScreen = (props) => {
               height={45}
               type={'secret'}
               toggleSecureEntry={_toggleNewPassSecurity}
-              placeholderText="New password"
+              placeholderText={t('ProfileScreen.new_password')}
               errorMessage={newPasswordError}
               value={newPassword}
               strengthMessage={newStrengthMessage}
@@ -611,7 +616,7 @@ const ProfileScreen = (props) => {
               height={45}
               type={'secret'}
               toggleSecureEntry={_toggleRePassSecurity}
-              placeholderText="Re enter new password"
+              placeholderText={t('ProfileScreen.re_enter_new_password')}
               errorMessage={rePasswordError}
               value={rePassword}
               strengthMessage={reStrengthMessage}
@@ -635,41 +640,41 @@ const ProfileScreen = (props) => {
 
         {/* Update Password Button */}
         <View style={styles._itemContainer}>
-          <View style={{ width: 250, alignSelf: 'center' }}>
-            <SimpleButton
+          <View style={{ width: 250, alignSelf: 'center', marginTop: 16 }}>
+            <PrimaryButton
+              title={t('ProfileScreen.update_password')}
               onPress={_onUpdatePasswordClick}
-              width={'100%'}
-              title="Update Password"
-              titleColor={WHITE_COLOR}
-              buttonColor={GREEN_COLOR}
-              style={{
-                marginTop: 10,
+              disabled={false}
+              buttonStyle={{
+                backgroundColor: AppColors.BLUE,
+                alignSelf: 'center',
               }}
+              buttonTitleStyle={{ color: AppColors.WHITE }}
             />
           </View>
         </View>
 
         {/* Pincode */}
-        <Text style={styles._parent}>Pincode</Text>
+        <Text style={styles._parent}>{t('ProfileScreen.pincode')}</Text>
         {!isPincodeSet ? (
           <>
             <Text style={styles._pincodeInfo}>
-              You didn't set your pincode yet. Please click below button to set your 6 digit pincode
+              {t('ProfileScreen.info_pincode')}
             </Text>
             {/* Set Pincode Button */}
             <View style={styles._itemContainer}>
-              <View style={{ width: 250, alignSelf: 'center' }}>
-                <SimpleButton
+              <View style={{ width: 250, alignSelf: 'center', marginTop: 16 }}>
+                <PrimaryButton
+                  title={t('ProfileScreen.set_pincode')}
                   onPress={() => {
                     setShowPinCodeModal(!showPincodeModal);
                   }}
-                  width={'100%'}
-                  title="Set Pincode"
-                  titleColor={WHITE_COLOR}
-                  buttonColor={GREEN_COLOR}
-                  style={{
-                    marginTop: 10,
+                  disabled={false}
+                  buttonStyle={{
+                    backgroundColor: AppColors.BLUE,
+                    alignSelf: 'center',
                   }}
+                  buttonTitleStyle={{ color: AppColors.WHITE }}
                 />
               </View>
             </View>
@@ -683,7 +688,7 @@ const ProfileScreen = (props) => {
                   height={45}
                   type={'secret'}
                   toggleSecureEntry={_toggleOldPincodeSecurity}
-                  placeholderText="Old pincode"
+                  placeholderText={t('ProfileScreen.old_pincode')}
                   errorMessage={oldPincodeError}
                   value={oldPincode}
                   keyboardType="number-pad"
@@ -706,7 +711,7 @@ const ProfileScreen = (props) => {
                   height={45}
                   type={'secret'}
                   toggleSecureEntry={_toggleNewPincodeSecurity}
-                  placeholderText="New pincode"
+                  placeholderText={t('ProfileScreen.new_pincode')}
                   errorMessage={newPincodeError}
                   value={newPincode}
                   keyboardType="number-pad"
@@ -729,7 +734,7 @@ const ProfileScreen = (props) => {
                   height={45}
                   type={'secret'}
                   toggleSecureEntry={_toggleRePincodeSecurity}
-                  placeholderText="Re enter pincode"
+                  placeholderText={t('ProfileScreen.re_enter_pincode')}
                   errorMessage={rePincodeError}
                   value={rePincode}
                   keyboardType="number-pad"
@@ -747,18 +752,18 @@ const ProfileScreen = (props) => {
 
             {/* Set Pincode Button */}
             <View style={styles._itemContainer}>
-              <View style={{ width: 250, alignSelf: 'center' }}>
-                <SimpleButton
+              <View style={{ width: 250, alignSelf: 'center', marginTop: 16 }}>
+                <PrimaryButton
+                  title={t('ProfileScreen.update_pincode')}
                   onPress={() => {
                     _updatePincode();
                   }}
-                  width={'100%'}
-                  title="Update Pincode"
-                  titleColor={WHITE_COLOR}
-                  buttonColor={GREEN_COLOR}
-                  style={{
-                    marginTop: 10,
+                  disabled={false}
+                  buttonStyle={{
+                    backgroundColor: AppColors.BLUE,
+                    alignSelf: 'center',
                   }}
+                  buttonTitleStyle={{ color: AppColors.WHITE }}
                 />
               </View>
             </View>
@@ -766,17 +771,17 @@ const ProfileScreen = (props) => {
         )}
 
         <View style={styles.deleteAccountViewStyle}>
-          <SimpleButton
+          <PrimaryButton
+            title={t('ProfileScreen.delete_account')}
             onPress={() => {
               deleteAccount();
             }}
-            width={'100%'}
-            title="Delete Account"
-            titleColor={AppColors.WHITE}
-            buttonColor={AppColors.DANGER}
-            style={{
-              marginTop: 10,
+            disabled={false}
+            buttonStyle={{
+              backgroundColor: AppColors.DANGER,
+              alignSelf: 'center',
             }}
+            buttonTitleStyle={{ color: AppColors.WHITE }}
           />
         </View>
       </ScrollView>

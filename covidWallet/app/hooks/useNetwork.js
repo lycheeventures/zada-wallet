@@ -11,8 +11,6 @@ const useNetwork = () => {
   useEffect(() => {
     // Subscribe
     const unsubscribe = NetInfo.addEventListener((state) => {
-      console.log('Connection type', state.type);
-      console.log('Is connected?', state.isConnected);
       dispatch(updateNetworkStatus(state.isConnected ? 'connected' : 'disconnected'));
     });
 

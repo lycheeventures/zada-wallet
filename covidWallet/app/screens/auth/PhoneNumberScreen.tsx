@@ -22,6 +22,7 @@ import { updateUser } from '../../store/auth';
 import AnimatedButton from '../../components/Buttons/AnimatedButton';
 import { getUserStatus, sendOTP } from '../../store/auth/thunk';
 import AnimatedLoading from '../../components/Animations/AnimatedLoading';
+import { useTranslation } from 'react-i18next';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -30,6 +31,7 @@ const PhoneNumberScreen = (props: INProps) => {
   const dispatch = useAppDispatch<AppDispatch>();
   const networkStatus = useAppSelector(selectNetworkStatus);
   const user = useAppSelector(selectUser);
+  const { t } = useTranslation();
 
   const phoneInputRef = useRef(null);
   const [phone, setPhone] = useState('');
@@ -123,7 +125,7 @@ const PhoneNumberScreen = (props: INProps) => {
             style={{ width: '100%', height: '100%' }}
           />
         </View>
-        <Text style={styles.phoneHeadingStyle}>Your Phone Number</Text>
+        <Text style={styles.phoneHeadingStyle}>{t('PhoneNumberScreen.sub_title')}</Text>
         <View style={styles.inputContainer}>
           {/* Phone input component */}
           <PhoneInputComponent
@@ -138,7 +140,7 @@ const PhoneNumberScreen = (props: INProps) => {
 
         <View style={styles.btnContainer}>
           <AnimatedButton
-            title={'NEXT'}
+            title={t('common.next')}
             animateBtnValue={animateConfirmButtonValue}
             onPress={_handleConfirmPress}
             disabled={confirmBtnDisabled}

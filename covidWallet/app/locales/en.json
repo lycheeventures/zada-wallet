@@ -1,0 +1,176 @@
+{
+  "common": {
+    "back": "Back",
+    "confirm": "Confirm",
+    "next": "Next",
+    "continue": "Continue",
+    "close": "Close",
+    "search": "Search",
+    "pull_to_refresh": "Pull to refresh",
+    "actions": "Actions",
+    "certificates": "Certificates",
+    "connections": "Connections"
+  },
+  "PreferenceScreen": {
+    "title": "Select Country & Language",
+    "sub_title": "Please select your country and language",
+    "select_country": "Select Country",
+    "select_language": "Select Language"
+  },
+  "PhoneNumberScreen": {
+    "header_title": "Enter your phone number",
+    "sub_title": "Your Phone Number"
+  },
+  "RecoveryPhraseScreen": {
+    "header_title": "Your Recovery Phrase",
+    "text_info_1": "The secret phrase is the master key to your account.",
+    "text_info_2": "You can use this phrase to recover your account.",
+    "text_info_3": "Please copy and keep it in a safe place."
+  },
+  "VerifyOTPScreen": {
+    "title": "We've just sent you a verification code",
+    "sub_title_1": "We just sent you the verification code to",
+    "sub_title_2": "please verify.",
+    "resend_otp": "Resend OTP"
+  },
+  "RegistrationScreen": {
+    "title": "Hello",
+    "sub_title": "Create a new account",
+    "full_name": "Full Name (Official Name)",
+    "email": "Email (Optional)"
+  },
+  "ConnectionListScreen": {
+    "title": "Select connections to be connected automatically."
+  },
+  "SecurityScreen": {
+    "title": "Be Secure",
+    "sub_title": "Using biometric and pincode security significantly reduces the chances your account will be compromised in case your phone is lost or stolen.",
+    "enable_btn": "ENABLE SECURE ID"
+  },
+  "PincodeScreen": {
+    "title": "Enter a new six-digit PIN.",
+    "sub_title": "This pin is required when sharing your data",
+    "confirm_pin_title": "Please confirm PIN Again.",
+    "confirm_pin_sub_title": "Re-enter PIN that you have entered on previous screen.",
+    "alert_message": "Your pincode is set successfully. Please keep it safe and secure."
+  },
+  "NotifyMeScreen": {
+    "title": "Get notified",
+    "sub_title": "We use push notifications to deliver messages for important events, such as when you receive a new digital certificate.",
+    "enable_btn": "ENABLE NOTIFICATIONS"
+  },
+  "ActionsScreen": {
+    "empty_list_text": "There are no actions to complete, Please scan a QR code to either get a digital certificate or to prove it.",
+    "qr_code": "QR CODE",
+    "notification_alert_message": "Notifications are disabled. You will not be able to receive alerts for the actions. Pull down to refresh and receive the latest actions."
+  },
+  "CredentialsScreen": {
+    "all_certificates": "All Certificates",
+    "groups": "Groups",
+    "all_certificates_empty_list_text": "There are no certificates in your wallet. Once you receive a certificate, it will show up here.",
+    "groups_empty_list_text": "There are no certificate groups in your wallet. Create first by clicking on plus button",
+    "new_group": "New Group",
+    "group_name": "Group Name",
+    "create_group": "CREATE GROUP",
+    "group_name_error_message": "Group name should contain at least 2 characters",
+    "select_credential_error_message": "Please select at least one credential"
+  },
+  "ConnectionsScreen": {
+    "list_empty_text": "You have no connections yet."
+  },
+  "SettingsScreen": {
+    "general": "General",
+    "authenticate_with_biometric": "Authenticate with biometric",
+    "auto_accept_connections": "Auto Accept Connections",
+    "edit_profile": "Edit Profile",
+    "change_language": "Change Language",
+    "logout": "Logout",
+    "support": "Support",
+    "contact_us": "Contact Us",
+    "about_us": "About Us",
+    "license_and_agreements": "License & Agreements"
+  },
+  "ProfileScreen": {
+    "general": "General",
+    "full_name": "Full Name (Official Name)",
+    "email": "Email",
+    "phone_number": "Phone Number",
+    "change_password": "Change Password",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "re_enter_new_password": "Re-enter New Password",
+    "update_password": "UPDATE PASSWORD",
+    "pincode": "Pincode",
+    "old_pincode": "Old Pincode",
+    "new_pincode": "New Pincode",
+    "re_enter_pincode": "Re-enter Pincode",
+    "update_pincode": "UPDATE PINCODE",
+    "delete_account": "Delete Account",
+    "set_pincode": "Set Pincode"
+  },
+  "ContactUsScreen": {
+    "title": "For questions and support, don’t hesitate to contact us on any of the following:"
+  },
+  "AboutUsScreen": {
+    "text_1": "ZADA is a Digital Identity Technology Company, driven to ensure everyone can provide and use digital services without risk for fraud or privacy intrusion.",
+    "text_2": "Using ZADA, you are in full control of your data. You decide what you want to receive and what you want to share with who.",
+    "text_3": "ZADA is leading a revolution in how personal information is managed, and by using ZADA you are part of this change!",
+    "text_4": "To contribute back to the community, the ZADA App is created as an open source project, originally created by Trustnet Pakistan, so other companies that want to launch a wallet on ZADA Network also can do that.",
+    "text_5": "ZADA is not just an app but an ecosystem, a network, and a mission to ensure everyone can provide and use digital services without risk for fraud or privacy intrusion!"
+  },
+  "errors": {
+    "info_pincode": "You didn't set your pincode yet. Please click below button to set your {{max}} digit pincode",
+
+    "invalid_email": "Please enter a valid email address.",
+    "invalid_pincode": "You entered incorrect pincode. Please check your pincode and try again",
+    "invalid_old_pincode": "You entered wrong old pincode. Please enter the correct.",
+    "invalid_internet": "Internet Connection is not available",
+    "invalid_credential_offer": "Invalid Credential Offer",
+
+    "required_current_password": "Current password is required.",
+    "required_new_password": "New password is required.",
+    "required_confirm_password": "Confirm password is required.",
+    "required_pincode": "Pincode is required.",
+    "required_old_pincode": "Old pincode is required.",
+    "required_new_pincode": "New pincode is required.",
+    "required_confirm_pincode": "Confirm pincode is required.",
+    "required_account_deletion": "Please set your EMAIL in order to continue with account deletion.",
+
+    "length_name": "Please enter a name between {{min}}-{{max}} alphabetical characters long. No numbers or special characters.",
+    "length_current_password": "Password length should be {{min}} to {{max}} characters",
+    "length_new_password": "Password length should be {{min}} to {{max}} characters",
+    "length_pincode": "Pincode should contain only {{max}} digits",
+    "length_old_pincode": "Old pincode should contain only {{max}} digits",
+    "length_new_pincode": "New pincode should contain only {{max}} digits.",
+    "length_confirm_pincode": "Confirm pincode should contain only {{max}} digits.",
+
+    "new_pincode_confirm_not_match": "New pincode and confirm pincode should be same",
+    "password_not_match": "New Password and Confirm Password should be same",
+    "pincode_confirm_not_match": "Pincode and confirm pincode are not same. Please check them carefully",
+
+    "verification_request": "Verification request has been rejected!",
+    "accept_connection": "Connection is already accepted",
+    "accept_credential_offer": "Credential offer is already accepted"
+  },
+  "messages": {
+    "delete_account": "Do you want to DELETE your account?",
+    "delete_request": "Are you sure you want to delete this request?",
+    "updating_profile": "Updating your profile...",
+    "fetching_profile": "Fetching your profile...",
+    "logout": "Are you sure you want to log out?",
+    "receiving_certificate": "Please wait! we are receiving your certificate this may take around ~10 seconds...",
+    "verifying_certificate": "Please wait! we are verifying your certificate this may take around ~10 seconds...",
+    "creating_connection": "Please wait! we are creating a connection this may take around ~10 seconds...",
+    "submitting": "Submitting...",
+    "deleting": "Deleting...",
+    "success_verification_request_submit": "Verification request has been submitted successfully",
+    "success_verification_request": "Your verification request is fulfilled successfully.",
+    "success_connection": "Your connection is created successfully.",
+    "success_certificate": "You have received a certificate successfully."
+  },
+  "success": {
+    "updated_password": "Password has been updated successfully",
+    "updated_profile": "Profile has been updated successfully",
+    "updated_pincode": "Pincode is updated successfully"
+  }
+}

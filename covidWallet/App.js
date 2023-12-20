@@ -9,6 +9,7 @@ import ErrorBoundary from 'react-native-error-boundary';
 import { analytics_log_app_error } from './app/helpers/analytics';
 import ErrorFallback from './app/components/ErrorFallback';
 import BootstrapPersistance from './app/BootstrapPersistance';
+import './app/locales/index';
 
 const App = () => {
   const errorHandler = (error, stackTrace) => {

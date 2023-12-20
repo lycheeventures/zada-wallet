@@ -12,7 +12,7 @@ function TextComponent({ text, onboarding }) {
       fontSize: 16,
       marginLeft: 35,
       marginRight: 35,
-      fontFamily:'Poppins-Regular',
+      fontFamily: 'Poppins-Regular',
       justifyContent: 'center',
       alignItems: 'center',
       textAlign: 'center',

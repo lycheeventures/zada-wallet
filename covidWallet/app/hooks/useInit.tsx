@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../store';
-
 import { selectActionsError, selectActionsStatus } from '../store/actions/selectors';
 import {
   selectConnections,
@@ -12,14 +12,15 @@ import { selectCredentialsError, selectCredentialsStatus } from '../store/creden
 import { fetchActions } from '../store/actions/thunk';
 import { fetchConnections } from '../store/connections/thunk';
 import { fetchCredentials } from '../store/credentials/thunk';
+import { getUserProfile } from '../store/auth/thunk';
 import { showNetworkMessage, _showAlert } from '../helpers/Toast';
 import { changeCredentialStatus } from '../store/credentials';
 import { changeActionStatus } from '../store/actions';
 import { changeConnectionStatus } from '../store/connections';
-import { selectAuthStatus, selectToken } from '../store/auth/selectors';
+import { selectAuthStatus, selectToken, selectUser } from '../store/auth/selectors';
 import { updateAuthStatus, updateIsAuthorized } from '../store/auth';
 import { ConnectionAPI, CredentialAPI } from '../gateways';
-import { checkIfWalletExist } from '../screens/auth/utils';
+import { checkIfWalletExist } from '../screens/utils';
 import { selectAppSetupComplete } from '../store/app/selectors';
 
 const useInit = () => {
@@ -27,8 +28,10 @@ const useInit = () => {
   const dispatch = useAppDispatch<AppDispatch>();
 
   // Selectors
+  const { i18n } = useTranslation(); // destructure i18n here
   const isAppSetupComplete = useAppSelector(selectAppSetupComplete);
   const token = useAppSelector(selectToken);
+  const user = useAppSelector(selectUser);
   const connections = useAppSelector(selectConnections.selectAll);
   const authStatus = useAppSelector(selectAuthStatus);
   const actionStatus = useAppSelector(selectActionsStatus);
@@ -50,10 +53,7 @@ const useInit = () => {
 
   useEffect(() => {
     if (actionStatus == 'idle' && connStatus == 'idle' && credStatus == 'idle') {
-      setMessageIndex(3);
-      setTimeout(() => {
-        setIsAppReady(true);
-      }, 1000);
+      fetchUserProfile();
     }
   }, [actionStatus, connStatus, credStatus]);
 
@@ -77,6 +77,17 @@ const useInit = () => {
       dispatch(changeConnectionStatus('idle'));
     }
   }, [token]);
+
+  const fetchUserProfile = async () => {
+    if (user.name === undefined) {
+      dispatch(getUserProfile());
+    }
+    await i18n.changeLanguage(user.language);
+    setTimeout(() => {
+      setMessageIndex(3);
+      setIsAppReady(true);
+    }, 1000);
+  };
 
   const startApp = async () => {
     if (token) {
