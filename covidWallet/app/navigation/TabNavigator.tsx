@@ -10,7 +10,7 @@ import { useAppSelector } from '../store';
 import { selectActionCount } from '../store/actions/selectors';
 // Screens
 import ActionsScreen from '../screens/action/ActionsScreen';
-import ConnectionsScreen from '../screens/ConnectionsScreen';
+import ConnectionsScreen from '../screens/connection/ConnectionsScreen';
 import CredentialsScreen from '../screens/credential/CredentialsScreen';
 
 function TabNavigator() {

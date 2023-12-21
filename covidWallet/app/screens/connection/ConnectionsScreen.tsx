@@ -1,33 +1,32 @@
-import React from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Animated,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Animated, StyleSheet, RefreshControl } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { useTranslation } from 'react-i18next';
 
-import TextComponent from '../components/TextComponent';
-import FlatCard from '../components/FlatCard';
-import HeadingComponent from '../components/HeadingComponent';
-import OverlayLoader from '../components/OverlayLoader';
-import PullToRefresh from '../components/PullToRefresh';
-import EmptyList from '../components/EmptyList';
-import { themeStyles } from '../theme/Styles';
-import { RED_COLOR, SECONDARY_COLOR } from '../theme/Colors';
+import TextComponent from '../../components/TextComponent';
+import FlatCard from '../../components/FlatCard';
+import HeadingComponent from '../../components/HeadingComponent';
+import OverlayLoader from '../../components/OverlayLoader';
+import PullToRefresh from '../../components/PullToRefresh';
+import EmptyList from '../../components/EmptyList';
+import { themeStyles } from '../../theme/Styles';
+import { AppColors, RED_COLOR, SECONDARY_COLOR } from '../../theme/Colors';
 
-import { useAppDispatch, useAppSelector } from '../store';
-import { selectConnections, selectConnectionsStatus } from '../store/connections/selectors';
-import { fetchConnections, removeConnection } from '../store/connections/thunk';
-import { showAskDialog } from '../helpers/Toast';
-import { selectDevelopmentMode } from '../store/app/selectors';
+import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
+import { selectConnections, selectConnectionsStatus } from '../../store/connections/selectors';
+import { fetchConnections, removeConnection } from '../../store/connections/thunk';
+import { showAskDialog } from '../../helpers/Toast';
+import { selectDevelopmentMode } from '../../store/app/selectors';
+import { IConnectionObject } from '../../store/connections/interface';
+import SelectModal from '../../components/Modal/SelectModal';
+import PrimaryButton from '../../components/Buttons/PrimaryButton';
+import SearchableList from '../../components/List/SearchableList';
+import ReactNativeModal from 'react-native-modal';
 
 function ConnectionsScreen() {
   // Constants
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch<AppDispatch>();
 
   // Selectors
   const { t } = useTranslation();
@@ -35,7 +34,18 @@ function ConnectionsScreen() {
   const connectionStatus = useAppSelector(selectConnectionsStatus);
   const developmentMode = useAppSelector(selectDevelopmentMode);
 
-  async function onSuccessPress(connection) {
+  // States
+  const [isVisible, setVisible] = useState(false);
+
+  async function handleAddButton() {
+    setVisible(true);
+  }
+
+  async function onSelect() {
+    setVisible(false);
+  }
+
+  async function onSuccessPress(connection: IConnectionObject) {
     dispatch(removeConnection(connection.connectionId));
   }
 
@@ -44,7 +54,7 @@ function ConnectionsScreen() {
       'Are you sure you want to delete this connection?',
       'This will also delete all certificates issued by this connection.',
       () => onSuccessPress(e),
-      () => { }
+      () => {}
     );
   }
 
@@ -53,15 +63,15 @@ function ConnectionsScreen() {
   };
 
   // Render Item
-  const renderItem = (rowData, rowMap) => {
+  const renderItem = (rowData: { item: IConnectionObject }) => {
     let imgURI = rowData.item.imageUrl;
     let header = rowData.item.name != undefined ? rowData.item.name : '';
     let subtitle =
       'The connection between you and ' + header.toLowerCase() + ' is secure and encrypted.';
-    return <FlatCard onPress={() => { }} imageURL={imgURI} heading={header} text={subtitle} />;
+    return <FlatCard onPress={() => {}} imageURL={imgURI} heading={header} text={subtitle} />;
   };
 
-  const renderHiddenItem = ({ item, index }) => {
+  const renderHiddenItem = ({ item, index }: { item: IConnectionObject; index: number }) => {
     return (
       <View key={index + item.connectionId} style={styles.rowBack}>
         <TextComponent text="" />
@@ -81,7 +91,9 @@ function ConnectionsScreen() {
   const listEmptyComponent = () => (
     <EmptyList
       text={t('ConnectionsScreen.list_empty_text')}
-      image={require('../assets/images/connectionsempty.png')}
+      image={require('../../assets/images/connectionsempty.png')}
+      onRefresh={() => {}}
+      refreshing={false}
     />
   );
 
@@ -119,6 +131,37 @@ function ConnectionsScreen() {
           rightOpenValue={-75}
         />
       </View>
+
+      <PrimaryButton
+        onPress={handleAddButton}
+        icon={{
+          name: 'add',
+          color: AppColors.WHITE,
+        }}
+        buttonStyle={{
+          alignSelf: 'flex-end',
+          borderRadius: 25,
+          width: 50,
+          height: 50,
+          backgroundColor: AppColors.PRIMARY,
+        }}
+        buttonContainerStyle={{
+          marginHorizontal: 8,
+          marginVertical: 8,
+        }}
+      />
+
+      {/* <ReactNativeModal isVisible={isVisible} style={{ flex: 1 }}>
+        <SearchableList data={[]} onSelect={onSelect} onClose={() => {}} />
+      </ReactNativeModal> */}
+      <SelectModal
+        data={[]}
+        isVisible={isVisible}
+        onClose={() => {
+          setVisible(false);
+        }}
+        onSelect={onSelect}
+      />
     </View>
   );
 }

@@ -14,13 +14,14 @@ interface INProps {
   isVisible: boolean;
   onSelect: (label: string, value: any) => void;
   onClose: () => void;
+  title: string;
   type?: 'country';
 }
 
 const SelectModal = (props: INProps) => {
   // Constants
   const insets = useSafeAreaInsets();
-  const { data, isVisible, onSelect, onClose, type } = props;
+  const { data, isVisible, onSelect, onClose, title, type } = props;
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState<{ label: string; value: string }[]>(data);
 
@@ -75,21 +76,28 @@ const SelectModal = (props: INProps) => {
       backdropOpacity={0.8}>
       <View
         style={{
+          flexDirection: 'row',
+          marginTop: insets.top + 80,
           width: '100%',
-          alignItems: 'center',
         }}>
-        <FontAwesomeIcon
-          onPress={onClose}
-          name="close"
-          size={25}
+        <View
           style={{
-            marginTop: 120,
-            color: AppColors.BLACK,
-            alignSelf: 'flex-end',
-            top: 24,
-            right: 24,
-          }}
-        />
+            position: 'absolute',
+            alignItems: 'center',
+            top: 14,
+            right: 0,
+            left: 0,
+          }}>
+          <Text style={styles.headingText}>{title}</Text>
+        </View>
+        <View
+          style={{
+            position: 'absolute',
+            right: 18,
+            top: 8,
+          }}>
+          <FontAwesomeIcon onPress={onClose} name="close" size={25} />
+        </View>
       </View>
 
       <SearchBar
@@ -159,6 +167,11 @@ const styles = StyleSheet.create({
   flatList: {
     marginTop: 16,
     marginBottom: 50,
+  },
+  headingText: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Bold',
+    color: AppColors.PRIMARY,
   },
 });
 

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { GRAY_COLOR } from '../theme/Colors';
 
-function TextComponent({ text, onboarding }) {
+function TextComponent({ text }) {
 
   const styles = StyleSheet.create({
     TextGuide: {
