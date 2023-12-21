@@ -23,19 +23,15 @@ const ConnectionListScreen = (props: INProps) => {
   const connections = props.route.params.connections;
 
   // State
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-
-  useEffect(() => {
-    connections.map((item: IConnectionList) => {
-      if (item.default) {
-        setSelectedItems([item._id]);
-      }
-    });
-  }, []);
+  const [selectedItems, setSelectedItems] = useState<string[]>(
+    connections
+      .filter((item: { checked: IConnectionList }) => item.checked)
+      .map((item: { _id: string }) => item._id)
+  );
 
   const handleSubmit = async () => {
     let metaData: string[] = [];
-    selectedItems.forEach((item) => {
+    selectedItems.forEach(item => {
       let conn = connections.find((e: IConnectionList) => item === e._id);
       metaData.push(conn.metadata);
     });
@@ -49,7 +45,7 @@ const ConnectionListScreen = (props: INProps) => {
   // Handle checkbox toggle
   const toggleCheckbox = (itemId: string) => {
     if (selectedItems.includes(itemId)) {
-      setSelectedItems(selectedItems.filter((item) => item !== itemId));
+      setSelectedItems(selectedItems.filter(item => item !== itemId));
     } else {
       setSelectedItems([...selectedItems, itemId]);
     }
@@ -57,9 +53,10 @@ const ConnectionListScreen = (props: INProps) => {
 
   // Render individual connection item
   const renderConnectionItem = ({ item }: { item: IConnectionList }) => {
-    const isChecked = item.checked;
+    const isChecked = selectedItems.includes(item._id) ? true : false;
     return (
       <TouchableOpacity
+        key={item._id}
         disabled={item.default}
         style={item.default ? styles.connectionItemDisabled : styles.connectionItem}
         onPress={() => toggleCheckbox(item._id)}
@@ -67,7 +64,7 @@ const ConnectionListScreen = (props: INProps) => {
         <CheckBox
           disabled={item.default}
           checkedColor={item.default ? AppColors.LIGHT_GRAY : AppColors.PRIMARY}
-          checked={isChecked ? true : selectedItems.includes(item._id) ? true : false}
+          checked={isChecked}
           onPress={() => toggleCheckbox(item._id)}
         />
         <View style={styles.connectionNameContainer}>
@@ -88,15 +85,13 @@ const ConnectionListScreen = (props: INProps) => {
         <View style={{ flex: 0.4 }}>
           <View style={styles.logoContainer}>
             <Text style={styles.headingText}>Connections</Text>
-            <Text style={styles.subHeadingText}>
-              {t('ConnectionListScreen.title')}
-            </Text>
+            <Text style={styles.subHeadingText}>{t('ConnectionListScreen.title')}</Text>
           </View>
         </View>
         <FlatList
           data={connections}
           renderItem={renderConnectionItem}
-          keyExtractor={(item) => item._id}
+          keyExtractor={item => item._id}
           style={styles.flatListStyle}
           contentContainerStyle={styles.flatListContainerStyle}
         />
