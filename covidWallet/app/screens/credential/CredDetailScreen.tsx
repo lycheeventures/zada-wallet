@@ -3,6 +3,7 @@ import { Dimensions, View, Text } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import QRCode from 'react-native-qrcode-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useTranslation } from 'react-i18next';
 
 import { BACKGROUND_COLOR, BLACK_COLOR, GRAY_COLOR, WHITE_COLOR } from '../../theme/Colors';
 import { getCredentialTemplate, replacePlaceHolders, sharePDF } from './utils';
@@ -43,6 +44,7 @@ const CredDetailScreen = (props: IProps) => {
   const viewShotRef = useRef(null);
 
   // Selectors
+  const { t } = useTranslation();
   const credentialStatus = useAppSelector(selectCredentialsStatus);
   const networkStatus = useAppSelector(selectNetworkStatus);
 
@@ -58,7 +60,8 @@ const CredDetailScreen = (props: IProps) => {
   // Useeffects
   useEffect(() => {
     if (credentialStatus === 'succeeded') {
-      showMessage('ZADA Wallet', 'Credential is deleted successfully');
+      let message: string = t('messages.success_certificate_deletion');
+      showMessage('ZADA Wallet', message);
       props.navigation.goBack();
     }
   }, [credentialStatus, props.navigation]);
@@ -87,7 +90,7 @@ const CredDetailScreen = (props: IProps) => {
               credentialStatus === 'idle'
                 ? showAskDialog(
                     'Are you sure?',
-                    'Are you sure you want to delete this certificate?',
+                    t('messages.delete_certificate'),
                     onSuccess,
                     () => {}
                   )
@@ -195,9 +198,11 @@ const CredDetailScreen = (props: IProps) => {
         )}
       </View>
       <View style={styles.innerContainer}>
-        {credentialStatus === 'pending' && <OverlayLoader text="Deleting credential..." />}
+        {credentialStatus === 'pending' && (
+          <OverlayLoader text={t('messages.deleting_certificate')} />
+        )}
 
-        {isGeneratingPDF && <OverlayLoader text="Generating credential PDF..." />}
+        {isGeneratingPDF && <OverlayLoader text={t('messages.generating_new_pdf')} />}
 
         <CredQRModal
           isVisible={showQRModal}

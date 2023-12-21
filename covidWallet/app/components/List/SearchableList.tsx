@@ -3,7 +3,6 @@ import { FlatList, StyleSheet, View, Text, Dimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SearchBar } from 'react-native-elements';
 import { AppColors } from '../../theme/Colors';
-import PrimaryButton from '../../components/PrimaryButton';
 import TouchableComponent from '../../components/Buttons/TouchableComponent';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
@@ -82,17 +81,6 @@ const SearchableList = (props: INProps) => {
           contentContainerStyle={styles.flatListContainer}
           keyboardShouldPersistTaps="handled"
           style={styles.flatList}
-        />
-        <PrimaryButton
-          title={'Confirm'}
-          onPress={onClose}
-          disabled={false}
-          buttonStyle={{
-            backgroundColor: AppColors.BLUE,
-            alignSelf: 'center',
-            marginBottom: 50,
-          }}
-          buttonTitleStyle={{ color: AppColors.WHITE }}
         />
       </View>
     </View>

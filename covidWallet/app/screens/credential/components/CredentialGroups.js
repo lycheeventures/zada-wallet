@@ -190,12 +190,12 @@ const CredentialGroups = (props) => {
       'Are you sure you want to delete this group?',
       [
         {
-          text: 'Cancel',
+          text: t('common.cancel'),
           onPress: () => { },
           style: 'cancel',
         },
         {
-          text: 'Confirm',
+          text: t('common.confirm'),
           onPress: () => onDeletePressed(group),
           style: 'default',
         },

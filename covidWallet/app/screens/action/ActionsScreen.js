@@ -126,9 +126,9 @@ function ActionsScreen({ navigation }) {
           message,
           [
             {
-              text: 'Okay',
+              text: t('common.confirm'),
               onPress: () => { },
-              style: 'cancel',
+              style: t('common.cancel'),
             },
           ],
           {

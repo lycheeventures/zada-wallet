@@ -52,7 +52,7 @@ const SecurityScreen = (props: INProps) => {
             checkSecureIDAuth(true);
             setShowPinCodeModal(true);
           })
-          .catch((error) => {
+          .catch(error => {
             setShowPinCodeModal(true);
           });
       } else {
@@ -77,7 +77,7 @@ const SecurityScreen = (props: INProps) => {
       .then(() => {
         checkSensor(true);
       })
-      .catch((error) => {
+      .catch(error => {
         checkSensor(false);
       });
   }
@@ -93,7 +93,7 @@ const SecurityScreen = (props: INProps) => {
         //set OTP also
         setShowPinCodeModal(true);
       })
-      .catch((error) => {
+      .catch(error => {
         //set OTP also
         FingerprintScanner.release();
         setShowPinCodeModal(true);
@@ -112,7 +112,7 @@ const SecurityScreen = (props: INProps) => {
         //set OTP also
         setShowPinCodeModal(true);
       })
-      .catch((error) => {
+      .catch(error => {
         FingerprintScanner.release();
         setShowPinCodeModal(true);
         checkSecureIDAuth(false);
@@ -125,34 +125,31 @@ const SecurityScreen = (props: INProps) => {
 
   const _setPinCode = async () => {
     if (pincode.length == 0) {
-      setPincodeError('Pincode is required.');
+      setPincodeError(t('errors.required_pincode'));
       return;
     }
     setPincodeError('');
 
     if (!pincodeRegex.test(pincode)) {
-      setPincodeError('Pincode should contain only 6 digits.');
+      setPincodeError(t('errors.length_pincode', { max: 6 }));
       return;
     }
     setPincodeError('');
 
     if (confirmPincode.length == 0) {
-      setConfirmPincodeError('Confirm pincode is required.');
+      setConfirmPincodeError(t('errors.required_confirm_pincode'));
       return;
     }
     setConfirmPincodeError('');
 
     if (!pincodeRegex.test(confirmPincode)) {
-      setConfirmPincodeError('Confirm pincode should contain only 6 digits.');
+      setConfirmPincodeError(t('errors.length_confirm_pincode', { max: 6 }));
       return;
     }
     setConfirmPincodeError('');
 
     if (pincode != confirmPincode) {
-      showMessage(
-        'Zada Wallet',
-        'Pincode and confirm pincode are not same. Please check them carefully'
-      );
+      showMessage('Zada Wallet', t('errors.pincode_confirm_not_match'));
       return;
     }
 
@@ -163,10 +160,7 @@ const SecurityScreen = (props: INProps) => {
 
       setIsPincode(true);
       setShowPinCodeModal(false);
-      showMessage(
-        'Zada Wallet',
-        message,
-      );
+      showMessage('Zada Wallet', message);
       setPincode('');
       setConfirmPincode('');
       nextHandler();
@@ -191,10 +185,7 @@ const SecurityScreen = (props: INProps) => {
         }}>
         <Text style={styles.TextContainerHead}>{t('SecurityScreen.title')}</Text>
 
-        <TextComponent
-          onboarding={true}
-          text={t('SecurityScreen.sub_title')}
-        />
+        <TextComponent onboarding={true} text={t('SecurityScreen.sub_title')} />
       </View>
       <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBoxComponent source={img} />

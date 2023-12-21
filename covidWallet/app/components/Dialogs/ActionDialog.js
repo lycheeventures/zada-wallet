@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Text, View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import Modal from 'react-native-modal';
+import { useTranslation } from 'react-i18next';
 import {
     WHITE_COLOR,
     GRAY_COLOR,
@@ -20,6 +21,9 @@ import { get_tenant } from '../../gateways/connections';
 import RenderValues from '../RenderValues';
 
 function ActionDialog(props) {
+
+    // Selectors
+    const { t } = useTranslation();
 
     //States
     const [visible, setVisible] = useState(props.isVisible);
@@ -111,7 +115,7 @@ function ActionDialog(props) {
 
         // If no certificate is selected.
         if ((props.data.type == VER_REQ || props.data.type == CONNLESS_VER_REQ) && (selectedCred == null || val == null)) {
-            alert('Please select a certificate');
+            alert(t('ActionsScreen.select_certificate'));
             return
         }
 
@@ -223,7 +227,7 @@ function ActionDialog(props) {
                                         {props.modalType === 'action' && (
                                             <BorderButton
                                                 nextHandler={() => props.rejectModal(props.data)}
-                                                text="CANCEL"
+                                                text={t("common.cancel")}
                                                 color={BLACK_COLOR}
                                                 textColor={WHITE_COLOR}
                                                 backgroundColor={RED_COLOR}

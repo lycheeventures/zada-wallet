@@ -97,7 +97,7 @@ export default function SettingsScreen(props) {
 
     showAskDialog(
       'Are you sure?',
-      'Are you sure you want to log out?',
+      t('messages.logout'),
       async () => {
         dispatch(changeAppStatus('loading'));
         const pCode = await getItem(PIN_CODE);
@@ -143,9 +143,10 @@ export default function SettingsScreen(props) {
           <Text style={styles._rowLabel}>{t('SettingsScreen.authenticate_with_biometric')}</Text>
           <Switch
             trackColor={{
-              false: '#81b0ff',
+              false: AppColors.BACKGROUND,
               true: AppColors.BLUE,
             }}
+            thumbColor="#ffffff"
             ios_backgroundColor="#ffffff"
             onValueChange={_toggleBio}
             value={isBioEnable}
@@ -156,9 +157,10 @@ export default function SettingsScreen(props) {
           <Text style={styles._rowLabel}>{t('SettingsScreen.auto_accept_connections')}</Text>
           <Switch
             trackColor={{
-              false: '#81b0ff',
+              false: AppColors.BACKGROUND,
               true: AppColors.BLUE,
             }}
+            thumbColor="#ffffff"
             ios_backgroundColor="#ffffff"
             onValueChange={_toggleAcceptConnection}
             value={isAcceptConnectionEnabled}
@@ -238,7 +240,7 @@ export default function SettingsScreen(props) {
             <Text style={styles._rowLabel}>Development Mode</Text>
             <Switch
               trackColor={{
-                false: '#81b0ff',
+                false: AppColors.BACKGROUND,
                 true: AppColors.BLUE,
               }}
               ios_backgroundColor="#ffffff"

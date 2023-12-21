@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Config from 'react-native-config';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import { useTranslation } from 'react-i18next';
 import CredValuesModal from './components/CredValuesModal';
 import CustomProgressBar from './components/CustomProgressBar';
 import ActionDialog from '../../components/Dialogs/ActionDialog';
@@ -33,6 +34,7 @@ const QRScreen = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
 
   // Selectors
+  const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const connections = useAppSelector(selectConnections.selectAll);
   const connectionStatus = useAppSelector(selectConnectionsStatus);
@@ -42,7 +44,7 @@ const QRScreen = ({ route, navigation }) => {
   // States
   const [scan, setScan] = useState(true);
   const [progress, setProgress] = useState(false);
-  const [dialogTitle, setDialogTitle] = useState('Fetching Details');
+  const [dialogTitle, setDialogTitle] = useState(t('messages.fetching_detail'));
   const [values, setValues] = useState(null);
   const [credentialData, setCredentialData] = useState(defaultCredState);
 
@@ -65,7 +67,7 @@ const QRScreen = ({ route, navigation }) => {
   useEffect(() => {
     // Alert
     if (connectionStatus === 'succeeded') {
-      showOKDialog('ZADA', 'Your connection is created successfully.', () => {});
+      showOKDialog('ZADA', t('messages.success_connection'), () => { });
       navigateToMainScreen();
     }
   }, [connectionStatus, navigateToMainScreen]);
@@ -438,10 +440,10 @@ const QRScreen = ({ route, navigation }) => {
             </View>
           }
           onRead={_handleQRScan}
-          topContent={<Text style={styles.textBold}>Point your camera to a QR code to scan</Text>}
+          topContent={<Text style={styles.textBold}>{t("QRScreen.title")}</Text>}
           bottomContent={
             <TouchableOpacity style={styles.buttonTouchable} onPress={navigateToMainScreen}>
-              <Text style={styles.buttonText}>Cancel Scan</Text>
+              <Text style={styles.buttonText}>{t('QRScreen.cancel_scan')}</Text>
             </TouchableOpacity>
           }
         />

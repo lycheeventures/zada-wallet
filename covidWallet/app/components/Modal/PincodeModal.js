@@ -244,7 +244,7 @@ const PincodeModal = ({
                 }),
               },
             ]}>
-            <Text style={styles._btnTitle}>CONTINUE</Text>
+            <Text style={styles._btnTitle}>{t('common.continue')}</Text>
           </Animated.View>
         </TouchableComponent>
       </View>
@@ -289,7 +289,7 @@ const PincodeModal = ({
                     }),
                   },
                 ]}>
-                <Text style={styles._btnTitle}>CONTINUE</Text>
+                <Text style={styles._btnTitle}>{t('common.continue')}</Text>
               </Animated.View>
             </TouchableComponent>
           </>

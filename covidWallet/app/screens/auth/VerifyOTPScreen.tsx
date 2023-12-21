@@ -20,6 +20,7 @@ import AnimatedLoading from '../../components/Animations/AnimatedLoading';
 import InputPinComponent from '../../components/Input/InputPinComponent';
 import ResendCode from './components/ResendCode';
 import { useTranslation } from 'react-i18next';
+import { showMessage } from '../../helpers';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -71,7 +72,7 @@ const VerifyOTPScreen = (props: INProps) => {
       setLoading(true);
       dispatch(validateUserOTP({ phone, code }))
         .unwrap()
-        .then((response) => {
+        .then(response => {
           setLoading(false);
           if (response.isRegistered) {
             props.navigation.navigate('SecurityScreen', { navigation: props.navigation });
@@ -79,7 +80,8 @@ const VerifyOTPScreen = (props: INProps) => {
             props.navigation.navigate('RegistrationScreen');
           }
         })
-        .catch((error) => {
+        .catch(error => {
+          showMessage('ZADA Wallet', error.message);
           setLoading(false);
         });
     }

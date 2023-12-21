@@ -79,8 +79,8 @@ const useInit = () => {
   }, [token]);
 
   const fetchUserProfile = async () => {
-    if (user.name === undefined) {
-      dispatch(getUserProfile());
+    if (user.language === undefined) {
+      await dispatch(getUserProfile()).unwrap();
     }
     await i18n.changeLanguage(user.language);
     setTimeout(() => {
