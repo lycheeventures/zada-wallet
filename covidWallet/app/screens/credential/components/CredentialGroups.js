@@ -330,7 +330,7 @@ const CredentialGroups = (props) => {
                         activeOpacity={0.9}
                         onPress={() => {
                           setCurrentIndex(index === currentIndex ? -1 : index);
-                          if (ref != null) ref.current.animateNextTransition();
+                          // if (ref != null) ref.current.animateNextTransition();
                         }}
                         style={styles._groupHeadingContainer}>
                         <View style={{ width: '90%' }}>
@@ -418,7 +418,7 @@ const CredentialGroups = (props) => {
                         activeOpacity={0.9}
                         onPress={() => {
                           setCurrentIndex(index === currentIndex ? -1 : index);
-                          if (ref != null) ref.current.animateNextTransition();
+                          // if (ref != null) ref.current.animateNextTransition();
                         }}
                         style={styles._groupHeadingContainer}>
                         <View style={{ width: '90%' }}>

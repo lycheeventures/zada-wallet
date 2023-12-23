@@ -131,37 +131,6 @@ function ConnectionsScreen() {
           rightOpenValue={-75}
         />
       </View>
-
-      <PrimaryButton
-        onPress={handleAddButton}
-        icon={{
-          name: 'add',
-          color: AppColors.WHITE,
-        }}
-        buttonStyle={{
-          alignSelf: 'flex-end',
-          borderRadius: 25,
-          width: 50,
-          height: 50,
-          backgroundColor: AppColors.PRIMARY,
-        }}
-        buttonContainerStyle={{
-          marginHorizontal: 8,
-          marginVertical: 8,
-        }}
-      />
-
-      {/* <ReactNativeModal isVisible={isVisible} style={{ flex: 1 }}>
-        <SearchableList data={[]} onSelect={onSelect} onClose={() => {}} />
-      </ReactNativeModal> */}
-      <SelectModal
-        data={[]}
-        isVisible={isVisible}
-        onClose={() => {
-          setVisible(false);
-        }}
-        onSelect={onSelect}
-      />
     </View>
   );
 }

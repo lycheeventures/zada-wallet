@@ -96,7 +96,7 @@ const SelectModal = (props: INProps) => {
             right: 18,
             top: 8,
           }}>
-          <FontAwesomeIcon onPress={onClose} name="close" size={25} />
+          <FontAwesomeIcon onPress={onClose} name="close" size={25} style={{ padding: 2 }} />
         </View>
       </View>
 

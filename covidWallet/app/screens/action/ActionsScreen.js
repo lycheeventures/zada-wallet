@@ -470,7 +470,7 @@ function ActionsScreen({ navigation }) {
   const _showSuccessAlert = (action) => {
     let message = '';
     if (action == 'conn') message = t('messages.success_connection');
-    else if (action == 'cred') message = t('messages.succcess_ceriificate');
+    else if (action == 'cred') message = t('messages.success_certificate');
     else if (action == 'ver') message = t('messages.success_verification_request');
 
     Alert.alert(
