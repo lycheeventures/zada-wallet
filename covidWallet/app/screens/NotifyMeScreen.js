@@ -13,6 +13,7 @@ import { AuthenticateUser } from './utils';
 import { changeAppStatus, updateAppSetupComplete } from '../store/app';
 import { saveItemInLocalStorage } from '../helpers/Storage';
 import { getUserProfile } from '../store/auth/thunk';
+import { fetchConnectionList } from '../store/connections/thunk';
 
 const img = require('../assets/images/notifications.png');
 
@@ -95,6 +96,7 @@ function NotifyMeScreen(props) {
     dispatch(updateToken(freshToken));
     saveItemInLocalStorage('isAppSetupComplete', true);
     await dispatch(getUserProfile()).unwrap();
+    dispatch(fetchConnectionList(user.country));
     dispatch(updateIsAuthorized(true));
     dispatch(changeAppStatus('idle'));
   }

@@ -82,7 +82,8 @@
     "select_credential_error_message": "ကျေးဇူးပြု၍ အနည်းဆုံး အထောက်အထားတစ်ခု ရွေးပါ။"
   },
   "ConnectionsScreen": {
-    "list_empty_text": "သင့်တွင် Connections အဆက်အသွယ်များမရှိသေးပါ။"
+    "list_empty_text": "သင့်တွင် Connections အဆက်အသွယ်များမရှိသေးပါ။",
+    "select_connections": "ရွေးချယ်ပါ။ Connections"
   },
   "SettingsScreen": {
     "general": "အထွေထွေ",

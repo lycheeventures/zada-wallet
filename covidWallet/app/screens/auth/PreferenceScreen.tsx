@@ -98,15 +98,7 @@ const PreferenceScreen = (props: INProps) => {
 
           <View style={styles.formContainer}>
             <SelectModal
-              isVisible={isLanguageModalVisible}
-              data={LanguageList}
-              onSelect={(label: string, value: string) => {
-                setLanguage({ label, value });
-                setIsLanguageModalVisible(false);
-              }}
-              onClose={() => setIsLanguageModalVisible(false)}
-            />
-            <SelectModal
+              title={t('PreferenceScreen.select_country')}
               type={'country'}
               isVisible={isCountryModalVisible}
               data={CountryList}
@@ -115,6 +107,16 @@ const PreferenceScreen = (props: INProps) => {
                 setIsCountryModalVisible(false);
               }}
               onClose={() => setIsCountryModalVisible(false)}
+            />
+            <SelectModal
+              title={t('PreferenceScreen.select_language')}
+              isVisible={isLanguageModalVisible}
+              data={LanguageList}
+              onSelect={(label: string, value: string) => {
+                setLanguage({ label, value });
+                setIsLanguageModalVisible(false);
+              }}
+              onClose={() => setIsLanguageModalVisible(false)}
             />
             <View style={{ flex: 0.5, justifyContent: 'space-around' }}>
               <PrimaryButton

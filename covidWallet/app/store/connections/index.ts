@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { IConnectionState } from './interface';
-import { removeConnection, fetchConnections, acceptConnection } from './thunk';
+import { IConnectionList, IConnectionState } from './interface';
+import { removeConnection, fetchConnections, acceptConnection, fetchConnectionList } from './thunk';
 import { ConnectionAdapter } from './selectors';
 
 // State initialization
@@ -12,6 +12,7 @@ export const ConnectionState: IConnectionState = {
     name: undefined,
     stack: undefined,
   },
+  connectionlist: [],
 };
 
 // Slice
@@ -22,6 +23,10 @@ export const slice = createSlice({
     addConnection: ConnectionAdapter.addOne,
     addConnections: ConnectionAdapter.addMany,
     deleteConnection: ConnectionAdapter.removeOne,
+
+    updateConnectionlist: (state, action) => {
+      state.connectionlist = action.payload;
+    },
 
     changeConnectionStatus(state, action) {
       state.status = action.payload;
@@ -48,7 +53,7 @@ export const slice = createSlice({
 
     // Accept Connection
     builder.addCase(acceptConnection.pending, (state, action) => {
-      state.status = 'pending';
+      state.status = 'accepting_connection';
     });
     builder.addCase(acceptConnection.fulfilled, (state, action) => {
       if (action.payload) {
@@ -73,11 +78,35 @@ export const slice = createSlice({
       state.status = 'failed';
       state.error = action?.error;
     });
+
+    // Get Connection list
+    builder.addCase(fetchConnectionList.pending, (state, action) => {
+      state.status = 'loading';
+    });
+    builder.addCase(fetchConnectionList.fulfilled, (state, action) => {
+      if (action.payload) {
+        state.status = 'succeeded';
+        let connectionsArray = [] as IConnectionList[];
+
+        // create an array where the connection is not present in the state
+        connectionsArray = action.payload.connections.filter((item: IConnectionList) => {
+          return Object.values(state.entities).length > 0 ? Object.values(state.entities).every((value) => {
+            return value?.name !== item.name
+          }) : true
+        })
+
+        state.connectionlist = connectionsArray
+      }
+    });
+    builder.addCase(fetchConnectionList.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action?.error;
+    });
   },
 });
 
 // Exporting Actions
-export const { changeConnectionStatus, addConnection, deleteConnection, resetConnection } =
+export const { changeConnectionStatus, addConnection, deleteConnection, updateConnectionlist, resetConnection } =
   slice.actions;
 
 export { slice as ConnectionSlice };

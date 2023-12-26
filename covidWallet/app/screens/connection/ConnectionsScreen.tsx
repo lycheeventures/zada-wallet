@@ -13,24 +13,25 @@ import EmptyList from '../../components/EmptyList';
 import { themeStyles } from '../../theme/Styles';
 import { AppColors, RED_COLOR, SECONDARY_COLOR } from '../../theme/Colors';
 
-import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
-import { selectConnections, selectConnectionsStatus } from '../../store/connections/selectors';
-import { fetchConnections, removeConnection } from '../../store/connections/thunk';
+import { useAppSelector } from '../../store';
+import { selectConnectionsStatus } from '../../store/connections/selectors';
 import { showAskDialog } from '../../helpers/Toast';
 import { selectDevelopmentMode } from '../../store/app/selectors';
 import { IConnectionObject } from '../../store/connections/interface';
 import SelectModal from '../../components/Modal/SelectModal';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
-import SearchableList from '../../components/List/SearchableList';
-import ReactNativeModal from 'react-native-modal';
+import useConnections from '../../hooks/useConnections';
 
 function ConnectionsScreen() {
-  // Constants
-  const dispatch = useAppDispatch<AppDispatch>();
-
   // Selectors
   const { t } = useTranslation();
-  const connections = useAppSelector(selectConnections.selectAll);
+  const {
+    connections,
+    connectionlist,
+    onAcceptConnection,
+    onDeleteConnection,
+    refreshConnections,
+  } = useConnections();
   const connectionStatus = useAppSelector(selectConnectionsStatus);
   const developmentMode = useAppSelector(selectDevelopmentMode);
 
@@ -41,12 +42,13 @@ function ConnectionsScreen() {
     setVisible(true);
   }
 
-  async function onSelect() {
+  const onConnectionSelect = (label: string, value: string) => {
+    onAcceptConnection(value);
     setVisible(false);
-  }
+  };
 
   async function onSuccessPress(connection: IConnectionObject) {
-    dispatch(removeConnection(connection.connectionId));
+    onDeleteConnection(connection.connectionId);
   }
 
   function onDeletePressed(e) {
@@ -59,7 +61,7 @@ function ConnectionsScreen() {
   }
 
   const refreshHandler = () => {
-    dispatch(fetchConnections());
+    refreshConnections();
   };
 
   // Render Item
@@ -102,6 +104,9 @@ function ConnectionsScreen() {
       <PullToRefresh />
       <HeadingComponent text={t('common.connections')} />
       {connectionStatus === 'pending' && <OverlayLoader text="Deleting connection..." />}
+      {connectionStatus === 'accepting_connection' && (
+        <OverlayLoader text="Creating Connection..." />
+      )}
 
       <View
         style={styles.viewStyle}
@@ -131,37 +136,37 @@ function ConnectionsScreen() {
           rightOpenValue={-75}
         />
       </View>
+      {connectionlist.length > 0 && (
+        <>
+          <PrimaryButton
+            onPress={handleAddButton}
+            icon={{
+              name: 'add',
+              color: AppColors.WHITE,
+            }}
+            buttonStyle={{
+              alignSelf: 'flex-end',
+              borderRadius: 25,
+              width: 50,
+              height: 50,
+              backgroundColor: AppColors.PRIMARY,
+            }}
+            buttonContainerStyle={{
+              marginHorizontal: 8,
+              marginVertical: 8,
+            }}
+          />
 
-      <PrimaryButton
-        onPress={handleAddButton}
-        icon={{
-          name: 'add',
-          color: AppColors.WHITE,
-        }}
-        buttonStyle={{
-          alignSelf: 'flex-end',
-          borderRadius: 25,
-          width: 50,
-          height: 50,
-          backgroundColor: AppColors.PRIMARY,
-        }}
-        buttonContainerStyle={{
-          marginHorizontal: 8,
-          marginVertical: 8,
-        }}
-      />
-
-      {/* <ReactNativeModal isVisible={isVisible} style={{ flex: 1 }}>
-        <SearchableList data={[]} onSelect={onSelect} onClose={() => {}} />
-      </ReactNativeModal> */}
-      <SelectModal
-        data={[]}
-        isVisible={isVisible}
-        onClose={() => {
-          setVisible(false);
-        }}
-        onSelect={onSelect}
-      />
+          <SelectModal
+            title={t('ConnectionsScreen.select_connections')}
+            subTitle="Select a connection to add"
+            isVisible={isVisible}
+            data={connectionlist}
+            onSelect={onConnectionSelect}
+            onClose={() => setVisible(false)}
+          />
+        </>
+      )}
     </View>
   );
 }

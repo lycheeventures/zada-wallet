@@ -98,6 +98,6 @@ const useAppDispatch = useDispatch;
 const useAppSelector = useSelector;
 
 // Types
-export { AppDispatch, RootState };
+export type { AppDispatch, RootState };
 
 export { store, persistor, useAppDispatch, useAppSelector };
