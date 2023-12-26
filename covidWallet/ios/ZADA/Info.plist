@@ -66,6 +66,10 @@
 	<string>ZADA Wallet needs photos access so that you can easily browse ZADA generated QRCode to handle connection and credentails requests</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>ZADA Wallet needs access to store photos/videos to your photo library.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+  		<string>itms-apps</string>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
