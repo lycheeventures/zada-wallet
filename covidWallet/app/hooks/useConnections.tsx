@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../store';
 import { selectConnectionList, selectConnections } from '../store/connections/selectors';
 import {
@@ -22,6 +21,11 @@ const useConnections = () => {
   const connectionlist = useAppSelector(selectConnectionList).map(item => {
     return { label: item.name, value: item.metadata, imageUrl: item.image };
   });
+
+  // UseEffect
+  useEffect(() => {
+    dispatch(fetchConnectionList());
+  }, []);
 
   // Functions
   const refreshConnections = () => {
