@@ -33,7 +33,7 @@ const SelectModal = (props: INProps) => {
 
   useEffect(() => {
     setSearchResults(data);
-  },[data]);
+  }, [data]);
 
   const handleSearch = (text: any) => {
     setSearchText(text);
@@ -60,8 +60,8 @@ const SelectModal = (props: INProps) => {
         <TouchableComponent
           onPress={() => onSelect(item.label, item.value)}
           underlayColor={AppColors.LIGHT_GRAY}
-          style={styles.itemView}>
-          <>
+          style={styles.touchableView}>
+          <View style={styles.itemView}>
             <Flag
               key={item.value}
               flagSize={25}
@@ -69,7 +69,7 @@ const SelectModal = (props: INProps) => {
               withFlagButton={true}
             />
             <Text style={styles.itemText}>{item.label}</Text>
-          </>
+          </View>
         </TouchableComponent>
       );
     } else {
@@ -77,8 +77,8 @@ const SelectModal = (props: INProps) => {
         <TouchableComponent
           onPress={() => onSelect(item.label, item.value)}
           underlayColor={AppColors.LIGHT_GRAY}
-          style={styles.itemView}>
-          <>
+          style={styles.touchableView}>
+          <View style={styles.itemView}>
             {item.imageUrl && (
               <Image
                 source={{ uri: item.imageUrl }}
@@ -86,7 +86,7 @@ const SelectModal = (props: INProps) => {
               />
             )}
             <Text style={styles.itemText}>{item.label}</Text>
-          </>
+          </View>
         </TouchableComponent>
       );
     }
@@ -195,18 +195,22 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: 14,
   },
-  itemView: {
+  touchableView: {
     marginHorizontal: 16,
-    height: 50,
     backgroundColor: AppColors.DISABLED_COLOR,
-    borderRadius: 25,
+    borderRadius: 30,
     padding: 8,
     marginTop: 8,
+  },
+  itemView: {
+    marginHorizontal: 16,
+    height: 60,
     alignItems: 'center',
     justifyContent: 'flex-start',
     flexDirection: 'row',
   },
   itemText: {
+    paddingLeft: 24,
     color: AppColors.BLACK,
     fontFamily: 'Poppins-Regular',
   },
