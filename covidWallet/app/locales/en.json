@@ -78,7 +78,8 @@
     "select_credential_error_message": "Please select at least one credential"
   },
   "ConnectionsScreen": {
-    "list_empty_text": "You have no connections yet."
+    "list_empty_text": "You have no connections yet.",
+    "select_connections": "Select Connection"
   },
   "QRScreen": {
     "title": "Point your camera to a QR code to scan",
