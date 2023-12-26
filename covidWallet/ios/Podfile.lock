@@ -682,7 +682,7 @@ PODS:
     - React-Core
   - RNCMaskedView (0.2.9):
     - React-Core
-  - RNDeviceInfo (10.11.0):
+  - RNDeviceInfo (10.12.0):
     - React-Core
   - RNExitApp (1.1.0):
     - React
@@ -1154,7 +1154,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 3a8f7145d17cdd9f88e7b77666c94a09e4f759c8
   RNCClipboard: d77213bfa269013bf4b857b7a9ca37ee062d8ef1
   RNCMaskedView: 949696f25ec596bfc697fc88e6f95cf0c79669b6
-  RNDeviceInfo: bf8a32acbcb875f568217285d1793b0e8588c974
+  RNDeviceInfo: db5c64a060e66e5db3102d041ebe3ef307a85120
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFBAnalytics: 80cb4aaa8502b2e1f53ff61936b11975826b4527
   RNFBApp: 5a16a735bad57ca29ee44757bde7e654c5bc8f60

@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { checkVersion, CheckVersionResponse } from 'react-native-check-version';
+import SpInAppUpdates, { IAUUpdateKind, StartUpdateOptions } from 'sp-react-native-in-app-updates';
 import SplashScreen from 'react-native-splash-screen';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import VersionModal from '../components/VersionModal';
 import useInit from '../hooks/useInit';
-import AppConfig from '../helpers/ConfigApp';
 import { getItemFromLocalStorage, saveItem } from '../helpers/Storage';
 import { AppDispatch, useAppSelector } from '../store';
 import { selectNetworkStatus } from '../store/app/selectors';
@@ -32,9 +31,6 @@ const RootNavigator = () => {
   const isAuthorized = useAppSelector(selectIsAuthorized);
 
   // States
-  const [isNewVersion, setIsNewVersion] = useState(false);
-  const [versionDetails, setVersionDetails] = useState<CheckVersionResponse | null>(null);
-  const [isLoading, setLoading] = useState(true);
 
   // Hooks
   useNetwork();
@@ -47,25 +43,27 @@ const RootNavigator = () => {
       SplashScreen.hide();
       let isAppSetupComplete = await getItemFromLocalStorage('isAppSetupComplete');
       dispatch(updateAppSetupComplete(isAppSetupComplete));
-      if (networkStatus === 'connected') {
-        const version = await checkVersion();
-        if (version.needsUpdate) {
-          setIsNewVersion(true);
-          setVersionDetails(version);
-          await saveItem(AppConfig.APP_VERSION, JSON.stringify(version));
-        } else {
-          startApp();
-        }
-      } else {
-        startApp();
-        setLoading(false);
-      }
+
+      // Check for updates
+      checkForUpdates();
     })();
   }, [networkStatus, setMessageIndex]);
 
-  // On Version skip click
-  const _onSkipClick = () => {
-    setIsNewVersion(false);
+  // Functions
+  const checkForUpdates = async () => {
+    const inAppUpdates = new SpInAppUpdates(
+      false // isDebug
+    );
+    inAppUpdates.checkNeedsUpdate().then(result => {
+      let updateOptions: StartUpdateOptions = {};
+      if (Platform.OS === 'android') {
+        // android only, on iOS the user will be promped to go to your app store page
+        updateOptions = {
+          updateType: IAUUpdateKind.FLEXIBLE,
+        };
+      }
+      inAppUpdates.startUpdate(updateOptions);
+    });
     startApp();
   };
 
@@ -79,13 +77,6 @@ const RootNavigator = () => {
 
   return (
     <NavigationContainer linking={linking} ref={navigationRef}>
-      <VersionModal
-        isVisible={isNewVersion}
-        versionDetails={versionDetails}
-        skipCallback={() => {
-          _onSkipClick();
-        }}
-      />
       {!isAppReady ? (
         <Stack.Navigator>
           <Stack.Screen
