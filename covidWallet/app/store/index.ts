@@ -49,7 +49,7 @@ export const generateStore = (encryptionKey: { isFresh: boolean; key: string }) 
     key: 'root',
     storage: AsyncStorage,
     version: 2,
-    blacklist: ['auth'],
+    blacklist: ['auth', 'app'],
     transforms: [encryptionTransform],
     stateReconciler: autoMergeLevel1,
   };
@@ -61,9 +61,16 @@ export const generateStore = (encryptionKey: { isFresh: boolean; key: string }) 
     blacklist: ['status'],
     transforms: [encryptionTransform],
   };
+  const appPersistConfig = {
+    key: 'app',
+    storage: AsyncStorage,
+    version: 1,
+    blacklist: ['webViewUrl'],
+    transforms: [encryptionTransform],
+  };
 
   reducers = combineReducers({
-    app: AppSlice.reducer,
+    app: persistReducer(appPersistConfig, AppSlice.reducer),
     auth: persistReducer(authPersistConfig, AuthSlice.reducer),
     actions: ActionSlice.reducer,
     credential: CredentialSlice.reducer,
