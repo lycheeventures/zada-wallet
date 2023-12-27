@@ -7,6 +7,7 @@ export const AppState: IAppState = {
   networkStatus: 'connected',
   developmentMode: false,
   isAppSetupComplete: false,
+  webViewUrl: '',
 };
 
 // Slice
@@ -26,12 +27,15 @@ export const slice = createSlice({
     updateAppSetupComplete(state, action) {
       state.isAppSetupComplete = action.payload;
     },
+    updateWebViewUrl(state, action) {
+      state.webViewUrl = action.payload;
+    },
     resetApp: () => AppState,
   },
 });
 
 // Exporting Actions
-export const { changeAppStatus, updateNetworkStatus, updateDevelopmentMode, updateAppSetupComplete ,resetApp } =
+export const { changeAppStatus, updateNetworkStatus, updateDevelopmentMode, updateAppSetupComplete, updateWebViewUrl, resetApp } =
   slice.actions;
 
 export { slice as AppSlice };

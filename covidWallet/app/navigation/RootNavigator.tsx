@@ -17,6 +17,7 @@ import useNetwork from '../hooks/useNetwork';
 import { navigationRef } from './utils';
 import { updateAppSetupComplete } from '../store/app';
 import { useAppDispatch } from '../store/index-old';
+import useWebview from '../hooks/useWebview';
 
 const Stack = createStackNavigator();
 const RootNavigator = () => {
@@ -77,6 +78,7 @@ const RootNavigator = () => {
 
   return (
     <NavigationContainer linking={linking} ref={navigationRef}>
+      {useWebview()}
       {!isAppReady ? (
         <Stack.Navigator>
           <Stack.Screen

@@ -3,4 +3,5 @@ export interface IAppState {
   networkStatus: 'connected' | 'disconnected';
   developmentMode: boolean;
   isAppSetupComplete: boolean;
+  webViewUrl: string;
 }
