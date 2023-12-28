@@ -39,7 +39,7 @@ const RenderValues = ({
     Object.keys(values).map((key, index) => {
       let value = values[key];
       value = parse_date_time(value);
-      let isLink = value.url ? true : false;
+      let isLink = value.startsWith("http") || value.startsWith("https") ? true : false;
 
       return (
         <View
@@ -57,7 +57,7 @@ const RenderValues = ({
             ]}>
             <Text
               disabled={!isLink}
-              onPress={() => onLinkPress(value.url)}
+              onPress={() => onLinkPress(value)}
               numberOfLines={3}
               style={[
                 styles._inputText,
@@ -67,7 +67,7 @@ const RenderValues = ({
                   fontSize: inputTextSize ? inputTextSize : null,
                 },
               ]}>
-              {isLink ? value.title : value}
+              {isLink ? "Click Here" : value}
             </Text>
           </View>
           {
