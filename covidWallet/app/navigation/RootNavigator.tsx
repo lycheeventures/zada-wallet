@@ -56,14 +56,16 @@ const RootNavigator = () => {
       false // isDebug
     );
     inAppUpdates.checkNeedsUpdate().then(result => {
-      let updateOptions: StartUpdateOptions = {};
-      if (Platform.OS === 'android') {
-        // android only, on iOS the user will be promped to go to your app store page
-        updateOptions = {
-          updateType: IAUUpdateKind.FLEXIBLE,
-        };
+      if (result.shouldUpdate) {
+        let updateOptions: StartUpdateOptions = {};
+        if (Platform.OS === 'android') {
+          // android only, on iOS the user will be promped to go to your app store page
+          updateOptions = {
+            updateType: IAUUpdateKind.FLEXIBLE,
+          };
+        }
+        inAppUpdates.startUpdate(updateOptions);
       }
-      inAppUpdates.startUpdate(updateOptions);
     });
     startApp();
   };
