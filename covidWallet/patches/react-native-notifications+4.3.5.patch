@@ -1,17 +1,13 @@
 diff --git a/node_modules/react-native-notifications/lib/android/app/build.gradle b/node_modules/react-native-notifications/lib/android/app/build.gradle
-index d049e84..9ad7004 100644
+index d049e84..6456e81 100644
 --- a/node_modules/react-native-notifications/lib/android/app/build.gradle
 +++ b/node_modules/react-native-notifications/lib/android/app/build.gradle
-@@ -96,9 +96,9 @@ android {
- 
+@@ -97,7 +97,7 @@ android {
      testOptions {
          unitTests.all { t ->
--            reports {
+             reports {
 -                html.enabled true
--            }
-+            // reports {
-+            //     html.enabled true
-+            // }
++                html.required.set true
+             }
              testLogging {
                  events "PASSED", "SKIPPED", "FAILED", "standardOut", "standardError"
-             }
