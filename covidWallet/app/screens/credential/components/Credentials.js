@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, RefreshControl, FlatList } from 'react-native';
+import { View, StyleSheet, RefreshControl, FlatList, Linking } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { themeStyles } from '../../../theme/Styles';
 import PullToRefresh from '../../../components/PullToRefresh';
 import EmptyList from '../../../components/EmptyList';
-import { PRIMARY_COLOR, WHITE_COLOR } from '../../../theme/Colors';
+import { AppColors, PRIMARY_COLOR, WHITE_COLOR } from '../../../theme/Colors';
 import { get_local_issue_date } from '../../../helpers/time';
 import CardBackground from '../../../components/CardBackground';
 import CertificateCard from '../../../components/CertificateCard';
@@ -18,6 +18,7 @@ import {
 } from '../../../store/credentials/selectors';
 import { fetchCredentials } from '../../../store/credentials/thunk';
 import { updateCredential } from '../../../store/credentials';
+import FloatingActionButton from '../../../components/Buttons/FloatingActionButton';
 
 function Credentials(props) {
   // Constants
@@ -99,27 +100,46 @@ function Credentials(props) {
     dispatch(fetchCredentials());
   };
 
+  const onRequestCredentialPress = () => {
+    Linking.openURL('https://myzada.info');
+  }
+
   return (
-    <View style={themeStyles.mainContainer}>
-      <PullToRefresh />
-      <FlatList
-        refreshControl={
-          <RefreshControl
-            tintColor={'#7e7e7e'}
-            refreshing={credentialStatus === 'loading'}
-            onRefresh={refreshHandler}
-          />
-        }
-        showsVerticalScrollIndicator={false}
-        style={styles.flatListStyle}
-        ListHeaderComponent={listHeaderComponent}
-        ListEmptyComponent={emptyListComponent}
-        data={searchedCredentials}
-        contentContainerStyle={styles.flatListContainerStyle}
-        keyExtractor={(item, index) => item.credentialId + ':' + index.toString()}
-        renderItem={renderItem}
-      />
-    </View>
+    <>
+      <View style={themeStyles.mainContainer}>
+        <PullToRefresh />
+        <FlatList
+          refreshControl={
+            <RefreshControl
+              tintColor={'#7e7e7e'}
+              refreshing={credentialStatus === 'loading'}
+              onRefresh={refreshHandler}
+            />
+          }
+          showsVerticalScrollIndicator={false}
+          style={styles.flatListStyle}
+          ListHeaderComponent={listHeaderComponent}
+          ListEmptyComponent={emptyListComponent}
+          data={searchedCredentials}
+          contentContainerStyle={styles.flatListContainerStyle}
+          keyExtractor={(item, index) => item.credentialId + ':' + index.toString()}
+          renderItem={renderItem}
+        />
+
+      </View>
+      <View style={styles.floatingBtnContainerStyle}>
+        <FloatingActionButton
+          buttonColor={AppColors.PRIMARY}
+          actionItems={[
+            {
+              title: "Request Credential",
+              onPress: onRequestCredentialPress,
+              iconName: "badge-account-horizontal-outline",
+              buttonColor: AppColors.WHITE,
+            }]}
+        />
+      </View>
+    </>
   );
 }
 
@@ -159,6 +179,9 @@ const styles = StyleSheet.create({
   emptyListStyle: {
     marginTop: 15,
   },
+  floatingBtnContainerStyle: {
+    bottom: 100,
+  }
 });
 
 export default Credentials;

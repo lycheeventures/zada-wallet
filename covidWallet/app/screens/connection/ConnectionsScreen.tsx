@@ -19,8 +19,8 @@ import { showAskDialog } from '../../helpers/Toast';
 import { selectDevelopmentMode } from '../../store/app/selectors';
 import { IConnectionObject } from '../../store/connections/interface';
 import SelectModal from '../../components/Modal/SelectModal';
-import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import useConnections from '../../hooks/useConnections';
+import FloatingActionButton from '../../components/Buttons/FloatingActionButton';
 
 function ConnectionsScreen() {
   // Selectors
@@ -100,62 +100,50 @@ function ConnectionsScreen() {
   );
 
   return (
-    <View style={themeStyles.mainContainer}>
-      <PullToRefresh />
-      <HeadingComponent text={t('common.connections')} />
-      {connectionStatus === 'pending' && <OverlayLoader text="Deleting connection..." />}
-      {connectionStatus === 'accepting_connection' && (
-        <OverlayLoader text="Creating Connection..." />
-      )}
+    <>
+      <View style={themeStyles.mainContainer}>
+        <PullToRefresh />
+        <HeadingComponent text={t('common.connections')} />
+        {connectionStatus === 'pending' && <OverlayLoader text="Deleting connection..." />}
+        {connectionStatus === 'accepting_connection' && (
+          <OverlayLoader text="Creating Connection..." />
+        )}
 
-      <View
-        style={styles.viewStyle}
-        pointerEvents={connectionStatus === 'pending' ? 'none' : 'auto'}>
-        <SwipeListView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              tintColor={'#7e7e7e'}
-              refreshing={connectionStatus === 'loading'}
-              onRefresh={refreshHandler}
-            />
-          }
-          useFlatList
-          disableRightSwipe
-          disableLeftSwipe={!developmentMode}
-          ListEmptyComponent={listEmptyComponent}
-          data={connections}
-          style={styles.flatListStyle}
-          contentContainerStyle={styles.flatListStyle}
-          keyExtractor={(rowData, index) => {
-            return index + rowData.connectionId;
-          }}
-          renderItem={renderItem}
-          renderHiddenItem={renderHiddenItem}
-          leftOpenValue={75}
-          rightOpenValue={-75}
-        />
+        <View
+          style={styles.viewStyle}
+          pointerEvents={connectionStatus === 'pending' ? 'none' : 'auto'}>
+          <SwipeListView
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                tintColor={'#7e7e7e'}
+                refreshing={connectionStatus === 'loading'}
+                onRefresh={refreshHandler}
+              />
+            }
+            useFlatList
+            disableRightSwipe
+            disableLeftSwipe={!developmentMode}
+            ListEmptyComponent={listEmptyComponent}
+            data={connections}
+            style={styles.flatListStyle}
+            contentContainerStyle={styles.flatListStyle}
+            keyExtractor={(rowData, index) => {
+              return index + rowData.connectionId;
+            }}
+            renderItem={renderItem}
+            renderHiddenItem={renderHiddenItem}
+            leftOpenValue={75}
+            rightOpenValue={-75}
+          />
+        </View>
       </View>
+
       {connectionlist.length > 0 && (
         <>
-          <PrimaryButton
-            onPress={handleAddButton}
-            icon={{
-              name: 'add',
-              color: AppColors.WHITE,
-            }}
-            buttonStyle={{
-              alignSelf: 'flex-end',
-              borderRadius: 25,
-              width: 50,
-              height: 50,
-              backgroundColor: AppColors.PRIMARY,
-            }}
-            buttonContainerStyle={{
-              marginHorizontal: 8,
-              marginVertical: 8,
-            }}
-          />
+          <View style={{ bottom: 100 }}>
+            <FloatingActionButton buttonColor={AppColors.PRIMARY} onPress={handleAddButton} />
+          </View>
 
           <SelectModal
             title={t('ConnectionsScreen.select_connections')}
@@ -167,15 +155,11 @@ function ConnectionsScreen() {
           />
         </>
       )}
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  MainContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
   viewStyle: { flex: 1 },
   EmptyContainer: {
     alignItems: 'center',

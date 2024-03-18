@@ -21,8 +21,8 @@ import {
   edit_credential_group,
   fetch_all_groups,
 } from '../../../helpers/Credential_Groups';
-import ActionButton from 'react-native-action-button';
 import {
+  AppColors,
   BLACK_COLOR,
   PRIMARY_COLOR,
   RED_COLOR,
@@ -40,6 +40,7 @@ import { get_local_issue_date, parse_date_time } from '../../../helpers/time';
 import { useAppDispatch, useAppSelector } from '../../../store';
 import { selectCredentials } from '../../../store/credentials/selectors';
 import { updateCredential } from '../../../store/credentials';
+import FloatingActionButton from '../../../components/Buttons/FloatingActionButton';
 
 const CredentialGroups = (props) => {
   // Constants
@@ -118,7 +119,7 @@ const CredentialGroups = (props) => {
   const onCreateGroupClick = async (creds) => {
     try {
       if (!groupNameRegex.test(groupName)) {
-        setGroupNameError(t('CredentialGroups.group_name_error'));
+        setGroupNameError(t('CredentialsScreen.group_name_error_message'));
         return;
       }
       setGroupNameError('');
@@ -148,7 +149,7 @@ const CredentialGroups = (props) => {
   const onUpdateGroupClick = async (creds) => {
     try {
       if (!groupNameRegex.test(groupName)) {
-        setGroupNameError(t('CredentialGroups.group_name_error'));
+        setGroupNameError(t('CredentialsScreen.group_name_error_message'));
         return;
       }
       setGroupNameError('');
@@ -480,12 +481,14 @@ const CredentialGroups = (props) => {
         />
       )}
 
-      <ActionButton
-        buttonColor={PRIMARY_COLOR}
-        onPress={() => {
-          setShowAddGroup(true);
-        }}
-      />
+      <View style={{ bottom: 100 }}>
+        <FloatingActionButton
+          buttonColor={AppColors.PRIMARY}
+          onPress={() => {
+            setShowAddGroup(true);
+          }}
+        />
+      </View>
     </View>
   );
 };
