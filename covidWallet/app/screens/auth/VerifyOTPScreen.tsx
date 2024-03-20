@@ -20,7 +20,8 @@ import AnimatedLoading from '../../components/Animations/AnimatedLoading';
 import InputPinComponent from '../../components/Input/InputPinComponent';
 import ResendCode from './components/ResendCode';
 import { useTranslation } from 'react-i18next';
-import { showMessage } from '../../helpers';
+import { saveItemInLocalStorage, showMessage } from '../../helpers';
+import ConstantsList from '../../helpers/ConfigApp';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -76,6 +77,8 @@ const VerifyOTPScreen = (props: INProps) => {
           setLoading(false);
           if (response.isRegistered) {
             props.navigation.navigate('SecurityScreen', { navigation: props.navigation });
+            // clear authentication count.
+            saveItemInLocalStorage(ConstantsList.AUTH_COUNT, 0);
           } else {
             props.navigation.navigate('RegistrationScreen');
           }

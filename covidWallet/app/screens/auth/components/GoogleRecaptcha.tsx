@@ -5,7 +5,7 @@ import TouchableComponent from '../../../components/Buttons/TouchableComponent';
 import ConstantsList from '../../../helpers/ConfigApp';
 
 interface IProps {
-  onVerify: () => {};
+  onVerify: () => void;
   recaptchaRef: React.RefObject<RecaptchaHandles>;
 }
 const GoogleRecaptcha = (props: IProps) => {
@@ -15,6 +15,7 @@ const GoogleRecaptcha = (props: IProps) => {
   return (
     <Recaptcha
       ref={recaptchaRef}
+      modalProps={{ animationType: 'slide' }}
       siteKey={ConstantsList.GOOGLE_RECAPTCHA_KEY}
       baseUrl={ConstantsList.RECAPTCHA_BASE_URL}
       onVerify={onVerify}
