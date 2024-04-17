@@ -117,6 +117,10 @@ const SelectModal = (props: INProps) => {
         margin: 0,
         paddingTop: insets.top,
       }}
+      animationInTiming={500}
+      animationOutTiming={500}
+      useNativeDriver={false}
+      onBackButtonPress={onClose}
       backdropOpacity={0.8}>
       <View style={styles.container}>
         <View style={{ maxWidth: 100 }}>

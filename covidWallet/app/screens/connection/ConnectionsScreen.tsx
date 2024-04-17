@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Animated, StyleSheet, RefreshControl } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Animated,
+  StyleSheet,
+  RefreshControl,
+  Dimensions,
+} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +29,7 @@ import SelectModal from '../../components/Modal/SelectModal';
 import useConnections from '../../hooks/useConnections';
 import FloatingActionButton from '../../components/Buttons/FloatingActionButton';
 
+const { height } = Dimensions.get('window');
 function ConnectionsScreen() {
   // Selectors
   const { t } = useTranslation();
@@ -141,7 +149,7 @@ function ConnectionsScreen() {
 
       {connectionlist.length > 0 && (
         <>
-          <View style={{ bottom: 100 }}>
+          <View style={{ bottom: height * 0.12 }}>
             <FloatingActionButton buttonColor={AppColors.PRIMARY} onPress={handleAddButton} />
           </View>
 
