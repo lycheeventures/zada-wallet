@@ -158,17 +158,24 @@ function ActionsScreen({ navigation }) {
       setDeepLink(true);
       return;
     } else {
-      const parsed = initialUrl.split('/');
+      const parsed = initialUrl.split("/");
       var item = {};
-      item['type'] = parsed[3];
-      item['metadata'] = parsed[4];
+      // Base64 request
+      if (initialUrl.includes('?data')) {
+        item['type'] = initialUrl.split('?data=')[0]
+        item['data'] = initialUrl.split('?data=')[1]
+      } else {
+        item['type'] = parsed[3];
+        item['metadata'] = parsed[4];
+      }
       requestArray.push(item);
       const requestJson = JSON.parse(JSON.stringify(item));
       setDeepLink(true);
 
-      if (item['type'] === 'connection_request') {
+      if (item['type'] === 'connection_request' || item['type'].includes('connectionless-verification')) {
         navigation.navigate('QRScreen', {
           request: requestJson,
+          isLink: item['type'] === 'connection_request',
         });
       } else {
         _showAlert('Zada Wallet', 'Invalid URL');
