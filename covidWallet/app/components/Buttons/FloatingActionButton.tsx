@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AppColors } from '../../theme/Colors';
@@ -16,17 +16,16 @@ interface IProps {
   actionItems?: IActionItems[];
 }
 
+const window = Dimensions.get('screen');
 const FloatingActionButton = (props: IProps) => {
   return (
     <View style={{ backgroundColor: '#f3f3f3' }}>
       <ActionButton
-        size={50}
+        size={window.width / 7}
         buttonColor={props.buttonColor}
-        useNativeFeedback
-        fixNativeFeedbackRadius
         onPress={props.onPress}
         renderIcon={() => <Icon name="plus" style={styles.actionButtonIcon} />}
-        nativeFeedbackRippleColor={AppColors.LIGHT_GRAY}>
+        nativeFeedbackRippleColor={AppColors.TRANSPARENT}>
         {props.actionItems &&
           props.actionItems.map((item, index) => {
             return (
@@ -48,8 +47,7 @@ const FloatingActionButton = (props: IProps) => {
 
 const styles = StyleSheet.create({
   actionButtonIcon: {
-    fontSize: 20,
-    height: 22,
+    fontSize: window.width / 20,
     color: 'white',
   },
   actionButtonItemIcon: {

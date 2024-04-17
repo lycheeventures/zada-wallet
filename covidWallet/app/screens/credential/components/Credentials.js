@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, RefreshControl, FlatList, Linking } from 'react-native';
+import { View, StyleSheet, RefreshControl, FlatList, Linking, Dimensions } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import FeatherIcon from 'react-native-vector-icons/Feather';
@@ -20,6 +20,7 @@ import { fetchCredentials } from '../../../store/credentials/thunk';
 import { updateCredential } from '../../../store/credentials';
 import FloatingActionButton from '../../../components/Buttons/FloatingActionButton';
 
+const { height } = Dimensions.get('window');
 function Credentials(props) {
   // Constants
   const dispatch = useAppDispatch();
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   floatingBtnContainerStyle: {
-    bottom: 100,
+    bottom: height * 0.12,
   }
 });
 

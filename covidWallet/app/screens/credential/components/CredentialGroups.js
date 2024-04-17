@@ -481,7 +481,7 @@ const CredentialGroups = (props) => {
         />
       )}
 
-      <View style={{ bottom: 100 }}>
+      <View style={{ bottom: Dimensions.get('screen').height * 0.12 }}>
         <FloatingActionButton
           buttonColor={AppColors.PRIMARY}
           onPress={() => {
