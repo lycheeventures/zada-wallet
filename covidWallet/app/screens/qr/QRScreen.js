@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, View, Linking } from 'react-native';
 import Config from 'react-native-config';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useTranslation } from 'react-i18next';
@@ -76,9 +76,9 @@ const QRScreen = ({ route, navigation }) => {
   useEffect(() => {
     if (route.params !== undefined) {
       setScan(false);
-      const { request } = route.params;
+      const { request, isLink } = route.params;
       const qrJSON = JSON.stringify(request);
-      _handleQRScan({ data: qrJSON }, true);
+      _handleQRScan({ data: qrJSON }, isLink);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -144,40 +144,35 @@ const QRScreen = ({ route, navigation }) => {
           let type = getType(e.data);
           let credObj = {};
 
-          if (type.startsWith('agency://')) {
-            type = 'agency';
+          if (type.startsWith('zada://') || type.startsWith('zada://network')) {
+            type = type.split('/')[3];
           }
           switch (type) {
-            // Handling agency
-            case 'agency':
-              setScan(false);
-              setProgress(true);
-              setDialogTitle('Please wait...');
+            // handling connectionless verification
+            case 'connectionless-verification':
+              try {
+                setScan(false);
+                setProgress(true);
+                setDialogTitle('Please wait...');
 
-              let base64 = convertStringToBase64(e.data);
-              let result = await VerificationAPI.send_request_to_agency(base64);
-              if (result.data.success) {
-                let res = await makeVerificationObject(result.data.verification);
-                setTimeout(() => {
+                let parsedData = JSON.parse(e.data);
+                if (parsedData.data === undefined) {
+                  parsedData = convertStringToBase64(JSON.stringify(parsedData));
+                } else {
+                  parsedData = parsedData.data
+                }
+                let result = await VerificationAPI.send_request_to_agency(parsedData);
+                if (result.data.success) {
+                  let res = await makeVerificationObject(result.data.verification);
                   setCredentialData({
-                    type: 'connectionless_verification',
+                    type: 'connectionless-verification',
                     credentials: res.credential,
                   });
-                }, 600);
-              }
+                }
 
-              setScan(false);
-              setProgress(false);
-              setDialogTitle('');
-              return;
-            // handling connectionless verification
-            case 'connectionless_verification':
-              try {
-                let res = await makeVerificationObject(JSON.parse(e.data));
-                setCredentialData({
-                  type: 'connectionless_verification',
-                  credentials: res.credential,
-                });
+                setScan(false);
+                setProgress(false);
+                setDialogTitle('');
               } catch (err) {
                 throw 'Not a valid ZADA QR';
               }
@@ -340,17 +335,31 @@ const QRScreen = ({ route, navigation }) => {
       type: 'temp',
     });
 
+    // Handle metadata as JSON
+    let metadata = undefined;
+    let redirectCallback = undefined;
+    if (typeof e.metadata === 'object') {
+      metadata = e.metadata.verificationRequestId;
+      redirectCallback = e.metadata.redirectCallback;
+    } else {
+      metadata = e.metadata;
+    }
+
     try {
       // Submitting verification
       await VerificationAPI.submit_verification_connectionless(
-        e.metadata,
+        metadata,
         e.policyName,
-        e.credentialId
+        e.credentialId,
       );
 
       setProgress(false);
       setCredentialData(defaultCredState);
-      showOKDialog('ZADA', 'Submitted Successfully!', navigateToMainScreen);
+      if (redirectCallback != undefined) {
+        Linking.openURL(redirectCallback);
+      } else {
+        showOKDialog('ZADA', 'Submitted Successfully!', navigateToMainScreen);
+      }
       navigation.goBack();
     } catch (error) {
       setScanning(false);
@@ -389,9 +398,9 @@ const QRScreen = ({ route, navigation }) => {
         onVerifyPress={_handleVerifyClick}
       />
 
-      {credentialData.type === 'connectionless_verification' && (
+      {credentialData.type === 'connectionless-verification' && (
         <ActionDialog
-          isVisible={credentialData.type === 'connectionless_verification'}
+          isVisible={credentialData.type === 'connectionless-verification'}
           rejectModal={rejectModal}
           data={credentialData.credentials}
           dismissModal={dismissModal}

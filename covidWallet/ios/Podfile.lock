@@ -217,7 +217,7 @@ PODS:
   - lottie-react-native (5.1.6):
     - lottie-ios (~> 3.4.0)
     - React-Core
-  - Mobilisten (5.4.0)
+  - Mobilisten (8.1.0)
   - nanopb (2.30909.1):
     - nanopb/decode (= 2.30909.1)
     - nanopb/encode (= 2.30909.1)
@@ -747,8 +747,8 @@ PODS:
   - RNVectorIcons (10.0.2):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
-  - RNZohoSalesIQ (5.4.0):
-    - Mobilisten (= 5.4.0)
+  - RNZohoSalesIQ (8.1.0):
+    - Mobilisten (= 8.1.0)
     - React
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
@@ -1101,7 +1101,7 @@ SPEC CHECKSUMS:
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   lottie-ios: 8f97d3271e155c2d688875c29cd3c74908aef5f8
   lottie-react-native: 8f9d4be452e23f6e5ca0fdc11669dc99ab52be81
-  Mobilisten: 1be1439c93e84d2259efa5dffdb023b4abd43e56
+  Mobilisten: f63ec4fd784894db637b533e709e3d777d425139
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   Permission-Camera: bf6791b17c7f614b6826019fcfdcc286d3a107f6
@@ -1169,11 +1169,11 @@ SPEC CHECKSUMS:
   RNShare: a5dc3b9c53ddc73e155b8cd9a94c70c91913c43c
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
   RNVectorIcons: 23b6e11af4aaf104d169b1b0afa7e5cf96c676ce
-  RNZohoSalesIQ: 78cd29360b4e584dc1e04a36e013c694d34a99af
+  RNZohoSalesIQ: 00c03b451bd0ef0411c50cf7dcf54750af308b43
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: b76f1acfda8212aa16b7e26bcce3983230c82603
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
 PODFILE CHECKSUM: 515fdd27dae388264e6a682b80720cbfd9d986d2
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.15.2

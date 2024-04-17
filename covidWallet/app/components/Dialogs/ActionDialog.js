@@ -53,7 +53,13 @@ function ActionDialog(props) {
             setSpinner(true);
             let result = []
             if (props.data.type == CONNLESS_VER_REQ) {
-                result = await get_all_credentials_connectionless_verification(props.data.metadata);
+                // Check if metadata is object or string
+                if(typeof props.data.metadata === 'object') {
+                    metadata = props.data.metadata.verificationRequestId;
+                } else {
+                    metadata = props.data.metadata;
+                }
+                result = await get_all_credentials_connectionless_verification(metadata);
             } else {
                 result = await get_all_credentials_for_verification(props.data.verificationId);
             }

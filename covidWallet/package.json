@@ -111,7 +111,7 @@
     "react-native-vector-icons": "^10.0.2",
     "react-native-view-shot": "^3.3.0",
     "react-native-webview": "^13.2.2",
-    "react-native-zohosalesiq-mobilisten": "^5.2.0",
+    "react-native-zohosalesiq-mobilisten": "^8.1.0",
     "react-redux": "^8.0.2",
     "redux": "^4.2.0",
     "redux-persist-transform-encrypt": "^4.0.0",
