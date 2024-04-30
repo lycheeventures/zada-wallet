@@ -931,7 +931,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZADA/ZADA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = L66ZW85V2S;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -949,7 +949,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 1.5.7;
+				MARKETING_VERSION = 1.5.9;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -975,7 +975,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZADA/ZADA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = L66ZW85V2S;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -989,7 +989,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 1.5.7;
+				MARKETING_VERSION = 1.5.9;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1199,10 +1199,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -1266,10 +1263,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
