@@ -27,7 +27,7 @@ export type AuthStackParamList = {
 export type MainStackParamList = {
   MainScreen: undefined;
   SettingsScreen: undefined;
-  LanguageSelectionScreen: undefined,
+  LanguageSelectionScreen: undefined;
   ContactUs: undefined;
   AboutUs: undefined;
   ProfileScreen: undefined;

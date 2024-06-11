@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import SpInAppUpdates, { IAUUpdateKind, StartUpdateOptions } from 'sp-react-native-in-app-updates';
@@ -6,7 +6,7 @@ import SplashScreen from 'react-native-splash-screen';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import useInit from '../hooks/useInit';
-import { getItemFromLocalStorage, saveItem } from '../helpers/Storage';
+import { getItemFromLocalStorage, saveItem, saveItemInLocalStorage } from '../helpers/Storage';
 import { AppDispatch, useAppSelector } from '../store';
 import { selectNetworkStatus } from '../store/app/selectors';
 import LoadingScreen from '../screens/LoadingScreen';
@@ -18,6 +18,10 @@ import { navigationRef } from './utils';
 import { updateAppSetupComplete } from '../store/app';
 import { useAppDispatch } from '../store/index-old';
 import useWebview from '../hooks/useWebview';
+import BiometricModal from '../screens/biometric/BiometricScreen';
+import DeviceInfo from 'react-native-device-info';
+import ConfigApp from '../helpers/ConfigApp';
+import { clearAllAndLogout } from '../store/utils';
 
 const Stack = createStackNavigator();
 const RootNavigator = () => {
@@ -26,6 +30,7 @@ const RootNavigator = () => {
     prefixes: ['https://zadanetwork.com', 'zada://'], //npx uri-scheme open https://zadanetwork.com/connection_request/abcd --android
   };
   const dispatch = useAppDispatch<AppDispatch>();
+  const appStarted = useRef(true);
 
   // Selectors
   const networkStatus = useAppSelector(selectNetworkStatus);
@@ -49,6 +54,25 @@ const RootNavigator = () => {
       checkForUpdates();
     })();
   }, [networkStatus, setMessageIndex]);
+
+  // // Check for app version and clear all data if the app has been updated
+  // useEffect(() => {
+  //   const checkAppVersion = async () => {
+  //     const currentVersion = DeviceInfo.getVersion();
+  //     const storedVersion = await getItemFromLocalStorage(ConfigApp.APP_VERSION);
+
+  //     if (storedVersion && storedVersion !== currentVersion) {
+  //       // App has been updated
+  //       clearAllAndLogout(dispatch);
+  //       await saveItemInLocalStorage(ConfigApp.APP_VERSION, currentVersion);
+  //     } else {
+  //       // Store the current version if it's the first time running the app
+  //       await saveItemInLocalStorage(ConfigApp.APP_VERSION, currentVersion);
+  //     }
+  //   };
+
+  //   checkAppVersion();
+  // }, []);
 
   // Functions
   const checkForUpdates = async () => {
@@ -74,7 +98,12 @@ const RootNavigator = () => {
     if (!isAuthorized) {
       return <AuthNavigator />;
     } else {
-      return <MainNavigator />;
+      return (
+        <>
+          <MainNavigator />
+          <BiometricModal appStarted={appStarted} />
+        </>
+      );
     }
   }, [isAuthorized]);
 

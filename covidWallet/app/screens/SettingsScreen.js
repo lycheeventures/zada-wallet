@@ -17,6 +17,7 @@ import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors'
 import { selectAppStatus, selectNetworkStatus } from '../store/app/selectors';
 import useDevelopment from '../hooks/useDevelopment';
 import OverlayLoader from '../components/OverlayLoader';
+import BiometricModal from './biometric/BiometricScreen';
 
 export default function SettingsScreen(props) {
   // Constants
@@ -34,6 +35,7 @@ export default function SettingsScreen(props) {
     useDevelopment();
 
   const [isBioEnable, setBioEnable] = useState(false);
+  const [isBiometricModalVisible, setBiometricModalVisible] = useState(false);
   const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(autoAcceptConnection);
   const [version, setVersion] = useState(null);
 
@@ -48,17 +50,19 @@ export default function SettingsScreen(props) {
 
       let biometric = JSON.parse((await getItem(BIOMETRIC_ENABLED)) || 'false');
 
-      // let auto_accept_connection = JSON.parse((await getItem(AUTO_ACCEPT_CONNECTION)) || 'false');
-
       setBioEnable(biometric);
-      // setIsAcceptConnectionEnabled(auto_accept_connection);
       setVersion(appVersion);
     };
     updatevalues();
   }, []);
 
   const _toggleBio = (value) => {
-    props.route.params.oneTimeAuthentication((e) => _bioResult(e, value));
+    if (value === false) {
+      setBiometricModalVisible(false);
+      _bioResult(true, value);
+      return;
+    }
+    setBiometricModalVisible(true);
   };
 
   const _bioResult = async (result, value) => {
@@ -82,6 +86,9 @@ export default function SettingsScreen(props) {
     } else {
       if (result) setBioEnable(false);
     }
+
+    // Setting modal to false.
+    setBiometricModalVisible(false);
   };
 
   const _toggleAcceptConnection = (value) => {
@@ -131,9 +138,15 @@ export default function SettingsScreen(props) {
     props.navigation.navigate('LanguageSelectionScreen')
   }
 
+  const onBiometricModalDismiss = () => {
+    setBioEnable(false);
+    setBiometricModalVisible(false);
+  }
+
   return (
     <View style={styles._mainContainer}>
       {appStatus === 'loading' && <OverlayLoader text="Logging out..." />}
+      {isBiometricModalVisible && <BiometricModal oneTimeAuthentication isVisible={isBiometricModalVisible} onDismiss={onBiometricModalDismiss} onSuccess={(e) => _bioResult(e, !isBioEnable)} />}
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles._list}

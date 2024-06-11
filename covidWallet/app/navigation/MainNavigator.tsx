@@ -1,6 +1,6 @@
 import React from 'react';
 import { TransitionPresets } from '@react-navigation/stack';
-import { Platform, Text } from 'react-native';
+import { Platform, Text, Modal } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -16,9 +16,9 @@ import ContactUs from '../screens/ContactUs';
 import AboutUs from '../screens/AboutUs';
 import ProfileScreen from '../screens/settings/ProfileScreen';
 import QRScreen from '../screens/qr/QRScreen';
-import useBiometric from '../hooks/useBiometric';
 import CredDetailScreen from '../screens/credential/CredDetailScreen';
 import LanguageSelectionScreen from '../screens/settings/LanguageSelectionScreen';
+import { navigationRef } from './utils';
 
 const navigationAnimation =
   Platform.OS == 'ios'
@@ -26,8 +26,6 @@ const navigationAnimation =
     : TransitionPresets.RevealFromBottomAndroid;
 
 const MainNavigator = () => {
-  // Hooks
-  const { oneTimeAuthentication } = useBiometric();
   const { t } = useTranslation();
 
   const backIcon = Platform.OS === 'ios' ? 'chevron-left' : 'arrow-back';
@@ -35,7 +33,7 @@ const MainNavigator = () => {
     <MainStack.Navigator screenOptions={{ ...navigationAnimation }} initialRouteName="MainScreen">
       <MainStack.Screen
         name="MainScreen"
-        options={({ navigation }) => ({
+        options={({ navigation, route }) => ({
           headerStyle: {
             backgroundColor: BACKGROUND_COLOR,
             elevation: 0,
@@ -46,9 +44,7 @@ const MainNavigator = () => {
           headerLeft: () => (
             <FontAwesome
               onPress={() => {
-                navigation.navigate('SettingsScreen', {
-                  oneTimeAuthentication,
-                });
+                navigationRef.navigate('SettingsScreen');
               }}
               style={styles.headerRightIcon}
               size={30}
