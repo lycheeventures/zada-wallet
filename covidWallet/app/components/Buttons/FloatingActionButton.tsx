@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions, Image, ImageSourcePropType } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AppColors } from '../../theme/Colors';
@@ -7,7 +7,8 @@ import { AppColors } from '../../theme/Colors';
 interface IActionItems {
   title: string;
   onPress: () => void;
-  iconName: string;
+  iconName?: string;
+  imageSrc?: ImageSourcePropType;
   buttonColor?: string;
 }
 interface IProps {
@@ -36,7 +37,11 @@ const FloatingActionButton = (props: IProps) => {
                 key={index}
                 textStyle={{ fontFamily: 'Poppins-Regular' }}
                 style={styles.actionButtonItemStyle}>
-                <Icon name={item.iconName} style={styles.actionButtonItemIcon} />
+                {item.iconName ? (
+                  <Icon name={item.iconName} style={styles.actionButtonItemIcon} />
+                ) : (
+                  <Image source={item.imageSrc} style={styles.actionButtonItemImage} />
+                )}
               </ActionButton.Item>
             );
           })}
@@ -53,6 +58,12 @@ const styles = StyleSheet.create({
   actionButtonItemIcon: {
     fontSize: 20,
     height: 22,
+    color: 'black',
+  },
+  actionButtonItemImage: {
+    fontSize: 20,
+    height: 40,
+    width: 40,
     color: 'black',
   },
   actionButtonItemStyle: {

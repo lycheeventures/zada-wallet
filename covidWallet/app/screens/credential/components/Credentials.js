@@ -10,6 +10,8 @@ import { AppColors, PRIMARY_COLOR, WHITE_COLOR } from '../../../theme/Colors';
 import { get_local_issue_date } from '../../../helpers/time';
 import CardBackground from '../../../components/CardBackground';
 import CertificateCard from '../../../components/CertificateCard';
+import phhLogo from "../../../assets/icons/phh-logo-color.png";
+import zadaLogo from "../../../assets/icons/zada-logo-color.png";
 
 import { useAppDispatch, useAppSelector } from '../../../store';
 import {
@@ -102,10 +104,13 @@ function Credentials(props) {
   };
 
   const onRequestCredentialPress = () => {
-    Linking.openURL('https://myzada.info');
+    Linking.openURL('https://app.uppass.io/en/kyc_RUZroVbzI6KW');
   }
   const onRequestCovidPass = () => {
     Linking.openURL('https://PHH.covidpass.id');
+  }
+  const onRequestZadaCredential = () => {
+    Linking.openURL('https://myzada.info');
   }
 
   return (
@@ -136,14 +141,20 @@ function Credentials(props) {
           buttonColor={AppColors.PRIMARY}
           actionItems={[
             {
-              title: "Request Credential",
-              onPress: onRequestCredentialPress,
-              iconName: "badge-account-horizontal-outline",
+              title: "myzada.info",
+              onPress: onRequestZadaCredential,
+              imageSrc: zadaLogo,
               buttonColor: AppColors.WHITE,
             },
             {
-              title: "Request CovidPass",
+              title: "PHH.covidpass.id",
               onPress: onRequestCovidPass,
+              imageSrc: phhLogo,
+              buttonColor: AppColors.WHITE,
+            },
+            {
+              title: "Request Credentials",
+              onPress: onRequestCredentialPress,
               iconName: "badge-account-horizontal-outline",
               buttonColor: AppColors.WHITE,
             },
