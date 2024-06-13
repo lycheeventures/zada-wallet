@@ -69,7 +69,7 @@
   "CredentialsScreen": {
     "all_certificates": "All Certificates",
     "groups": "Groups",
-    "all_certificates_empty_list_text": "There are no certificates in your wallet. Once you receive a certificate, it will show up here.",
+    "all_certificates_empty_list_text": "There are no certificates in your wallet. Please check the Actions Tab for any Certificate Offers or tap the \"+\" button at the bottom right to request a certificate.",
     "groups_empty_list_text": "There are no certificate groups in your wallet. Create first by clicking on plus button",
     "new_group": "New Group",
     "group_name": "Group Name",
