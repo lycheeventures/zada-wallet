@@ -104,6 +104,9 @@ function Credentials(props) {
   const onRequestCredentialPress = () => {
     Linking.openURL('https://myzada.info');
   }
+  const onRequestCovidPass = () => {
+    Linking.openURL('https://PHH.covidpass.id');
+  }
 
   return (
     <>
@@ -137,7 +140,14 @@ function Credentials(props) {
               onPress: onRequestCredentialPress,
               iconName: "badge-account-horizontal-outline",
               buttonColor: AppColors.WHITE,
-            }]}
+            },
+            {
+              title: "Request CovidPass",
+              onPress: onRequestCovidPass,
+              iconName: "badge-account-horizontal-outline",
+              buttonColor: AppColors.WHITE,
+            },
+          ]}
         />
       </View>
     </>
