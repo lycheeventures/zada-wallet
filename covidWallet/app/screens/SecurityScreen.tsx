@@ -7,12 +7,12 @@ import { AuthStackParamList } from '../navigation/types';
 import ImageBoxComponent from '../components/ImageBoxComponent';
 import TextComponent from '../components/TextComponent';
 import GreenPrimaryButton from '../components/GreenPrimaryButton';
-import PincodeModal from '../components/Modal/PincodeModal';
 import { pincodeRegex } from '../helpers/validation';
 import { showMessage } from '../helpers/Toast';
 import { saveItem } from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
 import { useTranslation } from 'react-i18next';
+import PincodeScreen from './pincode/PincodeScreen';
 
 const img = require('../assets/images/security.png');
 
@@ -196,10 +196,9 @@ const SecurityScreen = (props: INProps) => {
 
       {/* PinCode Modal */}
       {showPincodeModal && (
-        <PincodeModal
-          modalType={'normal'}
-          onCloseClick={() => setShowPinCodeModal(false)}
+        <PincodeScreen
           isVisible={showPincodeModal}
+          onDismiss={() => setShowPinCodeModal(false)}
           pincode={pincode}
           onPincodeChange={(text: string) => {
             setPincode(text);
@@ -212,7 +211,7 @@ const SecurityScreen = (props: INProps) => {
             if (text.length == 0) setConfirmPincodeError('');
           }}
           confirmPincodeError={confirmPincodeError}
-          onContinueClick={_setPinCode}
+          savePincode={_setPinCode}
         />
       )}
     </View>
