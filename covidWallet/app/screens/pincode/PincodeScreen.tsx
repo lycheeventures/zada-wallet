@@ -8,21 +8,24 @@ import {
   Modal,
   Animated,
   Easing,
+  Alert,
 } from 'react-native';
 import { AppColors, RED_COLOR } from '../../theme/Colors';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
-
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
 interface IProps {
   isVisible?: boolean;
   onDismiss?: () => void;
-  onPincodeChange: (text: string) => void;
-  pincode: string;
-  pincodeError: string;
+  onPincodeChange?: (text: string) => void;
+  pincode?: string;
+  pincodeError?: string;
   onConfirmPincodeChange: (text: string) => void;
   confirmPincode: string;
   confirmPincodeError: string;
   savePincode: () => void;
+  isVerifyPin?: boolean; // pass this when using this screen to authorize user,
+  onBiometricSuccess?: () => void;
 }
 
 const PincodeScreen = ({
@@ -34,18 +37,22 @@ const PincodeScreen = ({
   confirmPincode,
   onConfirmPincodeChange,
   savePincode,
-  confirmPincodeError
+  isVerifyPin,
+  confirmPincodeError,
+  onBiometricSuccess
 }: IProps) => {
 
   // states
-  const [isVerify, setIsVerify] = useState(false);
+  const [isVerify, setIsVerify] = useState(!!isVerifyPin);
   const animateLeftValue = useState(new Animated.Value(0))[0];
   const animateOpacity = useState(new Animated.Value(1))[0];
 
   const { t } = useTranslation();
 
+  const rnBiometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true });
+
   useEffect(() => {
-    if (pincode.length === 6 && !pincodeError) {
+    if (pincode?.length === 6 && !pincodeError) {
       Animated.sequence([
         Animated.parallel([
           Animated.timing(animateLeftValue, {
@@ -90,7 +97,7 @@ const PincodeScreen = ({
 
   useEffect(() => {
     // reset pin if there is any error
-    if (pincodeError) {
+    if (pincodeError && onPincodeChange) {
       onPincodeChange("");
     }
     if (confirmPincodeError) {
@@ -105,17 +112,58 @@ const PincodeScreen = ({
     }
   }, [confirmPincode]);
 
+  useEffect(() => {
+    if (isVerifyPin) {
+      isBiometricAvailable();
+    }
+  }, [])
+
+  const handleBiometricAuth = async () => {
+    try {
+      const resultObject = await rnBiometrics.simplePrompt({ promptMessage: 'Authenticate' });
+      const { success } = resultObject;
+      if (success) {
+        onConfirmPincodeChange("");
+        return true;
+      } else {
+        return false;
+      }
+    } catch {
+      Alert.alert('Biometric Authentication', 'Biometrics not supported or error occurred');
+      return false;
+    }
+  };
+
+  //Biometric funciton
+  const isBiometricAvailable = async () => {
+    const { available, biometryType } = await rnBiometrics.isSensorAvailable();
+    if (
+      (biometryType === BiometryTypes.FaceID || biometryType === BiometryTypes.Biometrics) &&
+      available
+    ) {
+      let result = await handleBiometricAuth();
+      if (result && onBiometricSuccess) {
+        onBiometricSuccess();
+      }
+    }
+  };
+
   const handleKeyPress = (key: string) => {
-    if (key === 'biometric') return;
-    if (key === 'delete') {
-      onPincodeChange(pincode.slice(0, -1));
-    } else if (pincode.length < 6) {
-      onPincodeChange(pincode + key);
+    if (onPincodeChange) {
+      if (key === 'biometric') return;
+      if (key === 'delete') {
+        onPincodeChange(pincode!.slice(0, -1));
+      } else if (pincode!.length < 6) {
+        onPincodeChange(pincode + key);
+      }
     }
   };
 
   const handleConfirmModalKeyPress = (key: string) => {
-    if (key === 'biometric') return;
+    if (key === 'biometric' && isVerifyPin) {
+      isBiometricAvailable();
+      return;
+    } else if (key === 'biometric') return;
     if (key === 'delete') {
       onConfirmPincodeChange(confirmPincode.slice(0, -1));
     } else if (confirmPincode.length < 6) {
@@ -154,7 +202,7 @@ const PincodeScreen = ({
         }),
       ]),
     ]).start(() => {
-      onPincodeChange("");
+      onPincodeChange && onPincodeChange("");
       onConfirmPincodeChange("");
       setIsVerify(false);
       // Reset animations after the state change
@@ -192,7 +240,7 @@ const PincodeScreen = ({
             onPress={() => (isVerify ? handleConfirmModalKeyPress(key) : handleKeyPress(key))}>
             <Text style={styles.keyText}>
               {key === 'biometric' ? (
-                <MaterialCommunityIcons name="fingerprint" size={0} />
+                <MaterialCommunityIcons name="fingerprint" size={isVerifyPin ? 35 : 0} />
               ) : key === 'delete' ? (
                 '⌫'
               ) : (
@@ -213,7 +261,7 @@ const PincodeScreen = ({
         />
         <Text style={styles.title}>{t('PincodeScreen.title')}</Text>
         <Text style={styles.subTitle}>{t('PincodeScreen.sub_title')}</Text>
-        <PinInput pin={pincode} />
+        <PinInput pin={pincode ?? ""} />
         {pincodeError && (
           <View style={{ height: 20, justifyContent: 'center' }}>
             <Text style={styles.errorStyle}>{pincodeError}</Text>
@@ -235,8 +283,8 @@ const PincodeScreen = ({
         <Image
           source={require('../../assets/images/lock.png')}
         />
-        <Text style={styles.title}>{t('PincodeScreen.confirm_pin_title')}</Text>
-        <Text style={styles.subTitle}>{t('PincodeScreen.confirm_pin_sub_title')}</Text>
+        <Text style={styles.title}>{isVerifyPin ? "VERIFY" : t('PincodeScreen.confirm_pin_title')}</Text>
+        <Text style={styles.subTitle}>{isVerifyPin ? "Please enter your 6 digit pincode to verify request" : t('PincodeScreen.confirm_pin_sub_title')}</Text>
         <PinInput pin={confirmPincode} />
         <NumericKeyboard />
       </Animated.View>
@@ -322,7 +370,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   keyboardContainer: {
-    width: '80%',
+    width: '100%',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',

@@ -149,6 +149,7 @@ const SecurityScreen = (props: INProps) => {
     setConfirmPincodeError('');
 
     if (pincode != confirmPincode) {
+      setConfirmPincodeError(t('errors.pincode_confirm_not_match'));
       showMessage('Zada Wallet', t('errors.pincode_confirm_not_match'));
       return;
     }
