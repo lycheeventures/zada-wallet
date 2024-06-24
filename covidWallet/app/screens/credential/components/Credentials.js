@@ -12,6 +12,7 @@ import CardBackground from '../../../components/CardBackground';
 import CertificateCard from '../../../components/CertificateCard';
 import phhLogo from "../../../assets/icons/phh-logo-color.png";
 import zadaLogo from "../../../assets/icons/zada-logo-color.png";
+import InAppBrowser from 'react-native-inappbrowser-reborn';
 
 import { useAppDispatch, useAppSelector } from '../../../store';
 import {
@@ -103,14 +104,44 @@ function Credentials(props) {
     dispatch(fetchCredentials());
   };
 
+  const openLink = async (url) => {
+    try {
+      if (await InAppBrowser.isAvailable()) {
+        InAppBrowser.open(url, {
+          // iOS Properties
+          dismissButtonStyle: 'cancel',
+          preferredBarTintColor: '#453AA4',
+          preferredControlTintColor: 'white',
+          readerMode: false,
+          animated: true,
+          modalPresentationStyle: 'fullScreen',
+          modalTransitionStyle: 'partialCurl',
+          modalEnabled: true,
+          enableBarCollapsing: false,
+          // Android Properties
+          showTitle: true,
+          toolbarColor: '#6200EE',
+          secondaryToolbarColor: 'black',
+          enableUrlBarHiding: true,
+          enableDefaultShare: true,
+          forceCloseOnRedirection: false,
+        });
+      } else {
+        Linking.openURL(url);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const onRequestCredentialPress = () => {
-    Linking.openURL('https://app.uppass.io/en/kyc_RUZroVbzI6KW');
+    openLink('https://app.uppass.io/en/kyc_RUZroVbzI6KW');
   }
   const onRequestCovidPass = () => {
-    Linking.openURL('https://PHH.covidpass.id');
+    openLink('https://PHH.covidpass.id');
   }
   const onRequestZadaCredential = () => {
-    Linking.openURL('https://myzada.info');
+    openLink('https://myzada.info');
   }
 
   return (
