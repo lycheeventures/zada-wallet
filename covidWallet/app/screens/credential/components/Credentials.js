@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, RefreshControl, FlatList, Linking, Dimensions } from 'react-native';
-import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, StyleSheet, RefreshControl, FlatList, Dimensions, TouchableOpacity } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { themeStyles } from '../../../theme/Styles';
@@ -12,7 +12,9 @@ import CardBackground from '../../../components/CardBackground';
 import CertificateCard from '../../../components/CertificateCard';
 import phhLogo from "../../../assets/icons/phh-logo-color.png";
 import zadaLogo from "../../../assets/icons/zada-logo-color.png";
-import InAppBrowser from 'react-native-inappbrowser-reborn';
+import { WebView } from 'react-native-webview';
+import Modal from 'react-native-modal';
+
 
 import { useAppDispatch, useAppSelector } from '../../../store';
 import {
@@ -30,6 +32,19 @@ function Credentials(props) {
 
   // States
   const [search, setSearch] = useState('');
+  const [isWebViewVisible, setIsWebViewVisible] = useState(false);
+  const [webViewUrls, setWebViewUrls] = useState({
+    url: '',
+    redirectUrl: '',
+  });
+
+  useEffect(() => {
+    if (webViewUrls.url) {
+      setIsWebViewVisible(true);
+    } else {
+      setIsWebViewVisible(false);
+    }
+  }, [webViewUrls.url]);
 
   // Selectors
   const { t } = useTranslation();
@@ -99,99 +114,109 @@ function Credentials(props) {
     );
   };
 
+
+  const WebViewScreen = ({ url, redirectUrl }) => {
+    return (
+      <Modal
+        isVisible={isWebViewVisible}
+        animationIn={'fadeInLeft'}
+        animationOut={'fadeOutRight'}
+        animationInTiming={250}
+        animationOutTiming={250}
+        style={{ margin: 0, backgroundColor: AppColors.PRIMARY }}
+      >
+        <View style={{ height: 40, flexDirection: "row", alignItems: "center", justifyContent: "flex-end" }}>
+          <TouchableOpacity
+            onPress={() => {
+              setWebViewUrls({ url: "", redirectUrl: "" })
+            }}
+            style={{ paddingHorizontal: 10 }}>
+            <FeatherIcon name="x" size={24} color={WHITE_COLOR} />
+          </TouchableOpacity>
+        </View>
+        <WebView
+          source={{ uri: url }}
+          style={{ flex: 1 }}
+          onNavigationStateChange={(event) => {
+            if (event.url === redirectUrl) {
+              setWebViewUrls({ url: "", redirectUrl: "" });
+            }
+          }}
+        />
+      </Modal>
+
+    );
+  };
+
   // Refresh List
   const refreshHandler = () => {
     dispatch(fetchCredentials());
   };
 
-  const openLink = async (url) => {
-    try {
-      if (await InAppBrowser.isAvailable()) {
-        InAppBrowser.open(url, {
-          // iOS Properties
-          dismissButtonStyle: 'cancel',
-          preferredBarTintColor: '#453AA4',
-          preferredControlTintColor: 'white',
-          readerMode: false,
-          animated: true,
-          modalPresentationStyle: 'fullScreen',
-          modalTransitionStyle: 'partialCurl',
-          modalEnabled: true,
-          enableBarCollapsing: false,
-          // Android Properties
-          showTitle: true,
-          toolbarColor: '#6200EE',
-          secondaryToolbarColor: 'black',
-          enableUrlBarHiding: true,
-          enableDefaultShare: true,
-          forceCloseOnRedirection: false,
-        });
-      } else {
-        Linking.openURL(url);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const onRequestCredentialPress = () => {
-    openLink('https://app.uppass.io/en/kyc_RUZroVbzI6KW');
+    setWebViewUrls({ url: 'https://app.uppass.io/en/kyc_RUZroVbzI6KW', redirectUrl: 'https://app.uppass.io/en/thankyou' });
   }
   const onRequestCovidPass = () => {
-    openLink('https://PHH.covidpass.id');
+    setWebViewUrls({ url: 'https://PHH.covidpass.id', redirectUrl: 'https://PHH.covidpass.id/thankYou' });
   }
   const onRequestZadaCredential = () => {
-    openLink('https://myzada.info');
+    setWebViewUrls({ url: 'https://myzada.info', redirectUrl: 'https://myzada.info/thankYou' });
   }
 
   return (
     <>
-      <View style={themeStyles.mainContainer}>
-        <PullToRefresh />
-        <FlatList
-          refreshControl={
-            <RefreshControl
-              tintColor={'#7e7e7e'}
-              refreshing={credentialStatus === 'loading'}
-              onRefresh={refreshHandler}
+      {isWebViewVisible ? (
+        <WebViewScreen url={webViewUrls.url} redirectUrl={webViewUrls.redirectUrl} />
+      ) : (
+        <>
+          <View style={themeStyles.mainContainer}>
+            <PullToRefresh />
+            <FlatList
+              refreshControl={
+                <RefreshControl
+                  tintColor={'#7e7e7e'}
+                  refreshing={credentialStatus === 'loading'}
+                  onRefresh={refreshHandler}
+                />
+              }
+              showsVerticalScrollIndicator={false}
+              style={styles.flatListStyle}
+              ListHeaderComponent={listHeaderComponent}
+              ListEmptyComponent={emptyListComponent}
+              data={searchedCredentials}
+              contentContainerStyle={styles.flatListContainerStyle}
+              keyExtractor={(item, index) => item.credentialId + ':' + index.toString()}
+              renderItem={renderItem}
             />
-          }
-          showsVerticalScrollIndicator={false}
-          style={styles.flatListStyle}
-          ListHeaderComponent={listHeaderComponent}
-          ListEmptyComponent={emptyListComponent}
-          data={searchedCredentials}
-          contentContainerStyle={styles.flatListContainerStyle}
-          keyExtractor={(item, index) => item.credentialId + ':' + index.toString()}
-          renderItem={renderItem}
-        />
 
-      </View>
-      <View style={styles.floatingBtnContainerStyle}>
-        <FloatingActionButton
-          buttonColor={AppColors.PRIMARY}
-          actionItems={[
-            {
-              title: "myzada.info",
-              onPress: onRequestZadaCredential,
-              imageSrc: zadaLogo,
-              buttonColor: AppColors.WHITE,
-            },
-            {
-              title: "PHH.covidpass.id",
-              onPress: onRequestCovidPass,
-              imageSrc: phhLogo,
-              buttonColor: AppColors.WHITE,
-            },
-            {
-              title: "Request Credentials",
-              onPress: onRequestCredentialPress,
-              iconName: "badge-account-horizontal-outline",
-              buttonColor: AppColors.WHITE,
-            },
-          ]}
-        />
-      </View>
+          </View>
+          <View style={styles.floatingBtnContainerStyle}>
+            <FloatingActionButton
+              buttonColor={AppColors.PRIMARY}
+              actionItems={[
+                {
+                  title: "myzada.info",
+                  onPress: onRequestZadaCredential,
+                  imageSrc: zadaLogo,
+                  buttonColor: AppColors.WHITE,
+                },
+                {
+                  title: "PHH.covidpass.id",
+                  onPress: onRequestCovidPass,
+                  imageSrc: phhLogo,
+                  buttonColor: AppColors.WHITE,
+                },
+                {
+                  title: "Request Credentials",
+                  onPress: onRequestCredentialPress,
+                  iconName: "badge-account-horizontal-outline",
+                  buttonColor: AppColors.WHITE,
+                },
+              ]}
+            />
+          </View>
+        </>
+      )}
     </>
   );
 }
