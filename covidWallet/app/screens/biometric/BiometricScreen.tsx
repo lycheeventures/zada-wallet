@@ -267,13 +267,13 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   keyboardContainer: {
-    width: '80%',
+    width: '100%',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
   key: {
-    width: '30%',
+    width: '25%',
     padding: 20,
     margin: 5,
     alignItems: 'center',
