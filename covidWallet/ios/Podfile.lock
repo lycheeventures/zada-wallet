@@ -56,9 +56,9 @@ PODS:
     - GoogleUtilities/Logger (~> 7.8)
   - FirebaseCoreExtension (10.17.0):
     - FirebaseCore (~> 10.0)
-  - FirebaseCoreInternal (10.27.0):
+  - FirebaseCoreInternal (10.28.0):
     - "GoogleUtilities/NSData+zlib (~> 7.8)"
-  - FirebaseInstallations (10.27.0):
+  - FirebaseInstallations (10.28.0):
     - FirebaseCore (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
@@ -202,11 +202,9 @@ PODS:
     - hermes-engine/Pre-built (= 0.73.8)
   - hermes-engine/Pre-built (0.73.8)
   - libevent (2.1.12)
-  - lottie-ios (4.4.1)
-  - lottie-react-native (6.7.2):
-    - glog
-    - lottie-ios (= 4.4.1)
-    - RCT-Folly (= 2022.05.16.00)
+  - lottie-ios (3.4.4)
+  - lottie-react-native (5.1.6):
+    - lottie-ios (~> 3.4.0)
     - React-Core
   - Mobilisten (8.1.3)
   - nanopb (2.30909.1):
@@ -1097,28 +1095,26 @@ PODS:
     - React-Core
   - react-native-camera/RN (4.2.1):
     - React-Core
-  - react-native-config (1.5.1):
-    - react-native-config/App (= 1.5.1)
-  - react-native-config/App (1.5.1):
+  - react-native-config (1.5.2):
+    - react-native-config/App (= 1.5.2)
+  - react-native-config/App (1.5.2):
     - React-Core
-  - react-native-config/Extension (1.5.1)
+  - react-native-config/Extension (1.5.2)
   - react-native-fingerprint-scanner (6.0.0):
     - React
   - react-native-html-to-pdf (0.12.0):
     - React-Core
   - react-native-netinfo (11.3.2):
     - React-Core
-  - react-native-notifications (5.1.0):
+  - react-native-notifications (4.3.5):
     - React-Core
-  - react-native-pager-view (6.3.1):
-    - glog
-    - RCT-Folly (= 2022.05.16.00)
+  - react-native-pager-view (5.4.25):
     - React-Core
   - react-native-quick-base64 (2.1.2):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - react-native-safe-area-context (4.10.4):
+  - react-native-safe-area-context (4.10.5):
     - React-Core
   - react-native-simple-biometrics (1.5.2):
     - React-Core
@@ -1128,7 +1124,7 @@ PODS:
     - React-Core
   - react-native-view-shot (3.8.0):
     - React-Core
-  - react-native-webview (13.10.3):
+  - react-native-webview (13.10.4):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1305,10 +1301,10 @@ PODS:
     - React-Core
   - RNCMaskedView (0.3.1):
     - React-Core
-  - RNDeviceInfo (11.1.0):
+  - RNDeviceInfo (10.14.0):
     - React-Core
-  - RNExitApp (2.0.0):
-    - React-Core
+  - RNExitApp (1.1.0):
+    - React
   - RNFBAnalytics (18.6.1):
     - Firebase/AnalyticsWithoutAdIdSupport (= 10.17.0)
     - React-Core
@@ -1321,7 +1317,7 @@ PODS:
     - FirebaseCoreExtension (= 10.17.0)
     - React-Core
     - RNFBApp
-  - RNGestureHandler (2.16.2):
+  - RNGestureHandler (2.17.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1329,12 +1325,12 @@ PODS:
     - React-Core
   - RNPermissions (4.1.5):
     - React-Core
-  - RNReanimated (3.12.0):
+  - RNReanimated (3.12.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
     - ReactCommon/turbomodule/core
-  - RNScreens (3.31.1):
+  - RNScreens (3.32.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1676,8 +1672,8 @@ SPEC CHECKSUMS:
   FirebaseAnalytics: b9284f9fff10157a843e0422e908711f7bf3b9f2
   FirebaseCore: 534544dd98cabcf4bf8598d88ec683b02319a528
   FirebaseCoreExtension: 47720bb330d7041047c0935a34a3a4b92f818074
-  FirebaseCoreInternal: 4b297a2d56063dbea2c1d0d04222d44a8d058862
-  FirebaseInstallations: 766dabca09fd94aef922538aaf144cc4a6fb6869
+  FirebaseCoreInternal: 58d07f1362fddeb0feb6a857d1d1d1c5e558e698
+  FirebaseInstallations: 60c1d3bc1beef809fd1ad1189a8057a040c59f2e
   FirebaseMessaging: 1367b28c0c83a63072af4a711328fcc2e6899902
   Flipper: c7a0093234c4bdd456e363f2f19b2e4b27652d44
   Flipper-Boost-iOSX: fd1e2b8cbef7e662a122412d7ac5f5bea715403c
@@ -1694,8 +1690,8 @@ SPEC CHECKSUMS:
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   hermes-engine: b12d9bb1b7cee546f5e48212e7ea7e3c1665a367
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  lottie-ios: e047b1d2e6239b787cc5e9755b988869cf190494
-  lottie-react-native: 2d9efc8a5ffabe688b55a1a1ac1fb94b9d971995
+  lottie-ios: 8f97d3271e155c2d688875c29cd3c74908aef5f8
+  lottie-react-native: 8f9d4be452e23f6e5ca0fdc11669dc99ab52be81
   Mobilisten: 43315e5b268bb7ee33db31deac9ff686e3cb4b54
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
@@ -1723,19 +1719,19 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 672a9342eb75a4d0663306e94d4dfc88aee73b93
   react-native-biometrics: 352e5a794bfffc46a0c86725ea7dc62deb085bdc
   react-native-camera: 3eae183c1d111103963f3dd913b65d01aef8110f
-  react-native-config: 86038147314e2e6d10ea9972022aa171e6b1d4d8
+  react-native-config: d7d8a0c65f7fa523197879f6b777997abbfc987e
   react-native-fingerprint-scanner: ac6656f18c8e45a7459302b84da41a44ad96dbbe
   react-native-html-to-pdf: 4c5c6e26819fe202971061594058877aa9b25265
   react-native-netinfo: 076df4f9b07f6670acf4ce9a75aac8d34c2e2ccc
-  react-native-notifications: 4601a5a8db4ced6ae7cfc43b44d35fe437ac50c4
-  react-native-pager-view: f1e72cb827406f1b49f007ab07400197d421b6e7
+  react-native-notifications: 504143d59f9628c3b0c22fd0ccf34b65b9182d01
+  react-native-pager-view: da490aa1f902c9a5aeecf0909cc975ad0e92e53e
   react-native-quick-base64: e1ea036b3dec44c6da2439bd62881a09de614b23
-  react-native-safe-area-context: 399a5859f6acbdf67f671c69b53113f535f3b5b0
+  react-native-safe-area-context: a240ad4b683349e48b1d51fed1611138d1bdad97
   react-native-simple-biometrics: 0f8ace5091780426188cef7f7593259effcd448e
   react-native-spinkit: da294fd828216ad211fe36a5c14c1e09f09e62db
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-view-shot: 6b7ed61d77d88580fed10954d45fad0eb2d47688
-  react-native-webview: d2116987f3a75ba677a9f49565bae6834d0e12c4
+  react-native-webview: dbc8171113daa2abb2499da5f327a8d0cdfcd61c
   React-nativeconfig: 2e44d0d2dd222b12a5183f4bcaa4a91881497acb
   React-NativeModulesApple: 8aa032fe6c92c1a3c63e4809d42816284a56a9b0
   React-perflogger: f9367428cf475f4606b5965c1d5a71781bb95299
@@ -1759,16 +1755,16 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
   RNCClipboard: 0a720adef5ec193aa0e3de24c3977222c7e52a37
   RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
-  RNDeviceInfo: b899ce37a403a4dea52b7cb85e16e49c04a5b88e
-  RNExitApp: 00036cabe7bacbb413d276d5520bf74ba39afa6a
+  RNDeviceInfo: 59344c19152c4b2b32283005f9737c5c64b42fba
+  RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFBAnalytics: 80cb4aaa8502b2e1f53ff61936b11975826b4527
   RNFBApp: 5a16a735bad57ca29ee44757bde7e654c5bc8f60
   RNFBMessaging: d1727030c98a9dcc7cd44e2fd29398acb6531cba
-  RNGestureHandler: 96439cf6543defdde87459e48cd1a3f0e45a008e
+  RNGestureHandler: 67d3f1f69d4d0c98d6e83f4229e3bbf997d1dc72
   RNKeychain: bfe3d12bf4620fe488771c414530bf16e88f3678
   RNPermissions: 5a2dafe37c8e0a3fa1d6e0783a1490b1b7fd92d6
-  RNReanimated: 6aeb85e1e17364c8069f9ee5661615b4a281bd5c
-  RNScreens: 134a7511b12b8eb440b87aac21e36a71295d6024
+  RNReanimated: 5307ba390921b76ddf9c0aa69876916ad427a61f
+  RNScreens: e842cdccb23c0a084bd6307f6fa83fd1c1738029
   RNSecureRandom: 07efbdf2cd99efe13497433668e54acd7df49fef
   RNSha256: e1bc64e9e50b293d5282bb4caa1b2043931f1c9d
   RNShare: a5dc3b9c53ddc73e155b8cd9a94c70c91913c43c
@@ -1777,6 +1773,6 @@ SPEC CHECKSUMS:
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: e5b887426cee15d2a326bdd34afc0282fc0486ad
 
-PODFILE CHECKSUM: 08a3a77c3558bda1a4af6e42606a1e1935a99cdf
+PODFILE CHECKSUM: 9b29125620940b15df80dc0a8760985b659cc3ca
 
 COCOAPODS: 1.15.2
