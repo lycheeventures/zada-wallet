@@ -32,7 +32,6 @@
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
-- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
   return [self getBundleURL];
 }
