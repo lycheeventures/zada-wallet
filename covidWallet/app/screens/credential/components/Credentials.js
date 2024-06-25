@@ -201,13 +201,13 @@ function Credentials(props) {
                   buttonColor: AppColors.WHITE,
                 },
                 {
-                  title: "PHH.covidpass.id",
+                  title: "phh.covidpass.id",
                   onPress: onRequestCovidPass,
                   imageSrc: phhLogo,
                   buttonColor: AppColors.WHITE,
                 },
                 {
-                  title: "Request Credentials",
+                  title: "Add Credential",
                   onPress: onRequestCredentialPress,
                   iconName: "badge-account-horizontal-outline",
                   buttonColor: AppColors.WHITE,
