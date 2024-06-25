@@ -275,11 +275,13 @@ const PincodeScreen = ({
   const VerifyPincodeModal = () => {
     return (
       <Animated.View style={[styles.container, { left: animateLeftValue, opacity: animateOpacity }]}>
-        <TouchableOpacity
-          style={styles.backIconStyle}
-          onPress={handleBackFromConfirmPinScreen}>
-          <MaterialCommunityIcons name="arrow-left" size={30} color="#FFF" />
-        </TouchableOpacity>
+        {!isVerifyPin && (
+          <TouchableOpacity
+            style={styles.backIconStyle}
+            onPress={handleBackFromConfirmPinScreen}>
+            <MaterialCommunityIcons name="arrow-left" size={30} color="#FFF" />
+          </TouchableOpacity>
+        )}
         <Image
           source={require('../../assets/images/lock.png')}
         />
