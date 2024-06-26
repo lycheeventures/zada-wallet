@@ -360,13 +360,14 @@ function ActionsScreen({ navigation }) {
         if (!isLoading) {
           setLoaderText(t('messages.deleting'));
 
+          // Deleting Verification from action list
+          dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
+
           // Deleting Verification
           await delete_verification(selectedItemObj.verificationId);
 
           _showAlert('Zada Wallet', t('errors.verification_request_rejected'));
 
-          // Deleting Verification from action list
-          dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
         }
       } else {
         setLoaderText(t('message.submitting'));
@@ -463,6 +464,7 @@ function ActionsScreen({ navigation }) {
     // Verification Action
     if (selectedItemObj.type === ConstantsList.VER_REQ) {
       // Biometric Verification
+      setDialogData(null);
       setShowConfirmModal(true);
     }
     setIsLoading(false);
@@ -598,13 +600,14 @@ function ActionsScreen({ navigation }) {
         if (!isLoading) {
           setLoaderText(t('messages.deleting'));
 
+          // Deleting Verification from action list
+          dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
+
           // Deleting Verification
           await delete_verification(selectedItemObj.verificationId);
 
           _showAlert('Zada Wallet', t('errors.verification_request_rejected'));
 
-          // Deleting Verification from action list
-          dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
         }
       } else {
         setLoaderText(t('message.submitting'));
@@ -637,7 +640,7 @@ function ActionsScreen({ navigation }) {
         <PincodeScreen
           isVerifyPin
           isVisible={showConfirmModal}
-          onDismiss={() => setShowPinCodeModal(false)}
+          onDismiss={() => setShowConfirmModal(false)}
           onConfirmPincodeChange={(text) => {
             setVerifyPincode(text);
             if (text.length === 0 || text === undefined) {

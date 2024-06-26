@@ -8,6 +8,7 @@ import {
   Alert,
   Modal,
   AppState,
+  Platform,
 } from 'react-native';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
 import { AppColors } from '../../theme/Colors';
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
   },
   backIconStyle: {
     position: 'absolute',
-    top: 20,
+    top: Platform.OS === "ios" ? 50 : 20,
     left: 30,
     padding: 10,
   },

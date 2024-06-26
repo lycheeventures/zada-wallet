@@ -9,6 +9,7 @@ import {
   Animated,
   Easing,
   Alert,
+  SafeAreaView,
 } from 'react-native';
 import { AppColors, RED_COLOR } from '../../theme/Colors';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -240,7 +241,7 @@ const PincodeScreen = ({
             onPress={() => (isVerify ? handleConfirmModalKeyPress(key) : handleKeyPress(key))}>
             <Text style={styles.keyText}>
               {key === 'biometric' ? (
-                <MaterialCommunityIcons name="fingerprint" size={isVerifyPin ? 35 : 0} />
+                !isVerifyPin ? <></> : <MaterialCommunityIcons name="fingerprint" size={35} />
               ) : key === 'delete' ? (
                 '⌫'
               ) : (
@@ -255,41 +256,45 @@ const PincodeScreen = ({
 
   const PincodeModal = () => {
     return (
-      <Animated.View style={[styles.container, { left: animateLeftValue, opacity: animateOpacity }]}>
-        <Image
-          source={require('../../assets/images/lock.png')}
-        />
-        <Text style={styles.title}>{t('PincodeScreen.title')}</Text>
-        <Text style={styles.subTitle}>{t('PincodeScreen.sub_title')}</Text>
-        <PinInput pin={pincode ?? ""} />
-        {pincodeError && (
-          <View style={{ height: 20, justifyContent: 'center' }}>
-            <Text style={styles.errorStyle}>{pincodeError}</Text>
-          </View>
-        )}
-        <NumericKeyboard />
-      </Animated.View>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Animated.View style={[styles.container, { left: animateLeftValue, opacity: animateOpacity }]}>
+          <Image
+            source={require('../../assets/images/lock.png')}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>{t('PincodeScreen.title')}</Text>
+          <Text style={styles.subTitle}>{t('PincodeScreen.sub_title')}</Text>
+          <PinInput pin={pincode ?? ""} />
+          {pincodeError && (
+            <View style={{ height: 20, justifyContent: 'center' }}>
+              <Text style={styles.errorStyle}>{pincodeError}</Text>
+            </View>
+          )}
+          <NumericKeyboard />
+        </Animated.View>
+      </SafeAreaView>
     )
   }
 
   const VerifyPincodeModal = () => {
     return (
-      <Animated.View style={[styles.container, { left: animateLeftValue, opacity: animateOpacity }]}>
-        {!isVerifyPin && (
+      <SafeAreaView style={{ flex: 1 }}>
+        <Animated.View style={[styles.container, { left: animateLeftValue, opacity: animateOpacity }]}>
           <TouchableOpacity
             style={styles.backIconStyle}
-            onPress={handleBackFromConfirmPinScreen}>
+            onPress={isVerifyPin ? onDismiss : handleBackFromConfirmPinScreen}>
             <MaterialCommunityIcons name="arrow-left" size={30} color="#FFF" />
           </TouchableOpacity>
-        )}
-        <Image
-          source={require('../../assets/images/lock.png')}
-        />
-        <Text style={styles.title}>{isVerifyPin ? "VERIFY" : t('PincodeScreen.confirm_pin_title')}</Text>
-        <Text style={styles.subTitle}>{isVerifyPin ? "Please enter your 6 digit pincode to verify request" : t('PincodeScreen.confirm_pin_sub_title')}</Text>
-        <PinInput pin={confirmPincode} />
-        <NumericKeyboard />
-      </Animated.View>
+          <Image
+            source={require('../../assets/images/lock.png')}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>{isVerifyPin ? "VERIFY" : t('PincodeScreen.confirm_pin_title')}</Text>
+          <Text style={styles.subTitle}>{isVerifyPin ? "Please enter your 6 digit pincode to verify request" : t('PincodeScreen.confirm_pin_sub_title')}</Text>
+          <PinInput pin={confirmPincode} />
+          <NumericKeyboard />
+        </Animated.View>
+      </SafeAreaView>
     )
   }
 
@@ -328,15 +333,14 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 100,
-    height: 50,
-    marginTop: 100,
+    marginTop: 50,
   },
   title: {
-    flex: 1,
     fontSize: 20,
     fontWeight: 'bold',
     textAlignVertical: 'center',
     color: '#FFF',
+    marginTop: 20,
   },
   subTitle: {
     flex: 1,
