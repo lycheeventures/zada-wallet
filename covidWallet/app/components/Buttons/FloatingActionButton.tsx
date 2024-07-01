@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
   },
   actionButtonItemImage: {
     fontSize: 20,
-    height: 40,
-    width: 40,
+    height: 35,
+    width: 35,
     color: 'black',
   },
   actionButtonItemStyle: {
