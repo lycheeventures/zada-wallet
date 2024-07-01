@@ -14,7 +14,6 @@ import phhLogo from "../../../assets/icons/phh-logo-color.png";
 import zadaLogo from "../../../assets/icons/zada-logo-color.png";
 import { WebView } from 'react-native-webview';
 import Modal from 'react-native-modal';
-import Config from 'react-native-config';
 
 
 import { useAppDispatch, useAppSelector } from '../../../store';
@@ -25,14 +24,16 @@ import {
 import { fetchCredentials } from '../../../store/credentials/thunk';
 import { updateCredential } from '../../../store/credentials';
 import FloatingActionButton from '../../../components/Buttons/FloatingActionButton';
-import useDevelopment from '../../../hooks/useDevelopment';
 import { selectUser } from '../../../store/auth/selectors';
+import ConfigApp from '../../../helpers/ConfigApp';
+import { selectDevelopmentMode } from '../../../store/app/selectors';
 
 const { height } = Dimensions.get('window');
+
 function Credentials(props) {
   // Constants
   const dispatch = useAppDispatch();
-  const { developmentMode } = useDevelopment();
+  const developmentMode = useAppSelector(selectDevelopmentMode);
   const user = useAppSelector(selectUser);
 
   // States
@@ -159,14 +160,13 @@ function Credentials(props) {
   };
 
   const onRequestCredentialPress = async () => {
-    const { UPPASS_API_KEY, UPPASS_FLOW_ID } = Config;
+    const { UPPASS_API_KEY, UPPASS_FLOW_ID } = ConfigApp;
     try {
       const payload = {
         answers: {
           phone_number: user.phone
         }
       };
-      console.log({ user, UPPASS_API_KEY, UPPASS_FLOW_ID });
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${UPPASS_API_KEY}`
@@ -192,42 +192,6 @@ function Credentials(props) {
   const onRequestZadaCredential = () => {
     setWebViewUrls({ url: 'https://myzada.info', redirectUrl: ['https://myzada.info/thankYou'] });
   }
-
-  const actionItems = developmentMode ?
-    [
-      {
-        title: "myzada.info",
-        onPress: onRequestZadaCredential,
-        imageSrc: zadaLogo,
-        buttonColor: AppColors.WHITE,
-      },
-      {
-        title: "phh.covidpass.id",
-        onPress: onRequestCovidPass,
-        imageSrc: phhLogo,
-        buttonColor: AppColors.WHITE,
-      },
-      {
-        title: "Add Credential",
-        onPress: onRequestCredentialPress,
-        iconName: "badge-account-horizontal-outline",
-        buttonColor: AppColors.WHITE,
-      },
-    ]
-    : [
-      {
-        title: "myzada.info",
-        onPress: onRequestZadaCredential,
-        imageSrc: zadaLogo,
-        buttonColor: AppColors.WHITE,
-      },
-      {
-        title: "phh.covidpass.id",
-        onPress: onRequestCovidPass,
-        imageSrc: phhLogo,
-        buttonColor: AppColors.WHITE,
-      }
-    ]
 
   return (
     <>
@@ -259,7 +223,41 @@ function Credentials(props) {
           <View style={styles.floatingBtnContainerStyle}>
             <FloatingActionButton
               buttonColor={AppColors.PRIMARY}
-              actionItems={actionItems}
+              actionItems={developmentMode ?
+                [
+                  {
+                    title: "myzada.info",
+                    onPress: onRequestZadaCredential,
+                    imageSrc: zadaLogo,
+                    buttonColor: AppColors.WHITE,
+                  },
+                  {
+                    title: "phh.covidpass.id",
+                    onPress: onRequestCovidPass,
+                    imageSrc: phhLogo,
+                    buttonColor: AppColors.WHITE,
+                  },
+                  {
+                    title: "Add Credential",
+                    onPress: onRequestCredentialPress,
+                    iconName: "badge-account-horizontal-outline",
+                    buttonColor: AppColors.WHITE,
+                  },
+                ]
+                : [
+                  {
+                    title: "myzada.info",
+                    onPress: onRequestZadaCredential,
+                    imageSrc: zadaLogo,
+                    buttonColor: AppColors.WHITE,
+                  },
+                  {
+                    title: "phh.covidpass.id",
+                    onPress: onRequestCovidPass,
+                    imageSrc: phhLogo,
+                    buttonColor: AppColors.WHITE,
+                  }
+                ]}
             />
           </View>
         </>
