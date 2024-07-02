@@ -355,7 +355,7 @@ const QRScreen = ({ route, navigation }) => {
 
       setProgress(false);
       setCredentialData(defaultCredState);
-      if (redirectCallback != undefined) {
+      if (redirectCallback != undefined && redirectCallback != '') {
         Linking.openURL(redirectCallback);
       } else {
         showOKDialog('ZADA', 'Submitted Successfully!', navigateToMainScreen);
