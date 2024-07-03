@@ -370,7 +370,7 @@ function ActionsScreen({ navigation }) {
 
         }
       } else {
-        setLoaderText(t('message.submitting'));
+        setLoaderText(t('messages.submitting'));
 
         // Accept verification
         await accept_verification_request(selectedItemObj, dialogData);
@@ -502,7 +502,7 @@ function ActionsScreen({ navigation }) {
   const onDeletePressed = (item) => {
     showAskDialog(
       'Are you sure?',
-      t('message.delete_request'),
+      t('messages.delete_request'),
       () => rejectModal(item),
       () => { }
     );
@@ -610,7 +610,7 @@ function ActionsScreen({ navigation }) {
 
         }
       } else {
-        setLoaderText(t('message.submitting'));
+        setLoaderText(t('messages.submitting'));
 
         // Accept verification
         await accept_verification_request(selectedItemObj, dialogData);

@@ -24,18 +24,24 @@ import {
 import { fetchCredentials } from '../../../store/credentials/thunk';
 import { updateCredential } from '../../../store/credentials';
 import FloatingActionButton from '../../../components/Buttons/FloatingActionButton';
+import { selectUser } from '../../../store/auth/selectors';
+import ConfigApp from '../../../helpers/ConfigApp';
+import { selectDevelopmentMode } from '../../../store/app/selectors';
 
 const { height } = Dimensions.get('window');
+
 function Credentials(props) {
   // Constants
   const dispatch = useAppDispatch();
+  const developmentMode = useAppSelector(selectDevelopmentMode);
+  const user = useAppSelector(selectUser);
 
   // States
   const [search, setSearch] = useState('');
   const [isWebViewVisible, setIsWebViewVisible] = useState(false);
   const [webViewUrls, setWebViewUrls] = useState({
     url: '',
-    redirectUrl: '',
+    redirectUrl: [],
   });
 
   useEffect(() => {
@@ -128,7 +134,7 @@ function Credentials(props) {
         <View style={{ height: 40, flexDirection: "row", alignItems: "center", justifyContent: "flex-end" }}>
           <TouchableOpacity
             onPress={() => {
-              setWebViewUrls({ url: "", redirectUrl: "" })
+              setWebViewUrls({ url: "", redirectUrl: [] })
             }}
             style={{ paddingHorizontal: 10 }}>
             <FeatherIcon name="x" size={24} color={WHITE_COLOR} />
@@ -138,8 +144,8 @@ function Credentials(props) {
           source={{ uri: url }}
           style={{ flex: 1 }}
           onNavigationStateChange={(event) => {
-            if (event.url === redirectUrl) {
-              setWebViewUrls({ url: "", redirectUrl: "" });
+            if (redirectUrl.includes(event.url)) {
+              setWebViewUrls({ url: "", redirectUrl: [] });
             }
           }}
         />
@@ -153,14 +159,38 @@ function Credentials(props) {
     dispatch(fetchCredentials());
   };
 
-  const onRequestCredentialPress = () => {
-    setWebViewUrls({ url: 'https://app.uppass.io/en/kyc_RUZroVbzI6KW', redirectUrl: 'https://app.uppass.io/en/thankyou' });
+  const onRequestCredentialPress = async () => {
+    const { UPPASS_API_KEY, UPPASS_FLOW_ID } = ConfigApp;
+    try {
+      const payload = {
+        answers: {
+          phone_number: user.phone
+        }
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${UPPASS_API_KEY}`
+      };
+      const url = `https://app.uppass.io/en/api/forms/${UPPASS_FLOW_ID}/create/`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(payload)
+      })
+      const data = await response.json();
+      if (data.form_url) {
+        setWebViewUrls({ url: data.form_url, redirectUrl: ['https://app.uppass.io/en/thankyou', `https://app.uppass.io/en/${UPPASS_FLOW_ID}/thankyou`] });
+      }
+    } catch (error) {
+      console.log({ error });
+    }
   }
   const onRequestCovidPass = () => {
-    setWebViewUrls({ url: 'https://PHH.covidpass.id', redirectUrl: 'https://PHH.covidpass.id/thankYou' });
+    setWebViewUrls({ url: 'https://PHH.covidpass.id', redirectUrl: ['https://PHH.covidpass.id/thankYou'] });
   }
   const onRequestZadaCredential = () => {
-    setWebViewUrls({ url: 'https://myzada.info', redirectUrl: 'https://myzada.info/thankYou' });
+    setWebViewUrls({ url: 'https://myzada.info', redirectUrl: ['https://myzada.info/thankYou'] });
   }
 
   return (
@@ -193,26 +223,41 @@ function Credentials(props) {
           <View style={styles.floatingBtnContainerStyle}>
             <FloatingActionButton
               buttonColor={AppColors.PRIMARY}
-              actionItems={[
-                {
-                  title: "myzada.info",
-                  onPress: onRequestZadaCredential,
-                  imageSrc: zadaLogo,
-                  buttonColor: AppColors.WHITE,
-                },
-                {
-                  title: "phh.covidpass.id",
-                  onPress: onRequestCovidPass,
-                  imageSrc: phhLogo,
-                  buttonColor: AppColors.WHITE,
-                },
-                {
-                  title: "Add Credential",
-                  onPress: onRequestCredentialPress,
-                  iconName: "badge-account-horizontal-outline",
-                  buttonColor: AppColors.WHITE,
-                },
-              ]}
+              actionItems={developmentMode ?
+                [
+                  {
+                    title: "myzada.info",
+                    onPress: onRequestZadaCredential,
+                    imageSrc: zadaLogo,
+                    buttonColor: AppColors.WHITE,
+                  },
+                  {
+                    title: "phh.covidpass.id",
+                    onPress: onRequestCovidPass,
+                    imageSrc: phhLogo,
+                    buttonColor: AppColors.WHITE,
+                  },
+                  {
+                    title: "Add Credential",
+                    onPress: onRequestCredentialPress,
+                    iconName: "badge-account-horizontal-outline",
+                    buttonColor: AppColors.WHITE,
+                  },
+                ]
+                : [
+                  {
+                    title: "myzada.info",
+                    onPress: onRequestZadaCredential,
+                    imageSrc: zadaLogo,
+                    buttonColor: AppColors.WHITE,
+                  },
+                  {
+                    title: "phh.covidpass.id",
+                    onPress: onRequestCovidPass,
+                    imageSrc: phhLogo,
+                    buttonColor: AppColors.WHITE,
+                  }
+                ]}
             />
           </View>
         </>
