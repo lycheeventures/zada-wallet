@@ -53,5 +53,7 @@ module.exports = Object.freeze({
   ZOHO_SALES_IQ_IOS_ACCESS_KEY:
     'Hvs0guXcRZB6auLrKXQV1fw7t0VUtEJi4oFatc4c46Le0Whytt8ZyF5vy7MQrGb8OXlW%2BSBj2aW1OSyeTdcf9GOQYqAhhEiQRVrIekfvSId27%2F0nMhrSs2PmPPk5EGfL0DtwFP3qFEP8AcAF2QaSTk9B54Vp%2Fqio',
   UPPASS_API_KEY: "sk_d3NfemFkYV9HWE1LQzBVSjU2Om1GJDp0VDhNUVRjKkxJMkt+eHlFU3FRZltldyVhYj43",
-  UPPASS_FLOW_ID: "kyc_RUZroVbzI6KW"
+  UPPASS_FLOW_ID: "kyc_RUZroVbzI6KW",
+  PROD_BASE_URL: "https://agency.zadanetwork.com",
+  TEST_BASE_URL: "http://test-agency.zadanetwork.com",
 });

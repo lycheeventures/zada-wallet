@@ -4,4 +4,5 @@ export interface IAppState {
   developmentMode: boolean;
   isAppSetupComplete: boolean;
   webViewUrl: string;
+  baseUrl: string;
 }

@@ -49,7 +49,7 @@ const getUserCredentials = (state: RootState) => {
   return creds;
 };
 
-const setup = (store: any) => {
+const setup = (store: any, baseurl: string) => {
   axios.interceptors.request.use(
     (config) => {
       if (!url_arr.includes(config.url ? config.url : '')) {
@@ -88,7 +88,7 @@ const setup = (store: any) => {
       config.timeout = 60000 * 2;
 
       // Setting baseurl
-      config.baseURL = Config.API_URL;
+      config.baseURL = baseurl;
 
       return config;
     },
@@ -130,7 +130,7 @@ const setup = (store: any) => {
           let { token } = state.auth;
           // Fetch token
           return new Promise((resolve, reject) => {
-            fetch(Config.API_URL + '/api/v1/authenticate', {
+            fetch(baseurl + '/api/v1/authenticate', {
               method: 'POST',
               headers: {
                 Accept: 'application/json',
