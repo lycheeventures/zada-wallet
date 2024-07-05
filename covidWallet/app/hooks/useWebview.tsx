@@ -16,7 +16,10 @@ const useWebview = () => {
   const { top } = useSafeAreaInsets();
 
   // Selectors
-  const url = useAppSelector(selectWebViewUrl);
+  const webViewData = useAppSelector(selectWebViewUrl);
+
+  // is webViewData a string or an object (if it is obj then it is comming from uppass)
+  const url = typeof webViewData === 'string' ? webViewData : webViewData.url;
 
   // States
   const [visible, setVisible] = useState(false);
@@ -72,6 +75,13 @@ const useWebview = () => {
             left: 0,
             bottom: 0,
             right: 0,
+          }}
+          onNavigationStateChange={(event) => {
+            if (typeof webViewData === "string") return;
+            const { redirectUrl } = webViewData;
+            if (redirectUrl === event.url) {
+              dispatch(updateWebViewUrl(''));
+            }
           }}
         />
       </View>
