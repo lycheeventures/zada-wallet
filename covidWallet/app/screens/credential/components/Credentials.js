@@ -132,7 +132,7 @@ function Credentials(props) {
       })
       const data = await response.json();
       if (data.form_url) {
-        dispatch(updateWebViewUrl({ url: data.form_url, redirectUrl: `https://app.uppass.io/en/${UPPASS_FLOW_ID}/thankyou` }));
+        dispatch(updateWebViewUrl({ url: data.form_url, redirectUrl: `https://app.uppass.io/en/thankyou` }));
       }
     } catch (error) {
       console.log({ error });

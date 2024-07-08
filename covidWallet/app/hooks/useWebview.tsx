@@ -80,7 +80,7 @@ const useWebview = () => {
             if (typeof webViewData === "string") return;
             const { redirectUrl } = webViewData;
             if (redirectUrl === event.url) {
-              dispatch(updateWebViewUrl(''));
+              setVisible(false);
             }
           }}
         />
