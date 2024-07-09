@@ -22,6 +22,7 @@ import BiometricModal from '../screens/biometric/BiometricScreen';
 import DeviceInfo from 'react-native-device-info';
 import ConfigApp from '../helpers/ConfigApp';
 import { clearAllAndLogout } from '../store/utils';
+import useCountry from '../hooks/useCountry';
 
 const Stack = createStackNavigator();
 const RootNavigator = () => {
@@ -109,6 +110,7 @@ const RootNavigator = () => {
 
   return (
     <NavigationContainer linking={linking} ref={navigationRef}>
+      {useCountry()}
       {useWebview()}
       {!isAppReady ? (
         <Stack.Navigator>
