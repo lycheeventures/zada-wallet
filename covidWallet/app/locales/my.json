@@ -157,7 +157,10 @@
 
     "verification_request": "စစ်ဆေးအတည်ပြုရန်တောင်းဆိုချက်သည် ပယ်ချခံခဲ့ရပါသည်။",
     "accept_connection": "Connection ရယူပြီးဖြစ်ပါသည်။",
-    "accept_credential_offer": "အထောက်အထားကမ်းလှမ်းချက်ကို လက်ခံပြီးဖြစ်ပါသည်။"
+    "accept_credential_offer": "အထောက်အထားကမ်းလှမ်းချက်ကို လက်ခံပြီးဖြစ်ပါသည်။",
+
+    "biometric_heading": "Biometric မရရှိနိုင်ပါ။",
+    "biometric_not_supported": "ကျေးဇူးပြု၍ သင့်စက်တွင် Biometric/FaceID ပါရှိပြီး မှန်ကန်စွာ စီစဉ်သတ်မှတ်ထားရန် လုပ်ဆောင်ပေးပါ၊ ထို့နောက် ထပ်မံစမ်းကြည့်ပါ။"
   },
   "messages": {
     "delete_account": "သင့်အကောင့်ကို ဖျက်လိုပါသလား။",

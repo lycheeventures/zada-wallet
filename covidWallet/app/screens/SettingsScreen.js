@@ -17,7 +17,7 @@ import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors'
 import { selectAppStatus, selectNetworkStatus } from '../store/app/selectors';
 import useDevelopment from '../hooks/useDevelopment';
 import OverlayLoader from '../components/OverlayLoader';
-import BiometricModal from './biometric/BiometricScreen';
+import BiometricModal from '../components/Modal/BiometricModal';
 
 export default function SettingsScreen(props) {
   // Constants
@@ -272,7 +272,7 @@ export default function SettingsScreen(props) {
               );
             else Linking.openURL('https://apps.apple.com/us/app/zada-wallet/id1578666669');
           }}
-          style={styles._appVersion}>{`Version ${version == undefined || version === null ? getVersion().toString() : version.version
+          style={styles._appVersion}>{`Version ${version == undefined || version === null ? getVersion().toString() : (version.version || version)
             }`}</Text>
       </View>
     </View>

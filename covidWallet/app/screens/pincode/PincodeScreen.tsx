@@ -139,7 +139,9 @@ const PincodeScreen = ({
   const isBiometricAvailable = async () => {
     const { available, biometryType } = await rnBiometrics.isSensorAvailable();
     if (
-      (biometryType === BiometryTypes.FaceID || biometryType === BiometryTypes.Biometrics) &&
+      (biometryType === BiometryTypes.FaceID ||
+        biometryType === BiometryTypes.Biometrics ||
+        biometryType === BiometryTypes.TouchID) &&
       available
     ) {
       let result = await handleBiometricAuth();
