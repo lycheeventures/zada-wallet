@@ -164,10 +164,13 @@ const QRScreen = ({ route, navigation }) => {
                 let result = await VerificationAPI.send_request_to_agency(parsedData);
                 if (result.data.success) {
                   let res = await makeVerificationObject(result.data.verification);
-                  setCredentialData({
-                    type: 'connectionless-verification',
-                    credentials: res.credential,
-                  });
+                  setTimeout(() => {
+                    setCredentialData({
+                      type: 'connectionless-verification',
+                      credentials: res.credential,
+                    });
+                  }, 500)
+
                 }
 
                 setScan(false);
@@ -185,10 +188,12 @@ const QRScreen = ({ route, navigation }) => {
                 if (credObj) {
                   // Setting values
                   setValues(credObj.sortedValues);
-                  setCredentialData({
-                    type: 'cred_ver',
-                    credentials: credObj.credential,
-                  });
+                  setTimeout(() => {
+                    setCredentialData({
+                      type: 'cred_ver',
+                      credentials: credObj.credential,
+                    });
+                  }, 500)
                 }
               } catch (err) {
                 throw 'Not a valid ZADA QR';
@@ -202,10 +207,12 @@ const QRScreen = ({ route, navigation }) => {
                 if (credObj) {
                   // Setting values
                   setValues(credObj.sortedValues);
-                  setCredentialData({
-                    type: 'cred_ver',
-                    credentials: credObj.credential,
-                  });
+                  setTimeout(() => {
+                    setCredentialData({
+                      type: 'cred_ver',
+                      credentials: credObj.credential,
+                    });
+                  }, 500)
                 }
               } catch (err) {
                 throw 'Not a valid ZADA QR';
