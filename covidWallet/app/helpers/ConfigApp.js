@@ -55,5 +55,5 @@ module.exports = Object.freeze({
   UPPASS_API_KEY: "sk_d3NfemFkYV9HWE1LQzBVSjU2Om1GJDp0VDhNUVRjKkxJMkt+eHlFU3FRZltldyVhYj43",
   UPPASS_FLOW_ID: "kyc_RUZroVbzI6KW",
   PROD_BASE_URL: "https://agency.zadanetwork.com",
-  TEST_BASE_URL: "http://test-agency.zadanetwork.com",
+  TEST_BASE_URL: "https://test-agency.zadanetwork.com",
 });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { FAB } from '@rneui/themed';
 import { AppColors } from '../../theme/Colors';
@@ -15,10 +15,6 @@ import { updateUser } from '../../store/auth';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import SelectModal from '../../components/Modal/SelectModal';
 import { CountryCode } from 'react-native-country-picker-modal';
-import useEnvironmentSwitch from '../../hooks/useEnvironmentSwitch';
-import Modal from 'react-native-modal';
-import { Provider } from 'react-redux';
-import RadioButton from '../../components/Dialogs/components/RadioButton';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -29,7 +25,6 @@ const { width } = Dimensions.get('window');
 const PreferenceScreen = (props: INProps) => {
   // Constants
   const dispatch = useAppDispatch<AppDispatch>();
-  const { longPressCount, pressCount, buttonPressed, openEnvOptionsModal, closeEnvOptionsModal, selectedEnvOption, setSelectedEnvOption } = useEnvironmentSwitch();
 
   // Selectors
   const networkStatus = useAppSelector(selectNetworkStatus);
@@ -68,31 +63,11 @@ const PreferenceScreen = (props: INProps) => {
 
   return (
     <FadeView style={{ flex: 1 }}>
-      <Modal
-        hideModalContentWhileAnimating={true}
-        useNativeDriver={true}
-        onBackdropPress={closeEnvOptionsModal}
-        isVisible={openEnvOptionsModal}
-        animationIn={'slideInLeft'}
-        animationOut={'slideOutRight'}
-      >
-        <View style={styles.optionsModalContainer}>
-          <Text style={styles.optionsTitle}>Select Environment:</Text>
-          <RadioButton option="Test Environment" selectedOption={selectedEnvOption} onSelect={setSelectedEnvOption} />
-          <RadioButton option="Production Environment" selectedOption={selectedEnvOption} onSelect={setSelectedEnvOption} />
-        </View>
-      </Modal>
       <View style={styles.container}>
         <View style={styles.container}>
           <View style={styles.logoContainer}>
             <View style={styles.headingTextContainer}>
-              <TouchableOpacity
-                activeOpacity={0.9}
-                onLongPress={buttonPressed}
-                onPress={longPressCount !== 3 ? () => { } : buttonPressed}
-              >
-                <Text style={styles.headingText}>{t('PreferenceScreen.title')}</Text>
-              </TouchableOpacity>
+              <Text style={styles.headingText}>{t('PreferenceScreen.title')}</Text>
               <Text style={styles.subHeadingText}>{t('PreferenceScreen.sub_title')}</Text>
             </View>
           </View>
@@ -160,11 +135,6 @@ const PreferenceScreen = (props: INProps) => {
               />
             </View>
           </View>
-          <Text style={styles.devTextStyle}>
-            {longPressCount === 3
-              ? 'Now just tap ' + (4 - pressCount) + ' more times!'
-              : ''}
-          </Text>
           <FAB
             visible={true}
             icon={{ name: 'arrow-forward', color: AppColors.PRIMARY }}
@@ -249,21 +219,6 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 14,
     color: '#777',
-  },
-  devTextStyle: {
-    textAlign: 'center',
-    marginTop: 24,
-    color: "white",
-  },
-  optionsModalContainer: {
-    backgroundColor: "white",
-    padding: 30,
-    borderRadius: 16
-  },
-  optionsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20
   }
 });
 

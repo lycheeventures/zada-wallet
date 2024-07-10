@@ -47,7 +47,6 @@ const useEnvironmentSwitch = () => {
     const apiUrl = selectedEnvOption === 'Production Environment' ? ConfigApp.PROD_BASE_URL : ConfigApp.TEST_BASE_URL;
     if (baseUrl === apiUrl) return;
     dispatch(updateBaseUrl(apiUrl));
-    setup(store, apiUrl);
     closeEnvOptionsModal();
   }, [selectedEnvOption]);
 

@@ -94,7 +94,7 @@ export const generateStore = (encryptionKey: { isFresh: boolean; key: string }) 
     },
   });
   persistor = persistStore(store);
-  setup(store, store.getState().app.baseUrl);
+  setup(store);
   return { store, persistor };
 };
 

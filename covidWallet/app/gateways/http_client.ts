@@ -49,7 +49,7 @@ const getUserCredentials = (state: RootState) => {
   return creds;
 };
 
-const setup = (store: any, baseurl: string) => {
+const setup = (store: any) => {
   axios.interceptors.request.use(
     (config) => {
       if (!url_arr.includes(config.url ? config.url : '')) {
@@ -88,7 +88,7 @@ const setup = (store: any, baseurl: string) => {
       config.timeout = 60000 * 2;
 
       // Setting baseurl
-      config.baseURL = baseurl;
+      config.baseURL = store.getState().app.baseUrl;
 
       return config;
     },
@@ -130,7 +130,7 @@ const setup = (store: any, baseurl: string) => {
           let { token } = state.auth;
           // Fetch token
           return new Promise((resolve, reject) => {
-            fetch(baseurl + '/api/v1/authenticate', {
+            fetch(store.getState().app.baseUrl + '/api/v1/authenticate', {
               method: 'POST',
               headers: {
                 Accept: 'application/json',
@@ -168,7 +168,7 @@ const setup = (store: any, baseurl: string) => {
           // Error message handling.
           handleErrorMessage(error);
         }
-        
+
         return Promise.reject(error);
       } else {
         networkError = true;
