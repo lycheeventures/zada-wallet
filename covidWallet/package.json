@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "/": "Development:",
-    "ios:dev": "react-native run-ios --simulator='iPhone 14 Pro' --scheme \"reactNativeMultiEnvDev\"",
+    "ios:dev": "react-native run-ios --simulator='iPhone 15 Pro' --scheme \"reactNativeMultiEnvDev\"",
     "ios:prod": "react-native run-ios --scheme \"reactNativeMultiEnv\"",
     "ios:12m": "npm run ios:dev --simulator='iPhone 12 mini' --scheme \"reactNativeMultiEnvDev\"",
     "android:dev": "adb reverse tcp:8081 tcp:8081 && react-native run-android",
@@ -51,7 +51,7 @@
     "@reduxjs/toolkit": "^1.8.3",
     "@rneui/base": "^4.0.0-rc.7",
     "@rneui/themed": "^4.0.0-rc.7",
-    "axios": "^0.21.1",
+    "axios": "^1.7.2",
     "buffer": "^6.0.3",
     "i18next": "^23.7.8",
     "install-expo-modules": "^0.6.4",

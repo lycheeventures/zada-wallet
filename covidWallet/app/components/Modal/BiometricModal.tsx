@@ -11,10 +11,11 @@ import {
   Platform,
 } from 'react-native';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
+import { useTranslation } from 'react-i18next';
 import { AppColors } from '../../theme/Colors';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getItem, getItemFromLocalStorage } from '../../helpers';
-import { BIOMETRIC_ENABLED } from '../../helpers/ConfigApp';
+import { getItemFromLocalStorage, saveItemInLocalStorage } from '../../helpers';
+import { BIOMETRIC_ENABLED, BIOMETRIC_IN_PROGRESS } from '../../helpers/ConfigApp';
 import ConstantsList from '../../helpers/ConfigApp';
 
 interface IProps {
@@ -25,31 +26,34 @@ interface IProps {
   onSuccess?: (e: boolean) => void;
 }
 
-const BiometricScreen = (props: IProps) => {
+const BiometricModal = (props: IProps) => {
+  // Hooks
+  const { t } = useTranslation();
+
+  // Constants
   const appState = useRef(AppState.currentState);
 
+  // States
   const [pin, setPin] = useState('');
   const [storedPin, setStoredPin] = useState(''); // This should be securely stored and retrieved
   const [authStatus, setAuthStatus] = useState(true);
   const rnBiometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true });
 
   useEffect(() => {
-    // if (Platform.OS === 'android') {
-    //   let androidBlurSubscription = AppState.addEventListener('blur', () => {
-    //     console.log('App has gone blur');
-    //   });
-    //   let androidFocusSubscription = AppState.addEventListener('focus', () => {
-    //     console.log('App has unblured');
-    //   });
-    //   return () => {
-    //     androidBlurSubscription.remove();
-    //     androidFocusSubscription.remove();
-    //   };
-    // }
-
     if (!props.oneTimeAuthentication) {
-      const subscription = AppState.addEventListener('change', nextAppState => {
-        checkIfAuthIsRequired();
+      const subscription = AppState.addEventListener('change', async nextAppState => {
+        if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+          let isBiometricInProgress = await getItemFromLocalStorage(BIOMETRIC_IN_PROGRESS);
+          if (isBiometricInProgress) {
+            return;
+          }
+          checkIfAuthIsRequired();
+        } else {
+          if (Platform.OS === 'android') {
+            saveItemInLocalStorage(BIOMETRIC_IN_PROGRESS, false);
+          }
+        }
+
         appState.current = nextAppState;
       });
       return () => {
@@ -62,10 +66,10 @@ const BiometricScreen = (props: IProps) => {
 
   // When app starts
   useEffect(() => {
-    if (props.appStarted?.current) checkIfAuthIsRequired();
+    if (props.appStarted?.current) {
+      checkIfAuthIsRequired();
+    }
   }, []);
-
-  // Pin needs to be created
 
   useEffect(() => {
     const setPinFromLocalStorage = async () => {
@@ -89,7 +93,7 @@ const BiometricScreen = (props: IProps) => {
     const isBiometricEnabled = await getItemFromLocalStorage(BIOMETRIC_ENABLED);
     if (isBiometricEnabled) {
       setAuthStatus(false);
-      isBiometricAvailable();
+      await isBiometricAvailable();
     } else {
       setAuthStatus(true);
     }
@@ -98,15 +102,22 @@ const BiometricScreen = (props: IProps) => {
     }
   };
 
-  const isBiometricAvailable = async () => {
+  const isBiometricAvailable = async (isManualPress?: boolean) => {
     const { available, biometryType } = await rnBiometrics.isSensorAvailable();
     if (
-      (biometryType === BiometryTypes.FaceID || biometryType === BiometryTypes.Biometrics) &&
+      (biometryType === BiometryTypes.FaceID ||
+        biometryType === BiometryTypes.Biometrics ||
+        biometryType === BiometryTypes.TouchID) &&
       available
     ) {
+      await saveItemInLocalStorage(BIOMETRIC_IN_PROGRESS, true);
       let result = await handleBiometricAuth();
       if (result && props.onSuccess && props.oneTimeAuthentication) {
         props.onSuccess(result);
+      }
+    } else {
+      if (isManualPress) {
+        Alert.alert(t('errors.biometric_heading'), t('errors.biometric_not_supported'));
       }
     }
   };
@@ -119,12 +130,16 @@ const BiometricScreen = (props: IProps) => {
         setAuthStatus(true);
         // Reset pin
         setPin('');
+        if (Platform.OS === 'ios') {
+          setTimeout(() => {
+            saveItemInLocalStorage(BIOMETRIC_IN_PROGRESS, false);
+          }, 2000);
+        }
         return true;
       } else {
         return false;
       }
-    } catch {
-      Alert.alert('Biometric Authentication', 'Biometrics not supported or error occurred');
+    } catch (e) {
       return false;
     }
   };
@@ -139,6 +154,7 @@ const BiometricScreen = (props: IProps) => {
       }
       // Reset pin
       setPin('');
+      saveItemInLocalStorage(BIOMETRIC_IN_PROGRESS, false);
       return true;
     } else {
       Alert.alert('PIN Authentication', 'Incorrect PIN');
@@ -176,7 +192,9 @@ const BiometricScreen = (props: IProps) => {
           <TouchableOpacity
             key={key}
             style={styles.key}
-            onPress={() => (key === 'biometric' ? isBiometricAvailable() : handleKeyPress(key))}>
+            onPress={() =>
+              key === 'biometric' ? isBiometricAvailable(true) : handleKeyPress(key)
+            }>
             <Text style={styles.keyText}>
               {key === 'biometric' ? (
                 <MaterialCommunityIcons name="fingerprint" size={35} />
@@ -203,6 +221,7 @@ const BiometricScreen = (props: IProps) => {
           <TouchableOpacity
             style={styles.backIconStyle}
             onPress={() => {
+              saveItemInLocalStorage(BIOMETRIC_IN_PROGRESS, false);
               props.onDismiss && props.onDismiss();
             }}>
             <MaterialCommunityIcons name="arrow-left" size={30} color="#FFF" />
@@ -227,7 +246,7 @@ const styles = StyleSheet.create({
   },
   backIconStyle: {
     position: 'absolute',
-    top: Platform.OS === "ios" ? 50 : 20,
+    top: Platform.OS === 'ios' ? 50 : 20,
     left: 30,
     padding: 10,
   },
@@ -285,4 +304,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BiometricScreen;
+export default BiometricModal;

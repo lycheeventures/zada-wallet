@@ -13,6 +13,7 @@ import CertificateCard from '../../../components/CertificateCard';
 import phhLogo from "../../../assets/icons/phh-logo-color.png";
 import zadaLogo from "../../../assets/icons/zada-logo-color.png";
 
+import { CredentialAPI } from '../../../gateways';
 
 import { useAppDispatch, useAppSelector } from '../../../store';
 import {
@@ -23,9 +24,9 @@ import { fetchCredentials } from '../../../store/credentials/thunk';
 import { updateCredential } from '../../../store/credentials';
 import FloatingActionButton from '../../../components/Buttons/FloatingActionButton';
 import { selectUser } from '../../../store/auth/selectors';
-import ConfigApp from '../../../helpers/ConfigApp';
 import { selectDevelopmentMode } from '../../../store/app/selectors';
 import { updateWebViewUrl } from '../../../store/app';
+import OverlayLoader from '../../../components/OverlayLoader';
 
 const { height } = Dimensions.get('window');
 
@@ -37,6 +38,7 @@ function Credentials(props) {
 
   // States
   const [search, setSearch] = useState('');
+  const [loader, setLoader] = useState(false);
 
   // Selectors
   const { t } = useTranslation();
@@ -112,29 +114,15 @@ function Credentials(props) {
   };
 
   const onRequestCredentialPress = async () => {
-    const { UPPASS_API_KEY, UPPASS_FLOW_ID } = ConfigApp;
     try {
-      const payload = {
-        answers: {
-          phone_number: user.phone
-        }
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${UPPASS_API_KEY}`
-      };
-      const url = `https://app.uppass.io/en/api/forms/${UPPASS_FLOW_ID}/create/`;
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(payload)
-      })
-      const data = await response.json();
-      if (data.form_url) {
-        dispatch(updateWebViewUrl({ url: data.form_url, redirectUrl: `https://app.uppass.io/en/thankyou` }));
+      setLoader(true);
+      let result = await CredentialAPI.get_uppass_url(user.phone);
+      if (result.data.success) {
+        dispatch(updateWebViewUrl({ url: result.data.url, redirectUrl: `https://app.uppass.io/en/thankyou` }));
       }
+      setLoader(false);
     } catch (error) {
+      setLoader(false);
       console.log({ error });
     }
   }
@@ -149,6 +137,7 @@ function Credentials(props) {
     <>
       <View style={themeStyles.mainContainer}>
         <PullToRefresh />
+        {loader && <OverlayLoader text='Please wait...' height={'100%'} width={'100%'} />}
         <FlatList
           refreshControl={
             <RefreshControl

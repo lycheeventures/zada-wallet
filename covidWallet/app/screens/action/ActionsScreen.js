@@ -29,7 +29,6 @@ import { getItem, saveItem } from '../../helpers/Storage';
 import ConstantsList, { CONN_REQ, CRED_OFFER, VER_REQ } from '../../helpers/ConfigApp';
 
 import { showMessage, showAskDialog, _showAlert } from '../../helpers/Toast';
-import { biometricVerification } from '../../helpers/Biometric';
 import { getActionHeader } from '../../helpers/ActionList';
 
 import { accept_credential, delete_credential } from '../../gateways/credentials';
@@ -39,6 +38,7 @@ import useNotification from '../../hooks/useNotification';
 import OverlayLoader from '../../components/OverlayLoader';
 import { analytics_log_action_screen } from '../../helpers/analytics';
 import PincodeModal from '../../components/Modal/PincodeModal';
+import BiometricModal from '../../components/Modal/BiometricModal';
 import { pincodeRegex } from '../../helpers/validation';
 import PullToRefresh from '../../components/PullToRefresh';
 import EmptyList from '../../components/EmptyList';
@@ -56,7 +56,6 @@ import { fetchConnections } from '../../store/connections/thunk';
 import { selectCredentials } from '../../store/credentials/selectors';
 import { selectNetworkStatus } from '../../store/app/selectors';
 import { addCredential } from '../../store/credentials/thunk';
-import PincodeScreen from '../pincode/PincodeScreen';
 
 function ActionsScreen({ navigation }) {
   //Constants
@@ -366,7 +365,7 @@ function ActionsScreen({ navigation }) {
           // Deleting Verification
           await delete_verification(selectedItemObj.verificationId);
 
-          _showAlert('Zada Wallet', t('errors.verification_request_rejected'));
+          _showAlert('Zada Wallet', t('errors.verification_request'));
 
         }
       } else {
@@ -390,7 +389,10 @@ function ActionsScreen({ navigation }) {
   // Handle Verification Request
   const handleVerificationRequests = async (data) => {
     setDialogData(data);
-    setShowConfirmModal(true);
+    setModalVisible(false);
+    setTimeout(() => {
+      setShowConfirmModal(true);
+    }, 500)
     setIsLoading(false);
     setLoaderText(null);
   };
@@ -465,7 +467,9 @@ function ActionsScreen({ navigation }) {
     if (selectedItemObj.type === ConstantsList.VER_REQ) {
       // Biometric Verification
       setDialogData(null);
-      setShowConfirmModal(true);
+      setTimeout(() => {
+        setShowConfirmModal(true);
+      }, 500)
     }
     setIsLoading(false);
     setLoaderText(null);
@@ -574,62 +578,6 @@ function ActionsScreen({ navigation }) {
     }
   };
 
-  const _confirmingPincode = async () => {
-    // Length check
-    if (verifyPincode.length === 0) {
-      setVerifyPincodeError(t('errors.required_pincode'));
-      return;
-    }
-
-    // Regex
-    if (!pincodeRegex.test(verifyPincode)) {
-      setVerifyPincodeError(t('errors.length_pincode', { max: 6 }));
-      return;
-    }
-
-    setVerifyPincodeError('');
-
-    const code = await getItem(ConstantsList.PIN_CODE);
-    if (verifyPincode === code) {
-      setShowConfirmModal(false);
-      setModalVisible(false);
-      setIsLoading(true);
-
-      let selectedItemObj = JSON.parse(selectedItem);
-      if (dialogData == null) {
-        if (!isLoading) {
-          setLoaderText(t('messages.deleting'));
-
-          // Deleting Verification from action list
-          dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
-
-          // Deleting Verification
-          await delete_verification(selectedItemObj.verificationId);
-
-          _showAlert('Zada Wallet', t('errors.verification_request_rejected'));
-
-        }
-      } else {
-        setLoaderText(t('messages.submitting'));
-
-        // Accept verification
-        await accept_verification_request(selectedItemObj, dialogData);
-
-        // Delete Credential from action list.
-        dispatch(deleteAction(selectedItemObj.connectionId + selectedItemObj.verificationId));
-      }
-      setDialogData(null);
-    } else {
-      showMessage(
-        'Zada Wallet',
-        t('errors.invalid_pincode')
-      );
-    }
-    setVerifyPincode("");
-    setIsLoading(false);
-    setLoaderText(null);
-  };
-
   const refreshHandler = () => {
     dispatch(fetchActions());
   };
@@ -637,20 +585,11 @@ function ActionsScreen({ navigation }) {
   return (
     <View style={themeStyles.mainContainer}>
       {showConfirmModal && (
-        <PincodeScreen
-          isVerifyPin
+        <BiometricModal
+          oneTimeAuthentication={true}
           isVisible={showConfirmModal}
           onDismiss={() => setShowConfirmModal(false)}
-          onConfirmPincodeChange={(text) => {
-            setVerifyPincode(text);
-            if (text.length === 0 || text === undefined) {
-              setVerifyPincodeError('');
-            }
-          }}
-          confirmPincode={verifyPincode}
-          confirmPincodeError={verifyPincodeError}
-          savePincode={_confirmingPincode}
-          onBiometricSuccess={onBiometricSuccess}
+          onSuccess={onBiometricSuccess}
         />
       )}
 

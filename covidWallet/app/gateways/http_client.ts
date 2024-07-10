@@ -1,10 +1,11 @@
-import axios from 'axios';
+import axios, { AxiosRequestHeaders } from 'axios';
 import Config from 'react-native-config';
 import { handleErrorMessage } from '.';
 import { isJWTExp } from '../helpers/Authenticate';
 import { showNetworkMessage } from '../helpers/Toast';
 import { RootState } from '../store';
 import { updateToken } from '../store/auth';
+import qs from 'query-string';
 
 // for multiple requests
 let isRefreshing = false;
@@ -50,6 +51,7 @@ const getUserCredentials = (state: RootState) => {
 };
 
 const setup = (store: any) => {
+  axios.defaults.paramsSerializer = (params) => {return qs.stringify(params, { encode: false })};
   axios.interceptors.request.use(
     (config) => {
       if (!url_arr.includes(config.url ? config.url : '')) {
@@ -66,7 +68,7 @@ const setup = (store: any) => {
           config.headers = {
             ...config.headers,
             Authorization: token,
-          };
+          } as AxiosRequestHeaders;
         }
       }
 
@@ -74,14 +76,14 @@ const setup = (store: any) => {
       config.headers = {
         ...config.headers,
         Accept: 'application/json',
-      };
+      } as AxiosRequestHeaders;
 
       // Add Content-Type header.
       if (!config.headers['Content-Type']) {
         config.headers = {
           ...config.headers,
           'Content-Type': 'application/json',
-        };
+        } as AxiosRequestHeaders;
       }
 
       // Setting timeout

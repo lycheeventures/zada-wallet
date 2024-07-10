@@ -27,6 +27,7 @@ module.exports = Object.freeze({
   CREDENTIALS: 'credentials',
   API_SECRET: '',
   BIOMETRIC_ENABLED: 'biometric_enabled',
+  BIOMETRIC_IN_PROGRESS: 'biometric_in_progress', 
   NOTIFICATION_ENABLED: 'notification_enabled',
   COUNTDOWN_TIME: 'countdown_time',
   USER_PROFILE: 'user_profile',
@@ -51,7 +52,5 @@ module.exports = Object.freeze({
   ZOHO_SALES_IQ_ANDROID_ACCESS_KEY:
     'Hvs0guXcRZB6auLrKXQV1fw7t0VUtEJi4oFatc4c46Le0Whytt8ZyF5vy7MQrGb8etJeLG5Am86VE8qKPjc%2Bvn9NtChLw3JycITa9K2oZuDdVwZL62QsUGPmPPk5EGfL0DtwFP3qFEP8AcAF2QaSTk9B54Vp%2Fqio',
   ZOHO_SALES_IQ_IOS_ACCESS_KEY:
-    'Hvs0guXcRZB6auLrKXQV1fw7t0VUtEJi4oFatc4c46Le0Whytt8ZyF5vy7MQrGb8OXlW%2BSBj2aW1OSyeTdcf9GOQYqAhhEiQRVrIekfvSId27%2F0nMhrSs2PmPPk5EGfL0DtwFP3qFEP8AcAF2QaSTk9B54Vp%2Fqio',
-  UPPASS_API_KEY: "sk_d3NfemFkYV9HWE1LQzBVSjU2Om1GJDp0VDhNUVRjKkxJMkt+eHlFU3FRZltldyVhYj43",
-  UPPASS_FLOW_ID: "kyc_RUZroVbzI6KW"
+    'Hvs0guXcRZB6auLrKXQV1fw7t0VUtEJi4oFatc4c46Le0Whytt8ZyF5vy7MQrGb8OXlW%2BSBj2aW1OSyeTdcf9GOQYqAhhEiQRVrIekfvSId27%2F0nMhrSs2PmPPk5EGfL0DtwFP3qFEP8AcAF2QaSTk9B54Vp%2Fqio'
 });

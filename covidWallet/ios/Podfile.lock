@@ -202,9 +202,11 @@ PODS:
     - hermes-engine/Pre-built (= 0.73.8)
   - hermes-engine/Pre-built (0.73.8)
   - libevent (2.1.12)
-  - lottie-ios (3.4.4)
-  - lottie-react-native (5.1.6):
-    - lottie-ios (~> 3.4.0)
+  - lottie-ios (4.4.1)
+  - lottie-react-native (6.7.2):
+    - glog
+    - lottie-ios (= 4.4.1)
+    - RCT-Folly (= 2022.05.16.00)
     - React-Core
   - Mobilisten (8.1.3)
   - nanopb (2.30909.1):
@@ -1106,15 +1108,17 @@ PODS:
     - React-Core
   - react-native-netinfo (11.3.2):
     - React-Core
-  - react-native-notifications (4.3.5):
+  - react-native-notifications (5.1.0):
     - React-Core
-  - react-native-pager-view (5.4.25):
+  - react-native-pager-view (6.3.3):
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
     - React-Core
   - react-native-quick-base64 (2.1.2):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - react-native-safe-area-context (4.10.5):
+  - react-native-safe-area-context (4.10.7):
     - React-Core
   - react-native-simple-biometrics (1.5.2):
     - React-Core
@@ -1301,10 +1305,10 @@ PODS:
     - React-Core
   - RNCMaskedView (0.3.1):
     - React-Core
-  - RNDeviceInfo (10.14.0):
+  - RNDeviceInfo (11.1.0):
     - React-Core
-  - RNExitApp (1.1.0):
-    - React
+  - RNExitApp (2.0.0):
+    - React-Core
   - RNFBAnalytics (18.6.1):
     - Firebase/AnalyticsWithoutAdIdSupport (= 10.17.0)
     - React-Core
@@ -1340,6 +1344,8 @@ PODS:
   - RNSha256 (1.4.10):
     - React-Core
   - RNShare (7.9.1):
+    - React-Core
+  - RNSVG (15.3.0):
     - React-Core
   - RNVectorIcons (10.1.0):
     - glog
@@ -1461,6 +1467,7 @@ DEPENDENCIES:
   - RNSecureRandom (from `../node_modules/react-native-securerandom`)
   - RNSha256 (from `../node_modules/react-native-sha256`)
   - RNShare (from `../node_modules/react-native-share`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNZohoSalesIQ (from `../node_modules/react-native-zohosalesiq-mobilisten/ios`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -1655,6 +1662,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-sha256"
   RNShare:
     :path: "../node_modules/react-native-share"
+  RNSVG:
+    :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   RNZohoSalesIQ:
@@ -1690,8 +1699,8 @@ SPEC CHECKSUMS:
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   hermes-engine: b12d9bb1b7cee546f5e48212e7ea7e3c1665a367
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  lottie-ios: 8f97d3271e155c2d688875c29cd3c74908aef5f8
-  lottie-react-native: 8f9d4be452e23f6e5ca0fdc11669dc99ab52be81
+  lottie-ios: e047b1d2e6239b787cc5e9755b988869cf190494
+  lottie-react-native: 2d9efc8a5ffabe688b55a1a1ac1fb94b9d971995
   Mobilisten: 43315e5b268bb7ee33db31deac9ff686e3cb4b54
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
@@ -1723,10 +1732,10 @@ SPEC CHECKSUMS:
   react-native-fingerprint-scanner: ac6656f18c8e45a7459302b84da41a44ad96dbbe
   react-native-html-to-pdf: 4c5c6e26819fe202971061594058877aa9b25265
   react-native-netinfo: 076df4f9b07f6670acf4ce9a75aac8d34c2e2ccc
-  react-native-notifications: 504143d59f9628c3b0c22fd0ccf34b65b9182d01
-  react-native-pager-view: da490aa1f902c9a5aeecf0909cc975ad0e92e53e
+  react-native-notifications: 4601a5a8db4ced6ae7cfc43b44d35fe437ac50c4
+  react-native-pager-view: 4cc7e44dbc04cad0ca9e0a49c62c593d0fa793cc
   react-native-quick-base64: e1ea036b3dec44c6da2439bd62881a09de614b23
-  react-native-safe-area-context: a240ad4b683349e48b1d51fed1611138d1bdad97
+  react-native-safe-area-context: 422017db8bcabbada9ad607d010996c56713234c
   react-native-simple-biometrics: 0f8ace5091780426188cef7f7593259effcd448e
   react-native-spinkit: da294fd828216ad211fe36a5c14c1e09f09e62db
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
@@ -1755,8 +1764,8 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
   RNCClipboard: 0a720adef5ec193aa0e3de24c3977222c7e52a37
   RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
-  RNDeviceInfo: 59344c19152c4b2b32283005f9737c5c64b42fba
-  RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
+  RNDeviceInfo: b899ce37a403a4dea52b7cb85e16e49c04a5b88e
+  RNExitApp: 00036cabe7bacbb413d276d5520bf74ba39afa6a
   RNFBAnalytics: 80cb4aaa8502b2e1f53ff61936b11975826b4527
   RNFBApp: 5a16a735bad57ca29ee44757bde7e654c5bc8f60
   RNFBMessaging: d1727030c98a9dcc7cd44e2fd29398acb6531cba
@@ -1768,6 +1777,7 @@ SPEC CHECKSUMS:
   RNSecureRandom: 07efbdf2cd99efe13497433668e54acd7df49fef
   RNSha256: e1bc64e9e50b293d5282bb4caa1b2043931f1c9d
   RNShare: a5dc3b9c53ddc73e155b8cd9a94c70c91913c43c
+  RNSVG: a48668fd382115bc89761ce291a81c4ca5f2fd2e
   RNVectorIcons: 96e8c5c45609932bb2f8347e1c709bcca0e95654
   RNZohoSalesIQ: d548ec89eb8413bb6dbd134429fea7e5e284c54e
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
