@@ -51,7 +51,7 @@ const getUserCredentials = (state: RootState) => {
 };
 
 const setup = (store: any) => {
-  axios.defaults.paramsSerializer = (params) => {return qs.stringify(params, { encode: false })};
+  axios.defaults.paramsSerializer = (params) => { return qs.stringify(params, { encode: true }) };
   axios.interceptors.request.use(
     (config) => {
       if (!url_arr.includes(config.url ? config.url : '')) {
