@@ -68,6 +68,47 @@ export const fetchCredentials = createAsyncThunk(
   }
 );
 
+export const addCredential = createAsyncThunk(
+  'credential/addCredential',
+  async (cred: ICredentialObject, { getState }) => {
+    // Current State
+    const currentState = getState() as RootState;
+    const connections = currentState.connection.entities;
+    const credentials = currentState.credential.entities;
+
+    let credObj = {
+      success: true,
+      credentials: Object.values(credentials) as any[],
+    };
+
+    // Finding connection from store.
+    let item: IConnectionObject | undefined = Object.values(connections).find(
+      (c) => c?.connectionId == cred.connectionId
+    );
+
+    let obj = {
+      ...cred,
+      imageUrl: item?.imageUrl ? item?.imageUrl : null,
+      organizationName: item?.name ? item?.name : null,
+      qrCode: undefined,
+      type:
+        cred.values != undefined && cred.values.Type != undefined
+          ? cred.values.Type
+          : (cred.values != undefined || cred.values != null) &&
+            cred.values['Vaccine Name'] != undefined &&
+            cred.values['Vaccine Name'].length != 0 &&
+            cred.values['Dose'] != undefined &&
+            cred.values['Dose'].length != 0
+          ? 'COVIDpass (Vaccination)'
+          : 'Digital Certificate',
+    };
+
+    credObj.credentials.push(obj);
+
+    return credObj;
+  }
+);
+
 // Removing credential
 export const removeCredentials = createAsyncThunk(
   'credential/removeCredentials',
@@ -98,13 +139,13 @@ export const removeCredentials = createAsyncThunk(
 // Compressing credentials
 export const compressCredentials = createAsyncThunk(
   'credential/compressCredentials',
-  async (credentialId: string, { getState, dispatch }) => {
+  async (threadId: string, { getState, dispatch }) => {
     try {
       // Current State
       let currentState = getState() as RootState;
       const credentials = currentState.credential.entities;
 
-      let credObj = Object.values(credentials).find((x) => x?.credentialId == credentialId);
+      let credObj = Object.values(credentials).find((x) => x?.threadId == threadId);
 
       // Return if credObj is undefined.
       if (!credObj) {
@@ -129,7 +170,8 @@ export const compressCredentials = createAsyncThunk(
         }, {});
       let qrObj = {
         d: Object.values(orderedData),
-        id: credentialId,
+        id: credObj.credentialId,
+        threadId,
       };
 
       let result = await CredentialAPI.compress_credential_qr(qrObj);
@@ -140,7 +182,7 @@ export const compressCredentials = createAsyncThunk(
           type: 'cv',
           i: 'zada',
         };
-        dispatch(updateCredential({ id: credentialId, changes: { qrCode: newQRObj } }));
+        dispatch(updateCredential({ id: credObj.credentialId, changes: { qrCode: newQRObj } }));
       }
       return { success: true };
     } catch (e) {

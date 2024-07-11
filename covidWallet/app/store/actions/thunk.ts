@@ -57,9 +57,10 @@ const createVerificationObject = async (connections: IConnectionObject[]) => {
 
         // Adding Image and Name to array.
         tempObj = addImageAndNameFromConnectionList(tempObj, connections);
-
-        // Adding obj to array
-        verification_arr.push(tempObj);
+        if (tempObj.organizationName !== undefined) {
+          // Adding obj to array
+          verification_arr.push(tempObj);
+        }
       }
 
       // Returning array

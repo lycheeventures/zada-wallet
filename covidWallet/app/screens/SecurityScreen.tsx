@@ -7,11 +7,12 @@ import { AuthStackParamList } from '../navigation/types';
 import ImageBoxComponent from '../components/ImageBoxComponent';
 import TextComponent from '../components/TextComponent';
 import GreenPrimaryButton from '../components/GreenPrimaryButton';
-import PincodeModal from '../components/Modal/PincodeModal';
 import { pincodeRegex } from '../helpers/validation';
 import { showMessage } from '../helpers/Toast';
 import { saveItem } from '../helpers/Storage';
 import ConstantsList from '../helpers/ConfigApp';
+import { useTranslation } from 'react-i18next';
+import PincodeScreen from './pincode/PincodeScreen';
 
 const img = require('../assets/images/security.png');
 
@@ -19,6 +20,9 @@ interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
 }
 const SecurityScreen = (props: INProps) => {
+  // Selectors
+  const { t } = useTranslation();
+
   // Constants
   const navigation = props.navigation;
 
@@ -48,7 +52,7 @@ const SecurityScreen = (props: INProps) => {
             checkSecureIDAuth(true);
             setShowPinCodeModal(true);
           })
-          .catch((error) => {
+          .catch(error => {
             setShowPinCodeModal(true);
           });
       } else {
@@ -73,7 +77,7 @@ const SecurityScreen = (props: INProps) => {
       .then(() => {
         checkSensor(true);
       })
-      .catch((error) => {
+      .catch(error => {
         checkSensor(false);
       });
   }
@@ -89,7 +93,7 @@ const SecurityScreen = (props: INProps) => {
         //set OTP also
         setShowPinCodeModal(true);
       })
-      .catch((error) => {
+      .catch(error => {
         //set OTP also
         FingerprintScanner.release();
         setShowPinCodeModal(true);
@@ -108,7 +112,7 @@ const SecurityScreen = (props: INProps) => {
         //set OTP also
         setShowPinCodeModal(true);
       })
-      .catch((error) => {
+      .catch(error => {
         FingerprintScanner.release();
         setShowPinCodeModal(true);
         checkSecureIDAuth(false);
@@ -121,47 +125,43 @@ const SecurityScreen = (props: INProps) => {
 
   const _setPinCode = async () => {
     if (pincode.length == 0) {
-      setPincodeError('Pincode is required.');
+      setPincodeError(t('errors.required_pincode'));
       return;
     }
     setPincodeError('');
 
     if (!pincodeRegex.test(pincode)) {
-      setPincodeError('Pincode should contain only 6 digits.');
+      setPincodeError(t('errors.length_pincode', { max: 6 }));
       return;
     }
     setPincodeError('');
 
     if (confirmPincode.length == 0) {
-      setConfirmPincodeError('Confirm pincode is required.');
+      setConfirmPincodeError(t('errors.required_confirm_pincode'));
       return;
     }
     setConfirmPincodeError('');
 
     if (!pincodeRegex.test(confirmPincode)) {
-      setConfirmPincodeError('Confirm pincode should contain only 6 digits.');
+      setConfirmPincodeError(t('errors.length_confirm_pincode', { max: 6 }));
       return;
     }
     setConfirmPincodeError('');
 
     if (pincode != confirmPincode) {
-      showMessage(
-        'Zada Wallet',
-        'Pincode and confirm pincode are not same. Please check them carefully'
-      );
+      setConfirmPincodeError(t('errors.pincode_confirm_not_match'));
+      showMessage('Zada Wallet', t('errors.pincode_confirm_not_match'));
       return;
     }
 
     // Saving pincode in async
     try {
       await saveItem(ConstantsList.PIN_CODE, pincode);
+      let message = t('PincodeScreen.alert_message');
 
       setIsPincode(true);
       setShowPinCodeModal(false);
-      showMessage(
-        'Zada Wallet',
-        'Your pincode is set successfully. Please keep it safe and secure.'
-      );
+      showMessage('Zada Wallet', message);
       setPincode('');
       setConfirmPincode('');
       nextHandler();
@@ -184,27 +184,22 @@ const SecurityScreen = (props: INProps) => {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Text style={styles.TextContainerHead}>Be Secure</Text>
+        <Text style={styles.TextContainerHead}>{t('SecurityScreen.title')}</Text>
 
-        <TextComponent
-          onboarding={true}
-          text="Using biometric and pincode security significantly reduces the chances
-                your account will be compromised in case your phone is lost or stolen."
-        />
+        <TextComponent onboarding={true} text={t('SecurityScreen.sub_title')} />
       </View>
       <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBoxComponent source={img} />
       </View>
       <View style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}>
-        <GreenPrimaryButton text="ENABLE SECURE ID" nextHandler={enableSecureID} />
+        <GreenPrimaryButton text={t('SecurityScreen.enable_btn')} nextHandler={enableSecureID} />
       </View>
 
       {/* PinCode Modal */}
       {showPincodeModal && (
-        <PincodeModal
-          modalType={'normal'}
-          onCloseClick={() => setShowPinCodeModal(false)}
+        <PincodeScreen
           isVisible={showPincodeModal}
+          onDismiss={() => setShowPinCodeModal(false)}
           pincode={pincode}
           onPincodeChange={(text: string) => {
             setPincode(text);
@@ -217,7 +212,7 @@ const SecurityScreen = (props: INProps) => {
             if (text.length == 0) setConfirmPincodeError('');
           }}
           confirmPincodeError={confirmPincodeError}
-          onContinueClick={_setPinCode}
+          savePincode={_setPinCode}
         />
       )}
     </View>

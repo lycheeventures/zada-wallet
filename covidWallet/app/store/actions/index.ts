@@ -27,7 +27,6 @@ export const slice = createSlice({
       state.status = action.payload;
     },
     resetAction: () => {
-      console.log(ActionAdapter.getInitialState(ActionState));
       return ActionAdapter.getInitialState(ActionState);
     },
   },

@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import { CredentialAPI } from '../../gateways';
+import { ConnectionAPI, CredentialAPI, VerificationAPI } from '../../gateways';
 import { get_encrypted_credential } from '../../gateways/credentials';
 import { decryptAES256CBC, performSHA256 } from '../../helpers/crypto';
 import { convertBase64ToString, convertStringToBase64, sortValuesByKey } from '../../helpers/utils';
@@ -96,15 +96,14 @@ export const handleCredVerification = async (credQrData) => {
   }
 };
 
-export const handleQRConnectionRequest = async (inviteID, qrJSON) => {
-  let baseURL = 'https://trinsic.studio/url/';
+export const handleQRConnectionRequest = async (connectionId, qrJSON) => {
   try {
-    let response = await fetch(baseURL + inviteID);
-    const parsed = queryString.parse(response.url, true);
-    let urlData = Object.values(parsed)[0];
+    let response = await ConnectionAPI.get_connection_metadata(connectionId)
+    let urlData = response.data.connection.connectionRequestData
     var data = JSON.parse(convertBase64ToString(urlData));
 
-    qrJSON.organizationName = data.label;
+    let parsedLabel = JSON.parse(convertBase64ToString(data.label))
+    qrJSON.organizationName = parsedLabel.label;
     qrJSON.imageUrl = data.imageUrl;
     qrJSON.connectionId = data['@id'];
 

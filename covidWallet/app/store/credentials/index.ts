@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ICredentialState } from './interface';
-import { fetchCredentials, removeCredentials } from './thunk';
+import { addCredential, fetchCredentials, removeCredentials } from './thunk';
 import { CredentialAdapter } from './selectors';
 
 // State initialization
@@ -18,7 +18,6 @@ export const slice = createSlice({
   name: 'credential',
   initialState: CredentialAdapter.getInitialState(CredentialState),
   reducers: {
-    addCredential: CredentialAdapter.addOne,
     addCredentials: CredentialAdapter.addMany,
     updateCredential: CredentialAdapter.updateOne,
     deleteCredential: CredentialAdapter.removeOne,
@@ -45,6 +44,23 @@ export const slice = createSlice({
       state.error = action?.error;
     });
 
+    // Add Credential
+    builder.addCase(addCredential.pending, (state, action) => {
+      if (state.status == 'idle') {
+        state.status = 'loading';
+      }
+    });
+    builder.addCase(addCredential.fulfilled, (state, action) => {
+      if (action.payload.success) {
+        CredentialAdapter.upsertMany(state, action.payload.credentials);
+        state.status = 'idle';
+      }
+    });
+    builder.addCase(addCredential.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action?.error;
+    });
+
     // Remove Credentials
     builder.addCase(removeCredentials.pending, (state, action) => {
       state.status = 'pending';
@@ -64,7 +80,6 @@ export const slice = createSlice({
 // Exporting Actions
 export const {
   changeCredentialStatus,
-  addCredential,
   updateCredential,
   deleteCredential,
   resetCredential,

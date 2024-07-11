@@ -10,7 +10,7 @@ import { useAppSelector } from '../store';
 import { selectActionCount } from '../store/actions/selectors';
 // Screens
 import ActionsScreen from '../screens/action/ActionsScreen';
-import ConnectionsScreen from '../screens/ConnectionsScreen';
+import ConnectionsScreen from '../screens/connection/ConnectionsScreen';
 import CredentialsScreen from '../screens/credential/CredentialsScreen';
 
 function TabNavigator() {
@@ -23,13 +23,13 @@ function TabNavigator() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName = '';
           if (route.name === 'Actions') {
-            iconName = 'md-notifications-outline';
+            iconName = 'notifications-outline';
             return <Ionicons name={iconName} size={size} color={color} />;
           } else if (route.name === 'Connections') {
-            iconName = 'ios-git-network';
+            iconName = 'git-network';
             return <Ionicons name={iconName} size={size} color={color} />;
           } else if (route.name === 'Certificates') {
-            iconName = 'account-badge-horizontal-outline';
+            iconName = 'badge-account-horizontal-outline';
             return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
           }
           // You can return any component that you like here!

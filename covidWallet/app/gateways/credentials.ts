@@ -35,18 +35,10 @@ export async function get_all_credentials() {
 // Accept Crendentials API
 export async function accept_credential(credentialId: string) {
   try {
-    const params = new URLSearchParams();
-    params.append('credentialId', credentialId);
-
-    let headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    };
-
     const result = await http_client({
       method: 'POST',
       url: '/api/credential/accept_credential',
-      data: params,
-      headers,
+      data: { credentialId },
     });
 
     // Google Analytics
@@ -61,18 +53,10 @@ export async function accept_credential(credentialId: string) {
 // Delete Crendentials API
 export async function delete_credential(credentialId: string) {
   try {
-    const params = new URLSearchParams();
-    params.append('credentialId', credentialId);
-
-    let headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    };
-
     const result = await http_client({
       method: 'POST',
       url: '/api/credential/delete_credential',
-      data: params,
-      headers,
+      data: { credentialId },
     });
 
     // Google Analytics
@@ -240,6 +224,22 @@ export async function submit_url_scheme(url: string, phone: string) {
       method: 'POST',
       url: '/api/credential/submit_url_scheme',
       data,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function get_uppass_url(phone: string) {
+  try {
+    let data = {
+      phone
+    };
+    const result = await http_client({
+      method: 'GET',
+      url: '/api/credential/get_uppass_url',
+      params: data,
     });
     return result;
   } catch (error) {

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Linking, Switch, Dimensions, Platform, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useTranslation } from 'react-i18next';
 import { getVersion } from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-import { BLACK_COLOR, GRAY_COLOR, GREEN_COLOR, WHITE_COLOR } from '../theme/Colors';
+import { AppColors, BLACK_COLOR, GRAY_COLOR, WHITE_COLOR } from '../theme/Colors';
 import { getItem, saveItem } from '../helpers/Storage';
 import { BIOMETRIC_ENABLED, APP_VERSION, PIN_CODE } from '../helpers/ConfigApp';
 import { showAskDialog, showMessage, showNetworkMessage, showOKDialog } from '../helpers/Toast';
@@ -16,12 +17,14 @@ import { selectAutoAcceptConnection, selectUser } from '../store/auth/selectors'
 import { selectAppStatus, selectNetworkStatus } from '../store/app/selectors';
 import useDevelopment from '../hooks/useDevelopment';
 import OverlayLoader from '../components/OverlayLoader';
+import BiometricModal from '../components/Modal/BiometricModal';
 
 export default function SettingsScreen(props) {
   // Constants
   const dispatch = useAppDispatch();
 
   // Selectors
+  const { t } = useTranslation();
   const autoAcceptConnection = useAppSelector(selectAutoAcceptConnection);
   const user = useAppSelector(selectUser);
   const appStatus = useAppSelector(selectAppStatus);
@@ -32,6 +35,7 @@ export default function SettingsScreen(props) {
     useDevelopment();
 
   const [isBioEnable, setBioEnable] = useState(false);
+  const [isBiometricModalVisible, setBiometricModalVisible] = useState(false);
   const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(autoAcceptConnection);
   const [version, setVersion] = useState(null);
 
@@ -46,17 +50,19 @@ export default function SettingsScreen(props) {
 
       let biometric = JSON.parse((await getItem(BIOMETRIC_ENABLED)) || 'false');
 
-      // let auto_accept_connection = JSON.parse((await getItem(AUTO_ACCEPT_CONNECTION)) || 'false');
-
       setBioEnable(biometric);
-      // setIsAcceptConnectionEnabled(auto_accept_connection);
       setVersion(appVersion);
     };
     updatevalues();
   }, []);
 
   const _toggleBio = (value) => {
-    props.route.params.oneTimeAuthentication((e) => _bioResult(e, value));
+    if (value === false) {
+      setBiometricModalVisible(false);
+      _bioResult(true, value);
+      return;
+    }
+    setBiometricModalVisible(true);
   };
 
   const _bioResult = async (result, value) => {
@@ -80,6 +86,9 @@ export default function SettingsScreen(props) {
     } else {
       if (result) setBioEnable(false);
     }
+
+    // Setting modal to false.
+    setBiometricModalVisible(false);
   };
 
   const _toggleAcceptConnection = (value) => {
@@ -95,14 +104,14 @@ export default function SettingsScreen(props) {
 
     showAskDialog(
       'Are you sure?',
-      'Are you sure you want to log out?',
+      t('messages.logout'),
       async () => {
         dispatch(changeAppStatus('loading'));
         const pCode = await getItem(PIN_CODE);
         saveItem(PIN_CODE, pCode);
         clearAllAndLogout(dispatch);
       },
-      () => {},
+      () => { },
       'Ok'
     );
   };
@@ -125,21 +134,32 @@ export default function SettingsScreen(props) {
     deleteAccountAndClearAll(dispatch);
   };
 
+  const _onLanguageClick = () => {
+    props.navigation.navigate('LanguageSelectionScreen')
+  }
+
+  const onBiometricModalDismiss = () => {
+    setBioEnable(false);
+    setBiometricModalVisible(false);
+  }
+
   return (
     <View style={styles._mainContainer}>
       {appStatus === 'loading' && <OverlayLoader text="Logging out..." />}
+      {isBiometricModalVisible && <BiometricModal oneTimeAuthentication isVisible={isBiometricModalVisible} onDismiss={onBiometricModalDismiss} onSuccess={(e) => _bioResult(e, !isBioEnable)} />}
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles._list}
         contentContainerStyle={styles._listContainer}>
-        <Text style={styles._rowHeading}>General</Text>
+        <Text style={styles._rowHeading}>{t('SettingsScreen.general')}</Text>
         <View style={styles._row}>
-          <Text style={styles._rowLabel}>Authenticate with Biometric</Text>
+          <Text style={styles._rowLabel}>{t('SettingsScreen.authenticate_with_biometric')}</Text>
           <Switch
             trackColor={{
-              false: '#81b0ff',
-              true: '#3ab6ae',
+              false: AppColors.BACKGROUND,
+              true: AppColors.BLUE,
             }}
+            thumbColor="#ffffff"
             ios_backgroundColor="#ffffff"
             onValueChange={_toggleBio}
             value={isBioEnable}
@@ -147,12 +167,13 @@ export default function SettingsScreen(props) {
         </View>
 
         <View style={styles._row}>
-          <Text style={styles._rowLabel}>Auto Accept Connections</Text>
+          <Text style={styles._rowLabel}>{t('SettingsScreen.auto_accept_connections')}</Text>
           <Switch
             trackColor={{
-              false: '#81b0ff',
-              true: '#3ab6ae',
+              false: AppColors.BACKGROUND,
+              true: AppColors.BLUE,
             }}
+            thumbColor="#ffffff"
             ios_backgroundColor="#ffffff"
             onValueChange={_toggleAcceptConnection}
             value={isAcceptConnectionEnabled}
@@ -165,8 +186,18 @@ export default function SettingsScreen(props) {
           onPress={() => {
             _onEditProfileClick();
           }}>
-          <Text style={styles._rowLabel}>Edit Profile</Text>
-          <Icon name="right" color={GREEN_COLOR} size={18} />
+          <Text style={styles._rowLabel}>{t('SettingsScreen.edit_profile')}</Text>
+          <Icon name="right" color={AppColors.BLUE} size={18} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles._row}
+          onPress={() => {
+            _onLanguageClick();
+          }}>
+          <Text style={styles._rowLabel}>{t('SettingsScreen.change_language')}</Text>
+          <Icon name="right" color={AppColors.BLUE} size={18} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -175,23 +206,23 @@ export default function SettingsScreen(props) {
           onPress={() => {
             onLogoutPressed();
           }}>
-          <Text style={styles._rowLabel}>Logout</Text>
-          <Icon name="right" color={GREEN_COLOR} size={18} />
+          <Text style={styles._rowLabel}>{t('SettingsScreen.logout')}</Text>
+          <Icon name="right" color={AppColors.BLUE} size={18} />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.9}
           onLongPress={buttonPressed}
-          onPress={longPressCount !== 3 ? () => {} : buttonPressed}>
-          <Text style={[styles._rowHeading, { marginTop: 15 }]}>Support</Text>
+          onPress={longPressCount !== 3 ? () => { } : buttonPressed}>
+          <Text style={[styles._rowHeading, { marginTop: 15 }]}>{t('SettingsScreen.support')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles._row}
           onPress={() => props.navigation.navigate('ContactUs')}>
-          <Text style={styles._rowLabel}>Contact Us</Text>
-          <Icon name="right" color={GREEN_COLOR} size={18} />
+          <Text style={styles._rowLabel}>{t('SettingsScreen.contact_us')}</Text>
+          <Icon name="right" color={AppColors.BLUE} size={18} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -200,16 +231,16 @@ export default function SettingsScreen(props) {
           onPress={() => {
             Linking.openURL('https://zada.io/privacy-policy/');
           }}>
-          <Text style={styles._rowLabel}>License and agreements</Text>
-          <Icon name="right" color={GREEN_COLOR} size={18} />
+          <Text style={styles._rowLabel}>{t('SettingsScreen.license_and_agreements')}</Text>
+          <Icon name="right" color={AppColors.BLUE} size={18} />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles._row}
           onPress={() => props.navigation.navigate('AboutUs')}>
-          <Text style={styles._rowLabel}>About Us</Text>
-          <Icon name="right" color={GREEN_COLOR} size={18} />
+          <Text style={styles._rowLabel}>{t('SettingsScreen.about_us')}</Text>
+          <Icon name="right" color={AppColors.BLUE} size={18} />
         </TouchableOpacity>
 
         <Text style={styles.devTextStyle}>
@@ -222,8 +253,8 @@ export default function SettingsScreen(props) {
             <Text style={styles._rowLabel}>Development Mode</Text>
             <Switch
               trackColor={{
-                false: '#81b0ff',
-                true: '#3ab6ae',
+                false: AppColors.BACKGROUND,
+                true: AppColors.BLUE,
               }}
               ios_backgroundColor="#ffffff"
               onValueChange={() => setDevelopmentMode(!developmentMode)}
@@ -241,9 +272,8 @@ export default function SettingsScreen(props) {
               );
             else Linking.openURL('https://apps.apple.com/us/app/zada-wallet/id1578666669');
           }}
-          style={styles._appVersion}>{`Version ${
-          version == undefined || version === null ? getVersion().toString() : version.version
-        }`}</Text>
+          style={styles._appVersion}>{`Version ${version == undefined || version === null ? getVersion().toString() : (version.version || version)
+            }`}</Text>
       </View>
     </View>
   );

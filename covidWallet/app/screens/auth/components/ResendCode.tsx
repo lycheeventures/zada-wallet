@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { AppColors } from '../../../theme/Colors';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../../store';
 import { sendOTP } from '../../../store/auth/thunk';
@@ -17,6 +18,7 @@ const ResendCode = (props: INProps) => {
 
   // Selectors
   const user = useAppSelector(selectUser);
+  const { t } = useTranslation();
 
   // States
   const [phoneMins, setPhoneMins] = useState(1);
@@ -75,7 +77,7 @@ const ResendCode = (props: INProps) => {
           <Text>
             {"Didn't get a code?"}{' '}
             <Text onPress={resendCode} style={styles._expireText}>
-              Resend OTP
+              {t('VerifyOTPScreen.resend_otp')}
             </Text>
           </Text>
         ) : (
@@ -89,7 +91,7 @@ const ResendCode = (props: INProps) => {
         )
       ) : (
         <Text>
-          {'Resend OTP in'}{' '}
+          {t('VerifyOTPScreen.resend_otp')} {'in '}
           <Text style={styles._countdown}>
             {('0' + phoneMins).slice(-2)} : {('0' + phoneSecs).slice(-2)}
           </Text>

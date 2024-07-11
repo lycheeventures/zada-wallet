@@ -40,7 +40,6 @@ const InputPinComponent = (props: INProps) => {
 
     handleOnPress();
     return () => {
-      console.log('removing subs')
       hideSubscription.remove();
     };
   }, []);
@@ -48,11 +47,13 @@ const InputPinComponent = (props: INProps) => {
   // Functions
   const handleOnPress = () => {
     InteractionManager.runAfterInteractions(() => {
-      if (ref.current) {
-        ref.current.focus();
-        setTextIsFocused(true);
-        setContainerIsFocused(true);
-      }
+      setTimeout(() => {
+        if (ref.current) {
+          ref.current.focus();
+          setTextIsFocused(true);
+          setContainerIsFocused(true);
+        }
+      }, 600)
     });
   };
 
@@ -123,7 +124,7 @@ const InputPinComponent = (props: INProps) => {
         value={code}
         onChangeText={handleCodeChange}
         onBlur={handleOnBlur}
-        keyboardType="numeric"
+        keyboardType="number-pad"
         returnKeyType="done"
         maxLength={CODE_LENGTH}
         style={style.hiddenCodeInput}

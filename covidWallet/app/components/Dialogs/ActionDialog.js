@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Text, View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import Modal from 'react-native-modal';
+import { useTranslation } from 'react-i18next';
 import {
     WHITE_COLOR,
     GRAY_COLOR,
@@ -20,6 +21,9 @@ import { get_tenant } from '../../gateways/connections';
 import RenderValues from '../RenderValues';
 
 function ActionDialog(props) {
+
+    // Selectors
+    const { t } = useTranslation();
 
     //States
     const [visible, setVisible] = useState(props.isVisible);
@@ -49,7 +53,13 @@ function ActionDialog(props) {
             setSpinner(true);
             let result = []
             if (props.data.type == CONNLESS_VER_REQ) {
-                result = await get_all_credentials_connectionless_verification(props.data.metadata);
+                // Check if metadata is object or string
+                if(typeof props.data.metadata === 'object') {
+                    metadata = props.data.metadata.verificationRequestId;
+                } else {
+                    metadata = props.data.metadata;
+                }
+                result = await get_all_credentials_connectionless_verification(metadata);
             } else {
                 result = await get_all_credentials_for_verification(props.data.verificationId);
             }
@@ -111,7 +121,7 @@ function ActionDialog(props) {
 
         // If no certificate is selected.
         if ((props.data.type == VER_REQ || props.data.type == CONNLESS_VER_REQ) && (selectedCred == null || val == null)) {
-            alert('Please select a certificate');
+            alert(t('ActionsScreen.select_certificate'));
             return
         }
 
@@ -124,9 +134,8 @@ function ActionDialog(props) {
         if (props.data.type == VER_REQ || props.data.type == CONNLESS_VER_REQ) {
             val = selectedCred;
             props.data.credentialId = selectedCred.credentialId;
-            props.data.policyName = policyName
+            props.data.policyName = policyName ? policyName : props.data.policy.name
         }
-
         //Adding type.
         val.type = props.data.type;
         props.acceptModal(props.data);
@@ -224,7 +233,7 @@ function ActionDialog(props) {
                                         {props.modalType === 'action' && (
                                             <BorderButton
                                                 nextHandler={() => props.rejectModal(props.data)}
-                                                text="CANCEL"
+                                                text={t("common.cancel")}
                                                 color={BLACK_COLOR}
                                                 textColor={WHITE_COLOR}
                                                 backgroundColor={RED_COLOR}

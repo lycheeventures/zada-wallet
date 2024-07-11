@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, View, Linking } from 'react-native';
 import Config from 'react-native-config';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import { useTranslation } from 'react-i18next';
 import CredValuesModal from './components/CredValuesModal';
 import CustomProgressBar from './components/CustomProgressBar';
 import ActionDialog from '../../components/Dialogs/ActionDialog';
@@ -33,6 +34,7 @@ const QRScreen = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
 
   // Selectors
+  const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const connections = useAppSelector(selectConnections.selectAll);
   const connectionStatus = useAppSelector(selectConnectionsStatus);
@@ -42,7 +44,7 @@ const QRScreen = ({ route, navigation }) => {
   // States
   const [scan, setScan] = useState(true);
   const [progress, setProgress] = useState(false);
-  const [dialogTitle, setDialogTitle] = useState('Fetching Details');
+  const [dialogTitle, setDialogTitle] = useState(t('messages.fetching_detail'));
   const [values, setValues] = useState(null);
   const [credentialData, setCredentialData] = useState(defaultCredState);
 
@@ -65,7 +67,7 @@ const QRScreen = ({ route, navigation }) => {
   useEffect(() => {
     // Alert
     if (connectionStatus === 'succeeded') {
-      showOKDialog('ZADA', 'Your connection is created successfully.', () => {});
+      showOKDialog('ZADA', t('messages.success_connection'), () => { });
       navigateToMainScreen();
     }
   }, [connectionStatus, navigateToMainScreen]);
@@ -74,9 +76,9 @@ const QRScreen = ({ route, navigation }) => {
   useEffect(() => {
     if (route.params !== undefined) {
       setScan(false);
-      const { request } = route.params;
+      const { request, isLink } = route.params;
       const qrJSON = JSON.stringify(request);
-      _handleQRScan({ data: qrJSON }, true);
+      _handleQRScan({ data: qrJSON }, isLink);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -142,40 +144,38 @@ const QRScreen = ({ route, navigation }) => {
           let type = getType(e.data);
           let credObj = {};
 
-          if (type.startsWith('agency://')) {
-            type = 'agency';
+          if (type.startsWith('zada://') || type.startsWith('zada://network')) {
+            type = type.split('/')[3];
           }
           switch (type) {
-            // Handling agency
-            case 'agency':
-              setScan(false);
-              setProgress(true);
-              setDialogTitle('Please wait...');
-
-              let base64 = convertStringToBase64(e.data);
-              let result = await VerificationAPI.send_request_to_agency(base64);
-              if (result.data.success) {
-                let res = await makeVerificationObject(result.data.verification);
-                setTimeout(() => {
-                  setCredentialData({
-                    type: 'connectionless_verification',
-                    credentials: res.credential,
-                  });
-                }, 600);
-              }
-
-              setScan(false);
-              setProgress(false);
-              setDialogTitle('');
-              return;
             // handling connectionless verification
-            case 'connectionless_verification':
+            case 'connectionless-verification':
               try {
-                let res = await makeVerificationObject(JSON.parse(e.data));
-                setCredentialData({
-                  type: 'connectionless_verification',
-                  credentials: res.credential,
-                });
+                setScan(false);
+                setProgress(true);
+                setDialogTitle('Please wait...');
+
+                let parsedData = JSON.parse(e.data);
+                if (parsedData.data === undefined) {
+                  parsedData = convertStringToBase64(JSON.stringify(parsedData));
+                } else {
+                  parsedData = parsedData.data
+                }
+                let result = await VerificationAPI.send_request_to_agency(parsedData);
+                if (result.data.success) {
+                  let res = await makeVerificationObject(result.data.verification);
+                  setTimeout(() => {
+                    setCredentialData({
+                      type: 'connectionless-verification',
+                      credentials: res.credential,
+                    });
+                  }, 500)
+
+                }
+
+                setScan(false);
+                setProgress(false);
+                setDialogTitle('');
               } catch (err) {
                 throw 'Not a valid ZADA QR';
               }
@@ -188,10 +188,12 @@ const QRScreen = ({ route, navigation }) => {
                 if (credObj) {
                   // Setting values
                   setValues(credObj.sortedValues);
-                  setCredentialData({
-                    type: 'cred_ver',
-                    credentials: credObj.credential,
-                  });
+                  setTimeout(() => {
+                    setCredentialData({
+                      type: 'cred_ver',
+                      credentials: credObj.credential,
+                    });
+                  }, 500)
                 }
               } catch (err) {
                 throw 'Not a valid ZADA QR';
@@ -205,10 +207,12 @@ const QRScreen = ({ route, navigation }) => {
                 if (credObj) {
                   // Setting values
                   setValues(credObj.sortedValues);
-                  setCredentialData({
-                    type: 'cred_ver',
-                    credentials: credObj.credential,
-                  });
+                  setTimeout(() => {
+                    setCredentialData({
+                      type: 'cred_ver',
+                      credentials: credObj.credential,
+                    });
+                  }, 500)
                 }
               } catch (err) {
                 throw 'Not a valid ZADA QR';
@@ -338,17 +342,31 @@ const QRScreen = ({ route, navigation }) => {
       type: 'temp',
     });
 
+    // Handle metadata as JSON
+    let metadata = undefined;
+    let redirectCallback = undefined;
+    if (typeof e.metadata === 'object') {
+      metadata = e.metadata.verificationRequestId;
+      redirectCallback = e.metadata.redirectCallback;
+    } else {
+      metadata = e.metadata;
+    }
+
     try {
       // Submitting verification
       await VerificationAPI.submit_verification_connectionless(
-        e.metadata,
+        metadata,
         e.policyName,
-        e.credentialId
+        e.credentialId,
       );
 
       setProgress(false);
       setCredentialData(defaultCredState);
-      showOKDialog('ZADA', 'Submitted Successfully!', navigateToMainScreen);
+      if (redirectCallback != undefined && redirectCallback != '') {
+        Linking.openURL(redirectCallback);
+      } else {
+        showOKDialog('ZADA', 'Submitted Successfully!', navigateToMainScreen);
+      }
       navigation.goBack();
     } catch (error) {
       setScanning(false);
@@ -387,9 +405,9 @@ const QRScreen = ({ route, navigation }) => {
         onVerifyPress={_handleVerifyClick}
       />
 
-      {credentialData.type === 'connectionless_verification' && (
+      {credentialData.type === 'connectionless-verification' && (
         <ActionDialog
-          isVisible={credentialData.type === 'connectionless_verification'}
+          isVisible={credentialData.type === 'connectionless-verification'}
           rejectModal={rejectModal}
           data={credentialData.credentials}
           dismissModal={dismissModal}
@@ -438,10 +456,10 @@ const QRScreen = ({ route, navigation }) => {
             </View>
           }
           onRead={_handleQRScan}
-          topContent={<Text style={styles.textBold}>Point your camera to a QR code to scan</Text>}
+          topContent={<Text style={styles.textBold}>{t("QRScreen.title")}</Text>}
           bottomContent={
             <TouchableOpacity style={styles.buttonTouchable} onPress={navigateToMainScreen}>
-              <Text style={styles.buttonText}>Cancel Scan</Text>
+              <Text style={styles.buttonText}>{t('QRScreen.cancel_scan')}</Text>
             </TouchableOpacity>
           }
         />

@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { parse_date_time } from '../helpers/time';
 import { capitalizeFirstLetter } from '../helpers/utils';
-import { GRAY_COLOR } from '../theme/Colors';
+import { AppColors, GRAY_COLOR } from '../theme/Colors';
 
 const RenderValues = ({
   values,
@@ -17,7 +17,6 @@ const RenderValues = ({
   inputTextWeight,
   inputTextSize,
 }) => {
-
   values = Object.keys(values)
     .sort()
     .reduce((obj, key) => {
@@ -27,11 +26,16 @@ const RenderValues = ({
 
   let size_values = Object.keys(values).length;
 
+  const onLinkPress = (url) => {
+    Linking.openURL(url);
+  }
+
   let credentialDetails =
     values != undefined &&
     Object.keys(values).map((key, index) => {
       let value = values[key];
       value = parse_date_time(value);
+      let isLink = value.startsWith("http") || value.startsWith("https") ? true : false;
 
       return (
         <View
@@ -48,15 +52,18 @@ const RenderValues = ({
               styles._inputContainer,
             ]}>
             <Text
+              disabled={!isLink}
+              onPress={() => onLinkPress(value)}
+              numberOfLines={3}
               style={[
                 styles._inputText,
                 {
-                  color: inputTextColor,
+                  color: isLink ? AppColors.BLUE : inputTextColor,
                   fontWeight: inputTextWeight ? inputTextWeight : null,
                   fontSize: inputTextSize ? inputTextSize : null,
                 },
               ]}>
-              {value}
+              {isLink ? "Click Here" : value}
             </Text>
           </View>
           {
