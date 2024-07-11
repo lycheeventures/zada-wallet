@@ -1,13 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Linking } from 'react-native';
 import Modal from 'react-native-modal';
-import {
-  BACKGROUND_COLOR,
-  BLACK_COLOR,
-  GRAY_COLOR,
-  GREEN_COLOR,
-  WHITE_COLOR,
-} from '../../../theme/Colors';
+import { AppColors } from '../../../theme/Colors';
 import SimpleButton from '../../../components/Buttons/SimpleButton';
 import HeadingComponent from '../../../components/HeadingComponent';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
@@ -21,16 +15,30 @@ const CredValuesModal = ({
   onCloseClick,
   isScanning,
 }) => {
+
+  const onLinkPress = (url) => {
+    Linking.openURL(url);
+  }
+
   // Render title.
   function renderTitleInput(title, index) {
     let value = values[title];
+    value = parse_date_time(value)
+    let isLink = value.startsWith("http") || value.startsWith("https") ? true : false;
+
     return (
       <View key={index} style={styles.titleViewStyle}>
         <Text style={styles.titleTextStyle}>{title}</Text>
         <View style={styles.titleDateStyle}>
-          <Text style={{ color: BLACK_COLOR }}>{parse_date_time(value)}</Text>
+          <Text
+            disabled={!isLink}
+            onPress={() => onLinkPress(value)}
+            style={{ color: isLink ? AppColors.BLUE : AppColors.BLACK }}
+          >
+            {isLink ? "Click Here" : value}
+          </Text>
         </View>
-      </View>
+      </View >
     );
   }
 
@@ -65,7 +73,7 @@ const CredValuesModal = ({
           <SimpleButton
             title="CLOSE"
             titleColor="white"
-            buttonColor={GRAY_COLOR}
+            buttonColor={AppColors.GRAY}
             onPress={onCloseClick}
             width={250}
             style={styles.closeButtonStyle}
@@ -74,7 +82,7 @@ const CredValuesModal = ({
           <SimpleButton
             title="VERIFY"
             titleColor="white"
-            buttonColor={GREEN_COLOR}
+            buttonColor={AppColors.GREEN}
             onPress={onVerifyPress}
             width={250}
             style={styles.verifyButtonStyle}
@@ -88,7 +96,7 @@ const CredValuesModal = ({
 const styles = StyleSheet.create({
   _mainContainer: {
     borderRadius: 10,
-    backgroundColor: BACKGROUND_COLOR,
+    backgroundColor: AppColors.BACKGROUND,
     paddingHorizontal: 20,
     paddingBottom: 20,
     alignItems: 'center',
@@ -100,15 +108,15 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   titleTextStyle: {
-    color: BLACK_COLOR,
+    color: AppColors.BLACK,
     marginLeft: 8,
     marginBottom: 8,
   },
   titleDateStyle: {
     paddingLeft: 16,
     paddingRight: 16,
-    backgroundColor: WHITE_COLOR,
-    color: BLACK_COLOR,
+    backgroundColor: AppColors.WHITE,
+    color: AppColors.BLACK,
     height: 40,
     marginBottom: 4,
     borderRadius: 16,

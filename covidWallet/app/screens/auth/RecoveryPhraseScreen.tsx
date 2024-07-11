@@ -13,6 +13,7 @@ import { sendOTP } from '../../store/auth/thunk';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import { selectUser } from '../../store/auth/selectors';
 import { updateUser } from '../../store/auth';
+import { useTranslation } from 'react-i18next';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -25,6 +26,7 @@ const RecoveryPhraseScreen = (props: INProps) => {
 
   // Store
   const user = useAppSelector(selectUser);
+  const { t } = useTranslation();
 
   // States
   const [copied, setCopied] = React.useState(false);
@@ -93,26 +95,26 @@ const RecoveryPhraseScreen = (props: INProps) => {
             <View style={styles.iconContainer}>
               <FontAwesome5 name="key" color={AppColors.WHITE} size={20} />
             </View>
-            <Text style={styles.text}>The secret phrase is the master key to your account.</Text>
+            <Text style={styles.text}>{t('RecoveryPhraseScreen.text_info_1')}</Text>
           </View>
           <View style={styles.textContainer}>
             <View style={styles.iconContainer}>
               <FontAwesome5 name="exclamation" color={AppColors.WHITE} size={20} />
             </View>
-            <Text style={styles.text}>You can use this phrase to recover your account.</Text>
+            <Text style={styles.text}>{t('RecoveryPhraseScreen.text_info_2')}</Text>
           </View>
           <View style={styles.textContainer}>
             <View style={styles.iconContainer}>
               <FontAwesome5 name="copy" color={AppColors.WHITE} size={20} />
             </View>
-            <Text style={styles.text}>Please copy and keep it in a safe place.</Text>
+            <Text style={styles.text}>{t('RecoveryPhraseScreen.text_info_3')}</Text>
           </View>
         </View>
       </FadeView>
 
       <View style={styles.btnContainer}>
         <PrimaryButton
-          title={'Confirm'}
+          title={t('common.confirm')}
           onPress={_handleConfirmPress}
           disabled={false}
           buttonStyle={{ backgroundColor: AppColors.WHITE }}
@@ -149,6 +151,7 @@ const styles = StyleSheet.create({
   copiedTextContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    marginHorizontal: 24,
     alignItems: 'center',
     alignSelf: 'center',
     marginTop: 16,
@@ -184,6 +187,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     marginTop: 24,
+    marginHorizontal: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

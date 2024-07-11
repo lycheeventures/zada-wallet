@@ -15,6 +15,7 @@ export const AppColors = {
   BACKGROUND: '#e4e2de',
   DANGER: '#f32013',
   BLUE: '#2870da',
+  TURQUOISE: '#3ab6ae',
   GRAY: '#708090',
   LIGHT_GRAY: '#dddddd',
   DISABLED_COLOR: '#dddddd60',

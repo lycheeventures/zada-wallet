@@ -14,16 +14,23 @@ const HeaderRightButton = ({ onPress }: { onPress: () => void }) => (
 const HeaderLeftButton = ({
   navigation,
   route,
+  onPress,
+  underlayColor = '#00000010',
 }: {
-  navigation: NativeStackNavigationProp<AuthStackParamList>;
-  route: any;
+  navigation?: NativeStackNavigationProp<AuthStackParamList>;
+  route?: any;
+  onPress?: () => void;
+  underlayColor?: string;
 }) => (
   <TouchableComponent
+    underlayColor={underlayColor}
     style={styles.headerLeftContainerStyle}
     onPress={() =>
-      navigation && route.name === 'VerifyOTPScreen'
+      onPress
+        ? onPress()
+        : navigation && route.name === 'VerifyOTPScreen'
         ? navigation.navigate('PhoneNumberScreen')
-        : navigation.goBack()
+        : navigation?.goBack()
     }>
     <Text style={styles.headerLeftTextStyle}>Back</Text>
   </TouchableComponent>

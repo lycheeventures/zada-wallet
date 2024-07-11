@@ -2,60 +2,37 @@
 
 buildscript {
     ext {
-        ext.kotlin_version = '1.6.10'
-        googlePlayServicesVersion = "+" // default: "+"
         firebaseMessagingVersion = "21.1.0" // default: "21.1.0"
 
-        buildToolsVersion = "30.0.3"
+        buildToolsVersion = "34.0.0"
         minSdkVersion = 23
-        compileSdkVersion = 31
-        targetSdkVersion = 31
-        ndkVersion = "21.4.7075529"
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        ndkVersion = "25.1.8937393"
+        kotlinVersion = "1.8.0"
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:4.2.2')
-        classpath('com.google.gms:google-services:4.3.8')
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath("com.android.tools.build:gradle:8.4.0")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath('com.google.gms:google-services:4.4.0')
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    }
+    allprojects {
+      repositories {
+         jcenter() {
+            content {
+                // these groups only available in jcenter otherwise we don't want to rely on jcenter.
+                includeModule("com.wei.android.lib", "fingerprintidentify") // <== Add this line
+            }
+        }
+          maven { url 'https://maven.zohodl.com' }
+          maven { url 'https://www.jitpack.io' }
+      }
     }
 }
 
-allprojects {
-    repositories {
-       exclusiveContent {
-           // We get React Native's Android binaries exclusively through npm,
-           // from a local Maven repo inside node_modules/react-native/.
-           // (The use of exclusiveContent prevents looking elsewhere like Maven Central
-           // and potentially getting a wrong version.)
-           filter {
-               includeGroup "com.facebook.react"
-           }
-           forRepository {
-               maven {
-                   // NOTE: if you are in a monorepo, you may have "$rootDir/../../../node_modules/react-native/android"
-                   url "$rootDir/../node_modules/react-native/android"
-               }
-           }
-       }
-        mavenLocal()
-        mavenCentral()
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url("$rootDir/../node_modules/react-native/android")
-        }
-        maven {
-            // Android JSC is installed from npm
-            url("$rootDir/../node_modules/jsc-android/dist")
-        }
-
-        google()
-        jcenter()
-        maven { url 'https://www.jitpack.io' }
-        maven { url 'https://maven.zohodl.com' }
-    }
-}
+apply plugin: "com.facebook.react.rootproject"

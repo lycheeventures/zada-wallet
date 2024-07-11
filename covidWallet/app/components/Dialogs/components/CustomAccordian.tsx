@@ -115,7 +115,7 @@ const CustomAccordian = (props: INProps) => {
 
   return credentials.length ? (
     credentials.map((cred: any, index: number) => (
-      <View style={styles._mainContainer}>
+      <View style={styles._mainContainer} key={cred.credentialId}>
         <View style={styles._titleContainer}>
           <CheckBox
             onPress={() => {

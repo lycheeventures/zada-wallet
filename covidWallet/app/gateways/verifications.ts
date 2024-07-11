@@ -18,6 +18,19 @@ export async function get_all_verification_proposals() {
   }
 }
 
+// Get Policies API
+export async function get_policy(policyId: string) {
+  try {
+    const result = await http_client({
+      method: 'GET',
+      url: '/api/credential/get_policy?policyId=' + policyId,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 // Get All Credentials for Verification Proposals API
 export async function get_all_credentials_for_verification(verificationId: string) {
   try {

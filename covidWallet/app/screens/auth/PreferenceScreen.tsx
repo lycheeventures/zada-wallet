@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { FAB } from '@rneui/themed';
 import { AppColors } from '../../theme/Colors';
 import FadeView from '../../components/FadeView';
@@ -8,7 +9,7 @@ import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import { selectNetworkStatus } from '../../store/app/selectors';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
-import { CountryList, LanguageList } from './utils';
+import { CountryList, LanguageList } from './../utils';
 import { selectUser } from '../../store/auth/selectors';
 import { updateUser } from '../../store/auth';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
@@ -28,12 +29,17 @@ const PreferenceScreen = (props: INProps) => {
   // Selectors
   const networkStatus = useAppSelector(selectNetworkStatus);
   const user = useAppSelector(selectUser);
+  const { t, i18n } = useTranslation(); // destructure i18n here
 
   const [country, setCountry] = useState<{ label: string | null; value: CountryCode | null }>();
-  const [language, setLanguage] = useState<{ label: string | null; value: string | null }>();
+  const [language, setLanguage] = useState({ label: 'English', value: 'en' });
 
   const [isCountryModalVisible, setIsCountryModalVisible] = useState(false);
   const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
+
+  useEffect(() => {
+    i18n.changeLanguage(language.value);
+  }, [language]);
 
   const handleSubmit = () => {
     // Return if network is unavailable
@@ -61,8 +67,8 @@ const PreferenceScreen = (props: INProps) => {
         <View style={styles.container}>
           <View style={styles.logoContainer}>
             <View style={styles.headingTextContainer}>
-              <Text style={styles.headingText}>Select Country & Language</Text>
-              <Text style={styles.subHeadingText}>Please select your country and language</Text>
+              <Text style={styles.headingText}>{t('PreferenceScreen.title')}</Text>
+              <Text style={styles.subHeadingText}>{t('PreferenceScreen.sub_title')}</Text>
             </View>
           </View>
           <View
@@ -92,15 +98,7 @@ const PreferenceScreen = (props: INProps) => {
 
           <View style={styles.formContainer}>
             <SelectModal
-              isVisible={isLanguageModalVisible}
-              data={LanguageList}
-              onSelect={(label: string | null, value: string | null) => {
-                setLanguage({ label, value });
-                setIsLanguageModalVisible(false);
-              }}
-              onClose={() => setIsLanguageModalVisible(false)}
-            />
-            <SelectModal
+              title={t('PreferenceScreen.select_country')}
               type={'country'}
               isVisible={isCountryModalVisible}
               data={CountryList}
@@ -110,19 +108,29 @@ const PreferenceScreen = (props: INProps) => {
               }}
               onClose={() => setIsCountryModalVisible(false)}
             />
-            <View>
+            <SelectModal
+              title={t('PreferenceScreen.select_language')}
+              isVisible={isLanguageModalVisible}
+              data={LanguageList}
+              onSelect={(label: string, value: string) => {
+                setLanguage({ label, value });
+                setIsLanguageModalVisible(false);
+              }}
+              onClose={() => setIsLanguageModalVisible(false)}
+            />
+            <View style={{ flex: 0.5, justifyContent: 'space-around' }}>
               <PrimaryButton
-                title={country?.label ? country.label : 'Select Country'}
+                title={country?.label ? country.label : t('PreferenceScreen.select_country')}
                 onPress={() => setIsCountryModalVisible(true)}
                 disabled={false}
-                buttonStyle={{ backgroundColor: AppColors.WHITE }}
+                buttonStyle={{ backgroundColor: AppColors.WHITE, height: 50 }}
                 buttonTitleStyle={{ color: AppColors.PRIMARY }}
               />
               <PrimaryButton
-                title={language?.label ? language.label : 'Select Language'}
+                title={language?.label ? language.label : t('PreferenceScreen.select_language')}
                 onPress={() => setIsLanguageModalVisible(true)}
                 disabled={false}
-                buttonStyle={{ backgroundColor: AppColors.WHITE, marginTop: 32 }}
+                buttonStyle={{ backgroundColor: AppColors.WHITE, height: 50 }}
                 buttonTitleStyle={{ color: AppColors.PRIMARY }}
               />
             </View>
@@ -149,7 +157,7 @@ const styles = StyleSheet.create({
   headingTextContainer: {
     position: 'absolute',
     top: 80,
-    left: 24,
+    marginHorizontal: 24,
     zIndex: 2,
   },
   headingText: {

@@ -11,5 +11,6 @@ export const ConnectionAdapter = createEntityAdapter({
 export const selectConnections = ConnectionAdapter.getSelectors(
   (s: RootState) => s.connection
 );
+export const selectConnectionList = (s: RootState) => s.connection.connectionlist;
 export const selectConnectionsStatus = (state: RootState) => state.connection.status;
 export const selectConnectionsError = (state: RootState) => state.connection.error;

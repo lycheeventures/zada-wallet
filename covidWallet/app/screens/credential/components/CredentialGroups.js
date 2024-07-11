@@ -12,7 +12,7 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
-import { Transition, Transitioning } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 import EmptyList from '../../../components/EmptyList';
 import PullToRefresh from '../../../components/PullToRefresh';
 import {
@@ -21,8 +21,8 @@ import {
   edit_credential_group,
   fetch_all_groups,
 } from '../../../helpers/Credential_Groups';
-import ActionButton from 'react-native-action-button';
 import {
+  AppColors,
   BLACK_COLOR,
   PRIMARY_COLOR,
   RED_COLOR,
@@ -40,12 +40,14 @@ import { get_local_issue_date, parse_date_time } from '../../../helpers/time';
 import { useAppDispatch, useAppSelector } from '../../../store';
 import { selectCredentials } from '../../../store/credentials/selectors';
 import { updateCredential } from '../../../store/credentials';
+import FloatingActionButton from '../../../components/Buttons/FloatingActionButton';
 
 const CredentialGroups = (props) => {
   // Constants
   const dispatch = useAppDispatch();
 
   // Selectors
+  const { t } = useTranslation();
   const credentials = useAppSelector(selectCredentials.selectAll);
 
   // States
@@ -68,13 +70,6 @@ const CredentialGroups = (props) => {
   // Dropdown Animation
   const [currentIndex, setCurrentIndex] = useState(-1);
   const ref = useRef(null);
-  const transition = (
-    <Transition.Together>
-      <Transition.In type="fade" durationMs={200} />
-      <Transition.Change />
-      <Transition.Out type="fade" durationMs={200} />
-    </Transition.Together>
-  );
 
   const updateBackgroundImage = (credentialId, background_url) => {
     dispatch(updateCredential({ id: credentialId, changes: { backgroundImage: background_url } }));
@@ -124,7 +119,7 @@ const CredentialGroups = (props) => {
   const onCreateGroupClick = async (creds) => {
     try {
       if (!groupNameRegex.test(groupName)) {
-        setGroupNameError('Group name should contain at least 2 characters');
+        setGroupNameError(t('CredentialsScreen.group_name_error_message'));
         return;
       }
       setGroupNameError('');
@@ -137,7 +132,7 @@ const CredentialGroups = (props) => {
       });
 
       if (selectedCreds.length == 0) {
-        _showAlert('ZADA Wallet', 'Please select at least one credential');
+        _showAlert('ZADA Wallet', t('CredentialsScreen.select_credential_error_message'));
         return;
       }
 
@@ -154,7 +149,7 @@ const CredentialGroups = (props) => {
   const onUpdateGroupClick = async (creds) => {
     try {
       if (!groupNameRegex.test(groupName)) {
-        setGroupNameError('Group name should contain at least 2 characters');
+        setGroupNameError(t('CredentialsScreen.group_name_error_message'));
         return;
       }
       setGroupNameError('');
@@ -167,7 +162,7 @@ const CredentialGroups = (props) => {
       });
 
       if (selectedCreds.length == 0) {
-        _showAlert('ZADA Wallet', 'Please select at least one credential');
+        _showAlert('ZADA Wallet', t('CredentialsScreen.select_credential_error_message'));
         return;
       }
 
@@ -196,19 +191,19 @@ const CredentialGroups = (props) => {
       'Are you sure you want to delete this group?',
       [
         {
-          text: 'Cancel',
-          onPress: () => {},
+          text: t('common.cancel'),
+          onPress: () => { },
           style: 'cancel',
         },
         {
-          text: 'Confirm',
+          text: t('common.confirm'),
           onPress: () => onDeletePressed(group),
           style: 'default',
         },
       ],
       {
         cancelable: true,
-        onDismiss: () => {},
+        onDismiss: () => { },
       }
     );
   };
@@ -220,7 +215,7 @@ const CredentialGroups = (props) => {
   );
 
   return (
-    <Transitioning.View ref={ref} transition={transition} style={styles._mainContainer}>
+    <View ref={ref} style={styles._mainContainer}>
       <AddGroupModal
         isVisible={showAddGroup}
         credentials={credentials}
@@ -268,7 +263,7 @@ const CredentialGroups = (props) => {
         <>
           <View style={styles._searchContainer}>
             <TextInput
-              placeholder="Search"
+              placeholder={t('common.search')}
               value={search}
               onChangeText={_searchInputHandler}
               style={styles._searchInput}
@@ -295,181 +290,181 @@ const CredentialGroups = (props) => {
             }}>
             {search
               ? filteredGroups.map((group, index) => {
-                  const renderRightActions = (progress, dragX) => {
-                    const trans = dragX.interpolate({
-                      inputRange: [0, 50, 100, 101],
-                      outputRange: [0, 5, 10, 15],
-                    });
-                    return (
-                      <View style={styles._leftActionContainer}>
-                        <Animated.View style={{ transform: [{ translateX: trans }] }}>
-                          <TouchableOpacity
-                            activeOpacity={0.9}
-                            style={styles._actionButton}
-                            onPress={() => {
-                              setSelectedEditGroup(group);
-                              setGroupName(group.group_name);
-                              setShowEditGroup(true);
-                            }}>
-                            <FeatherIcon name="edit" color={PRIMARY_COLOR} size={24} />
-                          </TouchableOpacity>
-                        </Animated.View>
-
-                        <Animated.View style={{ transform: [{ translateX: trans }] }}>
-                          <TouchableOpacity
-                            activeOpacity={0.9}
-                            style={[styles._actionButton, { marginLeft: 4 }]}
-                            onPress={() => {
-                              showDeleteAlert(group);
-                            }}>
-                            <FeatherIcon name="trash" color={RED_COLOR} size={24} />
-                          </TouchableOpacity>
-                        </Animated.View>
-                      </View>
-                    );
-                  };
-
+                const renderRightActions = (progress, dragX) => {
+                  const trans = dragX.interpolate({
+                    inputRange: [0, 50, 100, 101],
+                    outputRange: [0, 5, 10, 15],
+                  });
                   return (
-                    <Swipeable renderRightActions={renderRightActions}>
-                      <View style={styles._groupContainer}>
+                    <View style={styles._leftActionContainer}>
+                      <Animated.View style={{ transform: [{ translateX: trans }] }}>
                         <TouchableOpacity
                           activeOpacity={0.9}
+                          style={styles._actionButton}
                           onPress={() => {
-                            setCurrentIndex(index === currentIndex ? -1 : index);
-                            if (ref != null) ref.current.animateNextTransition();
-                          }}
-                          style={styles._groupHeadingContainer}>
-                          <View style={{ width: '90%' }}>
-                            <Text style={styles._groupName}>{group.group_name}</Text>
-                            <Text style={styles._groupDate}>
-                              Created At: {parse_date_time(group.createdAt)}
-                            </Text>
-                          </View>
-                          <FeatherIcon
-                            name={
-                              index === currentIndex ? 'chevron-down' : 'chevron-right'
-                            }
-                            size={24}
-                            color={PRIMARY_COLOR}
-                          />
+                            setSelectedEditGroup(group);
+                            setGroupName(group.group_name);
+                            setShowEditGroup(true);
+                          }}>
+                          <FeatherIcon name="edit" color={PRIMARY_COLOR} size={24} />
                         </TouchableOpacity>
-                        {index === currentIndex &&
-                          group.credentials.map((cred, credIndex) => (
-                            <TouchableOpacity
-                              onPress={() => {
-                                toggleModal(cred);
-                              }}
-                              key={credIndex.toString()}
-                              style={styles._credentialsCardContainer}>
-                              <CredentialsCard
-                                updateBackgroundImage={updateBackgroundImage}
-                                item={item}
-                                schemeId={cred['schemaId']}
-                                card_title={cred.name}
-                                card_type={cred.type}
-                                issuer={cred.organizationName}
-                                card_user=""
-                                date={
-                                  cred.values['Issue Time']
-                                    ? get_local_issue_date(cred.values['Issue Time'])
-                                    : undefined
-                                }
-                                card_logo={{ uri: cred.imageUrl }}
-                              />
-                            </TouchableOpacity>
-                          ))}
-                      </View>
-                    </Swipeable>
+                      </Animated.View>
+
+                      <Animated.View style={{ transform: [{ translateX: trans }] }}>
+                        <TouchableOpacity
+                          activeOpacity={0.9}
+                          style={[styles._actionButton, { marginLeft: 4 }]}
+                          onPress={() => {
+                            showDeleteAlert(group);
+                          }}>
+                          <FeatherIcon name="trash" color={RED_COLOR} size={24} />
+                        </TouchableOpacity>
+                      </Animated.View>
+                    </View>
                   );
-                })
+                };
+
+                return (
+                  <Swipeable renderRightActions={renderRightActions}>
+                    <View style={styles._groupContainer}>
+                      <TouchableOpacity
+                        activeOpacity={0.9}
+                        onPress={() => {
+                          setCurrentIndex(index === currentIndex ? -1 : index);
+                          // if (ref != null) ref.current.animateNextTransition();
+                        }}
+                        style={styles._groupHeadingContainer}>
+                        <View style={{ width: '90%' }}>
+                          <Text style={styles._groupName}>{group.group_name}</Text>
+                          <Text style={styles._groupDate}>
+                            Created At: {parse_date_time(group.createdAt)}
+                          </Text>
+                        </View>
+                        <FeatherIcon
+                          name={
+                            index === currentIndex ? 'chevron-down' : 'chevron-right'
+                          }
+                          size={24}
+                          color={PRIMARY_COLOR}
+                        />
+                      </TouchableOpacity>
+                      {index === currentIndex &&
+                        group.credentials.map((cred, credIndex) => (
+                          <TouchableOpacity
+                            onPress={() => {
+                              toggleModal(cred);
+                            }}
+                            key={credIndex.toString()}
+                            style={styles._credentialsCardContainer}>
+                            <CredentialsCard
+                              updateBackgroundImage={updateBackgroundImage}
+                              item={item}
+                              schemeId={cred['schemaId']}
+                              card_title={cred.name}
+                              card_type={cred.type}
+                              issuer={cred.organizationName}
+                              card_user=""
+                              date={
+                                cred.values['Issue Time']
+                                  ? get_local_issue_date(cred.values['Issue Time'])
+                                  : undefined
+                              }
+                              card_logo={{ uri: cred.imageUrl }}
+                            />
+                          </TouchableOpacity>
+                        ))}
+                    </View>
+                  </Swipeable>
+                );
+              })
               : credentialGroups.map((group, index) => {
-                  const renderRightActions = (progress, dragX) => {
-                    const trans = dragX.interpolate({
-                      inputRange: [0, 50, 100, 101],
-                      outputRange: [0, 5, 10, 15],
-                    });
-                    return (
-                      <View style={styles._leftActionContainer}>
-                        <Animated.View style={{ transform: [{ translateX: trans }] }}>
-                          <TouchableOpacity
-                            activeOpacity={0.9}
-                            style={styles._actionButton}
-                            onPress={() => {
-                              setSelectedEditGroup(group);
-                              setGroupName(group.group_name);
-                              setShowEditGroup(true);
-                            }}>
-                            <FeatherIcon name="edit" color={PRIMARY_COLOR} size={24} />
-                          </TouchableOpacity>
-                        </Animated.View>
-
-                        <Animated.View style={{ transform: [{ translateX: trans }] }}>
-                          <TouchableOpacity
-                            activeOpacity={0.9}
-                            style={[styles._actionButton, { marginLeft: 4 }]}
-                            onPress={() => {
-                              showDeleteAlert(group);
-                            }}>
-                            <FeatherIcon name="trash" color={RED_COLOR} size={24} />
-                          </TouchableOpacity>
-                        </Animated.View>
-                      </View>
-                    );
-                  };
-
+                const renderRightActions = (progress, dragX) => {
+                  const trans = dragX.interpolate({
+                    inputRange: [0, 50, 100, 101],
+                    outputRange: [0, 5, 10, 15],
+                  });
                   return (
-                    <Swipeable renderRightActions={renderRightActions}>
-                      <View style={styles._groupContainer}>
+                    <View style={styles._leftActionContainer}>
+                      <Animated.View style={{ transform: [{ translateX: trans }] }}>
                         <TouchableOpacity
                           activeOpacity={0.9}
+                          style={styles._actionButton}
                           onPress={() => {
-                            setCurrentIndex(index === currentIndex ? -1 : index);
-                            if (ref != null) ref.current.animateNextTransition();
-                          }}
-                          style={styles._groupHeadingContainer}>
-                          <View style={{ width: '90%' }}>
-                            <Text style={styles._groupName}>{group.group_name}</Text>
-                            <Text style={styles._groupDate}>
-                              Created At: {parse_date_time(group.createdAt)}
-                            </Text>
-                          </View>
-                          <FeatherIcon
-                            name={
-                              index === currentIndex ? 'chevron-down' : 'chevron-right'
-                            }
-                            size={24}
-                            color={PRIMARY_COLOR}
-                          />
+                            setSelectedEditGroup(group);
+                            setGroupName(group.group_name);
+                            setShowEditGroup(true);
+                          }}>
+                          <FeatherIcon name="edit" color={PRIMARY_COLOR} size={24} />
                         </TouchableOpacity>
-                        {index === currentIndex &&
-                          group.credentials.map((cred, credIndex) => (
-                            <TouchableOpacity
-                              onPress={() => {
-                                toggleModal(cred);
-                              }}
-                              key={credIndex.toString()}
-                              style={styles._credentialsCardContainer}>
-                              <CredentialsCard
-                                updateBackgroundImage={updateBackgroundImage}
-                                item={cred}
-                                schemeId={cred['schemaId']}
-                                card_title={cred.name}
-                                card_type={cred.type}
-                                issuer={cred.organizationName}
-                                card_user=""
-                                date={
-                                  cred.values['Issue Time']
-                                    ? get_local_issue_date(cred.values['Issue Time'])
-                                    : undefined
-                                }
-                                card_logo={{ uri: cred.imageUrl }}
-                              />
-                            </TouchableOpacity>
-                          ))}
-                      </View>
-                    </Swipeable>
+                      </Animated.View>
+
+                      <Animated.View style={{ transform: [{ translateX: trans }] }}>
+                        <TouchableOpacity
+                          activeOpacity={0.9}
+                          style={[styles._actionButton, { marginLeft: 4 }]}
+                          onPress={() => {
+                            showDeleteAlert(group);
+                          }}>
+                          <FeatherIcon name="trash" color={RED_COLOR} size={24} />
+                        </TouchableOpacity>
+                      </Animated.View>
+                    </View>
                   );
-                })}
+                };
+
+                return (
+                  <Swipeable renderRightActions={renderRightActions}>
+                    <View style={styles._groupContainer}>
+                      <TouchableOpacity
+                        activeOpacity={0.9}
+                        onPress={() => {
+                          setCurrentIndex(index === currentIndex ? -1 : index);
+                          // if (ref != null) ref.current.animateNextTransition();
+                        }}
+                        style={styles._groupHeadingContainer}>
+                        <View style={{ width: '90%' }}>
+                          <Text style={styles._groupName}>{group.group_name}</Text>
+                          <Text style={styles._groupDate}>
+                            Created At: {parse_date_time(group.createdAt)}
+                          </Text>
+                        </View>
+                        <FeatherIcon
+                          name={
+                            index === currentIndex ? 'chevron-down' : 'chevron-right'
+                          }
+                          size={24}
+                          color={PRIMARY_COLOR}
+                        />
+                      </TouchableOpacity>
+                      {index === currentIndex &&
+                        group.credentials.map((cred, credIndex) => (
+                          <TouchableOpacity
+                            onPress={() => {
+                              toggleModal(cred);
+                            }}
+                            key={credIndex.toString()}
+                            style={styles._credentialsCardContainer}>
+                            <CredentialsCard
+                              updateBackgroundImage={updateBackgroundImage}
+                              item={cred}
+                              schemeId={cred['schemaId']}
+                              card_title={cred.name}
+                              card_type={cred.type}
+                              issuer={cred.organizationName}
+                              card_user=""
+                              date={
+                                cred.values['Issue Time']
+                                  ? get_local_issue_date(cred.values['Issue Time'])
+                                  : undefined
+                              }
+                              card_logo={{ uri: cred.imageUrl }}
+                            />
+                          </TouchableOpacity>
+                        ))}
+                    </View>
+                  </Swipeable>
+                );
+              })}
           </ScrollView>
         </>
       ) : (
@@ -478,7 +473,7 @@ const CredentialGroups = (props) => {
           onRefresh={() => {
             fetchGroupsAndCredentials();
           }}
-          text="There are no certificate groups in your wallet. Create first by clicking on plus button"
+          text={t('CredentialsScreen.groups_empty_list_text')}
           image={require('../../../assets/images/credentialsempty.png')}
           style={{
             marginTop: 10,
@@ -486,13 +481,15 @@ const CredentialGroups = (props) => {
         />
       )}
 
-      <ActionButton
-        buttonColor={PRIMARY_COLOR}
-        onPress={() => {
-          setShowAddGroup(true);
-        }}
-      />
-    </Transitioning.View>
+      <View style={{ bottom: Dimensions.get('screen').height * 0.12 }}>
+        <FloatingActionButton
+          buttonColor={AppColors.PRIMARY}
+          onPress={() => {
+            setShowAddGroup(true);
+          }}
+        />
+      </View>
+    </View>
   );
 };
 

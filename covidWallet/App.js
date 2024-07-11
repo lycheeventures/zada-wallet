@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NetworkContext from './app/context/NetworkContext';
 import RootNavigator from './app/navigation/RootNavigator';
@@ -9,6 +9,7 @@ import ErrorBoundary from 'react-native-error-boundary';
 import { analytics_log_app_error } from './app/helpers/analytics';
 import ErrorFallback from './app/components/ErrorFallback';
 import BootstrapPersistance from './app/BootstrapPersistance';
+import './app/locales/index';
 
 const App = () => {
   const errorHandler = (error, stackTrace) => {

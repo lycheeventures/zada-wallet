@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { _showAlert } from '../../helpers';
 import { IAuthState, IUserState } from './interface';
-import { reactivateUserAccount, resetUserPassword, sendOTP, validateUserOTP } from './thunk';
+import { getUserProfile, reactivateUserAccount, resetUserPassword, sendOTP, updateUserProfile, validateUserOTP } from './thunk';
 
 // State initialization
 export const AuthState: IAuthState = {
@@ -17,6 +17,8 @@ export const AuthState: IAuthState = {
   user: {
     isNew: true,
     id: undefined,
+    name: undefined,
+    email: undefined,
     walletSecret: undefined,
     phone: undefined,
     type: undefined,
@@ -115,6 +117,42 @@ const slice = createSlice({
       }
     });
     builder.addCase(reactivateUserAccount.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action?.error;
+    });
+
+    // Get user profile
+    builder.addCase(getUserProfile.pending, (state, action) => {
+      if (state.status === 'idle') {
+        state.status = 'pending';
+      }
+    });
+    builder.addCase(getUserProfile.fulfilled, (state, action) => {
+      if (action.payload?.success) {
+        state.status = 'succeeded';
+        state.user.name = action.payload.user.name;
+        state.user.email = action.payload.user.email;
+        state.user.country = action.payload.user.country;
+        state.user.language = action.payload.user.language;
+      }
+    });
+    builder.addCase(getUserProfile.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action?.error;
+    });
+
+    // Update user profile
+    builder.addCase(updateUserProfile.pending, (state, action) => {
+      if (state.status === 'idle') {
+        state.status = 'pending';
+      }
+    });
+    builder.addCase(updateUserProfile.fulfilled, (state, action) => {
+      if (action.payload?.success) {
+        state.status = 'succeeded';
+      }
+    });
+    builder.addCase(updateUserProfile.rejected, (state, action) => {
       state.status = 'failed';
       state.error = action?.error;
     });

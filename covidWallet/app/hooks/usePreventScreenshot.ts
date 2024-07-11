@@ -10,11 +10,9 @@ interface INProps {
 const usePreventScreenshot = (props: INProps) => {
   useEffect(() => {
     const focusEvent = props.navigation.addListener('focus', () => {
-      console.log('adding listener');
       PreventScreenshots.start();
     });
     const blurEvent = props.navigation.addListener('blur', () => {
-      console.log('removing listerner');
       PreventScreenshots.stop();
     });
 
