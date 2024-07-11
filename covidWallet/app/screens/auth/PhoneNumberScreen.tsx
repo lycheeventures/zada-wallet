@@ -9,19 +9,28 @@ import {
   Animated,
   Keyboard,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { RecaptchaHandles } from 'react-native-recaptcha-that-works';
 import PhoneInputComponent from './components/PhoneInputComponent';
 import { AppColors } from '../../theme/Colors';
 import FadeView from '../../components/FadeView';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import { selectUser } from '../../store/auth/selectors';
 import { selectNetworkStatus } from '../../store/app/selectors';
-import { _showAlert, showNetworkMessage } from '../../helpers';
+import {
+  _showAlert,
+  showNetworkMessage,
+  getItemFromLocalStorage,
+  saveItemInLocalStorage,
+} from '../../helpers';
+import ConstantsList from '../../helpers/ConfigApp';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
 import { updateUser } from '../../store/auth';
 import AnimatedButton from '../../components/Buttons/AnimatedButton';
 import { getUserStatus, sendOTP } from '../../store/auth/thunk';
 import AnimatedLoading from '../../components/Animations/AnimatedLoading';
+import GoogleRecaptcha from './components/GoogleRecaptcha';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -30,13 +39,16 @@ const PhoneNumberScreen = (props: INProps) => {
   const dispatch = useAppDispatch<AppDispatch>();
   const networkStatus = useAppSelector(selectNetworkStatus);
   const user = useAppSelector(selectUser);
+  const { t } = useTranslation();
 
+  const recaptchaRef = useRef<RecaptchaHandles>(null);
   const phoneInputRef = useRef(null);
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('Please enter phone number.');
   const [animateConfirmButtonValue, setAnimateConfirmButtonValue] = useState(new Animated.Value(0));
   const [confirmBtnDisabled, setConfirmBtnDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [nextBtnCount, setNextBtnCount] = useState(0);
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -74,7 +86,22 @@ const PhoneNumberScreen = (props: INProps) => {
     dispatch(updateUser({ ...user, phone: phone }));
   }, [phone]);
 
-  const _handleConfirmPress = () => {
+  useEffect(() => {
+    const getCount = async () => {
+      let count = (await getItemFromLocalStorage(ConstantsList.AUTH_COUNT)) || '0';
+      const authCount = JSON.parse(count);
+      setNextBtnCount(authCount);
+    };
+    getCount();
+  }, []);
+
+  const incrementBtnCount = async () => {
+    // Increament authentication count.
+    await saveItemInLocalStorage(ConstantsList.AUTH_COUNT, nextBtnCount + 1);
+    setNextBtnCount(nextBtnCount => nextBtnCount + 1);
+  };
+
+  const _handleConfirmPress = async () => {
     if (networkStatus === 'connected') {
       // Return if phone number has errors
       if (phoneError !== '') {
@@ -86,7 +113,7 @@ const PhoneNumberScreen = (props: INProps) => {
         setLoading(true);
         dispatch(getUserStatus({ phone }))
           .unwrap()
-          .then((res) => {
+          .then(res => {
             if (res.isVerified) {
               dispatch(sendOTP({ phone: phone, secret: undefined }));
               if (res.type === 'demo') {
@@ -94,13 +121,15 @@ const PhoneNumberScreen = (props: INProps) => {
                 props.navigation.navigate('SecurityScreen', { navigation: props.navigation });
               } else {
                 props.navigation.navigate('VerifyOTPScreen');
+                incrementBtnCount();
               }
             } else {
               props.navigation.navigate('RecoveryPhraseScreen');
+              incrementBtnCount();
             }
             setLoading(false);
           })
-          .catch((error) => {
+          .catch(error => {
             setLoading(false);
             console.log(error);
           });
@@ -123,7 +152,7 @@ const PhoneNumberScreen = (props: INProps) => {
             style={{ width: '100%', height: '100%' }}
           />
         </View>
-        <Text style={styles.phoneHeadingStyle}>Your Phone Number</Text>
+        <Text style={styles.phoneHeadingStyle}>{t('PhoneNumberScreen.sub_title')}</Text>
         <View style={styles.inputContainer}>
           {/* Phone input component */}
           <PhoneInputComponent
@@ -138,9 +167,13 @@ const PhoneNumberScreen = (props: INProps) => {
 
         <View style={styles.btnContainer}>
           <AnimatedButton
-            title={'NEXT'}
+            title={t('common.next')}
             animateBtnValue={animateConfirmButtonValue}
-            onPress={_handleConfirmPress}
+            onPress={
+              nextBtnCount >= 3
+                ? recaptchaRef.current?.open || _handleConfirmPress
+                : _handleConfirmPress
+            }
             disabled={confirmBtnDisabled}
             firstColor={AppColors.DISABLED_COLOR}
             secondColor={AppColors.PRIMARY}
@@ -148,6 +181,7 @@ const PhoneNumberScreen = (props: INProps) => {
           />
         </View>
       </KeyboardAvoidingView>
+      <GoogleRecaptcha recaptchaRef={recaptchaRef} onVerify={_handleConfirmPress} />
       {loading && <AnimatedLoading type="FadingCircleAlt" color={AppColors.PRIMARY} />}
     </FadeView>
   );

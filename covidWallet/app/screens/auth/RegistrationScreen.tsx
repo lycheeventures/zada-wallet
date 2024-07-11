@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,8 @@ import {
   KeyboardAvoidingView,
   Dimensions,
   Platform,
-  Keyboard,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { InputComponent } from '../../components/Input/inputComponent';
 import { AppColors } from '../../theme/Colors';
 import FadeView from '../../components/FadeView';
@@ -20,10 +20,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
 import { selectToken, selectUser } from '../../store/auth/selectors';
 import { ConnectionAPI } from '../../gateways';
-import { AuthenticateUser } from './utils';
+import { AuthenticateUser } from '../utils';
 import { updateToken } from '../../store/auth';
 import AnimatedLoading from '../../components/Animations/AnimatedLoading';
-import { Button } from 'react-native-elements';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 
 interface INProps {
@@ -40,6 +39,7 @@ const RegistrationScreen = (props: INProps) => {
   const networkStatus = useAppSelector(selectNetworkStatus);
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
+  const { t } = useTranslation();
 
   const [values, setValues] = useState({ name: '', email: '' });
   const [error, setError] = useState({
@@ -55,12 +55,22 @@ const RegistrationScreen = (props: INProps) => {
       return;
     }
 
-    if (error.email.length !== 0 && values.email.length > 0) {
-      _showAlert('ZADA', error.email + error.name);
+    let nameError = validate('name', values.name);
+    let emailError = ''
+    if (values.email.length > 0) {
+      emailError = validate('email', values.email);
+    }
+
+    // Setting Error
+    setError({ name: nameError, email: emailError });
+
+    if (nameError.length > 0) {
+      _showAlert('ZADA', nameError);
       return;
     }
-    if (error.name.length !== 0) {
-      _showAlert('ZADA', error.email + error.name);
+
+    if (emailError.length > 0) {
+      _showAlert('ZADA', emailError);
       return;
     }
 
@@ -78,7 +88,7 @@ const RegistrationScreen = (props: INProps) => {
       .then(async (res) => {
         let result = await ConnectionAPI.get_ConnectionList(user.country?.toLowerCase());
         if (result.data.success) {
-          
+
           // Generating wallet if does not exist
           let newToken = await AuthenticateUser(token, true);
           dispatch(updateToken(newToken));
@@ -119,15 +129,15 @@ const RegistrationScreen = (props: INProps) => {
           <View style={styles.headingTextContainer}></View>
           <View style={styles.container}>
             <View style={styles.logoContainer}>
-              <Text style={styles.headingText}>Hello</Text>
-              <Text style={styles.subHeadingText}>Create a new account</Text>
+              <Text style={styles.headingText}>{t('RegistrationScreen.title')}</Text>
+              <Text style={styles.subHeadingText}>{t('RegistrationScreen.sub_title')}</Text>
             </View>
 
             <View style={styles.formContainer}>
               <InputComponent
                 type={'default'}
                 leftIconName={'user'}
-                placeholderText="Full Name (Official Name) *"
+                placeholderText={t('RegistrationScreen.full_name') + " *"}
                 errorMessage={error.name}
                 value={values.name}
                 isSecureText={false}
@@ -139,7 +149,7 @@ const RegistrationScreen = (props: INProps) => {
                 type={'default'}
                 keyboardType={'email-address'}
                 leftIconName={'mail'}
-                placeholderText="Email (Optional)"
+                placeholderText={t('RegistrationScreen.email')}
                 errorMessage={error.email}
                 value={values.email}
                 isSecureText={false}

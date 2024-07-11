@@ -9,17 +9,21 @@ interface INProps {
   title?: string;
   disabled?: boolean;
   buttonStyle?: StyleProp<ViewStyle>;
+  buttonContainerStyle?: StyleProp<ViewStyle>;
   buttonTitleStyle?: StyleProp<TextStyle>;
   icon?: IconProps;
   textColor?: string;
 }
 const PrimaryButton = (props: INProps) => {
   // Constants
-  const { title, onPress, buttonStyle, buttonTitleStyle, icon, disabled } = props;
+  const { title, onPress, buttonStyle, buttonContainerStyle, buttonTitleStyle, icon, disabled } =
+    props;
   return (
     <Button
+      style={[styles._button, buttonStyle]}
       titleProps={{ numberOfLines: 1 }}
       title={title}
+      containerStyle={buttonContainerStyle}
       disabled={disabled}
       titleStyle={[styles._btnTitle, buttonTitleStyle]}
       icon={icon ? icon : undefined}

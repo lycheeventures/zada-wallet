@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, Text, Linking, StyleSheet, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import TouchableComponent from '../components/Buttons/TouchableComponent';
@@ -7,6 +8,7 @@ import { AppColors } from '../theme/Colors';
 import { ZohoSalesIQOpenChat } from '../components/Chat/utils';
 
 function ContactUs() {
+  const { t } = useTranslation();
   return (
     <View style={styles.MainContainer}>
       <ScrollView
@@ -18,7 +20,7 @@ function ContactUs() {
         contentContainerStyle={styles.contentContainer}>
         <View style={styles.centerView}>
           <Text style={styles.MainText}>
-            For questions and support, don’t hesitate to contact us on any of the following:
+            {t('ContactUsScreen.title')}
           </Text>
         </View>
 

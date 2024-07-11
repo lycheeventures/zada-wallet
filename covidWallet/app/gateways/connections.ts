@@ -104,6 +104,23 @@ export async function delete_connection(connectionId: string) {
   }
 }
 
+// Get All Connections Metadata
+export async function get_connection_metadata(connectionId: string) {
+  try {
+    const result = await http_client({
+      method: 'GET',
+      url: '/api/connection/get_connection_metadata',
+      params: {
+        connectionId
+      },
+    });
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function invalidateCache() {
   try {
     const result = await http_client({

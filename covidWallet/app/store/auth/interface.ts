@@ -4,6 +4,8 @@ export type IStatus = 'idle' | 'loading' | 'pending' | 'succeeded' | 'failed';
 export interface IUserState {
   isNew: boolean;
   id: Partial<string | undefined>;
+  name: Partial<string | undefined>;
+  email: Partial<string | undefined>;
   walletSecret: string | undefined;
   phone: string | undefined;
   type: 'demo' | undefined;

@@ -7,7 +7,7 @@ git clone https://github.com/lycheeventures/zada-wallet.git
 cd zada-wallet
 yarn
 cd zada-wallet/ios
-pod install
+pod install --repo-update 
 ```
 For iOS:
 ```

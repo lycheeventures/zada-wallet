@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, PermissionsAndroid, Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { PRIMARY_COLOR } from '../theme/Colors';
 import ImageBoxComponent from '../components/ImageBoxComponent';
 import TextComponent from '../components/TextComponent';
@@ -8,9 +9,11 @@ import messaging from '@react-native-firebase/messaging';
 import { useAppDispatch, useAppSelector } from '../store';
 import { updateIsAuthorized, updateToken, updateUser } from '../store/auth';
 import { selectToken, selectUser } from '../store/auth/selectors';
-import { AuthenticateUser } from './auth/utils';
+import { AuthenticateUser } from './utils';
 import { changeAppStatus, updateAppSetupComplete } from '../store/app';
 import { saveItemInLocalStorage } from '../helpers/Storage';
+import { getUserProfile } from '../store/auth/thunk';
+import { fetchConnectionList } from '../store/connections/thunk';
 
 const img = require('../assets/images/notifications.png');
 
@@ -21,41 +24,60 @@ function NotifyMeScreen(props) {
   // Selectors
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
+  const { t } = useTranslation();
 
   // States
   const [loading, setLoading] = useState(false);
 
+  async function requestIOSNotificationPermission() {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async function requestAndroidNotificationPermission() {
+    try {
+      const status = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+      if (status === false) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          {
+            title: 'Notification Permission',
+            message:
+              'ZADA Wallet needs notification permission to ' +
+              'recieve credentials.',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          return true;
+        }
+
+        return false;
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
   async function enableNotifications() {
     setLoading(true);
 
+    let granted = false;
+
     // ask for notification permission
-    const authorizationStatus = await messaging().hasPermission();
-    if (authorizationStatus == messaging.AuthorizationStatus.AUTHORIZED) {
-      const authorizationStatus = await messaging().requestPermission({
-        sound: true,
-        badge: true,
-        alert: true,
-      });
-      if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
-        console.log('Notification Permission => Authorized');
-      } else if (authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL) {
-        console.log('Notification Permission => Provisional');
-      } else {
-        console.log('Notification Permission => Disabled');
-      }
+    if (Platform.OS === 'ios') {
+      granted = await requestIOSNotificationPermission();
     } else {
-      const authorizationStatus = await messaging().requestPermission({
-        sound: true,
-        badge: true,
-        alert: true,
-      });
-      if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
-        console.log('Notification Permission => Authorized');
-      } else if (authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL) {
-        console.log('Notification Permission => Provisional');
-      } else {
-        console.log('Notification Permission => Disabled');
-      }
+      granted = await requestAndroidNotificationPermission();
     }
 
     let data = {
@@ -70,21 +92,22 @@ function NotifyMeScreen(props) {
 
     dispatch(updateUser({ ...data }));
     let freshToken = await AuthenticateUser(token);
+    dispatch(updateAppSetupComplete(true));
     dispatch(updateToken(freshToken));
     saveItemInLocalStorage('isAppSetupComplete', true);
+    await dispatch(getUserProfile()).unwrap();
+    dispatch(fetchConnectionList(user.country));
     dispatch(updateIsAuthorized(true));
-    dispatch(updateAppSetupComplete(true));
     dispatch(changeAppStatus('idle'));
   }
 
   return (
     <View style={styles.viewStyle}>
       <View style={styles.textViewStyle}>
-        <Text style={styles.TextContainerHead}>Get notified</Text>
+        <Text style={styles.TextContainerHead}> {t('NotifyMeScreen.title')}</Text>
         <TextComponent
           onboarding={true}
-          text="We use push notifications to deliver messages for important events,
-          such as when you recieve a new digital certificate."
+          text={t('NotifyMeScreen.sub_title')}
         />
       </View>
       <View style={styles.imageViewStyle}>
@@ -93,7 +116,7 @@ function NotifyMeScreen(props) {
       <View style={styles.buttonViewStyle}>
         <GreenPrimaryButton
           loading={loading}
-          text="ENABLE NOTIFICATIONS"
+          text={t('NotifyMeScreen.enable_btn')}
           nextHandler={enableNotifications}
         />
       </View>
@@ -121,7 +144,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     color: 'black',
     fontWeight: 'bold',
-    fontSize: 32,
+    fontSize: 28,
     flexDirection: 'column',
   },
 });

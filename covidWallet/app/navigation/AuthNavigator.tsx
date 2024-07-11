@@ -1,6 +1,7 @@
 import React from 'react';
 import { TransitionPresets } from '@react-navigation/stack';
 import { Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AuthStack, AuthStackParamList } from './types';
 
@@ -36,6 +37,7 @@ const fadeNavigationConfig = ({ current }: { current: any }) => ({
 
 const AuthNavigator = () => {
   const isAppSetupComplete = useAppSelector(selectAppSetupComplete);
+  const { t } = useTranslation();
   let routeName: keyof AuthStackParamList = isAppSetupComplete
     ? 'PhoneNumberScreen'
     : 'PreferenceScreen';
@@ -66,6 +68,7 @@ const AuthNavigator = () => {
               <HeaderLeftButton navigation={navigation} route={route} />
             ),
           headerShown: true,
+          title: t('PhoneNumberScreen.header_title'),
           headerTitleAlign: 'center',
           headerTitleStyle: {
             fontFamily: 'Poppins-Bold',
@@ -82,7 +85,7 @@ const AuthNavigator = () => {
         options={({ navigation, route }) => ({
           headerLeft: () => <HeaderLeftButton navigation={navigation} route={route} />,
           headerShown: true,
-          title: 'Your Recovery Phrase',
+          title: t('RecoveryPhraseScreen.header_title'),
           headerTitleStyle: {
             fontFamily: 'Poppins-Bold',
             fontSize: 14,
