@@ -90,7 +90,7 @@ const setup = (store: any) => {
       config.timeout = 60000 * 2;
 
       // Setting baseurl
-      config.baseURL = Config.API_URL;
+      config.baseURL = store.getState().app.baseUrl;
 
       return config;
     },
@@ -132,7 +132,7 @@ const setup = (store: any) => {
           let { token } = state.auth;
           // Fetch token
           return new Promise((resolve, reject) => {
-            fetch(Config.API_URL + '/api/v1/authenticate', {
+            fetch(store.getState().app.baseUrl + '/api/v1/authenticate', {
               method: 'POST',
               headers: {
                 Accept: 'application/json',
@@ -170,7 +170,7 @@ const setup = (store: any) => {
           // Error message handling.
           handleErrorMessage(error);
         }
-        
+
         return Promise.reject(error);
       } else {
         networkError = true;

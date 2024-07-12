@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 14,
     color: '#777',
-  },
+  }
 });
 
 export default PreferenceScreen;
