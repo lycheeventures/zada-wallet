@@ -58,8 +58,6 @@ const PhoneNumberScreen = (props: INProps) => {
   const [loading, setLoading] = useState(false);
   const [nextBtnCount, setNextBtnCount] = useState(0);
 
-  console.log("BASE URL", baseURL)
-
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerBackground: () => (

@@ -2,13 +2,14 @@ import { StyleSheet, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { useEffect, useState } from 'react';
 import { getCountry } from "react-native-localize";
-import { BACKGROUND_COLOR, GREEN_COLOR } from '../theme/Colors';
 import HeadingComponent from '../components/HeadingComponent';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import TextComponent from '../components/TextComponent';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../store';
 import { selectBaseUrl } from '../store/app/selectors';
+import { AppColors } from '../theme/Colors';
+import { fetchAllowedCountryList } from '../gateways/auth';
 
 
 const useCountry = () => {
@@ -29,21 +30,6 @@ const useCountry = () => {
     setVisible(false);
   };
 
-  const fetchAllowedCountryList = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/api/v1/get_allowed_countries`, {
-        method: 'GET',
-        headers: {
-          Country: getCountry()
-        }
-      })
-      const allowedCountries = await response.json();
-      return allowedCountries;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   const isCurrentCountryAllowed = async () => {
     try {
       const currentCountry = getCountry();
@@ -60,7 +46,7 @@ const useCountry = () => {
   // UseEffect   
   useEffect(() => {
     isCurrentCountryAllowed();
-  }, []);
+  }, [baseUrl]);
 
   return (
     <Modal
@@ -77,7 +63,7 @@ const useCountry = () => {
           onPress={onClose}
           title="Close"
           titleColor="white"
-          buttonColor={GREEN_COLOR}
+          buttonColor={AppColors.GREEN}
           style={{
             marginTop: 20,
           }}
@@ -90,15 +76,12 @@ const useCountry = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: BACKGROUND_COLOR,
+    backgroundColor: AppColors.BACKGROUND,
     paddingHorizontal: 20,
     paddingBottom: 20,
     borderRadius: 10,
     alignItems: 'center',
-  },
-  generatingOverlayLoaderViewStyle: {
-    height: 200,
-  },
+  }
 });
 
 export default useCountry;

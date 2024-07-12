@@ -1,6 +1,7 @@
 import http_client from './http_client';
 import { analytics_log_register_success, analytics_log_verifies_otp } from '../helpers/analytics';
 import { throwErrorIfExist } from '.';
+import { store } from '../store';
 
 // login user api
 export const login = async (phone: string, secret: string) => {
@@ -249,6 +250,20 @@ export async function deleteAccount() {
       url: '/api/delete_account',
     });
     return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+export async function fetchAllowedCountryList() {
+  try {
+    const baseUrl = store.getState().app.baseUrl
+    const response = await fetch(`${baseUrl}/api/v1/get_allowed_countries`, {
+      method: 'GET'
+    })
+    const allowedCountries = await response.json();
+    return allowedCountries;
   } catch (error) {
     throw error;
   }
