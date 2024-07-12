@@ -8,6 +8,7 @@ import {
   Platform,
   Animated,
   Keyboard,
+  TouchableOpacity,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { RecaptchaHandles } from 'react-native-recaptcha-that-works';
@@ -16,7 +17,7 @@ import { AppColors } from '../../theme/Colors';
 import FadeView from '../../components/FadeView';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import { selectUser } from '../../store/auth/selectors';
-import { selectNetworkStatus } from '../../store/app/selectors';
+import { selectBaseUrl, selectNetworkStatus } from '../../store/app/selectors';
 import {
   _showAlert,
   showNetworkMessage,
@@ -31,6 +32,9 @@ import AnimatedButton from '../../components/Buttons/AnimatedButton';
 import { getUserStatus, sendOTP } from '../../store/auth/thunk';
 import AnimatedLoading from '../../components/Animations/AnimatedLoading';
 import GoogleRecaptcha from './components/GoogleRecaptcha';
+import Modal from 'react-native-modal';
+import RadioButton from '../../components/Dialogs/components/RadioButton';
+import useEnvironmentSwitch from '../../hooks/useEnvironmentSwitch';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -39,7 +43,11 @@ const PhoneNumberScreen = (props: INProps) => {
   const dispatch = useAppDispatch<AppDispatch>();
   const networkStatus = useAppSelector(selectNetworkStatus);
   const user = useAppSelector(selectUser);
+  const baseURL = useAppSelector(selectBaseUrl);
   const { t } = useTranslation();
+
+  const { longPressCount, pressCount, buttonPressed, openEnvOptionsModal, closeEnvOptionsModal, selectedEnvOption, setSelectedEnvOption } = useEnvironmentSwitch();
+
 
   const recaptchaRef = useRef<RecaptchaHandles>(null);
   const phoneInputRef = useRef(null);
@@ -49,6 +57,8 @@ const PhoneNumberScreen = (props: INProps) => {
   const [confirmBtnDisabled, setConfirmBtnDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [nextBtnCount, setNextBtnCount] = useState(0);
+
+  console.log("BASE URL", baseURL)
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -141,6 +151,20 @@ const PhoneNumberScreen = (props: INProps) => {
 
   return (
     <FadeView style={{ flex: 1 }}>
+      <Modal
+        hideModalContentWhileAnimating={true}
+        useNativeDriver={true}
+        onBackdropPress={closeEnvOptionsModal}
+        isVisible={openEnvOptionsModal}
+        animationIn={'slideInLeft'}
+        animationOut={'slideOutRight'}
+      >
+        <View style={styles.optionsModalContainer}>
+          <Text style={styles.optionsTitle}>Select Environment:</Text>
+          <RadioButton option="Test Environment" selectedOption={selectedEnvOption} onSelect={setSelectedEnvOption} />
+          <RadioButton option="Production Environment" selectedOption={selectedEnvOption} onSelect={setSelectedEnvOption} />
+        </View>
+      </Modal>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -151,6 +175,12 @@ const PhoneNumberScreen = (props: INProps) => {
             source={require('../../assets/images/phone.gif')}
             style={{ width: '100%', height: '100%' }}
           />
+          <TouchableOpacity
+            activeOpacity={0.9}
+            style={styles.envSwitchButton}
+            onLongPress={buttonPressed}
+            onPress={longPressCount !== 3 ? () => { } : buttonPressed}
+          ></TouchableOpacity>
         </View>
         <Text style={styles.phoneHeadingStyle}>{t('PhoneNumberScreen.sub_title')}</Text>
         <View style={styles.inputContainer}>
@@ -165,6 +195,12 @@ const PhoneNumberScreen = (props: INProps) => {
           />
         </View>
 
+        <Text style={styles.devTextStyle}>
+          {longPressCount === 3
+            ? 'Now just tap ' + (4 - pressCount) + ' more times!'
+            : ''}
+        </Text>
+        
         <View style={styles.btnContainer}>
           <AnimatedButton
             title={t('common.next')}
@@ -222,6 +258,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  devTextStyle: {
+    textAlign: 'center',
+    marginTop: 24,
+    color: "grey",
+  },
+  optionsModalContainer: {
+    backgroundColor: "white",
+    padding: 30,
+    borderRadius: 16
+  },
+  optionsTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20
+  },
+  envSwitchButton: {
+    position: 'absolute',
+    width: 100,
+    height: 200,
+    right: 16,
+  }
 });
 
 export default PhoneNumberScreen;

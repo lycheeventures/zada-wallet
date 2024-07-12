@@ -22,7 +22,7 @@ import { selectConnections, selectConnectionsStatus } from '../../store/connecti
 import { acceptConnection } from '../../store/connections/thunk';
 import { addAction } from '../../store/actions';
 import { selectAutoAcceptConnection, selectUser } from '../../store/auth/selectors';
-import { selectNetworkStatus } from '../../store/app/selectors';
+import { selectBaseUrl, selectNetworkStatus } from '../../store/app/selectors';
 import { convertStringToBase64 } from '../../helpers/utils';
 import { clearAllAndLogout } from '../../store/utils';
 import { addConnection } from '../../store/connections';
@@ -40,6 +40,7 @@ const QRScreen = ({ route, navigation }) => {
   const connectionStatus = useAppSelector(selectConnectionsStatus);
   const auto_accept_connection = useAppSelector(selectAutoAcceptConnection);
   const networkStatus = useAppSelector(selectNetworkStatus);
+  const API_URL = useAppSelector(selectBaseUrl);
 
   // States
   const [scan, setScan] = useState(true);
@@ -164,10 +165,13 @@ const QRScreen = ({ route, navigation }) => {
                 let result = await VerificationAPI.send_request_to_agency(parsedData);
                 if (result.data.success) {
                   let res = await makeVerificationObject(result.data.verification);
-                  setCredentialData({
-                    type: 'connectionless-verification',
-                    credentials: res.credential,
-                  });
+                  setTimeout(() => {
+                    setCredentialData({
+                      type: 'connectionless-verification',
+                      credentials: res.credential,
+                    });
+                  }, 500)
+
                 }
 
                 setScan(false);
@@ -185,10 +189,12 @@ const QRScreen = ({ route, navigation }) => {
                 if (credObj) {
                   // Setting values
                   setValues(credObj.sortedValues);
-                  setCredentialData({
-                    type: 'cred_ver',
-                    credentials: credObj.credential,
-                  });
+                  setTimeout(() => {
+                    setCredentialData({
+                      type: 'cred_ver',
+                      credentials: credObj.credential,
+                    });
+                  }, 500)
                 }
               } catch (err) {
                 throw 'Not a valid ZADA QR';
@@ -202,10 +208,12 @@ const QRScreen = ({ route, navigation }) => {
                 if (credObj) {
                   // Setting values
                   setValues(credObj.sortedValues);
-                  setCredentialData({
-                    type: 'cred_ver',
-                    credentials: credObj.credential,
-                  });
+                  setTimeout(() => {
+                    setCredentialData({
+                      type: 'cred_ver',
+                      credentials: credObj.credential,
+                    });
+                  }, 500)
                 }
               } catch (err) {
                 throw 'Not a valid ZADA QR';
@@ -269,13 +277,13 @@ const QRScreen = ({ route, navigation }) => {
 
         if (qrJSON.type === ConstantsList.CONN_REQ) {
           if (
-            Config.API_URL === 'https://test-agency.zadanetwork.com' &&
+            API_URL === 'https://test-agency.zadanetwork.com' &&
             qrJSON.env === 'production'
           ) {
             throw 'You are trying to scan production QR code with test app!';
           }
           if (
-            Config.API_URL === 'https://agency.zadanetwork.com' &&
+            API_URL === 'https://agency.zadanetwork.com' &&
             (qrJSON.env === 'debug' || qrJSON.env === 'test')
           ) {
             throw 'You are trying to scan test QR code with production app!';

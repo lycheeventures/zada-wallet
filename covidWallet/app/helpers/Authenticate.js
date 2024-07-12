@@ -5,6 +5,7 @@ import ConstantsList, { ZADA_AUTH_SECRET, ZADA_AUTH_URL } from '../helpers/Confi
 import { getItem, saveItem } from '../helpers/Storage';
 import axios from 'axios';
 import Config from 'react-native-config';
+import { store } from '../store';
 
 var localPassCode = 0;
 var isSuccessful = false;
@@ -149,7 +150,8 @@ export const AuthenticateUser = async (forceAuthenticate) => {
         if (isAuthExpired || forceAuthenticate) {
             let walletSecret = await getItem(ConstantsList.WALLET_SECRET);
             let userID = await getItem(ConstantsList.USER_ID);
-            return await fetch(Config.API_URL + `/api/v1/authenticate`, {
+            const API_URL = store.getState().app.baseUrl;
+            return await fetch(API_URL + `/api/v1/authenticate`, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -220,10 +222,10 @@ export const authenticateZadaAuth = async () => {
 
             let walletSecret = await getItem(ConstantsList.WALLET_SECRET);
             let userID = await getItem(ConstantsList.USER_ID);
-
+            const API_URL = store.getState().app.baseUrl;
             // Code expired generate new one and return it
             const authResult = await axios({
-                url: `${Config.API_URL}/api/authenticate_zada_auth`,
+                url: `${API_URL}/api/authenticate_zada_auth`,
                 method: 'POST',
                 data: {
                     userId: userID,

@@ -1,11 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { parse_date_time } from '../helpers/time';
 import { capitalizeFirstLetter } from '../helpers/utils';
 import { AppColors, GRAY_COLOR } from '../theme/Colors';
-import { updateWebViewUrl } from '../store/app';
-import { useAppDispatch } from '../store';
 
 const RenderValues = ({
   values,
@@ -19,8 +17,6 @@ const RenderValues = ({
   inputTextWeight,
   inputTextSize,
 }) => {
-  const dispatch = useAppDispatch();
-
   values = Object.keys(values)
     .sort()
     .reduce((obj, key) => {
@@ -31,7 +27,7 @@ const RenderValues = ({
   let size_values = Object.keys(values).length;
 
   const onLinkPress = (url) => {
-    dispatch(updateWebViewUrl(url))
+    Linking.openURL(url);
   }
 
   let credentialDetails =

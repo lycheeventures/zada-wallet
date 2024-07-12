@@ -18,7 +18,7 @@ import { navigationRef } from './utils';
 import { updateAppSetupComplete } from '../store/app';
 import { useAppDispatch } from '../store/index-old';
 import useWebview from '../hooks/useWebview';
-import BiometricModal from '../screens/biometric/BiometricScreen';
+import BiometricModal from '../components/Modal/BiometricModal';
 import DeviceInfo from 'react-native-device-info';
 import ConfigApp from '../helpers/ConfigApp';
 import { clearAllAndLogout } from '../store/utils';
@@ -56,24 +56,24 @@ const RootNavigator = () => {
     })();
   }, [networkStatus, setMessageIndex]);
 
-  // // Check for app version and clear all data if the app has been updated
-  // useEffect(() => {
-  //   const checkAppVersion = async () => {
-  //     const currentVersion = DeviceInfo.getVersion();
-  //     const storedVersion = await getItemFromLocalStorage(ConfigApp.APP_VERSION);
+  // Check for app version and clear all data if the app has been updated
+  useEffect(() => {
+    const checkAppVersion = async () => {
+      const currentVersion = DeviceInfo.getVersion();
+      const storedVersion = await getItemFromLocalStorage(ConfigApp.APP_VERSION);
 
-  //     if (storedVersion && storedVersion !== currentVersion) {
-  //       // App has been updated
-  //       clearAllAndLogout(dispatch);
-  //       await saveItemInLocalStorage(ConfigApp.APP_VERSION, currentVersion);
-  //     } else {
-  //       // Store the current version if it's the first time running the app
-  //       await saveItemInLocalStorage(ConfigApp.APP_VERSION, currentVersion);
-  //     }
-  //   };
+      if (storedVersion && storedVersion !== currentVersion) {
+        // Uncomment if users needs to be logged after app update
+        // clearAllAndLogout(dispatch);
+        await saveItemInLocalStorage(ConfigApp.APP_VERSION, currentVersion);
+      } else {
+        // Store the current version if it's the first time running the app
+        await saveItemInLocalStorage(ConfigApp.APP_VERSION, currentVersion);
+      }
+    };
 
-  //   checkAppVersion();
-  // }, []);
+    checkAppVersion();
+  }, []);
 
   // Functions
   const checkForUpdates = async () => {

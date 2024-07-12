@@ -159,7 +159,10 @@
 
     "verification_request": "Verification request has been rejected!",
     "accept_connection": "Connection is already accepted",
-    "accept_credential_offer": "Credential offer is already accepted"
+    "accept_credential_offer": "Credential offer is already accepted",
+
+    "biometric_heading": "Biometric Unavailable",
+    "biometric_not_supported": "Please ensure your device has Biometric/FaceID and is configured correctly, then try again."
   },
   "messages": {
     "delete_account": "Do you want to DELETE your account?",
