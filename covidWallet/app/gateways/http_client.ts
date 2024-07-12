@@ -2,7 +2,6 @@ import axios from 'axios';
 import Config from 'react-native-config';
 import { handleErrorMessage } from '.';
 import { isJWTExp } from '../helpers/Authenticate';
-import { showNetworkMessage } from '../helpers/Toast';
 import { RootState } from '../store';
 import { updateToken } from '../store/auth';
 

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { useEffect, useState } from 'react';
 import { getCountry } from "react-native-localize";
@@ -6,12 +6,15 @@ import { BACKGROUND_COLOR, GREEN_COLOR } from '../theme/Colors';
 import HeadingComponent from '../components/HeadingComponent';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import TextComponent from '../components/TextComponent';
+import { useTranslation } from 'react-i18next';
 
 
 const useCountry = () => {
 
+  const { t } = useTranslation();
+
   // Constants
-  const warningText = `Some functionalities might not function properly. Since you are not in the allowed list of countries or you're using a VPN.`;
+  const warningText = t('errors.countryNotSupported');
 
   //states
   const [visible, setVisible] = useState(false);
@@ -23,8 +26,11 @@ const useCountry = () => {
 
   const fetchAllowedCountryList = async () => {
     try {
-      const response = await fetch('http://192.168.0.106:8000/api/v1/get_allowed_countries', {
+      const response = await fetch('https://c9fb-139-135-59-98.ngrok-free.app/api/v1/get_allowed_countries', {
         method: 'GET',
+        headers: {
+          Country: getCountry()
+        }
       })
       const allowedCountries = await response.json();
       return allowedCountries;
@@ -40,6 +46,7 @@ const useCountry = () => {
       const isAllowed = response?.allowedCountries.includes(currentCountry);
       setVisible(!isAllowed);
     } catch (error) {
+      setVisible(true);
       console.log({ error });
     }
 
@@ -57,7 +64,7 @@ const useCountry = () => {
       onBackdropPress={onClose}
       onBackButtonPress={onClose}>
       <View style={styles.container}>
-        <HeadingComponent text={`Warning!`} />
+        <HeadingComponent text={t('errors.warning') + '!'} />
 
         <TextComponent text={warningText} />
 
