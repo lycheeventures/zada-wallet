@@ -7,6 +7,8 @@ import HeadingComponent from '../components/HeadingComponent';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import TextComponent from '../components/TextComponent';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '../store';
+import { selectBaseUrl } from '../store/app/selectors';
 
 
 const useCountry = () => {
@@ -19,6 +21,9 @@ const useCountry = () => {
   //states
   const [visible, setVisible] = useState(false);
 
+  //selectors
+  const baseUrl = useAppSelector(selectBaseUrl)
+
   // functions
   const onClose = () => {
     setVisible(false);
@@ -26,7 +31,7 @@ const useCountry = () => {
 
   const fetchAllowedCountryList = async () => {
     try {
-      const response = await fetch('https://c9fb-139-135-59-98.ngrok-free.app/api/v1/get_allowed_countries', {
+      const response = await fetch(`${baseUrl}/api/v1/get_allowed_countries`, {
         method: 'GET',
         headers: {
           Country: getCountry()
