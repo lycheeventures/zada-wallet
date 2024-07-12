@@ -5,6 +5,7 @@ import { isJWTExp } from '../helpers/Authenticate';
 import { RootState } from '../store';
 import { updateToken } from '../store/auth';
 import qs from 'query-string';
+import { getCountry } from 'react-native-localize';
 
 // for multiple requests
 let isRefreshing = false;
@@ -76,6 +77,9 @@ const setup = (store: any) => {
         ...config.headers,
         Accept: 'application/json',
       } as AxiosRequestHeaders;
+
+      // Add country header
+      config.headers.country = getCountry();
 
       // Add Content-Type header.
       if (!config.headers['Content-Type']) {

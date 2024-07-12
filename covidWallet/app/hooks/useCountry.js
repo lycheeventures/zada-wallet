@@ -1,7 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { useEffect, useState } from 'react';
-import { getCountry } from "react-native-localize";
 import HeadingComponent from '../components/HeadingComponent';
 import SimpleButton from '../components/Buttons/SimpleButton';
 import TextComponent from '../components/TextComponent';
@@ -9,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../store';
 import { selectBaseUrl } from '../store/app/selectors';
 import { AppColors } from '../theme/Colors';
-import { fetchAllowedCountryList } from '../gateways/auth';
+import { checkIfCountryIsAllowed } from '../gateways/auth';
 
 
 const useCountry = () => {
@@ -32,15 +31,14 @@ const useCountry = () => {
 
   const isCurrentCountryAllowed = async () => {
     try {
-      const currentCountry = getCountry();
-      const response = await fetchAllowedCountryList();
-      const isAllowed = response?.allowedCountries.includes(currentCountry);
-      setVisible(!isAllowed);
+      const response = await checkIfCountryIsAllowed();
+      if (response && !response.isCountryAllowed) {
+        setVisible(true);
+      }
     } catch (error) {
       setVisible(true);
       console.log({ error });
     }
-
   }
 
   // UseEffect   
@@ -51,9 +49,10 @@ const useCountry = () => {
   return (
     <Modal
       isVisible={visible}
-      useNativeDriver={true}
       onBackdropPress={onClose}
-      onBackButtonPress={onClose}>
+      onBackButtonPress={onClose}
+      useNativeDriver={false}
+    >
       <View style={styles.container}>
         <HeadingComponent text={t('errors.warning') + '!'} />
 

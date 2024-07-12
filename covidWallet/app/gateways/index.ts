@@ -74,7 +74,7 @@ export function handleErrorMessage(error: any) {
     return;
   }
   alertsToShow.add(error.response.data.error);
-  setTimeout(() => trigegShowAlert(), 2000);
+  setTimeout(() => trigegShowAlert(), 1000);
 }
 
 const trigegShowAlert = () => {
