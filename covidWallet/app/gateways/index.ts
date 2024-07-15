@@ -74,10 +74,10 @@ export function handleErrorMessage(error: any) {
     return;
   }
   alertsToShow.add(error.response.data.error);
-  setTimeout(() => trigegShowAlert(), 1000);
+  setTimeout(() => triggerShowAlert(), 1000);
 }
 
-const trigegShowAlert = () => {
+const triggerShowAlert = () => {
   const alertMessages = Array.from(alertsToShow);
   alertsToShow.clear();
   alertMessages.map(alertMessage => {

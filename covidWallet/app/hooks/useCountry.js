@@ -18,13 +18,13 @@ const useCountry = () => {
   // Constants
   const warningText = t('errors.countryNotSupported');
 
-  //states
+  // States
   const [visible, setVisible] = useState(false);
 
-  //selectors
+  // Selectors
   const baseUrl = useAppSelector(selectBaseUrl)
 
-  // functions
+  // Functions
   const onClose = () => {
     setVisible(false);
   };
@@ -32,7 +32,10 @@ const useCountry = () => {
   const isCurrentCountryAllowed = async () => {
     try {
       const response = await checkIfCountryIsAllowed();
-      if (response && !response.isCountryAllowed) {
+      if (
+        response?.data &&
+        !response.data.isCountryAllowed
+      ) {
         setVisible(true);
       }
     } catch (error) {

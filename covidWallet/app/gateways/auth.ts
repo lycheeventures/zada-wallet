@@ -1,8 +1,6 @@
 import http_client from './http_client';
 import { analytics_log_register_success, analytics_log_verifies_otp } from '../helpers/analytics';
 import { throwErrorIfExist } from '.';
-import { store } from '../store';
-import { getCountry } from 'react-native-localize';
 
 // login user api
 export const login = async (phone: string, secret: string) => {
@@ -259,16 +257,11 @@ export async function deleteAccount() {
 
 export async function checkIfCountryIsAllowed() {
   try {
-    const country = getCountry();
-    const baseUrl = store.getState().app.baseUrl
-    const response = await fetch(`${baseUrl}/api/v1/is_country_allowed`, {
+    const result = await http_client({
       method: 'GET',
-      headers: {
-        country
-      }
-    })
-    const isCountryAllwed = await response.json();
-    return isCountryAllwed;
+      url: '/api/v1/is_country_allowed',
+    });
+    return result;
   } catch (error) {
     throw error;
   }

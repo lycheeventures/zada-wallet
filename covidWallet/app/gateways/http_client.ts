@@ -21,6 +21,7 @@ const url_arr = [
   '/api/v1/validateOTPs',
   '/api/wallet/create',
   '/api/get_user_status',
+  '/api/v1/is_country_allowed',
 ];
 // Api request Queue machanism, if authorization token has expired.
 const processQueue = (error: any, token = null) => {
