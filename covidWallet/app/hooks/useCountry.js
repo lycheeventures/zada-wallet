@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../store';
 import { selectBaseUrl } from '../store/app/selectors';
 import { AppColors } from '../theme/Colors';
-import { checkIfCountryIsAllowed } from '../gateways/auth';
+import { AuthAPI } from '../gateways';
 
 
 const useCountry = () => {
@@ -31,7 +31,7 @@ const useCountry = () => {
 
   const isCurrentCountryAllowed = async () => {
     try {
-      const response = await checkIfCountryIsAllowed();
+      const response = await AuthAPI.checkIfCountryIsAllowed();
       if (
         response?.data &&
         !response.data.isCountryAllowed
