@@ -8,6 +8,8 @@ import { clearAllAndLogout } from '../store/utils';
 import { store } from '../store';
 import { navigationRef } from '../navigation/utils';
 
+const alertsToShow = new Set<string>();
+
 // Exception List
 const exceptionList = ['The specified key does not exist.'];
 // Errors
@@ -71,8 +73,16 @@ export function handleErrorMessage(error: any) {
     _showAlert('Error', error.response.data.message);
     return;
   }
+  alertsToShow.add(error.response.data.error);
+  setTimeout(() => triggerShowAlert(), 1000);
+}
 
-  _showAlert('Error', error.response.data.error);
+const triggerShowAlert = () => {
+  const alertMessages = Array.from(alertsToShow);
+  alertsToShow.clear();
+  alertMessages.map(alertMessage => {
+    _showAlert('Error', alertMessage);
+  })
 }
 
 export { AuthAPI, CredentialAPI, ConnectionAPI, VerificationAPI };

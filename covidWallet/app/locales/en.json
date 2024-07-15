@@ -126,6 +126,8 @@
     "text_5": "ZADA is not just an app but an ecosystem, a network, and a mission to ensure everyone can provide and use digital services without risk for fraud or privacy intrusion!"
   },
   "errors": {
+    "warning": "Warning",
+    "countryNotSupported": "Some functionalities might not function properly. Since you are not in the allowed list of countries or you're using a VPN.",
     "info_pincode": "You didn't set your pincode yet. Please click below button to set your {{max}} digit pincode",
 
     "invalid_email": "Please enter a valid email address.",

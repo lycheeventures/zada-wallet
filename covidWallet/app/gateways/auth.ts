@@ -253,3 +253,16 @@ export async function deleteAccount() {
     throw error;
   }
 }
+
+
+export async function checkIfCountryIsAllowed() {
+  try {
+    const result = await http_client({
+      method: 'GET',
+      url: '/api/v1/is_country_allowed',
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}

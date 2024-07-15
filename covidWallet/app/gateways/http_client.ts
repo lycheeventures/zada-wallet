@@ -2,10 +2,10 @@ import axios, { AxiosRequestHeaders } from 'axios';
 import Config from 'react-native-config';
 import { handleErrorMessage } from '.';
 import { isJWTExp } from '../helpers/Authenticate';
-import { showNetworkMessage } from '../helpers/Toast';
 import { RootState } from '../store';
 import { updateToken } from '../store/auth';
 import qs from 'query-string';
+import { getCountry } from 'react-native-localize';
 
 // for multiple requests
 let isRefreshing = false;
@@ -21,6 +21,7 @@ const url_arr = [
   '/api/v1/validateOTPs',
   '/api/wallet/create',
   '/api/get_user_status',
+  '/api/v1/is_country_allowed',
 ];
 // Api request Queue machanism, if authorization token has expired.
 const processQueue = (error: any, token = null) => {
@@ -77,6 +78,9 @@ const setup = (store: any) => {
         ...config.headers,
         Accept: 'application/json',
       } as AxiosRequestHeaders;
+
+      // Add country header
+      config.headers.country = getCountry();
 
       // Add Content-Type header.
       if (!config.headers['Content-Type']) {
