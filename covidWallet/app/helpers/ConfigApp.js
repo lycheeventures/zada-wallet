@@ -54,7 +54,7 @@ module.exports = Object.freeze({
   ZOHO_SALES_IQ_IOS_ACCESS_KEY:
     'Hvs0guXcRZB6auLrKXQV1fw7t0VUtEJi4oFatc4c46Le0Whytt8ZyF5vy7MQrGb8OXlW%2BSBj2aW1OSyeTdcf9GOQYqAhhEiQRVrIekfvSId27%2F0nMhrSs2PmPPk5EGfL0DtwFP3qFEP8AcAF2QaSTk9B54Vp%2Fqio',
   PROD_BASE_URL: "https://agency.zadanetwork.com",
-  TEST_BASE_URL: "https://ac2f-139-135-59-98.ngrok-free.app",
+  TEST_BASE_URL: "https://test-agency.zadanetwork.com",
   ZADA_WALLET_ID_CRED_DEF_TEST: "EJXjfnvH1nAPJzdJCSzUUX:3:CL:61037:acme",
   ZADA_WALLET_ID_CRED_DEF_PROD: "EJXjfnvH1nAPJzdJCSzUUX:3:CL:61037:acme",
 });
