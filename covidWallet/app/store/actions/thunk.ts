@@ -23,8 +23,6 @@ export const fetchActions = createAsyncThunk(
 
       const response = await CredentialAPI.get_all_credentials_offers();
 
-      console.log({ response: response?.data?.offers })
-
       let offers = response.data.offers;
       let actions = {
         success: response.data.success,
