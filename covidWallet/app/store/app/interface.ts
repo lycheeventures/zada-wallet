@@ -3,8 +3,10 @@ export interface IAppState {
   networkStatus: 'connected' | 'disconnected';
   developmentMode: boolean;
   isAppSetupComplete: boolean;
+  baseUrl: string;
   webViewUrl: string | {
     url: string;
     redirectUrl: string;
   };
+  showClaimButton: boolean;
 }

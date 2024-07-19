@@ -1,18 +1,29 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '..';
 import { CredentialAPI, VerificationAPI } from '../../gateways';
-import ConstantsList from '../../helpers/ConfigApp';
+import ConstantsList, { PROD_BASE_URL, ZADA_WALLET_ID_CRED_DEF_PROD, ZADA_WALLET_ID_CRED_DEF_TEST } from '../../helpers/ConfigApp';
 import { IConnectionObject } from '../connections/interface';
+import { showMessage } from '../../helpers';
+import { updateShowClaimButton } from '../app';
+import { accept_credential } from '../../gateways/credentials';
+import { addCredential } from '../credentials/thunk';
+import { deleteAction } from '.';
+import { ICredentialObject } from '../credentials/interface';
 
 export const fetchActions = createAsyncThunk(
   'actions/fetchActions',
-  async (args, { getState }) => {
+  async (args, { dispatch, getState }) => {
     try {
       // Current State
-      const { connection } = getState() as RootState;
+      const { connection, app } = getState() as RootState;
       const connArr = Object.values(connection.entities) as IConnectionObject[];
 
+      // Getting credDef for wallet ID
+      const ZadaWalletIdCredDef = PROD_BASE_URL === app.baseUrl ? ZADA_WALLET_ID_CRED_DEF_PROD : ZADA_WALLET_ID_CRED_DEF_TEST;
+
       const response = await CredentialAPI.get_all_credentials_offers();
+
+      console.log({ response: response?.data?.offers })
 
       let offers = response.data.offers;
       let actions = {
@@ -24,7 +35,40 @@ export const fetchActions = createAsyncThunk(
         for (let i = 0; i < offers.length; ++i) {
           // Adding Credential Object
           offers[i]['type'] = ConstantsList.CRED_OFFER;
-          actions.actions[i] = addImageAndNameFromConnectionList(offers[i], connArr);
+          if (offers[i].definitionId === ZadaWalletIdCredDef) {
+            // accept credential offer
+            let result = await accept_credential(offers[i].credentialId);
+
+            let cred_dict = result.data.credential;
+
+            let attributes = cred_dict.credential_proposal_dict.credential_proposal.attributes;
+
+            let values: any = {}
+            for (let item of attributes) {
+              values[item.name] = item.value;
+            }
+
+
+            let cred = {
+              acceptedAtUtc: cred_dict.updated_at,
+              connectionId: cred_dict.connection_id,
+              correlationId: cred_dict.credential_exchange_id,
+              credentialId: cred_dict.credential_exchange_id,
+              definitionId: cred_dict.credential_definition_id,
+              issuedAtUtc: cred_dict.created_at,
+              schemaId: cred_dict.schema_id,
+              state: 'Issued',
+              threadId: cred_dict.thread_id,
+              values,
+            };
+
+            if (result.data.success) {
+              dispatch(updateShowClaimButton(false))
+              dispatch(addCredential(cred as any));
+            }
+          } else {
+            actions.actions[i] = addImageAndNameFromConnectionList(offers[i], connArr);
+          }
         }
       }
 

@@ -134,6 +134,7 @@ const slice = createSlice({
         state.user.email = action.payload.user.email;
         state.user.country = action.payload.user.country;
         state.user.language = action.payload.user.language;
+        state.user.didExist = !!action.payload.user.didExist;
       }
     });
     builder.addCase(getUserProfile.rejected, (state, action) => {

@@ -11,3 +11,5 @@ export const selectAppSetupComplete = (state: RootState) => state.app.isAppSetup
 export const selectWebViewUrl = (state: RootState) => state.app.webViewUrl;
 
 export const selectBaseUrl = (state: RootState) => state.app.baseUrl;
+
+export const selectShowClaimButton = (state: RootState) => state.app.showClaimButton;

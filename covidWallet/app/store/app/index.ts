@@ -10,6 +10,7 @@ export const AppState: IAppState = {
   isAppSetupComplete: false,
   webViewUrl: '',
   baseUrl: ConfigApp.PROD_BASE_URL,
+  showClaimButton: false,
 };
 
 // Slice
@@ -35,12 +36,15 @@ export const slice = createSlice({
     updateBaseUrl(state, action) {
       state.baseUrl = action.payload;
     },
+    updateShowClaimButton(state, action) {
+      state.showClaimButton = action.payload;
+    },
     resetApp: () => AppState,
   },
 });
 
 // Exporting Actions
-export const { changeAppStatus, updateNetworkStatus, updateDevelopmentMode, updateAppSetupComplete, updateWebViewUrl, resetApp, updateBaseUrl } =
+export const { changeAppStatus, updateNetworkStatus, updateDevelopmentMode, updateAppSetupComplete, updateWebViewUrl, resetApp, updateBaseUrl, updateShowClaimButton } =
   slice.actions;
 
 export { slice as AppSlice };

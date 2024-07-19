@@ -21,8 +21,8 @@ import useWebview from '../hooks/useWebview';
 import BiometricModal from '../components/Modal/BiometricModal';
 import DeviceInfo from 'react-native-device-info';
 import ConfigApp from '../helpers/ConfigApp';
-import { clearAllAndLogout } from '../store/utils';
 import useCountry from '../hooks/useCountry';
+import useClaimCredential from '../hooks/useClaimCredential';
 
 const Stack = createStackNavigator();
 const RootNavigator = () => {
@@ -110,6 +110,7 @@ const RootNavigator = () => {
 
   return (
     <NavigationContainer linking={linking} ref={navigationRef}>
+      {useClaimCredential()}
       {useCountry()}
       {useWebview()}
       {!isAppReady ? (
