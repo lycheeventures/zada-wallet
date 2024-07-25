@@ -1327,6 +1327,8 @@ PODS:
     - React-Core
   - RNKeychain (8.2.0):
     - React-Core
+  - RNLocalize (3.2.0):
+    - React-Core
   - RNPermissions (4.1.5):
     - React-Core
   - RNReanimated (3.12.1):
@@ -1343,7 +1345,7 @@ PODS:
     - React
   - RNSha256 (1.4.10):
     - React-Core
-  - RNShare (7.9.1):
+  - RNShare (10.2.1):
     - React-Core
   - RNSVG (15.3.0):
     - React-Core
@@ -1461,6 +1463,7 @@ DEPENDENCIES:
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
+  - RNLocalize (from `../node_modules/react-native-localize`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -1650,6 +1653,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNKeychain:
     :path: "../node_modules/react-native-keychain"
+  RNLocalize:
+    :path: "../node_modules/react-native-localize"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
   RNReanimated:
@@ -1771,12 +1776,13 @@ SPEC CHECKSUMS:
   RNFBMessaging: d1727030c98a9dcc7cd44e2fd29398acb6531cba
   RNGestureHandler: 67d3f1f69d4d0c98d6e83f4229e3bbf997d1dc72
   RNKeychain: bfe3d12bf4620fe488771c414530bf16e88f3678
+  RNLocalize: b77875884750cb6a58cd6865863fe2ba2729b72b
   RNPermissions: 5a2dafe37c8e0a3fa1d6e0783a1490b1b7fd92d6
   RNReanimated: 5307ba390921b76ddf9c0aa69876916ad427a61f
   RNScreens: e842cdccb23c0a084bd6307f6fa83fd1c1738029
   RNSecureRandom: 07efbdf2cd99efe13497433668e54acd7df49fef
   RNSha256: e1bc64e9e50b293d5282bb4caa1b2043931f1c9d
-  RNShare: a5dc3b9c53ddc73e155b8cd9a94c70c91913c43c
+  RNShare: 0fad69ae2d71de9d1f7b9a43acf876886a6cb99c
   RNSVG: a48668fd382115bc89761ce291a81c4ca5f2fd2e
   RNVectorIcons: 96e8c5c45609932bb2f8347e1c709bcca0e95654
   RNZohoSalesIQ: d548ec89eb8413bb6dbd134429fea7e5e284c54e
