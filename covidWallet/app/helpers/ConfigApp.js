@@ -1,9 +1,6 @@
 module.exports = Object.freeze({
-  //BASE_URL: 'http://8130-111-119-187-42.ngrok.io',
-  BASE_URL: 'http://test-agency.zadanetwork.com',
-  // BASE_URL: 'https://agency.zadanetwork.com',
-  ZADA_AUTH_URL: 'https://auth-test.zadanetwork.com',
-  //ZADA_AUTH_URL: 'http://0876-182-191-89-195.ngrok.io',
+  PROD_BASE_URL: "https://agency.zadanetwork.com",
+  TEST_BASE_URL: "https://test-agency.zadanetwork.com",
   ZADA_AUTH_SECRET: 'doingtestinginzadaauth',
   ZIGNSEC_TEST_URL: 'https://test.zignsec.com/v3',
   ZIGNSEC_WEBHOOK: 'http://ce63-206-84-130-27.ngrok.io/api/kycs_webhook',
@@ -52,7 +49,5 @@ module.exports = Object.freeze({
   ZOHO_SALES_IQ_ANDROID_ACCESS_KEY:
     'Hvs0guXcRZB6auLrKXQV1fw7t0VUtEJi4oFatc4c46Le0Whytt8ZyF5vy7MQrGb8etJeLG5Am86VE8qKPjc%2Bvn9NtChLw3JycITa9K2oZuDdVwZL62QsUGPmPPk5EGfL0DtwFP3qFEP8AcAF2QaSTk9B54Vp%2Fqio',
   ZOHO_SALES_IQ_IOS_ACCESS_KEY:
-    'Hvs0guXcRZB6auLrKXQV1fw7t0VUtEJi4oFatc4c46Le0Whytt8ZyF5vy7MQrGb8OXlW%2BSBj2aW1OSyeTdcf9GOQYqAhhEiQRVrIekfvSId27%2F0nMhrSs2PmPPk5EGfL0DtwFP3qFEP8AcAF2QaSTk9B54Vp%2Fqio',
-  PROD_BASE_URL: "https://agency.zadanetwork.com",
-  TEST_BASE_URL: "https://test-agency.zadanetwork.com"
+    'Hvs0guXcRZB6auLrKXQV1fw7t0VUtEJi4oFatc4c46Le0Whytt8ZyF5vy7MQrGb8OXlW%2BSBj2aW1OSyeTdcf9GOQYqAhhEiQRVrIekfvSId27%2F0nMhrSs2PmPPk5EGfL0DtwFP3qFEP8AcAF2QaSTk9B54Vp%2Fqio'
 });
