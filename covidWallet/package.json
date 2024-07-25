@@ -101,7 +101,7 @@
     "react-native-screens": "^3.31.0",
     "react-native-securerandom": "^1.0.1",
     "react-native-sha256": "^1.4.8",
-    "react-native-share": "^7.3.9",
+    "react-native-share": "^10.2.1",
     "react-native-simple-biometrics": "^1.5.2",
     "react-native-snap-carousel-v4": "^1.0.1",
     "react-native-spinkit": "^1.5.1",
