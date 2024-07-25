@@ -40,7 +40,7 @@ export const slice = createSlice({
 });
 
 // Exporting Actions
-export const { changeAppStatus, updateNetworkStatus, updateDevelopmentMode, updateAppSetupComplete, updateWebViewUrl, resetApp, updateBaseUrl } =
+export const { changeAppStatus, updateNetworkStatus, updateDevelopmentMode, updateAppSetupComplete, updateWebViewUrl, updateBaseUrl, resetApp } =
   slice.actions;
 
 export { slice as AppSlice };

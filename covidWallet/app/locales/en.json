@@ -127,7 +127,7 @@
   },
   "errors": {
     "warning": "Warning",
-    "countryNotSupported": "Some functionalities might not function properly. Since you are not in the allowed list of countries or you're using a VPN.",
+    "countryNotSupported": "Your connection appears to be blocked. Please try to disable any VPN, check your internet connection, and try again. If the issue persists, contact support for assistance.",
     "info_pincode": "You didn't set your pincode yet. Please click below button to set your {{max}} digit pincode",
 
     "invalid_email": "Please enter a valid email address.",
@@ -183,7 +183,8 @@
     "success_verification_request": "Your verification request is fulfilled successfully.",
     "success_connection": "Your connection is created successfully.",
     "success_certificate": "You have received a certificate successfully.",
-    "success_certificate_deletion": "Credential is deleted successfully"
+    "success_certificate_deletion": "Credential is deleted successfully",
+    "success_claim_credential": "Request for credential has been submitted. It will be delivered shortly."
   },
   "success": {
     "updated_password": "Password has been updated successfully",
