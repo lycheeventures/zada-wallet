@@ -71,5 +71,5 @@ export function showOKDialog(title: string, subtitle: string, onOkPress: () => {
 }
 
 export function showNetworkMessage() {
-  Alert.alert('No Internet', 'You are not connected with internet. Please connect and try again.');
+  _showAlert("Warning!", "Your connection appears to be blocked. Please try to disable any VPN, check your internet connection, and try again. If the issue persists, contact support for assistance.");
 }
