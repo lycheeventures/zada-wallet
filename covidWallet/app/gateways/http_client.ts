@@ -91,7 +91,7 @@ const setup = (store: any) => {
       }
 
       // Setting timeout
-      config.timeout = 60000 * 2;
+      config.timeout = 45000;
 
       // Setting baseurl
       config.baseURL = store.getState().app.baseUrl;
