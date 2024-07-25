@@ -1,10 +1,9 @@
 import { Platform } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ConstantsList, { ZADA_AUTH_SECRET, ZADA_AUTH_URL } from '../helpers/ConfigApp';
+import ConstantsList from '../helpers/ConfigApp';
 import { getItem, saveItem } from '../helpers/Storage';
 import axios from 'axios';
-import Config from 'react-native-config';
 import { store } from '../store';
 
 var localPassCode = 0;
