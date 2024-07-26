@@ -13,11 +13,11 @@ workflows:
             - google_credentials # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS <-- Put your google-services.json)
           vars:
             PACKAGE_NAME: "com.zadanetwork.wallet" # <-- Put your package name here e.g. com.domain.myapp
-          node: v21.5.0
+          node: v19.7.0
         scripts:
             - name: Install npm dependencies
               script: |
-                npm install --prefix ./covidWallet
+                npm install --prefix ./covidWallet --legacy-peer-deps
             - name: Set Android SDK location
               script: |
                 echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"            
