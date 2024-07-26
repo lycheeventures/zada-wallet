@@ -13,7 +13,7 @@ workflows:
             - google_credentials # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS <-- Put your google-services.json)
           vars:
             PACKAGE_NAME: "com.zadanetwork.wallet" # <-- Put your package name here e.g. com.domain.myapp
-          node: v19.7.0
+          node: v21.5.0
         scripts:
             - name: Install npm dependencies
               script: |
