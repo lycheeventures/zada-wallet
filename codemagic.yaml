@@ -9,8 +9,7 @@ workflows:
         environment:
           android_signing:
             - keystore_reference
-          groups:
-            - google_play
+          groups:            
             - google_credentials # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS <-- Put your google-services.json)
           vars:
             PACKAGE_NAME: "com.zadanetwork.wallet" # <-- Put your package name here e.g. com.domain.myapp
