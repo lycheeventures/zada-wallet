@@ -32,9 +32,9 @@ import AnimatedButton from '../../components/Buttons/AnimatedButton';
 import { getUserStatus, sendOTP } from '../../store/auth/thunk';
 import AnimatedLoading from '../../components/Animations/AnimatedLoading';
 import GoogleRecaptcha from './components/GoogleRecaptcha';
-import Modal from 'react-native-modal';
 import RadioButton from '../../components/Dialogs/components/RadioButton';
-import useEnvironmentSwitch from '../../hooks/useEnvironmentSwitch';
+import BottomSheetComponent from '../../components/BottomSheet/bottomSheetComponent';
+import { updateBaseUrl } from '../../store/app';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -46,9 +46,6 @@ const PhoneNumberScreen = (props: INProps) => {
   const baseURL = useAppSelector(selectBaseUrl);
   const { t } = useTranslation();
 
-  const { longPressCount, pressCount, buttonPressed, openEnvOptionsModal, closeEnvOptionsModal, selectedEnvOption, setSelectedEnvOption } = useEnvironmentSwitch();
-
-
   const recaptchaRef = useRef<RecaptchaHandles>(null);
   const phoneInputRef = useRef(null);
   const [phone, setPhone] = useState('');
@@ -57,6 +54,8 @@ const PhoneNumberScreen = (props: INProps) => {
   const [confirmBtnDisabled, setConfirmBtnDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [nextBtnCount, setNextBtnCount] = useState(0);
+  const [longPressCount, setLongpressCount] = useState(0);
+  const [selected, setSelected] = useState('Production Environment');
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -147,77 +146,92 @@ const PhoneNumberScreen = (props: INProps) => {
     }
   };
 
-  return (
-    <FadeView style={{ flex: 1 }}>
-      <Modal
-        hideModalContentWhileAnimating={true}
-        useNativeDriver={true}
-        onBackdropPress={closeEnvOptionsModal}
-        isVisible={openEnvOptionsModal}
-        animationIn={'slideInLeft'}
-        animationOut={'slideOutRight'}
-      >
-        <View style={styles.optionsModalContainer}>
-          <Text style={styles.optionsTitle}>Select Environment:</Text>
-          <RadioButton option="Test Environment" selectedOption={selectedEnvOption} onSelect={setSelectedEnvOption} />
-          <RadioButton option="Production Environment" selectedOption={selectedEnvOption} onSelect={setSelectedEnvOption} />
+  const renderBottomSheet = (): React.ReactNode => {
+    const onSelect = (env: string) => {
+      dispatch(
+        updateBaseUrl(
+          env === 'Test Environment' ? ConstantsList.BASE_URL_TEST : ConstantsList.BASE_URL_PROD
+        )
+      );
+      setSelected(env);
+    };
+    return (
+      <View style={styles.bottomSheetViewStyle}>
+        <View style={{ padding: 10, borderBottomWidth: 1 }}>
+          <RadioButton option="Test Environment" selectedOption={selected} onSelect={onSelect} />
         </View>
-      </Modal>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
-        <View style={styles.imageViewStyle}>
-          <Image
-            resizeMode="contain"
-            source={require('../../assets/images/phone.gif')}
-            style={{ width: '100%', height: '100%' }}
-          />
-          <TouchableOpacity
-            activeOpacity={0.9}
-            style={styles.envSwitchButton}
-            onLongPress={buttonPressed}
-            onPress={longPressCount !== 3 ? () => { } : buttonPressed}
-          ></TouchableOpacity>
-        </View>
-        <Text style={styles.phoneHeadingStyle}>{t('PhoneNumberScreen.sub_title')}</Text>
-        <View style={styles.inputContainer}>
-          {/* Phone input component */}
-          <PhoneInputComponent
-            defaultCountry={user.country ? user.country : 'MM'}
-            autofocus={true}
-            inputRef={phoneInputRef}
-            phone={phone}
-            setPhone={setPhone}
-            setPhoneError={setPhoneError}
+        <View style={{ padding: 10, borderBottomWidth: 1 }}>
+          <RadioButton
+            option="Production Environment"
+            selectedOption={selected}
+            onSelect={onSelect}
           />
         </View>
+      </View>
+    );
+  };
 
-        <Text style={styles.devTextStyle}>
-          {longPressCount === 3
-            ? 'Now just tap ' + (4 - pressCount) + ' more times!'
-            : ''}
-        </Text>
-        
-        <View style={styles.btnContainer}>
-          <AnimatedButton
-            title={t('common.next')}
-            animateBtnValue={animateConfirmButtonValue}
-            onPress={
-              nextBtnCount >= 3
-                ? recaptchaRef.current?.open || _handleConfirmPress
-                : _handleConfirmPress
-            }
-            disabled={confirmBtnDisabled}
-            firstColor={AppColors.DISABLED_COLOR}
-            secondColor={AppColors.PRIMARY}
-            firstTextColor={AppColors.GRAY}
+  return (
+    <>
+      <FadeView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+          <View style={styles.imageViewStyle}>
+            <Image
+              resizeMode="contain"
+              source={require('../../assets/images/phone.gif')}
+              style={{ width: '100%', height: '100%' }}
+            />
+            <TouchableOpacity
+              activeOpacity={0.9}
+              style={styles.envSwitchButton}
+              disabled={longPressCount === 3}
+              onLongPress={() => setLongpressCount(longPressCount => longPressCount + 1)}
+            />
+          </View>
+          <Text style={styles.phoneHeadingStyle}>{t('PhoneNumberScreen.sub_title')}</Text>
+          <View style={styles.inputContainer}>
+            {/* Phone input component */}
+            <PhoneInputComponent
+              defaultCountry={user.country ? user.country : 'MM'}
+              autofocus={true}
+              inputRef={phoneInputRef}
+              phone={phone}
+              setPhone={setPhone}
+              setPhoneError={setPhoneError}
+            />
+          </View>
+          <View style={styles.btnContainer}>
+            <AnimatedButton
+              title={t('common.next')}
+              animateBtnValue={animateConfirmButtonValue}
+              onPress={
+                nextBtnCount >= 3
+                  ? recaptchaRef.current?.open || _handleConfirmPress
+                  : _handleConfirmPress
+              }
+              disabled={confirmBtnDisabled}
+              firstColor={AppColors.DISABLED_COLOR}
+              secondColor={AppColors.PRIMARY}
+              firstTextColor={AppColors.GRAY}
+            />
+          </View>
+        </KeyboardAvoidingView>
+        <GoogleRecaptcha recaptchaRef={recaptchaRef} onVerify={_handleConfirmPress} />
+        {loading && <AnimatedLoading type="FadingCircleAlt" color={AppColors.PRIMARY} />}
+        {longPressCount === 3 && (
+          <BottomSheetComponent
+            component={renderBottomSheet}
+            headingText="Select Environment"
+            headingTextColor={AppColors.PRIMARY}
+            backgroundColor={AppColors.WHITE}
+            onDismiss={() => setLongpressCount(0)}
           />
-        </View>
-      </KeyboardAvoidingView>
-      <GoogleRecaptcha recaptchaRef={recaptchaRef} onVerify={_handleConfirmPress} />
-      {loading && <AnimatedLoading type="FadingCircleAlt" color={AppColors.PRIMARY} />}
-    </FadeView>
+        )}
+      </FadeView>
+    </>
   );
 };
 
@@ -256,27 +270,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  devTextStyle: {
-    textAlign: 'center',
-    marginTop: 24,
-    color: "grey",
-  },
-  optionsModalContainer: {
-    backgroundColor: "white",
-    padding: 30,
-    borderRadius: 16
-  },
-  optionsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20
+  bottomSheetViewStyle: {
+    backgroundColor: AppColors.WHITE,
+    width: '100%',
+    padding: 16,
   },
   envSwitchButton: {
     position: 'absolute',
     width: 100,
     height: 200,
     right: 16,
-  }
+  },
 });
 
 export default PhoneNumberScreen;

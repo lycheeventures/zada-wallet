@@ -1,6 +1,6 @@
 module.exports = Object.freeze({
-  PROD_BASE_URL: "https://agency.zadanetwork.com",
-  TEST_BASE_URL: "https://test-agency.zadanetwork.com",
+  BASE_URL_PROD: "https://agency.zadanetwork.com",
+  BASE_URL_TEST: "https://test-agency.zadanetwork.com",
   ZADA_AUTH_SECRET: 'doingtestinginzadaauth',
   ZIGNSEC_TEST_URL: 'https://test.zignsec.com/v3',
   ZIGNSEC_WEBHOOK: 'http://ce63-206-84-130-27.ngrok.io/api/kycs_webhook',

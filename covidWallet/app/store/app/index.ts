@@ -9,7 +9,7 @@ export const AppState: IAppState = {
   developmentMode: false,
   isAppSetupComplete: false,
   webViewUrl: '',
-  baseUrl: ConfigApp.PROD_BASE_URL,
+  baseUrl: ConfigApp.BASE_URL_PROD,
 };
 
 // Slice
