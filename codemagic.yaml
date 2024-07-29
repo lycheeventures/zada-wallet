@@ -31,48 +31,61 @@ workflows:
                 echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"
             - name: Build Android release
               script: |
-                # Fetch version and build numbers from Google Play
-                PRODUCTION_INFO=$(google-play-cli app-info --package-name "$PACKAGE_NAME" --track production)
-                INTERNAL_INFO=$(google-play-cli app-info --package-name "$PACKAGE_NAME" --track internal)
-
-                # Extract version names
-                PROD_VERSION_NAME=$(echo "$PRODUCTION_INFO" | grep "versionName" | awk '{print $2}')
-                INT_VERSION_NAME=$(echo "$INTERNAL_INFO" | grep "versionName" | awk '{print $2}')
+                # Get the latest build numbers and version names from Google Play
+                LATEST_PRODUCTION_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "production")
+                LATEST_INTERNAL_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "internal")
                 
-                # Extract build numbers
-                LATEST_PROD_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track production)
-                LATEST_INT_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track internal)
+                # Fetch latest version name from Google Play
+                APP_INFO_PRODUCTION=$(google-play-cli app-info --package-name "$PACKAGE_NAME" --track "production")
+                VERSION_NAME_PRODUCTION=$(echo "$APP_INFO_PRODUCTION" | grep "versionName" | awk '{print $2}')
 
-                # Output current version names and build numbers
-                echo "Production Version Name: $PROD_VERSION_NAME"
-                echo "Internal Version Name: $INT_VERSION_NAME"
-                echo "Production Build Number: $LATEST_PROD_BUILD_NUMBER"
-                echo "Internal Build Number: $LATEST_INT_BUILD_NUMBER"
+                APP_INFO_INTERNAL=$(google-play-cli app-info --package-name "$PACKAGE_NAME" --track "internal")
+                VERSION_NAME_INTERNAL=$(echo "$APP_INFO_INTERNAL" | grep "versionName" | awk '{print $2}')
 
-                # Extract version components
-                IFS='.' read -r PROD_MAJOR PROD_MINOR PROD_PATCH <<< "$PROD_VERSION_NAME"
-                IFS='.' read -r INT_MAJOR INT_MINOR INT_PATCH <<< "$INT_VERSION_NAME"
+                # Output the current version names
+                echo "Production Version Name: $VERSION_NAME_PRODUCTION"
+                echo "Internal Version Name: $VERSION_NAME_INTERNAL"
 
                 # Compare versions
-                if [ "$PROD_MAJOR" == "$INT_MAJOR" ] && [ "$PROD_MINOR" == "$INT_MINOR" ] && [ "$PROD_PATCH" == "$INT_PATCH" ]; then
-                  # Same major, minor, and patch version, increment internal patch number and build number
-                  NEW_PATCH=$(($INT_PATCH + 1))
-                  NEW_VERSION_NAME="$INT_MAJOR.$INT_MINOR.$NEW_PATCH"
-                  UPDATED_BUILD_NUMBER=$(($LATEST_INT_BUILD_NUMBER + 1))
+                IFS='.' read -r P_MAJOR P_MINOR P_PATCH <<< "$VERSION_NAME_PRODUCTION"
+                IFS='.' read -r I_MAJOR I_MINOR I_PATCH <<< "$VERSION_NAME_INTERNAL"
+
+                if [ "$P_MAJOR" -eq "$I_MAJOR" ] && [ "$P_MINOR" -eq "$I_MINOR" ] && [ "$P_PATCH" -eq "$I_PATCH" ]; then
+                  # Increment patch version and build number
+                  NEW_PATCH=$(($P_PATCH + 1))
+                  NEW_BUILD_NUMBER=$(($LATEST_INTERNAL_BUILD_NUMBER + 1))
+
+                  # Handle patch version exceeding 50
+                  if [ "$NEW_PATCH" -gt 50 ]; then
+                    NEW_PATCH=0
+                    NEW_MINOR=$(($I_MINOR + 1))
+                    # Handle minor version exceeding 50
+                    if [ "$NEW_MINOR" -gt 50 ]; then
+                      NEW_MINOR=0
+                      NEW_MAJOR=$(($I_MAJOR + 1))
+                    else
+                      NEW_MAJOR=$I_MAJOR
+                    fi
+                  else
+                    NEW_MINOR=$I_MINOR
+                    NEW_MAJOR=$I_MAJOR
+                  fi
+
+                  NEW_VERSION_NAME="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
                 else
-                  # Different major, minor, or patch version, only increment build number
-                  NEW_VERSION_NAME="$INT_MAJOR.$INT_MINOR.$INT_PATCH"
-                  UPDATED_BUILD_NUMBER=$(($LATEST_INT_BUILD_NUMBER + 1))
+                  # Only increment build number
+                  NEW_VERSION_NAME="$I_MAJOR.$I_MINOR.$I_PATCH"
+                  NEW_BUILD_NUMBER=$(($LATEST_INTERNAL_BUILD_NUMBER + 1))
                 fi
 
-                # Output the new version name and build number
+                # Output the new version name
                 echo "New Version Name: $NEW_VERSION_NAME"
-                echo "Updated Build Number: $UPDATED_BUILD_NUMBER"
-                
-                # Build the app with updated version and build number
+                echo "New Build Number: $NEW_BUILD_NUMBER"
+
+                # Build the release
                 cd covidWallet/android
                 ./gradlew bundleRelease \
-                  -PversionCode=$UPDATED_BUILD_NUMBER \
+                  -PversionCode=$NEW_BUILD_NUMBER \
                   -PversionName=$NEW_VERSION_NAME
         artifacts:
             - covidWallet/android/app/build/outputs/**/*.aab
