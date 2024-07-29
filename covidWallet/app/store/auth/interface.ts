@@ -13,6 +13,7 @@ export interface IUserState {
   language: string | undefined;
   auto_accept_connection: boolean;
   status: 'deleted' | 'inactive' | undefined;
+  didExist?: boolean;
 }
 export interface IAuthState {
   status: IStatus;

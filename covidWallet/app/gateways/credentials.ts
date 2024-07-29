@@ -247,6 +247,22 @@ export async function get_uppass_url(phone: string) {
   }
 }
 
+export async function claimCredential(type: string) {
+  try {
+    let data = {
+      type
+    };
+    const result = await http_client({
+      method: 'POST',
+      url: '/api/credential/claim_credential',
+      data: data,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function invalidateCache() {
   try {
     const result = await http_client({

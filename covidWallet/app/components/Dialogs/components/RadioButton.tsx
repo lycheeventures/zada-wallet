@@ -1,15 +1,22 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import TouchableComponent from '../../Buttons/TouchableComponent';
 
-const RadioButton = ({ option, selectedOption, onSelect }) => {
+interface IProps {
+  option: string;
+  selectedOption: string;
+  onSelect: (option: string) => void;
+}
+const RadioButton = (props: IProps) => {
+  const { option, selectedOption, onSelect } = props;
   return (
     <View style={styles.container}>
-      <TouchableOpacity key={option} style={styles.radioButton} onPress={() => onSelect(option)}>
+      <TouchableComponent key={option} style={styles.radioButton} onPress={() => onSelect(option)}>
         <View style={styles.radioButtonIcon}>
           {selectedOption === option && <View style={styles.radioButtonSelected} />}
         </View>
         <Text style={styles.radioButtonLabel}>{option}</Text>
-      </TouchableOpacity>
+      </TouchableComponent>
     </View>
   );
 };

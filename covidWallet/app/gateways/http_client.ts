@@ -1,14 +1,15 @@
 import axios, { AxiosRequestHeaders } from 'axios';
-import Config from 'react-native-config';
+import qs from 'query-string';
+import { getCountry } from 'react-native-localize';
 import { handleErrorMessage } from '.';
 import { isJWTExp } from '../helpers/Authenticate';
-import { showNetworkMessage } from '../helpers/Toast';
 import { RootState } from '../store';
 import { updateToken } from '../store/auth';
-import qs from 'query-string';
+import { _showAlert } from '../helpers';
 
 // for multiple requests
 let isRefreshing = false;
+let alertsToShow = new Set<string>();
 let failedQueue: any = [];
 const url_arr = [
   '/api/login',
@@ -21,6 +22,7 @@ const url_arr = [
   '/api/v1/validateOTPs',
   '/api/wallet/create',
   '/api/get_user_status',
+  '/api/v1/is_country_allowed',
 ];
 // Api request Queue machanism, if authorization token has expired.
 const processQueue = (error: any, token = null) => {
@@ -35,20 +37,6 @@ const processQueue = (error: any, token = null) => {
   failedQueue = [];
 };
 
-// Getting user credentials.
-const getUserCredentials = (state: RootState) => {
-  // const credentials = await Keychain.getGenericPassword();
-  // let AuthCredentials = null;
-  // if (credentials) {
-  //   AuthCredentials = JSON.parse(credentials.username);
-  // }
-  // const { refreshToken } = AuthCredentials;
-  let creds = {
-    userId: state.auth.user.id,
-    walletSecret: state.auth.user.walletSecret,
-  };
-  return creds;
-};
 
 const setup = (store: any) => {
   axios.defaults.paramsSerializer = (params) => { return qs.stringify(params, { encode: true }) };
@@ -78,6 +66,9 @@ const setup = (store: any) => {
         Accept: 'application/json',
       } as AxiosRequestHeaders;
 
+      // Add country header
+      config.headers.country = getCountry();
+
       // Add Content-Type header.
       if (!config.headers['Content-Type']) {
         config.headers = {
@@ -87,10 +78,10 @@ const setup = (store: any) => {
       }
 
       // Setting timeout
-      config.timeout = 60000 * 2;
+      config.timeout = 45000;
 
       // Setting baseurl
-      config.baseURL = Config.API_URL;
+      config.baseURL = store.getState().app.baseUrl;
 
       return config;
     },
@@ -103,6 +94,18 @@ const setup = (store: any) => {
   let networkError = false;
   axios.interceptors.response.use(
     (res) => {
+      if (res.data.isCountryAllowed === false) {
+        // Return if already shown
+        if (alertsToShow.has('countryNotAllowed')) return res;
+
+        alertsToShow.add('countryNotAllowed');
+        let en_message = 'Your connection appears to be blocked. Please try to disable any VPN, check your internet connection, and try again. If the issue persists, contact support for assistance.';
+        _showAlert('WARNING!', en_message)
+
+        setTimeout(() => {
+          alertsToShow.delete('countryNotAllowed');
+        }, 5000)
+      }
       return res;
     },
     async (error) => {
@@ -132,7 +135,7 @@ const setup = (store: any) => {
           let { token } = state.auth;
           // Fetch token
           return new Promise((resolve, reject) => {
-            fetch(Config.API_URL + '/api/v1/authenticate', {
+            fetch(store.getState().app.baseUrl + '/api/v1/authenticate', {
               method: 'POST',
               headers: {
                 Accept: 'application/json',
@@ -170,7 +173,7 @@ const setup = (store: any) => {
           // Error message handling.
           handleErrorMessage(error);
         }
-        
+
         return Promise.reject(error);
       } else {
         networkError = true;

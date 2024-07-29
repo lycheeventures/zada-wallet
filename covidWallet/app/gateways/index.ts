@@ -71,8 +71,6 @@ export function handleErrorMessage(error: any) {
     _showAlert('Error', error.response.data.message);
     return;
   }
-
-  _showAlert('Error', error.response.data.error);
 }
 
 export { AuthAPI, CredentialAPI, ConnectionAPI, VerificationAPI };
