@@ -23,12 +23,12 @@ workflows:
             PACKAGE_NAME: "com.zadanetwork.wallet"
           node: v19.7.0
         scripts:
-            # - name: Install npm dependencies
-            #   script: |
-            #     npm install --prefix ./covidWallet --legacy-peer-deps
-            # - name: Set Android SDK location
-            #   script: |
-            #     echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"
+            - name: Install npm dependencies
+              script: |
+                npm install --prefix ./covidWallet --legacy-peer-deps
+            - name: Set Android SDK location
+              script: |
+                echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"
             - name: Build Android release
               script: |
               curl -s -H "Authorization:
