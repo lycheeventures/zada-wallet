@@ -44,6 +44,10 @@ workflows:
                                                 "https://play.googleapis.com/v3/applications/$PACKAGE_NAME/edits/track/internal")
                 INTERNAL_VERSION_NAME=$(echo "$INTERNAL_VERSION_INFO" | jq -r '.versionName')
 
+                # Output the current version names
+                echo "Production Version Name: $PRODUCTION_VERSION_NAME"
+                echo "Internal Version Name: $INTERNAL_VERSION_NAME"
+
                 # # Get the latest build numbers and version names from Google Play
                 # LATEST_PRODUCTION_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "production")
                 # LATEST_INTERNAL_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "internal")
