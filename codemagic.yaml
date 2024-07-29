@@ -25,7 +25,7 @@ workflows:
         scripts:
             - name: Install npm dependencies
               script: |
-                npm install --prefix ./covidWallet --legacy-peer-deps
+                npm install --prefix ./covidWallet gplaycli --legacy-peer-deps
             - name: Set Android SDK location
               script: |
                 echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"
