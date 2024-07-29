@@ -28,20 +28,52 @@ workflows:
                 npm install --prefix ./covidWallet --legacy-peer-deps
             - name: Set Android SDK location
               script: |
-                echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"            
+                echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"
             - name: Build Android release
               script: |
-                LATEST_GOOGLE_PLAY_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME")
-                if [ -z LATEST_BUILD_NUMBER ]; then
-                  # fallback in case no build number was found from google play. Alternatively, you can `exit 1` to fail the build
-                  UPDATED_BUILD_NUMBER=$BUILD_NUMBER
+                # Fetch version and build numbers from Google Play
+                PRODUCTION_INFO=$(google-play-cli app-info --package-name "$PACKAGE_NAME" --track production)
+                INTERNAL_INFO=$(google-play-cli app-info --package-name "$PACKAGE_NAME" --track internal)
+
+                # Extract version names
+                PROD_VERSION_NAME=$(echo "$PRODUCTION_INFO" | grep "versionName" | awk '{print $2}')
+                INT_VERSION_NAME=$(echo "$INTERNAL_INFO" | grep "versionName" | awk '{print $2}')
+                
+                # Extract build numbers
+                LATEST_PROD_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track production)
+                LATEST_INT_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track internal)
+
+                # Output current version names and build numbers
+                echo "Production Version Name: $PROD_VERSION_NAME"
+                echo "Internal Version Name: $INT_VERSION_NAME"
+                echo "Production Build Number: $LATEST_PROD_BUILD_NUMBER"
+                echo "Internal Build Number: $LATEST_INT_BUILD_NUMBER"
+
+                # Extract version components
+                IFS='.' read -r PROD_MAJOR PROD_MINOR PROD_PATCH <<< "$PROD_VERSION_NAME"
+                IFS='.' read -r INT_MAJOR INT_MINOR INT_PATCH <<< "$INT_VERSION_NAME"
+
+                # Compare versions
+                if [ "$PROD_MAJOR" == "$INT_MAJOR" ] && [ "$PROD_MINOR" == "$INT_MINOR" ] && [ "$PROD_PATCH" == "$INT_PATCH" ]; then
+                  # Same major, minor, and patch version, increment internal patch number and build number
+                  NEW_PATCH=$(($INT_PATCH + 1))
+                  NEW_VERSION_NAME="$INT_MAJOR.$INT_MINOR.$NEW_PATCH"
+                  UPDATED_BUILD_NUMBER=$(($LATEST_INT_BUILD_NUMBER + 1))
                 else
-                  UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 1))
+                  # Different major, minor, or patch version, only increment build number
+                  NEW_VERSION_NAME="$INT_MAJOR.$INT_MINOR.$INT_PATCH"
+                  UPDATED_BUILD_NUMBER=$(($LATEST_INT_BUILD_NUMBER + 1))
                 fi
+
+                # Output the new version name and build number
+                echo "New Version Name: $NEW_VERSION_NAME"
+                echo "Updated Build Number: $UPDATED_BUILD_NUMBER"
+                
+                # Build the app with updated version and build number
                 cd covidWallet/android
                 ./gradlew bundleRelease \
                   -PversionCode=$UPDATED_BUILD_NUMBER \
-                  -PversionName=1.6.2
+                  -PversionName=$NEW_VERSION_NAME
         artifacts:
             - covidWallet/android/app/build/outputs/**/*.aab
         publishing:
