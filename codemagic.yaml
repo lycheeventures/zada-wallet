@@ -34,16 +34,13 @@ workflows:
                 # Get the latest build numbers and version names from Google Play
                 LATEST_PRODUCTION_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "production")
                 LATEST_INTERNAL_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "internal")
-
-                TEST_NUMBER=$(google-play tracks get --package-name "$PACKAGE_NAME" --track "internal" --json )
-                echo "TEST_NUMBER: $TEST_NUMBER"
                 
                 # Fetch latest version name from Google Play
-                APP_INFO_PRODUCTION=$(google-play-cli app-info --package-name "$PACKAGE_NAME" --track "production")
-                VERSION_NAME_PRODUCTION=$(echo "$APP_INFO_PRODUCTION" | grep "versionName" | awk '{print $2}')
+                APP_INFO_PRODUCTION=$(google-play tracks get --package-name "$PACKAGE_NAME" --track "production")
+                VERSION_NAME_PRODUCTION=$(echo "$APP_INFO_PRODUCTION" | grep "name" | awk '{print $2}')
 
-                APP_INFO_INTERNAL=$(google-play-cli app-info --package-name "$PACKAGE_NAME" --track "internal")
-                VERSION_NAME_INTERNAL=$(echo "$APP_INFO_INTERNAL" | grep "versionName" | awk '{print $2}')
+                APP_INFO_INTERNAL=$(google-play tracks get --package-name "$PACKAGE_NAME" --track "internal")
+                VERSION_NAME_INTERNAL=$(echo "$APP_INFO_INTERNAL" | grep "name" | awk '{print $2}')
 
                 # Output the current version names
                 echo "Production Version Name: $VERSION_NAME_PRODUCTION"
