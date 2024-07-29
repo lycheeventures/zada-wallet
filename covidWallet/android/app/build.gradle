@@ -62,6 +62,16 @@ react {
  */
 def enableProguardInReleaseBuilds = false
 
+// get version code from the specified property argument `-PversionCode` during the build call
+def getMyVersionCode = { ->
+    return project.hasProperty('versionCode') ? versionCode.toInteger() : -1
+}
+
+// get version name from the specified property argument `-PversionName` during the build call
+def getMyVersionName = { ->
+    return project.hasProperty('versionName') ? versionName : "1.0"
+}
+
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
  *
@@ -86,8 +96,8 @@ android {
         applicationId "com.zadanetwork.wallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 183
-        versionName "1.6.1(5)"
+        versionCode getMyVersionCode()
+        versionName getMyVersionName()
         missingDimensionStrategy 'react-native-camera', 'general'
     }
     signingConfigs {
