@@ -35,7 +35,7 @@ workflows:
                 LATEST_PRODUCTION_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "production")
                 LATEST_INTERNAL_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "internal")
 
-                TEST_NUMBER=$(google-play get --package-name "$PACKAGE_NAME" --track "internal" --json )
+                TEST_NUMBER=$(google-play get track --package-name "$PACKAGE_NAME" --track "internal" --json )
                 echo "TEST_NUMBER: $TEST_NUMBER"
                 
                 # Fetch latest version name from Google Play
