@@ -82,21 +82,21 @@ workflows:
                 echo "New Version Name: $NEW_VERSION_NAME"
                 echo "New Build Number: $NEW_BUILD_NUMBER"
 
-                # Build the release
-                cd covidWallet/android
-                ./gradlew bundleRelease \
-                  -PversionCode=$NEW_BUILD_NUMBER \
-                  -PversionName=$NEW_VERSION_NAME
-        artifacts:
-            - covidWallet/android/app/build/outputs/**/*.aab
-        publishing:
-          email:
-            recipients:
-              - devs@zada.io              
-            notify:
-              success: true     # To not receive a notification when a build succeeds
-              failure: true    # To not receive a notification when a build fails
-          google_play:
-            credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-            track: internal   # Any default or custom track that is not in ‘draft’ status
-            # submit_as_draft: true
+                # # Build the release
+                # cd covidWallet/android
+                # ./gradlew bundleRelease \
+                #   -PversionCode=$NEW_BUILD_NUMBER \
+                #   -PversionName=$NEW_VERSION_NAME
+        # artifacts:
+        #     - covidWallet/android/app/build/outputs/**/*.aab
+        # publishing:
+        #   email:
+        #     recipients:
+        #       - devs@zada.io              
+        #     notify:
+        #       success: true     # To not receive a notification when a build succeeds
+        #       failure: true    # To not receive a notification when a build fails
+        #   google_play:
+        #     credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        #     track: internal   # Any default or custom track that is not in ‘draft’ status
+        #     # submit_as_draft: true
