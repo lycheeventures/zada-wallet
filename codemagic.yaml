@@ -23,35 +23,72 @@ workflows:
             PACKAGE_NAME: "com.zadanetwork.wallet"
           node: v19.7.0
         scripts:
-            - name: Install npm dependencies
-              script: |
-                npm install --prefix ./covidWallet --legacy-peer-deps
+            # - name: Install npm dependencies
+            #   script: |
+            #     npm install --prefix ./covidWallet --legacy-peer-deps
             - name: Set Android SDK location
               script: |
-                echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"            
+                echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"
             - name: Build Android release
               script: |
+                # Fetch OAuth 2.0 token (Replace this with actual token retrieval method)
+                ACCESS_TOKEN=$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+
+                # Get production track version
+                PRODUCTION_VERSION_INFO=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" \
+                                                "https://play.googleapis.com/v3/applications/$PACKAGE_NAME/edits/track/production")
+                PRODUCTION_VERSION_NAME=$(echo "$PRODUCTION_VERSION_INFO" | jq -r '.versionName')
+                
+                # Get internal track version
+                INTERNAL_VERSION_INFO=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" \
+                                                "https://play.googleapis.com/v3/applications/$PACKAGE_NAME/edits/track/internal")
+                INTERNAL_VERSION_NAME=$(echo "$INTERNAL_VERSION_INFO" | jq -r '.versionName')
+
+                # Increment build number logic
+                IFS='.' read -r PROD_MAJOR PROD_MINOR PROD_PATCH <<< "$PRODUCTION_VERSION_NAME"
+                IFS='.' read -r INT_MAJOR INT_MINOR INT_PATCH <<< "$INTERNAL_VERSION_NAME"
+
+                if [ "$PROD_MAJOR" -eq "$INT_MAJOR" ] && [ "$PROD_MINOR" -eq "$INT_MINOR" ] && [ "$PROD_PATCH" -eq "$INT_PATCH" ]; then
+                  # Increment patch version and build number
+                  if [ "$PROD_PATCH" -ge 9 ]; then
+                    NEW_MINOR=$((PROD_MINOR + 1))
+                    NEW_PATCH=0
+                  else
+                    NEW_MINOR=$PROD_MINOR
+                    NEW_PATCH=$((PROD_PATCH + 1))
+                  fi
+                  UPDATED_VERSION_NAME="$PROD_MAJOR.$NEW_MINOR.$NEW_PATCH"
+                else
+                  # Increment build number only
+                  UPDATED_VERSION_NAME="$PROD_MAJOR.$PROD_MINOR.$PROD_PATCH"
+                fi
+
+                # Determine build number
                 LATEST_GOOGLE_PLAY_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME")
-                if [ -z LATEST_BUILD_NUMBER ]; then
-                  # fallback in case no build number was found from google play. Alternatively, you can `exit 1` to fail the build
+                if [ -z "$LATEST_GOOGLE_PLAY_BUILD_NUMBER" ]; then
                   UPDATED_BUILD_NUMBER=$BUILD_NUMBER
                 else
                   UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 1))
                 fi
-                cd covidWallet/android
-                ./gradlew bundleRelease \
-                  -PversionCode=$UPDATED_BUILD_NUMBER \
-                  -PversionName=1.6.2
-        artifacts:
-            - covidWallet/android/app/build/outputs/**/*.aab
-        publishing:
-          email:
-            recipients:
-              - devs@zada.io              
-            notify:
-              success: true     # To not receive a notification when a build succeeds
-              failure: true    # To not receive a notification when a build fails
-          google_play:
-            credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-            track: internal   # Any default or custom track that is not in ‘draft’ status
-            # submit_as_draft: true
+
+                echo "New Version Name: $UPDATED_VERSION_NAME"
+                echo "New Build Number: $UPDATED_BUILD_NUMBER"
+
+                # # Change directory and build
+                # cd covidWallet/android
+                # ./gradlew bundleRelease \
+                #   -PversionCode=$UPDATED_BUILD_NUMBER \
+                #   -PversionName=$UPDATED_VERSION_NAME
+        # artifacts:
+        #     - covidWallet/android/app/build/outputs/**/*.aab
+        # publishing:
+        #   email:
+        #     recipients:
+        #       - devs@zada.io              
+        #     notify:
+        #       success: true     # To not receive a notification when a build succeeds
+        #       failure: true    # To not receive a notification when a build fails
+        #   google_play:
+        #     credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        #     track: internal   # Any default or custom track that is not in ‘draft’ status
+        #     # submit_as_draft: true
