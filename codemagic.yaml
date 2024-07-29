@@ -23,21 +23,27 @@ workflows:
             PACKAGE_NAME: "com.zadanetwork.wallet"
           node: v19.7.0
         scripts:
-            - name: Install npm dependencies
-              script: |
-                npm install --prefix ./covidWallet --legacy-peer-deps
+            # - name: Install npm dependencies
+            #   script: |
+            #     npm install --prefix ./covidWallet --legacy-peer-deps
             - name: Set Android SDK location
               script: |
                 echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/covidWallet/android/local.properties"
             - name: Build Android release
               script: |
-              curl -s -H "Authorization:
-                Bearer $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS" \
-                "https://play.googleapis.com/v3/applications/$PACKAGE_NAME/edits/track/internal"
+                # Fetch OAuth 2.0 token (Replace this with actual token retrieval method)
+                ACCESS_TOKEN=$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
 
-              VERSION_NAME=$(curl -s -H "Authorization: Bearer $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS" \
-                  "https://play.googleapis.com/v3/applications/$PACKAGE_NAME/edits/track/internal" \
-                  | jq -r '.versionName')
+                # Get production track version
+                PRODUCTION_VERSION_INFO=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" \
+                                                "https://play.googleapis.com/v3/applications/$PACKAGE_NAME/edits/track/production")
+                PRODUCTION_VERSION_NAME=$(echo "$PRODUCTION_VERSION_INFO" | jq -r '.versionName')
+                
+                # Get internal track version
+                INTERNAL_VERSION_INFO=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" \
+                                                "https://play.googleapis.com/v3/applications/$PACKAGE_NAME/edits/track/internal")
+                INTERNAL_VERSION_NAME=$(echo "$INTERNAL_VERSION_INFO" | jq -r '.versionName')
+
                 # # Get the latest build numbers and version names from Google Play
                 # LATEST_PRODUCTION_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "production")
                 # LATEST_INTERNAL_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --track "internal")
