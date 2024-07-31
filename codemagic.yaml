@@ -120,7 +120,7 @@ workflows:
             bundle_identifier: com.zadanetwork.wallet
           vars:
             XCODE_WORKSPACE: "ZADA.xcworkspace" # <-- Put the name of your Xcode workspace here
-            XCODE_SCHEME: "zada" # <-- Put the name of your Xcode scheme here
+            XCODE_SCHEME: "reactNativeMultiEnv" # <-- Put the name of your Xcode scheme here
             APP_ID: 1578666669 # <-- Put the app id number here. This is found in App Store Connect > App > General > App Information
           node: v19.7.0
           xcode: latest
