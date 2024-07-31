@@ -33,7 +33,7 @@ workflows:
                 npm install --prefix ./covidWallet
             - name: Install CocoaPods dependencies
               script: |
-                cd ios && pod install
+                cd ./covidWallet/ios && pod install
             - name: Set up code signing settings on Xcode project
               script: |
                 xcode-project use-profiles --warn-only
