@@ -30,7 +30,7 @@ workflows:
         scripts:
             - name: Install npm dependencies
               script: |
-                npm install --prefix ./covidWallet
+                npm install --prefix ./covidWallet --legacy-peer-deps
             - name: Install CocoaPods dependencies
               script: |
                 cd ./covidWallet/ios && pod install
