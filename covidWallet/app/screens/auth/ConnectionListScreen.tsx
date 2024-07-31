@@ -84,8 +84,8 @@ const ConnectionListScreen = (props: INProps) => {
       <View style={styles.container}>
         <View style={{ flex: 0.4 }}>
           <View style={styles.logoContainer}>
-            <Text style={styles.headingText}>Connections</Text>
-            <Text style={styles.subHeadingText}>{t('ConnectionListScreen.title')}</Text>
+            <Text style={styles.headingText}>{t('ConnectionListScreen.title')}</Text>
+            <Text style={styles.subHeadingText}>{t('ConnectionListScreen.sub_title')}</Text>
           </View>
         </View>
         <FlatList

@@ -41,7 +41,8 @@
     "email": "Email (Optional)"
   },
   "ConnectionListScreen": {
-    "title": "Select connections to be connected automatically."
+    "title": "Create Connections",
+    "sub_title": "Select the organisations from which you want to receive credentials."
   },
   "SecurityScreen": {
     "title": "Be Secure",
