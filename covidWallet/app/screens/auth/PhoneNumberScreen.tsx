@@ -102,6 +102,13 @@ const PhoneNumberScreen = (props: INProps) => {
     getCount();
   }, []);
 
+  // Keyboard dismiss on long press for IOS.
+  useEffect(() => {
+    if (longPressCount === 3) {
+      Keyboard.dismiss();
+    }
+  }, [longPressCount]);
+
   const incrementBtnCount = async () => {
     // Increament authentication count.
     await saveItemInLocalStorage(ConstantsList.AUTH_COUNT, nextBtnCount + 1);

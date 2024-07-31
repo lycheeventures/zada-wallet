@@ -12,10 +12,12 @@ const RadioButton = (props: IProps) => {
   return (
     <View style={styles.container}>
       <TouchableComponent key={option} style={styles.radioButton} onPress={() => onSelect(option)}>
-        <View style={styles.radioButtonIcon}>
-          {selectedOption === option && <View style={styles.radioButtonSelected} />}
-        </View>
-        <Text style={styles.radioButtonLabel}>{option}</Text>
+        <>
+          <View style={styles.radioButtonIcon}>
+            {selectedOption === option && <View style={styles.radioButtonSelected} />}
+          </View>
+          <Text style={styles.radioButtonLabel}>{option}</Text>
+        </>
       </TouchableComponent>
     </View>
   );
@@ -28,7 +30,7 @@ const styles = StyleSheet.create({
   radioButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 8,
+    paddingVertical: 8,
   },
   radioButtonIcon: {
     width: 24,
