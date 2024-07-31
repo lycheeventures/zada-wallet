@@ -13,7 +13,7 @@ import ConstantsList from '../../helpers/ConfigApp';
 import {
   getType,
   handleCredVerification,
-  handleQRConnectionRequest,
+  getConnectionDetails,
   makeVerificationObject,
 } from './utils';
 import { CredentialAPI, VerificationAPI } from '../../gateways';
@@ -157,7 +157,10 @@ const QRScreen = ({ route, navigation }) => {
                 setDialogTitle('Please wait...');
 
                 let parsedData = JSON.parse(e.data);
+                let connectionId = undefined;
                 if (parsedData.data === undefined) {
+                  // Adding connectionId to support connection creation during connectionless-verification
+                  connectionId = parsedData.metadata.connectionId;
                   parsedData = convertStringToBase64(JSON.stringify(parsedData));
                 } else {
                   parsedData = parsedData.data
@@ -168,7 +171,7 @@ const QRScreen = ({ route, navigation }) => {
                   setTimeout(() => {
                     setCredentialData({
                       type: 'connectionless-verification',
-                      credentials: res.credential,
+                      credentials: { ...res.credential, connectionId },
                     });
                   }, 500)
 
@@ -292,7 +295,7 @@ const QRScreen = ({ route, navigation }) => {
           setScan(false);
           setProgress(true);
 
-          let data = await handleQRConnectionRequest(qrJSON.metadata, qrJSON);
+          let data = await getConnectionDetails(qrJSON.metadata, qrJSON);
 
           let connectionExists = connections.find((x) => x.name === data.organizationName);
           if (connectionExists) {
@@ -368,6 +371,19 @@ const QRScreen = ({ route, navigation }) => {
       } else {
         showOKDialog('ZADA', 'Submitted Successfully!', navigateToMainScreen);
       }
+
+      // Create connection if connectionId is available
+      if (e.connectionId) {
+        let data = await getConnectionDetails(e.connectionId, { "type": "connection_request", metadata });
+        let connectionExists = connections.find((x) => x.name === data.organizationName);
+
+        // Don't add connection if already exists
+        if (!connectionExists) {
+          // Accept Connection
+          dispatch(acceptConnection(e.connectionId));
+        }
+      }
+
       navigation.goBack();
     } catch (error) {
       setScanning(false);

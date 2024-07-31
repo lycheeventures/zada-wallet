@@ -96,7 +96,7 @@ export const handleCredVerification = async (credQrData) => {
   }
 };
 
-export const handleQRConnectionRequest = async (connectionId, qrJSON) => {
+export const getConnectionDetails = async (connectionId, qrJSON) => {
   try {
     let response = await ConnectionAPI.get_connection_metadata(connectionId)
     let urlData = response.data.connection.connectionRequestData
