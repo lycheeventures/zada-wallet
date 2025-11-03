@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '../../theme/Colors';
 import Icon from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
@@ -16,9 +16,10 @@ type Props = {
   onAccept?: (credential: Credential) => void;
   onReject?: () => void;
   onClose?: () => void;
+  imageUrl?: string;
 };
 
-const CredentialListScreen = ({ data, onAccept, onReject, onClose }: Props) => {
+const CredentialListScreen = ({ data, onAccept, onReject, onClose, imageUrl }: Props) => {
   const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -46,12 +47,13 @@ const CredentialListScreen = ({ data, onAccept, onReject, onClose }: Props) => {
     const isExpanded = item.credentialId === expandedId;
 
     const verificationName =
-      item.values?.Type ||
-      ((item.values != undefined || item.values != null) &&
-        item.values['Vaccine Name'] != undefined &&
-        item.values['Vaccine Name'].length != 0 &&
-        item.values['Dose'] != undefined &&
-        item.values['Dose'].length != 0)
+      item.values?.Type && item.values.Type.length !== 0
+        ? item.values.Type
+        : item.values &&
+          item.values['Vaccine Name'] &&
+          item.values['Vaccine Name'].length !== 0 &&
+          item.values['Dose'] &&
+          item.values['Dose'].length !== 0
         ? 'COVIDpass (Vaccination)'
         : 'Digital Certificate';
 
@@ -60,7 +62,6 @@ const CredentialListScreen = ({ data, onAccept, onReject, onClose }: Props) => {
         <View style={[styles.card, isSelected && styles.selectedCard]}>
           <View style={styles.row}>
             <View style={[styles.radioButton, isSelected && styles.radioButtonSelected]} />
-
             <View style={styles.textContainer}>
               <Text style={styles.cardTitle}>{verificationName}</Text>
 
@@ -99,42 +100,46 @@ const CredentialListScreen = ({ data, onAccept, onReject, onClose }: Props) => {
 
   return (
     <SafeAreaProvider style={styles.container}>
-      <View style={styles.toolbar}>
-        <TouchableOpacity style={styles.closeIcon} onPress={onClose}>
-          <Icon name="x" size={24} color={AppColors.BLACK} />
-        </TouchableOpacity>
-        <Text style={styles.toolbarTitle}>{t('VerificationRequestScreen.toolbar')}</Text>
-      </View>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <View style={styles.toolbar}>
+          <TouchableOpacity style={styles.closeIcon} onPress={onClose}>
+            <Icon name="x" size={24} color={AppColors.BLACK} />
+          </TouchableOpacity>
+          <Text style={styles.toolbarTitle}>{t('VerificationRequestScreen.toolbar')}</Text>
+        </View>
 
-      <View style={styles.body}>
-        <Image
-          source={require('../../assets/images/zada_logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <View style={styles.body}>
+          <View style={styles.connectionLogoContainer}>
+            <Image
+              source={imageUrl ? { uri: imageUrl } : require('../../assets/images/zada_logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
 
-        <Text style={styles.title}>{t('VerificationRequestScreen.title')}</Text>
-        <Text style={styles.label}>{t('VerificationRequestScreen.label')}</Text>
+          <Text style={styles.title}>{t('VerificationRequestScreen.title')}</Text>
+          <Text style={styles.label}>{t('VerificationRequestScreen.label')}</Text>
 
-        <FlatList
-          data={data}
-          keyExtractor={item => item.credentialId}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 100 }}
-          ListFooterComponent={
-            <Text style={styles.footerText}>{t('VerificationRequestScreen.footer')}</Text>
-          }
-        />
-      </View>
+          <FlatList
+            data={data}
+            keyExtractor={item => item.credentialId}
+            renderItem={renderItem}
+            contentContainerStyle={{ paddingBottom: 100 }}
+            ListFooterComponent={
+              <Text style={styles.footerText}>{t('VerificationRequestScreen.footer')}</Text>
+            }
+          />
+        </View>
 
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.rejectButton} onPress={onReject}>
-          <Text style={styles.buttonText}>{t('VerificationRequestScreen.reject')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.acceptButton]} onPress={handleAccept}>
-          <Text style={styles.buttonText}>{t('VerificationRequestScreen.accept')}</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.bottomBar}>
+          <TouchableOpacity style={styles.rejectButton} onPress={onReject}>
+            <Text style={styles.buttonText}>{t('VerificationRequestScreen.reject')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.acceptButton]} onPress={handleAccept}>
+            <Text style={styles.buttonText}>{t('VerificationRequestScreen.accept')}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 };
@@ -157,7 +162,17 @@ const styles = StyleSheet.create({
     left: 16,
   },
   body: { flex: 1, padding: 16, width: '100%' },
-  logo: { width: 120, height: 120, alignSelf: 'center', marginBottom: 16 },
+  connectionLogoContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: AppColors.LIGHT_GRAY,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  logo: { width: 118, height: 118, borderRadius: 60 },
   title: {
     fontSize: 20,
     fontWeight: '600',
@@ -201,7 +216,6 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   radioButtonSelected: { borderColor: AppColors.BLUE, borderWidth: 5 },
-  circleLogo: { width: 40, height: 40, borderRadius: 20, marginRight: 12 },
   textContainer: { flex: 1 },
   valueRow: {
     flexDirection: 'row',

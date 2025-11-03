@@ -3,6 +3,7 @@ import EmptyCredentialScreen from './EmptyCredentialScreen';
 import CredentialListScreen from './CredentialListScreen';
 import { useNavigation } from '@react-navigation/native';
 import { get_all_credentials_connectionless_verification } from '../../gateways/verifications';
+import { showOKDialog } from '../../helpers/Toast';
 import { ActivityIndicator, View, Linking, StyleSheet } from 'react-native';
 import { VerificationAPI } from '../../gateways';
 import LoadingDialog from '../../components/Dialogs/LoadingDialog';
@@ -81,26 +82,12 @@ const VerificationRequestScreen = props => {
   };
 
   const goBackToMainScreen = async () => {
-    if (!redirectCallback || redirectCallback === '') {
-      alert(t('VerificationRequestScreen.cannot_open_link'));
-      return;
-    }
-
-    const supported = await Linking.canOpenURL(redirectCallback);
-    if (!supported) {
-      alert(t('VerificationRequestScreen.cannot_open_link'));
-      return;
-    }
-
-    // Open the link
-    await Linking.openURL(redirectCallback);
-    await new Promise(resolve => setTimeout(resolve, 1000));
     resetState();
     navigation.navigate('MainScreen');
   };
 
   const rejectButtonClick = async () => {
-    goBackToMainScreen();
+    navigation.navigate('MainScreen');
   };
 
   const acceptButtonClick = async credential => {
@@ -112,7 +99,15 @@ const VerificationRequestScreen = props => {
         credential.policyName,
         credential.credentialId
       );
-      goBackToMainScreen();
+
+      if (redirectCallback != undefined && redirectCallback != '') {
+        await Linking.openURL(redirectCallback);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        resetState();
+        navigation.navigate('MainScreen');
+      } else {
+        showOKDialog('ZADA', 'Submitted Successfully!', goBackToMainScreen);
+      }
     } catch (error) {
       alert(t('errors.something_went_wrong'));
     } finally {

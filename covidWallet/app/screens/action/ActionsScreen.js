@@ -195,6 +195,12 @@ function ActionsScreen({ navigation }) {
 
     let data = JSON.parse(JSON.stringify(v));
 
+    // check connection base verification
+    if (data.type === VER_REQ) {
+      navigation.navigate('ConnectionBaseVerificationScreen', data);
+      return;
+    }
+
     setModalData(data);
     setModalVisible(true);
   };

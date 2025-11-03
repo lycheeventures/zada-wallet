@@ -20,6 +20,7 @@ import CredDetailScreen from '../screens/credential/CredDetailScreen';
 import LanguageSelectionScreen from '../screens/settings/LanguageSelectionScreen';
 import { navigationRef } from './utils';
 import VerificationRequestScreen from '../screens/verification_request_screen/VerificationRequestScreen';
+import ConnectionBaseVerificationScreen from '../screens/verification_request_screen/ConnectionBaseVerificationScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 const navigationAnimation =
@@ -206,6 +207,11 @@ const MainNavigator = () => {
         options={{ headerShown: false }}
         name="VerificationRequestScreen"
         component={VerificationRequestScreen}
+      />
+      <MainStack.Screen
+        options={{ headerShown: false }}
+        name="ConnectionBaseVerificationScreen"
+        component={ConnectionBaseVerificationScreen}
       />
     </MainStack.Navigator>
   );

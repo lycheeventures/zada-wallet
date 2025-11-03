@@ -38,6 +38,7 @@ export type MainStackParamList = {
   EmptyCredentialScreen: undefined;
   CredentialListScreen: undefined;
   VerificationRequestScreen: undefined;
+  ConnectionBaseVerificationScreen: undefined;
   CommonErrorView: undefined;
 };
 
