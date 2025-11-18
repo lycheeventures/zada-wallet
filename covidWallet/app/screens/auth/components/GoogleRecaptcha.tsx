@@ -6,7 +6,7 @@ import ConstantsList from '../../../helpers/ConfigApp';
 
 interface IProps {
   onVerify: () => void;
-  recaptchaRef: React.RefObject<RecaptchaHandles>;
+  recaptchaRef: React.RefObject<RecaptchaHandles | null>;
 }
 const GoogleRecaptcha = (props: IProps) => {
   // Constants

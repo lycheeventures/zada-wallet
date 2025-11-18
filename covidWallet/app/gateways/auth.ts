@@ -58,12 +58,17 @@ export const _registerUserAPI = async (name: string, phone: string, secretPhrase
 };
 
 // resend otp code api
-export const _resendOTPAPI = async (phone: string, type: string, secret?: string) => {
+export const _resendOTPAPI = async (
+  phone: string,
+  type: string,
+  channel: string,
+  secret?: string
+) => {
   try {
     const result = await http_client({
       method: 'POST',
       url: '/api/v1/resend_codes',
-      data: { phone, type, secretPhrase: secret },
+      data: { phone, type, secretPhrase: secret, channel: channel },
     });
     return result;
   } catch (error) {
@@ -253,7 +258,6 @@ export async function deleteAccount() {
     throw error;
   }
 }
-
 
 export async function checkIfCountryIsAllowed() {
   try {

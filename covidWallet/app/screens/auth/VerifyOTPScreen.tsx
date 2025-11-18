@@ -9,6 +9,7 @@ import {
   Platform,
   Keyboard,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '../../theme/Colors';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import { selectUser } from '../../store/auth/selectors';
@@ -139,36 +140,40 @@ const VerifyOTPScreen = (props: INProps) => {
   };
 
   return (
-    <FadeView style={{ flex: 2 }}>
-      <View style={styles.imageStyle}>
-        <Image
-          resizeMode="contain"
-          source={require('../../assets/images/otp.gif')}
-          style={{ width: '100%', height: '100%' }}
-        />
-      </View>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
-        <Text style={styles.headingStyle}>{t('VerifyOTPScreen.title')}</Text>
-        <Text style={styles.subheadingStyle}>
-          {t('VerifyOTPScreen.sub_title_1')} {user.phone}, {t('VerifyOTPScreen.sub_title_2')}
-        </Text>
-        <View style={styles.inputContainer}>
-          <InputPinComponent
-            OTP
-            onPincodeChange={setCode}
-            pincodeError={codeError}
-            emptyComponent={codeEmptyComponent}
-            filledComponent={codeFilledComponent}
+    <SafeAreaView style={{ flex: 1, backgroundColor: AppColors.WHITE }}>
+      <FadeView style={{ flex: 2 }}>
+        <View style={styles.imageStyle}>
+          <Image
+            resizeMode="contain"
+            source={require('../../assets/images/otp.gif')}
+            style={{ width: '100%', height: '100%' }}
           />
         </View>
-      </KeyboardAvoidingView>
-      {loading && <AnimatedLoading type="FadingCircleAlt" color={AppColors.PRIMARY} />}
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+          <Text style={styles.headingStyle}>{t('VerifyOTPScreen.title')}</Text>
+          <Text style={styles.subheadingStyle}>
+            {t('VerifyOTPScreen.sub_title_1')} {user.phone}, {t('VerifyOTPScreen.sub_title_2')}
+          </Text>
+          <View style={styles.inputContainer}>
+            <InputPinComponent
+              OTP
+              onPincodeChange={setCode}
+              pincodeError={codeError}
+              emptyComponent={codeEmptyComponent}
+              filledComponent={codeFilledComponent}
+            />
+          </View>
+        </KeyboardAvoidingView>
+        {loading && <AnimatedLoading type="FadingCircleAlt" color={AppColors.PRIMARY} />}
 
-      <View style={styles.resendOTPContainer}>{<ResendCode navigation={props.navigation} />}</View>
-    </FadeView>
+        <View style={styles.resendOTPContainer}>
+          {<ResendCode navigation={props.navigation} />}
+        </View>
+      </FadeView>
+    </SafeAreaView>
   );
 };
 
@@ -207,9 +212,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resendOTPContainer: {
-    flex: 0.2,
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 40 : 20,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
   },
 });
 

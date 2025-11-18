@@ -35,6 +35,7 @@ import GoogleRecaptcha from './components/GoogleRecaptcha';
 import RadioButton from '../../components/Dialogs/components/RadioButton';
 import BottomSheetComponent from '../../components/BottomSheet/bottomSheetComponent';
 import { updateBaseUrl } from '../../store/app';
+import { OTP_CHANNEL } from '../../store/auth/OtpChannel';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -129,7 +130,7 @@ const PhoneNumberScreen = (props: INProps) => {
           .unwrap()
           .then(res => {
             if (res.isVerified) {
-              dispatch(sendOTP({ phone: phone, secret: undefined }));
+              dispatch(sendOTP({ phone: phone, secret: undefined, channel: OTP_CHANNEL.SMS }));
               if (res.type === 'demo') {
                 // If type is demo, skip to SecurityScreen
                 props.navigation.navigate('SecurityScreen', { navigation: props.navigation });

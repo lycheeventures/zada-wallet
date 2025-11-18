@@ -2511,6 +2511,8 @@ PODS:
     - React-perflogger (= 0.81.1)
     - React-utils (= 0.81.1)
     - SocketRocket
+  - rn-fetch-blob (0.12.0):
+    - React-Core
   - RNCAsyncStorage (1.24.0):
     - React-Core
   - RNCClipboard (1.16.3):
@@ -2559,7 +2561,7 @@ PODS:
     - FirebaseCoreExtension
     - React-Core
     - RNFBApp
-  - RNGestureHandler (2.28.0):
+  - RNGestureHandler (2.29.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2589,11 +2591,11 @@ PODS:
     - Yoga
   - RNKeychain (8.2.0):
     - React-Core
-  - RNLocalize (3.5.2):
+  - RNLocalize (3.6.0):
     - React-Core
   - RNPermissions (4.1.5):
     - React-Core
-  - RNReanimated (3.19.1):
+  - RNReanimated (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2620,11 +2622,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.19.1)
-    - RNReanimated/worklets (= 3.19.1)
+    - RNReanimated/reanimated (= 3.19.3)
+    - RNReanimated/worklets (= 3.19.3)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (3.19.1):
+  - RNReanimated/reanimated (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2651,10 +2653,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 3.19.1)
+    - RNReanimated/reanimated/apple (= 3.19.3)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (3.19.1):
+  - RNReanimated/reanimated/apple (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2683,7 +2685,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets (3.19.1):
+  - RNReanimated/worklets (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2710,10 +2712,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/worklets/apple (= 3.19.1)
+    - RNReanimated/worklets/apple (= 3.19.3)
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets/apple (3.19.1):
+  - RNReanimated/worklets/apple (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2777,7 +2779,7 @@ PODS:
     - React-Core
   - RNShare (10.2.1):
     - React-Core
-  - RNSVG (15.13.0):
+  - RNSVG (15.14.0):
     - React-Core
   - RNVectorIcons (10.3.0):
     - boost
@@ -2811,6 +2813,12 @@ PODS:
     - Mobilisten (= 8.1.3)
     - React
   - SocketRocket (0.7.1)
+  - VisionCamera (4.7.2):
+    - VisionCamera/Core (= 4.7.2)
+    - VisionCamera/React (= 4.7.2)
+  - VisionCamera/Core (4.7.2)
+  - VisionCamera/React (4.7.2):
+    - React-Core
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -2907,6 +2915,7 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
@@ -2928,6 +2937,7 @@ DEPENDENCIES:
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNZohoSalesIQ (from `../node_modules/react-native-zohosalesiq-mobilisten/ios`)
   - SocketRocket (~> 0.7.1)
+  - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -3125,6 +3135,8 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  rn-fetch-blob:
+    :path: "../node_modules/rn-fetch-blob"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
@@ -3165,6 +3177,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-vector-icons"
   RNZohoSalesIQ:
     :path: "../node_modules/react-native-zohosalesiq-mobilisten/ios"
+  VisionCamera:
+    :path: "../node_modules/react-native-vision-camera"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -3271,6 +3285,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 3eb9096cb139eb433965693bbe541d96eb3d3ec9
   ReactCodegen: 4d203eddf6f977caa324640a20f92e70408d648b
   ReactCommon: ce5d4226dfaf9d5dacbef57b4528819e39d3a120
+  rn-fetch-blob: 25612b6d6f6e980c6f17ed98ba2f58f5696a51ca
   RNCAsyncStorage: b6410dead2732b5c72a7fdb1ecb5651bbcf4674b
   RNCClipboard: f6679d470d0da2bce2a37b0af7b9e0bf369ecda5
   RNCMaskedView: 84430d0d76eff7473af742c3c2298ed23cc4a296
@@ -3279,19 +3294,20 @@ SPEC CHECKSUMS:
   RNFBAnalytics: 290b70fa445e75a3797f3faef1320e56c35df78e
   RNFBApp: 2cbcd7fd5063d8a521a09385915934e99295a79f
   RNFBMessaging: d307457b2cd06e87d77e3dada610200b328f53a6
-  RNGestureHandler: 12a436b5074378be95468a57b62c165a1e24cfc9
+  RNGestureHandler: 507c67d169cae3f7ade381fbe3358187e62b2c92
   RNKeychain: bbe2f6d5cc008920324acb49ef86ccc03d3b38e4
-  RNLocalize: 3c4d0abd777a546fa77bdb6caef85a87fb9ea349
+  RNLocalize: 5c5e0454cb8a73f173f27a6353630e17684f07dd
   RNPermissions: c9f6254b68483c75efe58543d6cd92e5a3d869f5
-  RNReanimated: 488bbae315509dec258dc50e8625b34d3d449aec
+  RNReanimated: 7302108cff8306ca3460b472d2498833b84a5766
   RNScreens: 35525ebfe219c8709da0d26aebbc9a5e02e1077b
   RNSecureRandom: b64d263529492a6897e236a22a2c4249aa1b53dc
   RNSha256: 4d35f112e967f58273d625a19376f4eafc72bd5c
   RNShare: 694e19d7f74ac4c04de3a8af0649e9ccc03bd8b1
-  RNSVG: e0293d50d2cc0c7b8259fc66faa292378a04ba9a
+  RNSVG: ad69b385e35653fd9694935c48840117e96ccc1d
   RNVectorIcons: 9084b0cf37b3c5690b730c5627a21d750c9f517e
   RNZohoSalesIQ: f12694631244abdc9157aa077e817f0320acbdb2
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
+  VisionCamera: 30b358b807324c692064f78385e9a732ce1bebfe
   Yoga: 11c9686a21e2cd82a094a723649d9f4507200fb0
 
 PODFILE CHECKSUM: 14df428dbf3d88918f0f84aec60e3a2fd0a8feb2

@@ -5,7 +5,7 @@ import { CountryCode } from 'react-native-country-picker-modal';
 
 interface INProps {
   defaultCountry: CountryCode;
-  inputRef: React.RefObject<PhoneInput>;
+  inputRef: React.RefObject<PhoneInput | null>;
   setPhoneError: Function;
   phone: string;
   setPhone: Function;

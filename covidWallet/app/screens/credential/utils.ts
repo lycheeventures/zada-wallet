@@ -1,22 +1,60 @@
 import moment from 'moment';
-import { Platform } from 'react-native';
+import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import Share from 'react-native-share';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import RNFetchBlob from 'rn-fetch-blob';
 import { CredentialAPI } from '../../gateways';
 import { parse_date_time } from '../../helpers';
 
 export const generatePDF = async (html: any, fileName: string) => {
-  let options = {
-    html: html,
-    fileName: fileName,
-    directory: 'Documents',
-    padding: 0,
-    height: 842,
-    width: 595,
-  };
-  let file = await RNHTMLtoPDF.convert(options);
+  try {
+    const options = {
+      html,
+      fileName,
+      directory: 'Download',
+      height: 842,
+      width: 595,
+      padding: 0,
+    };
 
-  return { url: Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath };
+    const file = await RNHTMLtoPDF.convert(options);
+
+    return { url: file.filePath };
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
+  }
+};
+
+export const downloadFile = async (html: any, fileName: string) => {
+  try {
+    if (Platform.OS === 'android') {
+      const hasPermission = await requestStoragePermission();
+      if (!hasPermission) {
+        Alert.alert('Permission Denied', 'Cannot save PDF without storage permission.');
+        return;
+      }
+    }
+
+    // Generate PDF into public Download folder
+    const options = {
+      html,
+      fileName,
+      directory: 'Download',
+      height: 842,
+      width: 595,
+      padding: 0,
+    };
+
+    const file = await RNHTMLtoPDF.convert(options);
+    const destPath = RNFetchBlob.fs.dirs.DownloadDir + `/${fileName}.pdf`;
+    await RNFetchBlob.fs.cp(file.filePath, destPath);
+    await RNFetchBlob.fs.scanFile([{ path: destPath }]);
+    return { url: `file://${destPath}` };
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
+  }
 };
 
 // Generating and sharing pdf
@@ -76,4 +114,31 @@ export const replacePlaceHolders = (htmlStr: string, data: any, credentialDetail
   htmlStr = htmlStr.replaceAll('{placeholder_qr}', data.qrUrl);
   htmlStr = htmlStr.replaceAll('{placeholder_table}', credentialDetails.join(''));
   return htmlStr;
+};
+
+const requestStoragePermission = async () => {
+  if (Platform.OS !== 'android') return true;
+
+  try {
+    if (Platform.Version >= 33) {
+      // Android > 11 uses READ_MEDIA_IMAGES
+      await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES);
+      return true;
+    } else {
+      // Android < 11 uses WRITE_EXTERNAL_STORAGE
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'File Download Permission',
+          message: 'Your permission is required to save files to your device.',
+          buttonPositive: 'OK',
+          buttonNegative: 'Cancel',
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+  } catch (err) {
+    console.error('Storage permission error:', err);
+    return false;
+  }
 };

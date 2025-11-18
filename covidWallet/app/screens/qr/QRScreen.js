@@ -1,11 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, StyleSheet, TouchableOpacity, View, Linking } from 'react-native';
-import Config from 'react-native-config';
-import QRCodeScanner from 'react-native-qrcode-scanner';
+import { Text, StyleSheet, TouchableOpacity, View, Linking, Dimensions } from 'react-native';
+//import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useTranslation } from 'react-i18next';
 import CredValuesModal from './components/CredValuesModal';
 import CustomProgressBar from './components/CustomProgressBar';
-import ActionDialog from '../../components/Dialogs/ActionDialog';
 import FailureModal from './components/FailureModal';
 import SuccessModal from './components/SuccessModal';
 import { useAppDispatch, useAppSelector } from '../../store';
@@ -28,6 +26,10 @@ import { clearAllAndLogout } from '../../store/utils';
 import { addConnection } from '../../store/connections';
 import VerificationRequestScreen from '../verification_request_screen/VerificationRequestScreen';
 import ErrorHandler from '../../components/Error/ErrorHandler';
+import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
+import { AppColors } from '../../theme/Colors';
+const { width, height } = Dimensions.get('window');
+const FRAME_SIZE = 300;
 
 const defaultCredState = { type: 'none', credentials: [] };
 
@@ -56,6 +58,28 @@ const QRScreen = ({ route, navigation }) => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [isScanning, setScanning] = useState(false);
   const [errMsg, setErrMsg] = useState('');
+
+  // camera
+  const [cameraActive, setCameraActive] = useState(true);
+  const [hasPermission, setHasPermission] = useState(false);
+  const device = useCameraDevice('back');
+
+  // Request camera permission
+  useEffect(() => {
+    (async () => {
+      const status = await Camera.requestCameraPermission();
+      setHasPermission(status === 'granted');
+      if (status !== 'granted') {
+        setTimeout(() => {
+          showOKDialog(
+            'Permission Denied',
+            'Please allow camera access in ZADA app info to continue.',
+            navigateToMainScreen
+          );
+        }, 500);
+      }
+    })();
+  }, []);
 
   // UseEffects
   // QR Scan Control.
@@ -94,6 +118,20 @@ const QRScreen = ({ route, navigation }) => {
     setCredentialData(defaultCredState);
     navigation.navigate('MainScreen');
   }, [navigation]);
+
+  // QR code scanner
+  const codeScanner = useCodeScanner({
+    codeTypes: ['qr'],
+    onCodeScanned: codes => {
+      if (codes.length > 0 && cameraActive) {
+        const value = codes[0]?.value;
+        if (value) {
+          _handleQRScan({ data: value }, false);
+          setCameraActive(false);
+        }
+      }
+    },
+  });
 
   // Handle verify button press.
   const _handleVerifyClick = async () => {
@@ -332,81 +370,18 @@ const QRScreen = ({ route, navigation }) => {
     [auto_accept_connection, connections, dispatch, navigateToMainScreen, networkStatus]
   );
 
-  // Accept modal handler
-  const acceptModal = async e => {
-    setTimeout(() => {
-      setProgress(true);
-      setDialogTitle('Submitting Verification...');
-    }, 500);
-
-    setCredentialData({
-      ...credentialData,
-      type: 'temp',
-    });
-
-    // Handle metadata as JSON
-    let metadata = undefined;
-    let redirectCallback = undefined;
-    if (typeof e.metadata === 'object') {
-      metadata = e.metadata.verificationRequestId;
-      redirectCallback = e.metadata.redirectCallback;
-    } else {
-      metadata = e.metadata;
-    }
-
-    try {
-      // Submitting verification
-      await VerificationAPI.submit_verification_connectionless(
-        metadata,
-        e.policyName,
-        e.credentialId
-      );
-
-      setProgress(false);
-      setCredentialData(defaultCredState);
-      if (redirectCallback != undefined && redirectCallback != '') {
-        Linking.openURL(redirectCallback);
-      } else {
-        showOKDialog('ZADA', 'Submitted Successfully!', navigateToMainScreen);
-      }
-
-      // Create connection if connectionId is available
-      if (e.connectionId) {
-        let data = await getConnectionDetails(e.connectionId, {
-          type: 'connection_request',
-          metadata,
-        });
-        let connectionExists = connections.find(x => x.name === data.organizationName);
-
-        // Don't add connection if already exists
-        if (!connectionExists) {
-          // Accept Connection
-          dispatch(acceptConnection(e.connectionId));
-        }
-      }
-
-      navigation.goBack();
-    } catch (error) {
-      setScanning(false);
-      setProgress(false);
-      setCredentialData(defaultCredState);
-      setErrMsg('Unable to verify credential');
-      setTimeout(() => {
-        setShowErrorModal(true);
-      }, 500);
-    }
-  };
-
-  // On dimiss pressed
-  const dismissModal = () => {
-    setScan(true);
-    setCredentialData(defaultCredState);
-  };
-  // On reject pressed
-  const rejectModal = () => {
-    navigation.goBack();
-    setCredentialData(defaultCredState);
-  };
+  if (!hasPermission)
+    return (
+      <View style={styles.labelContainer}>
+        <Text style={styles.label}>Waiting for camera permission...</Text>
+      </View>
+    );
+  if (!device)
+    return (
+      <View style={styles.labelContainer}>
+        <Text style={styles.label}>Your centered text</Text>
+      </View>
+    );
 
   return (
     <View style={styles.mainContainer}>
@@ -416,23 +391,15 @@ const QRScreen = ({ route, navigation }) => {
         heading={isScanning ? 'Verifying...' : 'Credential\nInformation'}
         isScanning={isScanning}
         onCloseClick={() => {
-          setScan(true);
           setValues(null);
-          setCredentialData(defaultCredState);
+          setTimeout(() => {
+            navigateToMainScreen();
+          }, 300);
         }}
         onVerifyPress={_handleVerifyClick}
       />
 
       {credentialData.type === 'connectionless-verification' && (
-        // <ActionDialog
-        //   isVisible={credentialData.type === 'connectionless-verification'}
-        //   rejectModal={rejectModal}
-        //   data={credentialData.credentials}
-        //   dismissModal={dismissModal}
-        //   acceptModal={acceptModal}
-        //   modalType="action"
-        //   isIconVisible={true}
-        // />
         <VerificationRequestScreen data={credentialData.credentials} />
       )}
 
@@ -443,10 +410,15 @@ const QRScreen = ({ route, navigation }) => {
         info="Credential is verified successfully"
         onCloseClick={() => {
           setShowSuccessModal(false);
+          setTimeout(() => {
+            navigateToMainScreen();
+          }, 300);
         }}
         onOkayPress={() => {
           setShowSuccessModal(false);
-          setScan(true);
+          setTimeout(() => {
+            navigateToMainScreen();
+          }, 300);
         }}
       />
 
@@ -457,37 +429,48 @@ const QRScreen = ({ route, navigation }) => {
         info={errMsg}
         onCloseClick={() => {
           setShowErrorModal(false);
+          setTimeout(() => {
+            navigateToMainScreen();
+          }, 300);
         }}
         onOkayPress={() => {
           setShowErrorModal(false);
-          setScan(true);
+          setTimeout(() => {
+            navigateToMainScreen();
+          }, 300);
         }}
       />
 
-      {scan ? (
-        <QRCodeScanner
-          reactivate={true}
-          showMarker={true}
-          reactivateTimeout={1000}
-          customMarker={
-            <View style={styles.customMarkerViewStyle}>
-              <View style={styles.customMarkerInnerViewStyle} />
+      {scan && cameraActive && (
+        <View style={styles.container}>
+          <Camera
+            style={StyleSheet.absoluteFill}
+            device={device}
+            isActive={cameraActive}
+            codeScanner={codeScanner}
+          />
+
+          <View style={styles.overlay}>
+            <View style={styles.topOverlay} />
+            <Text style={styles.title}>{t('QRScreen.title')}</Text>
+            <View style={styles.middleRow}>
+              <View style={styles.sideOverlay} />
+              <View style={styles.frame} />
+              <View style={styles.sideOverlay} />
             </View>
-          }
-          onRead={_handleQRScan}
-          topContent={<Text style={styles.textBold}>{t('QRScreen.title')}</Text>}
-          bottomContent={
-            <TouchableOpacity style={styles.buttonTouchable} onPress={navigateToMainScreen}>
-              <Text style={styles.buttonText}>{t('QRScreen.cancel_scan')}</Text>
-            </TouchableOpacity>
-          }
-        />
-      ) : (
-        progress && (
-          <View style={styles.progressViewStyle}>
-            <CustomProgressBar isVisible={true} text={dialogTitle} />
+            <View style={styles.bottomOverlay}>
+              <TouchableOpacity style={styles.button} onPress={navigateToMainScreen}>
+                <Text style={styles.buttonText}>{t('QRScreen.cancel_scan')}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        )
+        </View>
+      )}
+
+      {progress && (
+        <View style={styles.progressViewStyle}>
+          <CustomProgressBar isVisible={true} text={dialogTitle} />
+        </View>
       )}
     </View>
   );
@@ -500,35 +483,69 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  textBold: {
+  container: { flex: 1, width: '100%', height: '100%' },
+  overlay: {
+    position: 'absolute',
+    width,
+    height,
+    justifyContent: 'space-between',
+  },
+  topOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  middleRow: {
+    flexDirection: 'row',
+  },
+  sideOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  frame: {
+    width: FRAME_SIZE,
+    height: FRAME_SIZE,
+    borderWidth: 2,
+    borderColor: AppColors.WHITE,
+    borderRadius: 8,
+  },
+  bottomOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    paddingBottom: 40,
+  },
+  title: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
     fontSize: 20,
-    marginLeft: 70,
-    marginRight: 70,
-    zIndex: 10,
-    marginBottom: 10,
     textAlign: 'center',
     fontWeight: '600',
-    color: '#fff',
+    color: AppColors.WHITE,
+    zIndex: 10,
+  },
+  labelContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  label: {
+    textAlign: 'center',
+    fontWeight: '600',
+    color: AppColors.BLACK,
+  },
+  button: {
+    backgroundColor: '#FF3B30',
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    marginTop: 20,
+    borderRadius: 25,
   },
   buttonText: {
-    fontSize: 21,
-    color: '#4178CD',
-  },
-  buttonTouchable: {
-    padding: 16,
-  },
-  customMarkerViewStyle: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-  },
-  customMarkerInnerViewStyle: {
-    height: 250,
-    width: 250,
-    borderWidth: 2,
-    borderColor: 'white',
-    backgroundColor: 'transparent',
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   progressViewStyle: {
     flex: 1,

@@ -3,53 +3,6 @@ import { AuthAPI, throwErrorIfExist } from '../../gateways';
 import { navigationRef } from '../../navigation/utils';
 import { _showAlert } from '../../helpers';
 
-// export const loginUser = createAsyncThunk(
-//   'auth/loginUser',
-//   async (args: { phone: string; secret: string }, { dispatch }) => {
-//     let { phone, secret } = args;
-//     let response = await AuthAPI.login(phone, secret);
-//     let data = response?.data;
-
-//     // Check status
-//     if (data.status != undefined) {
-//       if (data.status === 'deleted') {
-//         // deleted user.
-//       } else if (data.status === 'inactive') {
-//         showAskDialog(
-//           'Re-activate Account',
-//           'Do you want to re-activate your account?',
-//           () => dispatch(reactivateUserAccount({ phone })),
-//           () => {
-//             dispatch(updateAuthStatus('idle'));
-//           },
-//           'Re-activate',
-//           'default',
-//           'Cancel',
-//           'destructive'
-//         );
-//       }
-//     } else {
-//       if (data.verified) {
-//         if (data.type === 'demo') {
-//           navigationRef.navigate('SecurityScreen', {
-//             navigation: navigationRef,
-//             user: { ...data, phone, secret: secret },
-//           });
-//           dispatch(updateAuthStatus('idle'));
-//           return;
-//         }
-//       }
-
-//       navigationRef.navigate('MultiFactorScreen', {
-//         from: 'Login',
-//         user: { ...data, phone, secret: secret },
-//       });
-//       dispatch(updateAuthStatus('idle'));
-//     }
-//     return data.success;
-//   }
-// );
-
 export const createWallet = createAsyncThunk('auth/createWallet', async (token: string) => {
   try {
     await AuthAPI.createWallet(token);
@@ -109,17 +62,14 @@ export const getUserStatus = createAsyncThunk(
   }
 );
 
-export const getUserProfile = createAsyncThunk(
-  'auth/getUserProfile',
-  async () => {
-    try {
-      let response = await AuthAPI._fetchProfileAPI();
-      return response?.data;
-    } catch (e) {
-      throwErrorIfExist(e);
-    }
+export const getUserProfile = createAsyncThunk('auth/getUserProfile', async () => {
+  try {
+    let response = await AuthAPI._fetchProfileAPI();
+    return response?.data;
+  } catch (e) {
+    throwErrorIfExist(e);
   }
-);
+});
 
 export const updateUserProfile = createAsyncThunk(
   'auth/updateUserProfile',
@@ -153,10 +103,10 @@ export const resetUserPassword = createAsyncThunk(
 // Resend Codes
 export const sendOTP = createAsyncThunk(
   'auth/sendOTP',
-  async (args: { phone: string; secret?: string }) => {
+  async (args: { phone: string; secret?: string; channel: string }) => {
     try {
-      let { phone, secret } = args;
-      let response = await AuthAPI._resendOTPAPI(phone, 'phone', secret);
+      let { phone, secret, channel } = args;
+      let response = await AuthAPI._resendOTPAPI(phone, 'phone', channel, secret);
       return response?.data;
     } catch (e) {
       throwErrorIfExist(e);

@@ -1,12 +1,12 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Dimensions, View, Text, Alert } from 'react-native';
+import { Dimensions, View, Text, Alert, Platform } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import QRCode from 'react-native-qrcode-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useTranslation } from 'react-i18next';
 
 import { BACKGROUND_COLOR, BLACK_COLOR, GRAY_COLOR, WHITE_COLOR } from '../../theme/Colors';
-import { generatePDF, getCredentialTemplate, replacePlaceHolders, sharePDF } from './utils';
+import { downloadFile, getCredentialTemplate, replacePlaceHolders, sharePDF } from './utils';
 import {
   get_local_issue_date,
   parse_date_time,
@@ -174,19 +174,20 @@ const CredDetailScreen = (props: IProps) => {
         credentialDetails
       );
       // Share PDF
-      if (isDownload) {
-        const result = await generatePDF(htmlStr, data.type ?? 'Credential');
+      if (isDownload && Platform.OS === 'android') {
+        const result = await downloadFile(htmlStr, data.type ?? 'Credential');
         setGeneratingPDF(false);
-        Alert.alert('Download Success', `PDF downloaded successfully!\nPath: ${result.url}`, [
-          { text: 'OK' },
-        ]);
+        Alert.alert(
+          'Download Success',
+          "PDF downloaded successfully! You can find it in your device's Downloads folder.",
+          [{ text: 'OK' }]
+        );
       } else {
         await sharePDF(htmlStr, data.type ?? 'Credential');
       }
       setGeneratingPDF(false);
     } catch (error) {
       setGeneratingPDF(false);
-      console.log('error', error);
     }
   };
 

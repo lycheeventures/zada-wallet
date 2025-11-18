@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, StyleSheet, ActivityIndicator, View, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
 import { AppColors } from '../../../theme/Colors';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../../store';
@@ -8,62 +9,56 @@ import { selectUser } from '../../../store/auth/selectors';
 import { _showAlert } from '../../../helpers';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../../navigation/types';
+import { OTP_CHANNEL } from '../../../store/auth/OtpChannel';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
 }
-const ResendCode = (props: INProps) => {
-  //Constants
-  const dispatch = useAppDispatch<AppDispatch>();
 
-  // Selectors
+const ResendCode = (props: INProps) => {
+  const dispatch = useAppDispatch<AppDispatch>();
   const user = useAppSelector(selectUser);
   const { t } = useTranslation();
 
-  // States
   const [phoneMins, setPhoneMins] = useState(1);
   const [phoneSecs, setPhoneSecs] = useState(59);
   const [phoneTimeout, setPhoneTimeout] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  //   Effect for phone code countdown
-  React.useEffect(() => {
+  useEffect(() => {
     let interval = setInterval(() => {
-      let tempSec = phoneSecs - 1;
-      if (tempSec <= 0 && phoneMins > 0) {
-        setPhoneSecs(59);
-        setPhoneMins(phoneMins - 1);
-      } else if (tempSec <= 0 && phoneMins == 0) {
-        setPhoneSecs(0);
-        setPhoneMins(0);
-        clearInterval(interval);
-        setPhoneTimeout(false);
-      } else {
-        setPhoneSecs(tempSec);
-      }
-    }, 1000); //each count lasts for a second
-    //cleanup the interval on complete
+      setPhoneSecs(prev => {
+        if (prev <= 1) {
+          if (phoneMins > 0) {
+            setPhoneMins(m => m - 1);
+            return 59;
+          } else {
+            setPhoneTimeout(false);
+            clearInterval(interval);
+            return 0;
+          }
+        }
+        return prev - 1;
+      });
+    }, 1000);
     return () => clearInterval(interval);
-  });
+  }, [phoneMins]);
 
-  // Function
-  const resendCode = async () => {
+  const resendCode = async (channel: string) => {
     if (user.phone) {
       setLoading(true);
-      dispatch(sendOTP({ phone: user.phone, secret: user.walletSecret }))
+      dispatch(sendOTP({ phone: user.phone, secret: user.walletSecret, channel }))
         .unwrap()
-        .then((res) => {
+        .then(res => {
           if (res.success) {
-            _showAlert('ZADA', 'Code sent successfully!');
+            _showAlert('ZADA', `Code sent successfully via ${channel.toUpperCase()}!`);
             setPhoneMins(1);
             setPhoneSecs(59);
             setPhoneTimeout(true);
-            setLoading(false);
           }
         })
-        .catch((e) => {
-          setLoading(false);
-        });
+        .catch(() => {})
+        .finally(() => setLoading(false));
     } else {
       _showAlert('ZADA', 'Invalid phone number!');
       props.navigation.navigate('PhoneNumberScreen');
@@ -71,62 +66,90 @@ const ResendCode = (props: INProps) => {
   };
 
   return (
-    <>
+    <View style={styles.container}>
       {!phoneTimeout ? (
         !loading ? (
-          <Text>
-            {"Didn't get a code?"}{' '}
-            <Text onPress={resendCode} style={styles._expireText}>
-              {t('VerifyOTPScreen.resend_otp')}
-            </Text>
-          </Text>
+          <>
+            <Text style={styles.questionText}>Didn't get a code?</Text>
+
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.button, styles.smsButton]}
+                onPress={() => resendCode(OTP_CHANNEL.SMS)}>
+                <Icon
+                  name="message-text-outline"
+                  size={18}
+                  color={AppColors.WHITE}
+                  style={styles.icon}
+                />
+                <Text style={styles.buttonText}>Send via SMS</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.whatsappButton]}
+                onPress={() => resendCode(OTP_CHANNEL.WHATSAPP)}>
+                <Icon name="whatsapp" size={18} color={AppColors.WHITE} style={styles.icon} />
+                <Text style={styles.buttonText}>Send via WhatsApp</Text>
+              </TouchableOpacity>
+            </View>
+          </>
         ) : (
-          <ActivityIndicator
-            color={AppColors.PRIMARY}
-            size={'small'}
-            style={{
-              marginLeft: 30,
-            }}
-          />
+          <ActivityIndicator color={AppColors.PRIMARY} size="small" style={{ marginLeft: 30 }} />
         )
       ) : (
         <Text>
-          {t('VerifyOTPScreen.resend_otp')} {'in '}
+          {t('VerifyOTPScreen.resend_otp')} in{' '}
           <Text style={styles._countdown}>
             {('0' + phoneMins).slice(-2)} : {('0' + phoneSecs).slice(-2)}
           </Text>
         </Text>
       )}
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  inputView: {
-    borderRadius: 10,
-    width: '40%',
-    height: 45,
-    marginLeft: 10,
-    marginTop: 8,
+  container: {
     alignItems: 'center',
   },
-  TextInputStyle: {
-    height: 50,
-    padding: 10,
-    fontSize: 18,
+  questionText: {
+    fontSize: 14,
     color: AppColors.BLACK,
+    marginBottom: 10,
   },
-  _countdownView: {
-    position: 'absolute',
-    borderWidth: 2,
-    padding: 10,
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 140,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  smsButton: {
+    backgroundColor: AppColors.PRIMARY,
+  },
+  whatsappButton: {
+    backgroundColor: AppColors.BRIGHT_GREEN,
+  },
+  icon: {
+    marginRight: 6,
+  },
+  buttonText: {
+    color: AppColors.WHITE,
+    fontSize: 14,
+    textAlign: 'center',
+    fontFamily: 'Poppins-Medium',
   },
   _countdown: {
     color: AppColors.PRIMARY,
   },
-  _expireText: {
-    color: AppColors.PRIMARY,
-    textDecorationLine: 'underline',
-  },
 });
+
 export default ResendCode;
