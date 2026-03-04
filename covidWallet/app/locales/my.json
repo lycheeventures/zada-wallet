@@ -10,8 +10,19 @@
     "pull_to_refresh": "Refresh လုပ်ရန်အောက်သို့ဆွဲချပါ",
     "actions": "လုပ်ဆောင်ချက်များ",
     "credentials": "အထောက်အထားများ",
+    "credential_detail": "Credential Detail",
     "connections": "ချိတ်ဆက်မှုများ",
     "try_again": "ထပ်မံကြိုးစားကြည့်ပါ"
+  },
+  "tooltips": {
+    "setting": "ဆက်တင်များကို အသုံးပြုရန် မီနူးကို ဖွင့်ပါ။",
+    "refresh": "ဒေတာများကို အသစ်ပြန်လည်ရယူရန် ဤနေရာကို နှိပ်ပါ။",
+    "qr": "QR ကုဒ် စကင်ဖတ်ရန် ဤနေရာကို နှိပ်ပါ။",
+    "request_credential": "သက်သေခံလက်မှတ်အသစ် တောင်းဆိုရန် ဤနေရာကို နှိပ်ပါ။",
+    "add_connection": "ချိတ်ဆက်မှုအသစ် ထည့်သွင်းရန် ဤနေရာကို နှိပ်ပါ။",
+    "download": "ဤသက်သေခံလက်မှတ်ကို သင်၏ဖုန်းထဲသို့ ဒေါင်းလုဒ်ရယူပါ။",
+    "share": "ဤသက်သေခံလက်မှတ်ကို အီးမေးလ် (သို့မဟုတ်) အခြားအက်ပ်များမှတစ်ဆင့် လုံခြုံစွာ မျှဝေပါ။",
+    "delete": "ဤသက်သေခံလက်မှတ်ကို သင်၏ Wallet ထဲမှ အပြီးတိုင် ဖျက်ပစ်ပါ။"
   },
   "PreferenceScreen": {
     "title": "နိုင်ငံနှင့် ဘာသာ စကားကိုရွေးပါ။",
@@ -33,7 +44,10 @@
     "title": "သင့်အား အတည်ပြုကုဒ်တစ်ခုပေးပို့လိုက်ပါသည်",
     "sub_title_1": "ကျွန်ုပ်တို့သည် အတည်ပြုကုဒ်ကို ပေးပို့လိုက်ပါသည်။",
     "sub_title_2": "အတည်ပြုပါ",
-    "resend_otp": "OTP ပြန်လည်ရယူရန်"
+    "resend_otp": "OTP ပြန်လည်ရယူရန်",
+    "sms": "SMS ဖြင့် ပေးပို့ရန်",
+    "wahtsapp": "WhatsApp ဖြင့် ပေးပို့ရန်",
+    "didnt_receive_code": "ကုဒ်မလက်ခံရသေးပါသလ။?"
   },
   "RegistrationScreen": {
     "title": "မင်္ဂလာပါ",
@@ -47,7 +61,9 @@
   },
   "QRScreen": {
     "title": "စကင်န်ဖတ်ရန် သင့်ကင်မရာကို QR ကုဒ်သို့ ညွှန်ပါ။",
-    "cancel_scan": "စကင်န်ကို ပယ်ဖျက်ပါ။"
+    "cancel_scan": "စကင်န်ကို ပယ်ဖျက်ပါ။",
+    "no_access_camera": "Camera can't open. Please allow camera access in ZADA app info to continue.",
+    "close": "Close"
   },
   "SecurityScreen": {
     "title": "လုံခြုံပါစေ။",
@@ -111,6 +127,7 @@
     "support": "SUPPORT",
     "contact_us": "တိုက်ရိုက်ဆက်သွယ်နိုင်ရန်",
     "about_us": "ကျွန်ုပ်တို့အကြောင်း",
+    "user_guide": "အသုံးပြုနိုင်ရန်အတွက် လမ်းညွှန်",
     "license_and_agreements": "လိုင်စင် နှင့် သဘောတူညီချက်များ"
   },
   "ProfileScreen": {
@@ -201,15 +218,23 @@
     "error_401": "Unauthorized – Please check your credentials.",
     "error_403": "ကျေးဇူးပြု၍ VPN ကိုပိတ်ပီး ပြန်လည်ကြိုးစားကြည့်ပါ။",
     "error_404": "Not Found – The requested resource could not be found.",
-    "error_500": "Oops! Something went wrong. Please try again later."
+    "error_500": "Oops! Something went wrong. Please try again later.",
+    "verification_fail_title": "Verification Failed",
+    "verification_fail_message": "Failed to verify the QR code. Please try again.",
+    "verification_fail_title_1": "Error",
+    "verification_fail_message_1": "An error occurred while processing the QR code. Please try again.",
+    "no_internet_title": "အင်တာနက်ချိတ်ဆက်မှု မရှိပါ။",
+    "no_internet_message": "အင်တာနက်ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်မံကြိုးစားပါ။"
   },
   "messages": {
     "delete_account": "သင့်အကောင့်ကို ဖျက်လိုပါသလား။",
+    "delete_action_title": "Delete Action",
     "delete_request": "ဤတောင်းဆိုချက်ကို ဖျက်လိုသည်မှာ သေချာပါသလား။",
     "delete_certificate": "သင်၏အထောက်အထားကိုဖျက်ရန်သေချာပါသလား။",
     "updating_profile": "သင့်ကိုယ့်ရေးကိုယ်တာအချက်အလက်များကိုပြင်ဆင်နေပါသည်။...",
     "fetching_profile": "သင့်ကိုယ့်ရေးကိုယ်တာအချက်အလက်များကိုထည့်သွင်းနေပါသည်။...",
     "fetching_detail": "အသေးစိတ်အချက်အလက်များကိုရယူခြင်း။",
+    "logout_title": "Log Out",
     "logout": "အကောင့်ထဲမှထွက်လိုသည်မှာ သေချာပါသလား။",
     "receiving_certificate": "ခဏစောင့်ပါ။ အထောက်အထားလက်မှတ်ကို လက်ခံရန်လုပ်ဆောင်ချိန် ~10 စက္ကန့်ခန့်ကြာနိုင်ပါသည်။",
     "verifying_certificate": "ခဏစောင့်ပါ။ အထောက်အထားလက်မှတ်ကို စစ်ဆေးအတည်ပြုရန်လုပ်ဆောင်ချိန် ~10 စက္ကန့်ခန့်ကြာနိုင်ပါသည်။",
@@ -221,9 +246,19 @@
     "success_verification_request_submit": "စစ်ဆေးအတည်ပြုရန်တောင်းဆိုချက်ကို အောင်မြင်စွာတင်သွင်းပြီးဖြစ်သည်။",
     "success_verification_request": "စစ်ဆေးအတည်ပြုရန်တောင်းဆိုချက်သည် အောင်မြင်စွာပြီးမြောက်ပြီဖြစ်ပါသည်။",
     "success_connection": "Connection ကို အောင်မြင်စွာရယူပြီးဖြစ်ပါသည်။",
+    "connection_already_exists_title": "Connection Already Exists",
+    "connection_already_exists_message": "Connection with {{organizationName}} has already been created",
+    "connection_fail_title": "Request Connection Failed",
+    "connection_fail_message": "Failed to request connection. Please try again.",
     "success_certificate": "အထောက်အထားလက်မှတ်ကို အောင်မြင်စွာလက်ခံပြီးဖြစ်ပါသည်။",
     "success_certificate_deletion": "အထောက်အထားအားအောင်မြင်စွာဖျက်လိုက်ပါပြီ",
-    "success_claim_credential": "အထောက်အထားအတွက် တောင်းဆိုချက်ကို တင်ပြပြီးပါပြီ။ မကြာမီ ပို့ဆောင်ပေးပါမည်။"
+    "success_claim_credential": "အထောက်အထားအတွက် တောင်းဆိုချက်ကို တင်ပြပြီးပါပြီ။ မကြာမီ ပို့ဆောင်ပေးပါမည်။",
+    "delete_connection_title": "ချိတ်ဆက်မှုကို ဖျက်ရန်",
+    "delete_connection_message": "ဤချိတ်ဆက်မှုကို ဖျက်လိုသည်မှာ သေချာပါသလား?",
+    "credential_exit": "ဤချိတ်ဆက်မှုအား ချိတ်ဆက်ထားသော အထောက်အထားများကြောင့် ဖျက်၍မရနိုင်ပါ။",
+    "action_exit": "ဤချိတ်ဆက်မှုအား ချိတ်ဆက်ထားသော လုပ်ဆောင်ချက်များကြောင့် ဖျက်၍မရနိုင်ပါ။",
+    "delete_connection_success": "ချိတ်ဆက်မှုကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။",
+    "delete_connection_fail": "ချိတ်ဆက်မှုကို ဖျက်ရန် မအောင်မြင်ပါ။"
   },
   "success": {
     "updated_password": "စကားဝှက်ကိုအောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ။",

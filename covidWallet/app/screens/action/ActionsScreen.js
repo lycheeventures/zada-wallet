@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useCallback, useLayoutEffect, useState, useRef } from 'react';
 import {
   Alert,
   View,
@@ -18,7 +18,6 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import FlatCard from '../../components/FlatCard';
 import TextComponent from '../../components/TextComponent';
 import ActionDialog from '../../components/Dialogs/ActionDialog';
-import HeadingComponent from '../../components/HeadingComponent';
 
 import messaging from '@react-native-firebase/messaging';
 
@@ -26,7 +25,12 @@ import { themeStyles } from '../../theme/Styles';
 import { BLACK_COLOR, RED_COLOR, SECONDARY_COLOR } from '../../theme/Colors';
 
 import { getItem, saveItem } from '../../helpers/Storage';
-import ConstantsList, { CONN_REQ, CRED_OFFER, VER_REQ } from '../../helpers/ConfigApp';
+import ConstantsList, {
+  CONN_REQ,
+  CRED_OFFER,
+  VER_REQ,
+  CONNLESS_VER_REQ,
+} from '../../helpers/ConfigApp';
 
 import { showMessage, showAskDialog, _showAlert } from '../../helpers/Toast';
 import { getActionHeader } from '../../helpers/ActionList';
@@ -52,10 +56,12 @@ import {
   selectVerificationActions,
 } from '../../store/actions/selectors';
 import { deleteAction } from '../../store/actions';
-import { fetchConnections } from '../../store/connections/thunk';
+import { fetchAcceptConnectionList } from '../../store/connections/thunk';
 import { selectCredentials } from '../../store/credentials/selectors';
 import { selectNetworkStatus } from '../../store/app/selectors';
 import { fetchCredentials } from '../../store/credentials/thunk';
+import AppCustomAlert, { AlertType } from '../../components/Alert/AppCustomAlert';
+import { IActionObject } from '../../store/actions/interface';
 
 function ActionsScreen({ navigation }) {
   //Constants
@@ -79,7 +85,7 @@ function ActionsScreen({ navigation }) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState([]);
   const [selectedItem, setSelectedItem] = useState('');
-  const [deepLink, setDeepLink] = useState(false);
+  //const [deepLink, setDeepLink] = useState(false);
   const [dialogData, setDialogData] = useState(null);
 
   // For Pincode
@@ -92,28 +98,62 @@ function ActionsScreen({ navigation }) {
 
   // Confirming pin
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [verifyPincode, setVerifyPincode] = useState('');
-  const [verifyPincodeError, setVerifyPincodeError] = useState('');
+
+  // Deep link guard (prevents double navigation)
+  const deepLinkHandledRef = useRef(false);
+
+  // show reject or delete action
+  const [selectedAction, setSelectedAction] = useState(null);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   // Notification hook
   useNotification();
 
-  var requestArray = [];
-
+  // Deep Link handling
   useEffect(() => {
-    if (!deepLink) getUrl();
-  }, [deepLink]);
+    const handleIncomingUrl = async incomingUrl => {
+      if (deepLinkHandledRef.current) return;
 
-  useEffect(() => {
-    // Setting listener for deeplink
-    let deepEvent = undefined;
-    if (!deepLink) {
-      deepEvent = Linking.addEventListener('url', ({ url }) => {
-        getUrl(url);
-      });
-    }
-    return () => deepEvent && deepEvent;
+      const url = incomingUrl ?? (await Linking.getInitialURL());
+
+      if (!url) return;
+
+      deepLinkHandledRef.current = true;
+      handleDeepLink(url);
+    };
+
+    handleIncomingUrl();
+
+    // Background / foreground
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      handleIncomingUrl(url);
+      deepLinkHandledRef.current = false;
+    });
+
+    return () => subscription.remove();
   }, []);
+
+  // fetch actions data
+  useFocusEffect(
+    useCallback(() => {
+      if (networkStatus !== 'connected') {
+        _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
+        return;
+      }
+      if (actionStatus === 'initial') {
+        dispatch(fetchActions());
+      }
+    }, [actionStatus, networkStatus])
+  );
+
+  // Pull to refresh
+  const refreshHandler = () => {
+    if (networkStatus !== 'connected') {
+      _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
+      return;
+    }
+    dispatch(fetchActions());
+  };
 
   //Checking Notification Status
   useLayoutEffect(() => {
@@ -147,46 +187,34 @@ function ActionsScreen({ navigation }) {
     }, [])
   );
 
-  const getUrl = async url => {
-    let initialUrl = '';
-    if (url != undefined) {
-      initialUrl = url;
-    } else {
-      initialUrl = await Linking.getInitialURL();
-    }
-    if (initialUrl === null) {
-      setDeepLink(true);
-      return;
-    } else {
-      const parsed = initialUrl.split('/');
-      var item = {};
-      // Base64 request
-      if (initialUrl.includes('?data')) {
-        item['type'] = initialUrl.split('?data=')[0];
-        item['data'] = initialUrl.split('?data=')[1];
-      } else {
-        item['type'] = parsed[3];
-        item['metadata'] = parsed[4];
-      }
-      requestArray.push(item);
-      const requestJson = JSON.parse(JSON.stringify(item));
-      setDeepLink(true);
+  const handleDeepLink = url => {
+    try {
+      console.log('Deep link:', url);
 
-      if (
-        item['type'] === 'connection_request' ||
-        item['type'].includes('connectionless-verification')
-      ) {
-        navigation.navigate('QRScreen', {
-          request: requestJson,
-          isLink: item['type'] === 'connection_request',
+      let item = {};
+
+      if (url.includes('?data=')) {
+        item.type = url.split('?data=')[0];
+        item.data = url.split('?data=')[1];
+      } else {
+        const parsed = url.split('/');
+        item.type = parsed[3];
+        item.metadata = parsed[4];
+      }
+
+      const requestType = item.type.includes('/') ? item.type.split('/').pop() : item.type;
+
+      if (requestType === CONNLESS_VER_REQ) {
+        navigation.navigate('VerificationRequestScreen', {
+          data: {
+            scanData: JSON.stringify(item),
+          },
         });
       } else {
         _showAlert('Zada Wallet', 'Invalid URL');
       }
-    }
-
-    if (initialUrl.includes('Details')) {
-      Alert.alert(initialUrl);
+    } catch (e) {
+      _showAlert('Zada Wallet', 'Failed to handle deep link');
     }
   };
 
@@ -257,7 +285,7 @@ function ActionsScreen({ navigation }) {
             let conn = actions.find(x => x.connectionId === selectedItemObj.connectionId);
 
             // Adding Connection
-            dispatch(fetchConnections());
+            dispatch(fetchAcceptConnectionList());
 
             // Deleting Action
             dispatch(deleteAction(conn.connectionId));
@@ -483,12 +511,14 @@ function ActionsScreen({ navigation }) {
   };
 
   const onDeletePressed = item => {
-    showAskDialog(
-      'Are you sure?',
-      t('messages.delete_request'),
-      () => rejectModal(item),
-      () => {}
-    );
+    // showAskDialog(
+    //   'Are you sure?',
+    //   t('messages.delete_request'),
+    //   () => rejectModal(item),
+    //   () => {}
+    // );
+    setSelectedAction(item);
+    setShowDeleteAlert(true);
   };
 
   // Checking is Pincode set or not
@@ -552,10 +582,6 @@ function ActionsScreen({ navigation }) {
     } catch (error) {
       showMessage('Zada Wallet', error.toString());
     }
-  };
-
-  const refreshHandler = () => {
-    dispatch(fetchActions());
   };
 
   return (
@@ -673,11 +699,29 @@ function ActionsScreen({ navigation }) {
           text={t('ActionsScreen.empty_list_text')}
           image={require('../../assets/images/action.png')}
           onPress={() => {
-            navigation.navigate('QRScreen');
+            navigation.navigate('NewQRScreen');
           }}
           screen="actions"
         />
       )}
+
+      <AppCustomAlert
+        isVisible={showDeleteAlert}
+        title={t('messages.delete_action_title')}
+        message={t('messages.delete_request')}
+        cancelText={t('common.cancel')}
+        confirmText={t('common.confirm')}
+        type={AlertType.DANGER}
+        onConfirm={() => {
+          if (selectedAction != null) {
+            rejectModal(selectedAction);
+          }
+          setShowDeleteAlert(false);
+        }}
+        onCancel={() => {
+          setShowDeleteAlert(false);
+        }}
+      />
     </View>
   );
 }

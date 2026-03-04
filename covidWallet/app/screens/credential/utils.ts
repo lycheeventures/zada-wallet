@@ -1,10 +1,12 @@
 import moment from 'moment';
-import { Platform, PermissionsAndroid, Alert } from 'react-native';
+import { Platform, PermissionsAndroid, NativeModules } from 'react-native';
 import Share from 'react-native-share';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFetchBlob from 'rn-fetch-blob';
 import { CredentialAPI } from '../../gateways';
 import { parse_date_time } from '../../helpers';
+
+const { PdfDownload } = NativeModules;
 
 export const generatePDF = async (html: any, fileName: string) => {
   try {
@@ -18,8 +20,7 @@ export const generatePDF = async (html: any, fileName: string) => {
     };
 
     const file = await RNHTMLtoPDF.convert(options);
-
-    return { url: file.filePath };
+    return { url: Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath };
   } catch (error) {
     console.error('Error generating PDF:', error);
     throw error;
@@ -28,32 +29,44 @@ export const generatePDF = async (html: any, fileName: string) => {
 
 export const downloadFile = async (html: any, fileName: string) => {
   try {
-    if (Platform.OS === 'android') {
-      const hasPermission = await requestStoragePermission();
-      if (!hasPermission) {
-        Alert.alert('Permission Denied', 'Cannot save PDF without storage permission.');
-        return;
-      }
-    }
-
-    // Generate PDF into public Download folder
-    const options = {
+    // Convert PDF file
+    const pdfResult = await RNHTMLtoPDF.convert({
       html,
       fileName,
-      directory: 'Download',
       height: 842,
       width: 595,
       padding: 0,
-    };
+    });
 
-    const file = await RNHTMLtoPDF.convert(options);
-    const destPath = RNFetchBlob.fs.dirs.DownloadDir + `/${fileName}.pdf`;
-    await RNFetchBlob.fs.cp(file.filePath, destPath);
-    await RNFetchBlob.fs.scanFile([{ path: destPath }]);
-    return { url: `file://${destPath}` };
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    throw error;
+    const tempPath = pdfResult.filePath;
+    if (!tempPath) throw new Error('Failed to generate PDF');
+
+    if (Platform.OS === 'android') {
+      if (Platform.Version >= 29) {
+        // Android 10+ → MediaStore
+        const msg = await PdfDownload.savePdfToDownloads(tempPath, fileName);
+        return {
+          success: true,
+          message: `PDF downloaded successfully! You can find it in your device\’s Downloads folder.`,
+        };
+      } else {
+        // Android 9 or below → Request permission
+        const hasPermission = await requestLegacyStoragePermission();
+        if (!hasPermission) {
+          throw new Error('Cannot save PDF without storage permission.');
+        }
+
+        const destPath = RNFetchBlob.fs.dirs.DownloadDir + `/${fileName}.pdf`;
+        await RNFetchBlob.fs.cp(tempPath, destPath);
+        await RNFetchBlob.fs.scanFile([{ path: destPath }]);
+        return {
+          success: true,
+          message: `PDF downloaded successfully! You can find it in your device\’s Downloads folder.`,
+        };
+      }
+    }
+  } catch (err: any) {
+    throw new Error('Failed to generate or download PDF.');
   }
 };
 
@@ -116,27 +129,22 @@ export const replacePlaceHolders = (htmlStr: string, data: any, credentialDetail
   return htmlStr;
 };
 
-const requestStoragePermission = async () => {
+const requestLegacyStoragePermission = async () => {
   if (Platform.OS !== 'android') return true;
 
+  if (Platform.Version >= 29) return true; // Using Media Storage API
+
   try {
-    if (Platform.Version >= 33) {
-      // Android > 11 uses READ_MEDIA_IMAGES
-      await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES);
-      return true;
-    } else {
-      // Android < 11 uses WRITE_EXTERNAL_STORAGE
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-          title: 'File Download Permission',
-          message: 'Your permission is required to save files to your device.',
-          buttonPositive: 'OK',
-          buttonNegative: 'Cancel',
-        }
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    }
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      {
+        title: 'Storage Permission',
+        message: 'Permission is required to save PDF to Downloads folder.',
+        buttonPositive: 'OK',
+        buttonNegative: 'Cancel',
+      }
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
   } catch (err) {
     console.error('Storage permission error:', err);
     return false;

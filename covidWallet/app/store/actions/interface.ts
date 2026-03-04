@@ -1,5 +1,5 @@
 export interface IActionState {
-  status: 'idle' | 'loading' | 'pending' | 'succeeded' | 'failed';
+  status: 'initial' | 'loading' | 'pending' | 'success' | 'error';
   error: {
     code?: string | undefined;
     message?: string | undefined;

@@ -18,12 +18,7 @@ import FadeView from '../../components/FadeView';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import { selectUser } from '../../store/auth/selectors';
 import { selectBaseUrl, selectNetworkStatus } from '../../store/app/selectors';
-import {
-  _showAlert,
-  showNetworkMessage,
-  getItemFromLocalStorage,
-  saveItemInLocalStorage,
-} from '../../helpers';
+import { _showAlert, getItemFromLocalStorage, saveItemInLocalStorage } from '../../helpers';
 import ConstantsList from '../../helpers/ConfigApp';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
@@ -146,11 +141,12 @@ const PhoneNumberScreen = (props: INProps) => {
           })
           .catch(error => {
             setLoading(false);
-            console.log(error);
+            const errorMessage = error?.message || 'Something went wrong!';
+            _showAlert('ZADA', errorMessage);
           });
       }
     } else {
-      showNetworkMessage();
+      _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
     }
   };
 

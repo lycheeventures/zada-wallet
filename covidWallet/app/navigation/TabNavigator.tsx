@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -7,6 +8,7 @@ import { AppColors, PRIMARY_COLOR, SECONDARY_COLOR } from '../theme/Colors';
 import { TabStack } from './types';
 // Store
 import { useAppSelector } from '../store';
+
 import { selectActionCount } from '../store/actions/selectors';
 // Screens
 import ActionsScreen from '../screens/action/ActionsScreen';

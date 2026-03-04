@@ -32,14 +32,32 @@ export type MainStackParamList = {
   LanguageSelectionScreen: undefined;
   ContactUs: undefined;
   AboutUs: undefined;
+  UserGuide: undefined;
   ProfileScreen: undefined;
   CredDetailScreen: { credentialId: string };
   QRScreen: undefined;
   EmptyCredentialScreen: undefined;
   CredentialListScreen: undefined;
-  VerificationRequestScreen: undefined;
+  VerificationRequestScreen: {
+    data: {
+      metadata?: any;
+      type?: string;
+      imageUrl?: string;
+      organizationName?: string;
+      connectionId?: string;
+      scanData?: string;
+    };
+  };
   ConnectionBaseVerificationScreen: undefined;
   CommonErrorView: undefined;
+  NewQRScreen: undefined;
+  ConnectionAccept: {
+    qrJSON: any;
+  };
+  VerifyQRScreen: {
+    credential: any;
+    values: Array<{ key: string; value: string }>;
+  };
 };
 
 export type TabStackParamList = {

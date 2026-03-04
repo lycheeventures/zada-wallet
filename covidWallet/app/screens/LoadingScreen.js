@@ -1,40 +1,28 @@
 import * as React from 'react';
-import { Animated, View, Text, Image, StyleSheet, ActivityIndicator, Easing } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { PRIMARY_COLOR, AppColors } from '../theme/Colors';
 import ChangingText from '../components/Animations/ChangingText';
-import LogoAnimation from '../components/Animations/LogoAnimation';
-import { PRIMARY_COLOR, BACKGROUND_COLOR } from '../theme/Colors';
 
-function LoadingScreen(props) {
+function LoadingScreen() {
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: PRIMARY_COLOR,
-      }}>
-      <View
-        style={{
-          alignItems: 'center',
-        }}>
-        <LogoAnimation />
-        <View style={styles.textViewStyle}>
-          <ChangingText messageIndex={props.messageIndex} />
-        </View>
-      </View>
+    <View style={styles.container}>
+      <Image source={require('../assets/images/splash_logo.png')} style={styles.image} />
+      <ChangingText messageIndex={2} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  textViewStyle: {
-    marginTop: 24, // space between logo and text
+  container: {
+    flex: 1,
+    backgroundColor: PRIMARY_COLOR,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  textStyle: {
-    color: 'white',
-  },
-  activityIndicatorStyle: {
-    marginTop: 16,
+  image: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
   },
 });
 

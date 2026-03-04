@@ -1,4 +1,10 @@
-export type IStatus = 'idle' | 'loading' | 'pending' | 'succeeded' | 'failed' | "accepting_connection";
+export type IStatus =
+  | 'initial'
+  | 'loading'
+  | 'pending'
+  | 'success'
+  | 'error'
+  | 'accepting_connection';
 
 export interface IConnectionState {
   status: IStatus;
@@ -8,7 +14,7 @@ export interface IConnectionState {
     name?: string | undefined;
     stack?: any;
   };
-  connectionlist: IConnectionList[],
+  connectionlist: IConnectionList[];
 }
 
 interface IEndpoint {

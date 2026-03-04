@@ -50,18 +50,14 @@ export const clearAllAndLogout = async (dispatch, type) => {
   if (type && type !== 'timeout') {
     await AuthAPI.unRegisterDeviceToken(Platform.OS);
   }
-  resetLocalStorage();
   resetSecureItems();
   dispatch(resetAction());
   dispatch(resetConnection());
   dispatch(resetCredential());
-  await dispatch(resetCache());
   dispatch(resetAuth());
-  dispatch(changeAppStatus('idle'));
-  persistor.purge();
 };
 
-export const deleteAccountAndClearAll = async (dispatch) => {
+export const deleteAccountAndClearAll = async dispatch => {
   await AuthAPI.unRegisterDeviceToken(Platform.OS);
   resetLocalStorage();
   resetSecureItems();

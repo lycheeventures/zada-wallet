@@ -1925,18 +1925,18 @@ PODS:
     - React-Core
   - react-native-camera/RN (4.2.1):
     - React-Core
-  - react-native-config (1.5.9):
-    - react-native-config/App (= 1.5.9)
-  - react-native-config/App (1.5.9):
+  - react-native-config (1.6.1):
+    - react-native-config/App (= 1.6.1)
+  - react-native-config/App (1.6.1):
     - React-Core
-  - react-native-config/Extension (1.5.9)
+  - react-native-config/Extension (1.6.1)
   - react-native-fingerprint-scanner (6.0.0):
     - React
   - react-native-html-to-pdf (0.12.0):
     - React-Core
   - react-native-netinfo (11.4.1):
     - React-Core
-  - react-native-notifications (5.1.0):
+  - react-native-notifications (5.2.2):
     - React-Core
   - react-native-pager-view (6.9.1):
     - boost
@@ -1974,8 +1974,6 @@ PODS:
     - React-Core
   - react-native-spinkit (1.4.1):
     - React
-  - react-native-splash-screen (3.3.0):
-    - React-Core
   - react-native-view-shot (3.8.0):
     - React-Core
   - react-native-webview (13.16.0):
@@ -2589,13 +2587,39 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNKeychain (8.2.0):
+  - RNKeychain (10.0.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - RNLocalize (3.6.0):
     - React-Core
   - RNPermissions (4.1.5):
     - React-Core
-  - RNReanimated (3.19.3):
+  - RNReanimated (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -2622,11 +2646,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.19.3)
-    - RNReanimated/worklets (= 3.19.3)
+    - RNReanimated/reanimated (= 3.19.4)
+    - RNReanimated/worklets (= 3.19.4)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (3.19.3):
+  - RNReanimated/reanimated (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -2653,10 +2677,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 3.19.3)
+    - RNReanimated/reanimated/apple (= 3.19.4)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (3.19.3):
+  - RNReanimated/reanimated/apple (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -2685,7 +2709,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets (3.19.3):
+  - RNReanimated/worklets (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -2712,10 +2736,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/worklets/apple (= 3.19.3)
+    - RNReanimated/worklets/apple (= 3.19.4)
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets/apple (3.19.3):
+  - RNReanimated/worklets/apple (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -2779,7 +2803,7 @@ PODS:
     - React-Core
   - RNShare (10.2.1):
     - React-Core
-  - RNSVG (15.14.0):
+  - RNSVG (15.15.1):
     - React-Core
   - RNVectorIcons (10.3.0):
     - boost
@@ -2813,11 +2837,11 @@ PODS:
     - Mobilisten (= 8.1.3)
     - React
   - SocketRocket (0.7.1)
-  - VisionCamera (4.7.2):
-    - VisionCamera/Core (= 4.7.2)
-    - VisionCamera/React (= 4.7.2)
-  - VisionCamera/Core (4.7.2)
-  - VisionCamera/React (4.7.2):
+  - VisionCamera (4.7.3):
+    - VisionCamera/Core (= 4.7.3)
+    - VisionCamera/React (= 4.7.3)
+  - VisionCamera/Core (4.7.3)
+  - VisionCamera/React (4.7.3):
     - React-Core
   - Yoga (0.0.0)
 
@@ -2882,7 +2906,6 @@ DEPENDENCIES:
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-simple-biometrics (from `../node_modules/react-native-simple-biometrics`)
   - react-native-spinkit (from `../node_modules/react-native-spinkit`)
-  - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -3069,8 +3092,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-simple-biometrics"
   react-native-spinkit:
     :path: "../node_modules/react-native-spinkit"
-  react-native-splash-screen:
-    :path: "../node_modules/react-native-splash-screen"
   react-native-view-shot:
     :path: "../node_modules/react-native-view-shot"
   react-native-webview:
@@ -3242,17 +3263,16 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 1ead4fe154df3b1ba34b5a9e35ef3c4bdfa72ccb
   react-native-biometrics: 43ed5b828646a7862dbc7945556446be00798e7d
   react-native-camera: 079d80421f0572d6b4e836908114d614d0adb553
-  react-native-config: d08b60865268872495a43e211059b4606131fe01
+  react-native-config: 8ebcf99c9ed605aea6ecea5ecb80416c63f0fbdc
   react-native-fingerprint-scanner: 91bf6825709dd7bd3abc4588a4772eb097a2b2d8
   react-native-html-to-pdf: 7a49e6c58ac5221bcc093027b195f4b214f27a9d
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
-  react-native-notifications: 3bafa1237ae8a47569a84801f17d80242fe9f6a5
+  react-native-notifications: e2d3c022d6077de7e420ba5c01b4bd9464f3941d
   react-native-pager-view: d5532793dc1770a3e75fd234f34e7cddd04c1882
   react-native-quick-base64: 6568199bb2ac8e72ecdfdc73a230fbc5c1d3aac4
   react-native-safe-area-context: 2243039f43d10cb1ea30ec5ac57fc6d1448413f4
   react-native-simple-biometrics: e9f7b35595c99829577878cf8f36ed8ca8268112
   react-native-spinkit: 96a74c3519fab0eded2ab8c285f774aa3f4b7944
-  react-native-splash-screen: 95994222cc95c236bd3cdc59fe45ed5f27969594
   react-native-view-shot: d1a701eb0719c6dccbd20b4bb43b1069f304cb70
   react-native-webview: 9cebbe24b05f426c783a9a81372ae1f21f2adae9
   React-NativeModulesApple: eff2eba56030eb0d107b1642b8f853bc36a833ac
@@ -3295,19 +3315,19 @@ SPEC CHECKSUMS:
   RNFBApp: 2cbcd7fd5063d8a521a09385915934e99295a79f
   RNFBMessaging: d307457b2cd06e87d77e3dada610200b328f53a6
   RNGestureHandler: 507c67d169cae3f7ade381fbe3358187e62b2c92
-  RNKeychain: bbe2f6d5cc008920324acb49ef86ccc03d3b38e4
+  RNKeychain: d9571527e40c1616307e6d213628b266fee8485b
   RNLocalize: 5c5e0454cb8a73f173f27a6353630e17684f07dd
   RNPermissions: c9f6254b68483c75efe58543d6cd92e5a3d869f5
-  RNReanimated: 7302108cff8306ca3460b472d2498833b84a5766
+  RNReanimated: 9282065c1fb748d2d1945ba46d6592c2cf4e5cc8
   RNScreens: 35525ebfe219c8709da0d26aebbc9a5e02e1077b
   RNSecureRandom: b64d263529492a6897e236a22a2c4249aa1b53dc
   RNSha256: 4d35f112e967f58273d625a19376f4eafc72bd5c
   RNShare: 694e19d7f74ac4c04de3a8af0649e9ccc03bd8b1
-  RNSVG: ad69b385e35653fd9694935c48840117e96ccc1d
+  RNSVG: 866f818ba926c5d3f7863705abed51bb09d8ddd3
   RNVectorIcons: 9084b0cf37b3c5690b730c5627a21d750c9f517e
   RNZohoSalesIQ: f12694631244abdc9157aa077e817f0320acbdb2
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  VisionCamera: 30b358b807324c692064f78385e9a732ce1bebfe
+  VisionCamera: 7187b3dac1ff3071234ead959ce311875748e14f
   Yoga: 11c9686a21e2cd82a094a723649d9f4507200fb0
 
 PODFILE CHECKSUM: 14df428dbf3d88918f0f84aec60e3a2fd0a8feb2

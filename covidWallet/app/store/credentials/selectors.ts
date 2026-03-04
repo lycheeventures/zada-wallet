@@ -7,10 +7,14 @@ export const CredentialAdapter = createEntityAdapter({
 });
 
 // Select Status
-export const selectCredentialsStatus = (state: RootState) => state.credential.status;
+export const credentialState = (state: RootState) => state.credential;
+
+export const addCredentialStatus = (state: RootState) => state.credential.addCredential;
+
+export const deleteCredentialStatus = (state: RootState) => state.credential.deleteCredential;
 
 // Select Error
-export const selectCredentialsError = (state: RootState) => state.credential.error;
+export const fetchCredentialsError = (state: RootState) => state.credential.error;
 
 // Select all credentials
 export const selectCredentials = CredentialAdapter.getSelectors((s: RootState) => s.credential);
@@ -23,6 +27,14 @@ export const selectSingleCredential = createSelector(
     return entities[credentialId];
   }
 );
+
+export const fetchCredentialsStatus = createSelector([credentialState], state => ({
+  initial: state.fetchCredentials === 'initial',
+  loading: state.fetchCredentials === 'loading',
+  success: state.fetchCredentials === 'success',
+  error: state.fetchCredentials === 'error',
+  status: state.fetchCredentials,
+}));
 
 // Select sorted array
 export const selectSortedCredentials = createSelector(selectCredentials.selectAll, cred =>

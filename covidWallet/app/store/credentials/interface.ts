@@ -1,5 +1,8 @@
 export interface ICredentialState {
-  status: 'idle' | 'loading' | 'pending' | 'succeeded' | 'failed';
+  //status: 'initial' | 'loading' | 'pending' | 'success' | 'error';
+  fetchCredentials: 'initial' | 'loading' | 'success' | 'error';
+  addCredential: 'initial' | 'loading' | 'success' | 'error';
+  deleteCredential: 'initial' | 'loading' | 'success' | 'error';
   error: {
     code?: string | undefined;
     message?: string | undefined;
@@ -32,7 +35,7 @@ export interface ICredentialObject {
   connectionId: string;
   correlationId: string;
   credentialId: string;
-  threadId: string,
+  threadId: string;
   definitionId: string;
   issuedAtUtc: Date;
   schemaId: string;
@@ -48,4 +51,16 @@ export interface ICredentialObject {
   };
   organizationName?: string;
   selected?: boolean;
+}
+
+export interface Action {
+  state: string;
+  credentialId: string;
+  connectionId: string;
+  threadId: string;
+  issuedAtUtc: string;
+  values: {
+    [key: string]: string;
+  };
+  correlationId: string;
 }

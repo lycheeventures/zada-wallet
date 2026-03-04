@@ -6,7 +6,7 @@ import { fetchActions } from '../store/actions/thunk';
 import { AuthAPI } from '../gateways';
 import { getItem, saveItem } from '../helpers/Storage';
 import ConstantList from '../helpers/ConfigApp';
-import { fetchConnections } from '../store/connections/thunk';
+import { fetchAcceptConnectionList } from '../store/connections/thunk';
 
 const useNotification = () => {
   // Constants
@@ -39,7 +39,7 @@ const useNotification = () => {
     Notifications.events().registerNotificationReceivedForeground(
       (notification: any, completion) => {
         if (notification?.payload) {
-          dispatch(fetchConnections());
+          dispatch(fetchAcceptConnectionList());
           dispatch(fetchActions());
         }
         completion({ alert: true, sound: true, badge: true });
@@ -51,7 +51,7 @@ const useNotification = () => {
     // Notification open handler when app is in background
     Notifications.events().registerNotificationOpened((notification: any, completion) => {
       if (notification?.payload) {
-        dispatch(fetchConnections());
+        dispatch(fetchAcceptConnectionList());
         dispatch(fetchActions());
       }
       completion();
@@ -59,13 +59,13 @@ const useNotification = () => {
 
     // Notification open handler when app is in destroyed IOS and Android
     Notifications.getInitialNotification()
-      .then((notification) => {
+      .then(notification => {
         if (notification?.payload) {
-          dispatch(fetchConnections());
+          dispatch(fetchAcceptConnectionList());
           dispatch(fetchActions());
         }
       })
-      .catch((err) => console.error('getInitialNotifiation() failed', err));
+      .catch(err => console.error('getInitialNotifiation() failed', err));
   }, []);
 };
 export default useNotification;

@@ -1,40 +1,111 @@
 import React, { useEffect, useState } from 'react';
 import EmptyCredentialScreen from './EmptyCredentialScreen';
 import CredentialListScreen from './CredentialListScreen';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { get_all_credentials_connectionless_verification } from '../../gateways/verifications';
 import { showOKDialog } from '../../helpers/Toast';
 import { ActivityIndicator, View, Linking, StyleSheet } from 'react-native';
 import { VerificationAPI } from '../../gateways';
 import LoadingDialog from '../../components/Dialogs/LoadingDialog';
 import { AppColors } from '../../theme/Colors';
-import CommonErrorView from '../../components/Error/CommonErrorView';
 import { useTranslation } from 'react-i18next';
+import { convertStringToBase64 } from '../../helpers/utils';
 
 const VerificationRequestScreen = props => {
   const navigation = useNavigation();
+  const route = useRoute();
   const { t } = useTranslation();
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
+  const [verificationRequestId, setVerificationRequestId] = useState(null);
+  const [redirectCallback, setRedirectCallback] = useState(null);
 
-  const verificationRequestId = props?.data?.metadata?.verificationRequestId ?? null;
-  const redirectCallback = props?.data?.metadata?.redirectCallback || null;
+  // Support both props and route params
+  const credentialData = props?.route?.params?.data || props?.data || route?.params?.data;
+  const scanData = credentialData?.scanData;
 
-  // Get verification list
-  const fetchVerificationList = async () => {
+  useEffect(() => {
+    initializeScreen();
+  }, [scanData]);
+
+  const initializeScreen = async () => {
     try {
       setLoading(true);
       setError(false);
-      if (!verificationRequestId) {
+      if (scanData) {
+        // Process QR scan verification first
+        await processVerificationRequest(scanData);
+      } else {
+        setData([]);
+        setLoading(false);
+      }
+    } catch (err) {
+      setLoading(false);
+    }
+  };
+
+  // Process verification request from QR code scan
+  const processVerificationRequest = async scanData => {
+    try {
+      let parsedData = JSON.parse(scanData);
+
+      if (parsedData.data === undefined) {
+        parsedData = convertStringToBase64(JSON.stringify(parsedData));
+      } else {
+        parsedData = parsedData.data;
+      }
+      const result = await VerificationAPI.send_request_to_agency(parsedData);
+
+      if (result.data.success) {
+        const credentials = result.data.verification;
+        const verificationId = credentials.metadata?.verificationRequestId;
+        const callback = credentials.metadata?.redirectCallback || null;
+
+        // Store in state for use in acceptButtonClick
+        setVerificationRequestId(verificationId);
+        setRedirectCallback(callback);
+
+        if (verificationId) {
+          await fetchVerificationList(verificationId);
+        } else {
+          setData([]);
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+        showOKDialog(
+          t('messages.verification_fail_title'),
+          t('messages.verification_fail_message'),
+          () => {
+            navigation.navigate('MainScreen');
+          }
+        );
+      }
+    } catch (error) {
+      setLoading(false);
+      showOKDialog(
+        t('messages.verification_fail_title_1'),
+        t('messages.verification_fail_message_1'),
+        () => {
+          navigation.navigate('MainScreen');
+        }
+      );
+    }
+  };
+
+  // Get verification list
+  const fetchVerificationList = async verificationId => {
+    try {
+      if (!verificationId) {
         setData([]);
         setLoading(false);
         return;
       }
 
-      const result = await get_all_credentials_connectionless_verification(verificationRequestId);
+      const result = await get_all_credentials_connectionless_verification(verificationId);
 
       if (result.data.success && result.data.availableCredentials.length > 0) {
         let cred = result.data.availableCredentials;
@@ -51,24 +122,19 @@ const VerificationRequestScreen = props => {
           }
         });
 
-        if (fullyVaccinatedCreds.length) {
-          setData(fullyVaccinatedCreds);
-        } else {
-          setData(cred);
-        }
+        setData(fullyVaccinatedCreds.length ? fullyVaccinatedCreds : cred);
+        setError(false);
       } else {
         setData([]);
+        setError(false);
       }
     } catch (error) {
       setError(true);
+      setData([]);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchVerificationList();
-  }, [verificationRequestId]);
 
   const resetState = () => {
     setData([]);
@@ -121,10 +187,6 @@ const VerificationRequestScreen = props => {
         <ActivityIndicator size="large" color={AppColors.PRIMARY} />
       </View>
     );
-  }
-
-  if (error) {
-    return <CommonErrorView onRetry={fetchVerificationList} />;
   }
 
   return data.length === 0 ? (

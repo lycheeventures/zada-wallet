@@ -13,11 +13,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '../../theme/Colors';
 import { AppDispatch, useAppDispatch, useAppSelector } from '../../store';
 import { selectUser } from '../../store/auth/selectors';
-import FadeView from '../../components/FadeView';
 import { validateUserOTP } from '../../store/auth/thunk';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
-import AnimatedLoading from '../../components/Animations/AnimatedLoading';
 import InputPinComponent from '../../components/Input/InputPinComponent';
 import ResendCode from './components/ResendCode';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +38,23 @@ const VerifyOTPScreen = (props: INProps) => {
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -140,39 +155,46 @@ const VerifyOTPScreen = (props: INProps) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: AppColors.WHITE }}>
-      <FadeView style={{ flex: 2 }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: AppColors.WHITE,
+      }}
+      edges={['bottom']}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
         <View style={styles.imageStyle}>
           <Image
             resizeMode="contain"
             source={require('../../assets/images/otp.gif')}
-            style={{ width: '100%', height: '100%' }}
+            style={{ width: 150, height: 150 }}
           />
         </View>
-        <KeyboardAvoidingView
-          style={styles.container}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
-          <Text style={styles.headingStyle}>{t('VerifyOTPScreen.title')}</Text>
-          <Text style={styles.subheadingStyle}>
-            {t('VerifyOTPScreen.sub_title_1')} {user.phone}, {t('VerifyOTPScreen.sub_title_2')}
-          </Text>
-          <View style={styles.inputContainer}>
-            <InputPinComponent
-              OTP
-              onPincodeChange={setCode}
-              pincodeError={codeError}
-              emptyComponent={codeEmptyComponent}
-              filledComponent={codeFilledComponent}
-            />
-          </View>
-        </KeyboardAvoidingView>
-        {loading && <AnimatedLoading type="FadingCircleAlt" color={AppColors.PRIMARY} />}
-
-        <View style={styles.resendOTPContainer}>
-          {<ResendCode navigation={props.navigation} />}
+        <Text style={styles.headingStyle}>{t('VerifyOTPScreen.title')}</Text>
+        <Text style={styles.subheadingStyle}>
+          {t('VerifyOTPScreen.sub_title_1')} {user.phone}, {t('VerifyOTPScreen.sub_title_2')}
+        </Text>
+        <View style={styles.inputContainer}>
+          <InputPinComponent
+            OTP
+            onPincodeChange={setCode}
+            pincodeError={codeError}
+            emptyComponent={codeEmptyComponent}
+            filledComponent={codeFilledComponent}
+          />
         </View>
-      </FadeView>
+
+        <View
+          style={{
+            marginTop: 'auto',
+            opacity: keyboardVisible ? 0 : 1,
+            pointerEvents: keyboardVisible ? 'none' : 'auto',
+          }}>
+          <ResendCode navigation={props.navigation} />
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -182,8 +204,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   imageStyle: {
-    flex: 0.5,
-    marginTop: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -212,12 +232,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resendOTPContainer: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 40 : 20,
-    left: 0,
-    right: 0,
     alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 

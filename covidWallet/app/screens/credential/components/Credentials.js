@@ -1,23 +1,12 @@
-import React, { useMemo, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  RefreshControl,
-  FlatList,
-  Dimensions,
-  TouchableOpacity,
-  Linking,
-} from 'react-native';
+import React, { useMemo, useState, useCallback } from 'react';
+import { View, StyleSheet, RefreshControl, FlatList, Dimensions, Linking } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+
 import { TextInput } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { themeStyles } from '../../../theme/Styles';
-import PullToRefresh from '../../../components/PullToRefresh';
-import EmptyList from '../../../components/EmptyList';
 import { AppColors, PRIMARY_COLOR, WHITE_COLOR } from '../../../theme/Colors';
-import { get_local_issue_date } from '../../../helpers/time';
-import CardBackground from '../../../components/CardBackground';
-import CertificateCard from '../../../components/CertificateCard';
 import phhLogo from '../../../assets/icons/phh-logo-color.png';
 import zadaLogo from '../../../assets/icons/zada-logo-color.png';
 
@@ -25,20 +14,22 @@ import { CredentialAPI } from '../../../gateways';
 
 import { useAppDispatch, useAppSelector } from '../../../store';
 import {
-  selectCredentialsStatus,
+  fetchCredentialsStatus,
   selectSearchedCredentials,
+  fetchCredentialsError,
 } from '../../../store/credentials/selectors';
 import { fetchCredentials } from '../../../store/credentials/thunk';
-import { updateCredential } from '../../../store/credentials';
+import useApiErrorHandler from '../../../hooks/useApiErrorHandler';
 import FloatingActionButton from '../../../components/Buttons/FloatingActionButton';
 import { selectUser } from '../../../store/auth/selectors';
-import { selectDevelopmentMode } from '../../../store/app/selectors';
+import { selectDevelopmentMode, selectNetworkStatus } from '../../../store/app/selectors';
 import { updateWebViewUrl } from '../../../store/app';
-import OverlayLoader from '../../../components/OverlayLoader';
 import EmptyCredentials from '../EmptyCredentials';
 import CredentialCard from './CredentialCard';
-
-const { height } = Dimensions.get('window');
+import { _showAlert } from '../../../helpers';
+import AppTooltip from '../../../components/tooltip/AppTooltip';
+import useAppTooltip from '../../../hooks/useAppTooltip';
+import { AppTooltipKeys } from '../../../helpers/AppTooltipKeys';
 
 function Credentials(props) {
   // Constants
@@ -52,18 +43,46 @@ function Credentials(props) {
 
   // Selectors
   const { t } = useTranslation();
-  const credentialStatus = useAppSelector(selectCredentialsStatus);
+  const { initial, loading } = useAppSelector(fetchCredentialsStatus);
   const searchedCredentials = useAppSelector(state => selectSearchedCredentials(state, search));
+  const networkStatus = useAppSelector(selectNetworkStatus);
+
+  // show app tooltip
+  const { activeStep, onNext, onSkip } = useAppTooltip({
+    tooltipKey: AppTooltipKeys.CREDENTIALS_SCREEN,
+    totalSteps: 1,
+  });
+
+  // Error Handling
+  const error = useAppSelector(fetchCredentialsError);
+  useApiErrorHandler(error);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (networkStatus !== 'connected') {
+        _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
+        return;
+      }
+      if (initial) {
+        dispatch(fetchCredentials());
+      }
+    }, [initial, networkStatus])
+  );
+
+  // Pull to refresh
+  const refreshHandler = () => {
+    if (networkStatus !== 'connected') {
+      _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
+      return;
+    }
+    dispatch(fetchCredentials());
+  };
 
   // Function
-  const toggleModal = v => {
+  const viewCredentialDetail = v => {
     props.navigation.navigate('CredDetailScreen', {
       credentialId: v.credentialId,
     });
-  };
-
-  const updateBackgroundImage = (credentialId, background_url) => {
-    dispatch(updateCredential({ id: credentialId, changes: { backgroundImage: background_url } }));
   };
 
   // List Empty Component
@@ -102,14 +121,9 @@ function Credentials(props) {
           subtitle: item.organizationName,
           issueDate: date,
         }}
-        onPress={() => toggleModal(item)}
+        onPress={() => viewCredentialDetail(item)}
       />
     );
-  };
-
-  // Refresh List
-  const refreshHandler = () => {
-    dispatch(fetchCredentials());
   };
 
   const onRequestCredentialPress = async () => {
@@ -127,7 +141,6 @@ function Credentials(props) {
       setLoader(false);
     } catch (error) {
       setLoader(false);
-      console.log({ error });
     }
   };
   const onRequestCovidPass = () => {
@@ -140,14 +153,10 @@ function Credentials(props) {
   return (
     <>
       <View style={themeStyles.mainContainer}>
-        {/* {loader && <OverlayLoader text="Please wait..." height={'100%'} width={'100%'} />} */}
+        {loader && <OverlayLoader text="Please wait..." height={'100%'} width={'100%'} />}
         <FlatList
           refreshControl={
-            <RefreshControl
-              tintColor={'#7e7e7e'}
-              refreshing={credentialStatus === 'loading'}
-              onRefresh={refreshHandler}
-            />
+            <RefreshControl tintColor={'#7e7e7e'} refreshing={loading} onRefresh={refreshHandler} />
           }
           showsVerticalScrollIndicator={false}
           style={styles.flatListStyle}
@@ -161,47 +170,58 @@ function Credentials(props) {
           renderItem={renderItem}
         />
       </View>
+
       <View style={styles.floatingBtnContainerStyle}>
-        <FloatingActionButton
-          buttonColor={AppColors.PRIMARY}
-          actionItems={
-            developmentMode
-              ? [
-                  {
-                    title: 'myzada.info',
-                    onPress: onRequestZadaCredential,
-                    imageSrc: zadaLogo,
-                    buttonColor: AppColors.WHITE,
-                  },
-                  {
-                    title: 'phh.covidpass.id',
-                    onPress: onRequestCovidPass,
-                    imageSrc: phhLogo,
-                    buttonColor: AppColors.WHITE,
-                  },
-                  {
-                    title: 'Add Credential',
-                    onPress: onRequestCredentialPress,
-                    iconName: 'badge-account-horizontal-outline',
-                    buttonColor: AppColors.WHITE,
-                  },
-                ]
-              : [
-                  {
-                    title: 'myzada.info',
-                    onPress: onRequestZadaCredential,
-                    imageSrc: zadaLogo,
-                    buttonColor: AppColors.WHITE,
-                  },
-                  {
-                    title: 'phh.covidpass.id',
-                    onPress: onRequestCovidPass,
-                    imageSrc: phhLogo,
-                    buttonColor: AppColors.WHITE,
-                  },
-                ]
-          }
-        />
+        <AppTooltip
+          isVisible={activeStep === 1}
+          message={t('tooltips.request_credential')}
+          onNext={onNext}
+          onSkip={onSkip}
+          isLastStep={true}
+          placement="bottom"
+          spacing={-210}
+          arrowSize={{ width: 0, height: 0 }}>
+          <FloatingActionButton
+            buttonColor={AppColors.PRIMARY}
+            actionItems={
+              developmentMode
+                ? [
+                    {
+                      title: 'myzada.info',
+                      onPress: onRequestZadaCredential,
+                      imageSrc: zadaLogo,
+                      buttonColor: AppColors.WHITE,
+                    },
+                    {
+                      title: 'phh.covidpass.id',
+                      onPress: onRequestCovidPass,
+                      imageSrc: phhLogo,
+                      buttonColor: AppColors.WHITE,
+                    },
+                    {
+                      title: 'Add Credential',
+                      onPress: onRequestCredentialPress,
+                      iconName: 'badge-account-horizontal-outline',
+                      buttonColor: AppColors.WHITE,
+                    },
+                  ]
+                : [
+                    {
+                      title: 'myzada.info',
+                      onPress: onRequestZadaCredential,
+                      imageSrc: zadaLogo,
+                      buttonColor: AppColors.WHITE,
+                    },
+                    {
+                      title: 'phh.covidpass.id',
+                      onPress: onRequestCovidPass,
+                      imageSrc: phhLogo,
+                      buttonColor: AppColors.WHITE,
+                    },
+                  ]
+            }
+          />
+        </AppTooltip>
       </View>
     </>
   );

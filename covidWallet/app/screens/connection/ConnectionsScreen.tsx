@@ -1,13 +1,5 @@
-import React, { useState } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Animated,
-  StyleSheet,
-  RefreshControl,
-  Dimensions,
-  Text,
-} from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, TouchableOpacity, Animated, StyleSheet, RefreshControl, Text } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { useTranslation } from 'react-i18next';
@@ -17,32 +9,59 @@ import { themeStyles } from '../../theme/Styles';
 import { AppColors, RED_COLOR, SECONDARY_COLOR } from '../../theme/Colors';
 import { useAppSelector } from '../../store';
 import { selectConnectionsStatus } from '../../store/connections/selectors';
-import { showAskDialog } from '../../helpers/Toast';
-import { selectDevelopmentMode } from '../../store/app/selectors';
+import { _showAlert, showAskDialog, showOKDialog } from '../../helpers/Toast';
 import { IConnectionObject } from '../../store/connections/interface';
 import SelectModal from '../../components/Modal/SelectModal';
 import useConnections from '../../hooks/useConnections';
 import FloatingActionButton from '../../components/Buttons/FloatingActionButton';
 import EmptyConnections from './EmptyConnection';
+import { useFocusEffect } from '@react-navigation/native';
+import { selectNetworkStatus } from '../../store/app/selectors';
+import AppCustomAlert, { AlertType } from '../../components/Alert/AppCustomAlert';
+import useAppTooltip from '../../hooks/useAppTooltip';
+import { AppTooltipKeys } from '../../helpers/AppTooltipKeys';
+import AppTooltip from '../../components/tooltip/AppTooltip';
 
-const { height } = Dimensions.get('window');
 function ConnectionsScreen() {
   // Selectors
   const { t } = useTranslation();
   const {
-    connections,
+    acceptConnections,
     connectionlist,
     onAcceptConnection,
     onDeleteConnection,
     refreshConnections,
+    fetchAcceptConnections,
   } = useConnections();
   const connectionStatus = useAppSelector(selectConnectionsStatus);
-  const developmentMode = useAppSelector(selectDevelopmentMode);
+  const networkStatus = useAppSelector(selectNetworkStatus);
 
   // States
   const [isVisible, setVisible] = useState(false);
 
-  async function handleAddButton() {
+  // show delete alert dialog
+  const [selectedConnection, setSelectedConnection] = useState<IConnectionObject | null>(null);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+
+  // show app tooltip
+  const { activeStep, onNext, onSkip } = useAppTooltip({
+    tooltipKey: AppTooltipKeys.CONNECTIONS_SCREEN,
+    totalSteps: 1,
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      if (networkStatus !== 'connected') {
+        _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
+        return;
+      }
+      if (connectionStatus === 'initial') {
+        fetchAcceptConnections();
+      }
+    }, [connectionStatus, networkStatus])
+  );
+
+  async function addConnection() {
     setVisible(true);
   }
 
@@ -52,19 +71,30 @@ function ConnectionsScreen() {
   };
 
   async function onSuccessPress(connection: IConnectionObject) {
-    onDeleteConnection(connection.connectionId);
+    // onDeleteConnection(connection.connectionId);
+    try {
+      const result = await onDeleteConnection(connection.connectionId);
+      if (result.success) {
+        showOKDialog('', t(result.message), () => {});
+      } else {
+        showOKDialog('', t(result.message), () => {});
+      }
+    } catch (error) {
+      showOKDialog('', t('errors.something_went_wrong'), () => {});
+    }
   }
 
+  // show delete alert dialog
   function onDeletePressed(item: IConnectionObject) {
-    showAskDialog(
-      'Are you sure you want to delete this connection?',
-      'This will also delete all certificates issued by this connection.',
-      () => onSuccessPress(item),
-      () => {}
-    );
+    setSelectedConnection(item);
+    setShowDeleteAlert(true);
   }
 
   const refreshHandler = () => {
+    if (networkStatus !== 'connected') {
+      _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
+      return;
+    }
     refreshConnections();
   };
 
@@ -97,7 +127,7 @@ function ConnectionsScreen() {
         {connectionStatus === 'accepting_connection' && (
           <OverlayLoader text="Creating Connection..." />
         )}
-        {connections.length > 0 && (
+        {acceptConnections.length > 0 && (
           <View style={styles.row}>
             <MaterialCommunityIcons name="lock" size={16} color={AppColors.BLACK} />
             <Text style={styles.message}>{t('EmptyConnections.secure_message')}</Text>
@@ -110,7 +140,7 @@ function ConnectionsScreen() {
           <SwipeListView
             showsVerticalScrollIndicator={false}
             refreshControl={
-              connections.length > 0 ? (
+              acceptConnections.length > 0 ? (
                 <RefreshControl
                   tintColor={'#7e7e7e'}
                   refreshing={connectionStatus === 'loading'}
@@ -120,9 +150,9 @@ function ConnectionsScreen() {
             }
             useFlatList
             disableRightSwipe
-            disableLeftSwipe={!developmentMode}
+            disableLeftSwipe={false}
             ListEmptyComponent={EmptyConnections}
-            data={connections}
+            data={acceptConnections}
             style={styles.flatListStyle}
             contentContainerStyle={styles.flatListStyle}
             keyExtractor={(rowData, index) => {
@@ -134,11 +164,39 @@ function ConnectionsScreen() {
             rightOpenValue={-75}
           />
         </View>
+
+        <AppCustomAlert
+          isVisible={showDeleteAlert}
+          title={t('messages.delete_connection_title')}
+          message={t('messages.delete_connection_message')}
+          cancelText={t('common.cancel')}
+          confirmText={t('common.confirm')}
+          type={AlertType.DANGER}
+          onConfirm={() => {
+            if (selectedConnection != null) {
+              onSuccessPress(selectedConnection);
+            }
+            setShowDeleteAlert(false);
+          }}
+          onCancel={() => {
+            setShowDeleteAlert(false);
+          }}
+        />
       </View>
 
       <>
         <View style={{ bottom: 10 }}>
-          <FloatingActionButton buttonColor={AppColors.PRIMARY} onPress={handleAddButton} />
+          <AppTooltip
+            isVisible={activeStep === 1}
+            message={t('tooltips.add_connection')}
+            onNext={onNext}
+            onSkip={onSkip}
+            isLastStep={true}
+            placement="bottom"
+            spacing={-200}
+            arrowSize={{ width: 0, height: 0 }}>
+            <FloatingActionButton buttonColor={AppColors.PRIMARY} onPress={addConnection} />
+          </AppTooltip>
         </View>
 
         <SelectModal
@@ -181,6 +239,7 @@ const styles = StyleSheet.create({
   },
   flatListStyle: {
     flexGrow: 1,
+    paddingBottom: 100,
   },
   swipeableViewStyle: {
     width: 40,

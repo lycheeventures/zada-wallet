@@ -21,9 +21,7 @@ const App = () => {
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
         <StatusBar barStyle="light-content" backgroundColor={PRIMARY_COLOR} />
         <BootstrapPersistance>
-          <SafeAreaProvider style={styles.viewStyle}>
-            <RootNavigator />
-          </SafeAreaProvider>
+          <RootNavigator />
         </BootstrapPersistance>
       </ErrorBoundary>
     </NetworkContext>

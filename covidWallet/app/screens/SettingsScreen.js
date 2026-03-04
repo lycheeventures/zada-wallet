@@ -27,6 +27,7 @@ import useDevelopment from '../hooks/useDevelopment';
 import OverlayLoader from '../components/OverlayLoader';
 import BiometricModal from '../components/Modal/BiometricModal';
 import CustomSwitchButton from '../components/Buttons/CustomSwitchButton';
+import AppCustomAlert, { AlertType } from '../components/Alert/AppCustomAlert';
 
 export default function SettingsScreen(props) {
   // Constants
@@ -47,6 +48,7 @@ export default function SettingsScreen(props) {
   const [isBiometricModalVisible, setBiometricModalVisible] = useState(false);
   const [isAcceptConnectionEnabled, setIsAcceptConnectionEnabled] = useState(autoAcceptConnection);
   const [version, setVersion] = useState(null);
+  const [showLogoutAlert, setShowLogoutAlert] = useState(false);
 
   // Set App Status to idle on load.
   useEffect(() => {
@@ -111,18 +113,13 @@ export default function SettingsScreen(props) {
       return;
     }
 
-    showAskDialog(
-      'Are you sure?',
-      t('messages.logout'),
-      async () => {
-        dispatch(changeAppStatus('loading'));
-        const pCode = await getItem(PIN_CODE);
-        saveItem(PIN_CODE, pCode);
-        clearAllAndLogout(dispatch);
-      },
-      () => {},
-      'Ok'
-    );
+    setShowLogoutAlert(true);
+  };
+
+  const onConfirmLogut = async () => {
+    dispatch(changeAppStatus('loading'));
+    clearAllAndLogout(dispatch);
+    setShowLogoutAlert(false);
   };
 
   // when user will click on edit profile screen
@@ -244,6 +241,14 @@ export default function SettingsScreen(props) {
           <Icon name="right" color={AppColors.BLUE} size={18} />
         </TouchableOpacity>
 
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles._row}
+          onPress={() => props.navigation.navigate('UserGuide')}>
+          <Text style={styles._rowLabel}>{t('SettingsScreen.user_guide')}</Text>
+          <Icon name="right" color={AppColors.BLUE} size={18} />
+        </TouchableOpacity>
+
         <Text style={styles.devTextStyle}>
           {longPressCount === 3 && !developmentMode
             ? 'Now just tap ' + (4 - pressCount) + ' more times!'
@@ -274,6 +279,19 @@ export default function SettingsScreen(props) {
             : version.version || version
         }`}</Text>
       </View>
+
+      <AppCustomAlert
+        isVisible={showLogoutAlert}
+        title={t('messages.logout_title')}
+        message={t('messages.logout')}
+        cancelText={t('common.cancel')}
+        confirmText={t('messages.logout_title')}
+        type={AlertType.DANGER}
+        onConfirm={onConfirmLogut}
+        onCancel={() => {
+          setShowLogoutAlert(false);
+        }}
+      />
     </View>
   );
 }

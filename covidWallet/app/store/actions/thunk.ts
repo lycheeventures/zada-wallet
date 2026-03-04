@@ -3,37 +3,48 @@ import { RootState } from '..';
 import { CredentialAPI, VerificationAPI } from '../../gateways';
 import ConstantsList from '../../helpers/ConfigApp';
 import { IConnectionObject } from '../connections/interface';
+import { fetchAcceptConnectionList } from '../connections/thunk';
 
 export const fetchActions = createAsyncThunk(
   'actions/fetchActions',
-  async (args, { getState }) => {
+  async (_, { getState, dispatch }) => {
     try {
-      // Current State
-      const { connection } = getState() as RootState;
-      const connArr = Object.values(connection.entities) as IConnectionObject[];
+      let state = getState() as RootState;
 
+      //  connections exist
+      if (Object.keys(state.connection.entities).length === 0) {
+        await dispatch(fetchAcceptConnectionList()).unwrap();
+        state = getState() as RootState;
+      }
+
+      const connArr = Object.values(state.connection.entities) as IConnectionObject[];
+
+      // Fetch offers
       const response = await CredentialAPI.get_all_credentials_offers();
 
-      let offers = response.data.offers;
-      let actions = {
+      const offers = response.data.offers || [];
+      const actions = {
         success: response.data.success,
-        actions: [] as any,
+        actions: [] as any[],
       };
 
       if (response.data.success) {
-        for (let i = 0; i < offers.length; ++i) {
-          // Adding Credential Object
-          offers[i]['type'] = ConstantsList.CRED_OFFER;
-          actions.actions[i] = addImageAndNameFromConnectionList(offers[i], connArr);
+        for (const offer of offers) {
+          const obj = {
+            ...offer,
+            type: ConstantsList.CRED_OFFER,
+          };
+
+          actions.actions.push(addImageAndNameFromConnectionList(obj, connArr));
         }
       }
 
-      // Adding Verification Object
-      let verifications = await createVerificationObject(connArr);
+      // 3. Fetch verifications
+      const verifications = await createVerificationObject(connArr);
       actions.actions = actions.actions.concat(verifications);
 
       return actions;
-    } catch (e: any) {
+    } catch (e) {
       throw e;
     }
   }
@@ -71,11 +82,8 @@ const createVerificationObject = async (connections: IConnectionObject[]) => {
   }
 };
 
-const addImageAndNameFromConnectionList = (
-  obj: any,
-  connections: IConnectionObject[]
-) => {
-  connections.forEach((e) => {
+const addImageAndNameFromConnectionList = (obj: any, connections: IConnectionObject[]) => {
+  connections.forEach(e => {
     if (e.connectionId == obj.connectionId) {
       obj.imageUrl = e.imageUrl;
       obj.organizationName = e.name;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, View, Text, Image } from 'react-native';
+import { FlatList, StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SearchBar } from '@rneui/themed';
 import Modal from 'react-native-modal';
@@ -9,6 +9,7 @@ import { CountryCode, Flag } from 'react-native-country-picker-modal';
 import TouchableComponent from '../Buttons/TouchableComponent';
 import { FAB } from 'react-native-elements';
 import { HeaderLeftButton } from '../../screens/auth/components/buttons/HeaderButtons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 interface INProps {
   data: { label: string; value: string; imageUrl?: string }[];
@@ -112,6 +113,7 @@ const SelectModal = (props: INProps) => {
   return (
     <Modal
       isVisible={isVisible}
+      propagateSwipe={true}
       style={{
         backgroundColor: AppColors.WHITE,
         margin: 0,
@@ -123,13 +125,16 @@ const SelectModal = (props: INProps) => {
       onBackButtonPress={onClose}
       backdropOpacity={0.8}>
       <View style={styles.container}>
-        <View style={{ maxWidth: 100 }}>
-          <HeaderLeftButton onPress={onClose} underlayColor="#fff" />
-        </View>
+        <TouchableOpacity
+          onPress={() => {
+            onClose();
+          }}>
+          <MaterialIcons name="highlight-off" size={30} color="#000" />
+        </TouchableOpacity>
         <View>
           <View style={styles.logoContainer}>
             <Text style={styles.headingText}>{title}</Text>
-            <Text style={styles.subHeadingText}>{subTitle}</Text>
+            {/* <Text style={styles.subHeadingText}>{subTitle}</Text> */}
           </View>
         </View>
         <View style={styles.searchBarViewStyle}>
@@ -149,16 +154,22 @@ const SelectModal = (props: INProps) => {
           renderItem={renderListItems}
           keyExtractor={item => item.value}
           ListEmptyComponent={ListEmptyComponent}
-          style={styles.flatListStyle}
-          contentContainerStyle={styles.flatListContainerStyle}
+          style={{ flex: 1, marginTop: 16 }}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         />
         {handleSubmit && (
           <FAB
-            visible={true}
             icon={{ name: 'arrow-forward', color: 'white' }}
             color={AppColors.PRIMARY}
-            style={{ alignSelf: 'flex-end', marginBottom: 16, marginRight: 8 }}
             onPress={handleSubmit}
+            placement="right"
+            style={{
+              position: 'absolute',
+              bottom: 24 + insets.bottom,
+              right: 16,
+            }}
           />
         )}
       </View>
@@ -223,9 +234,8 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   flatListStyle: {
-    // flex: 1,
+    flex: 1,
     marginTop: 16,
-    marginBottom: 50,
   },
 });
 

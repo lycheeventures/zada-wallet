@@ -49,7 +49,7 @@ export const generateStore = (encryptionKey: { isFresh: boolean; key: string }) 
     key: 'root',
     storage: AsyncStorage,
     version: 2,
-    blacklist: ['auth', 'app'],
+    blacklist: ['auth', 'app', 'actions', 'credential', 'connection'],
     transforms: [encryptionTransform],
     stateReconciler: autoMergeLevel1,
   };
@@ -84,7 +84,7 @@ export const generateStore = (encryptionKey: { isFresh: boolean; key: string }) 
   const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
   store = configureStore({
     reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) => {
+    middleware: getDefaultMiddleware => {
       const middlewares = getDefaultMiddleware({
         serializableCheck: {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],

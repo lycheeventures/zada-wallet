@@ -10,8 +10,19 @@
     "pull_to_refresh": "Pull to refresh",
     "actions": "Actions",
     "credentials": "Credentials",
+    "credential_detail": "Credential Detail",
     "connections": "Connections",
     "try_again": "Try Again"
+  },
+  "tooltips": {
+    "setting": "Open the menu to access your settings.",
+    "refresh": "Tap here to refresh your data.",
+    "qr": "Tap here to scan a QR code.",
+    "request_credential": "Tap here to request a new credential.",
+    "add_connection": "Tap here to add a new connection.",
+    "download": "Download this credential to your device.",
+    "share": "Share this credential securely via email or other apps.",
+    "delete": "Permanently delete this credential from your wallet."
   },
   "PreferenceScreen": {
     "title": "Select Country & Language",
@@ -33,7 +44,10 @@
     "title": "We've just sent you a verification code",
     "sub_title_1": "We just sent you the verification code to",
     "sub_title_2": "please verify.",
-    "resend_otp": "Resend OTP"
+    "resend_otp": "Resend OTP",
+    "sms": "Send via SMS",
+    "wahtsapp": "Send via WhatsApp",
+    "didnt_receive_code": "Didn't get a code?"
   },
   "RegistrationScreen": {
     "title": "Hello",
@@ -70,7 +84,7 @@
   },
   "ActionsScreen": {
     "empty_list_text": "There are no actions to complete, Please scan a QR code to either get a digital Credential or to prove it.",
-    "qr_code": "QR CODE",
+    "qr_code": "Scan QR",
     "notification_alert_message": "Notifications are disabled. You will not be able to receive alerts for the actions. Pull down to refresh and receive the latest actions.",
     "select_certificate": "Please select a Credential"
   },
@@ -99,7 +113,9 @@
   },
   "QRScreen": {
     "title": "Point your camera to a QR code to scan",
-    "cancel_scan": "Cancel Scan"
+    "cancel_scan": "Cancel Scan",
+    "no_access_camera": "Camera can't open. Please allow camera access in ZADA app info to continue.",
+    "close": "Close"
   },
   "SettingsScreen": {
     "general": "General",
@@ -111,6 +127,7 @@
     "support": "Support",
     "contact_us": "Contact Us",
     "about_us": "About Us",
+    "user_guide": "User Guide",
     "license_and_agreements": "License & Agreements"
   },
   "ProfileScreen": {
@@ -201,16 +218,24 @@
     "error_401": "Unauthorized – Please check your Credentials.",
     "error_403": "Your connection is blocked because a VPN or proxy was detected. Please turn off your VPN and try again.",
     "error_404": "Not Found – The requested resource could not be found.",
-    "error_500": "Oops! Something went wrong. Please try again later."
+    "error_500": "Oops! Something went wrong. Please try again later.",
+    "verification_fail_title": "Verification Failed",
+    "verification_fail_message": "Failed to verify the QR code. Please try again.",
+    "verification_fail_title_1": "Error",
+    "verification_fail_message_1": "An error occurred while processing the QR code. Please try again.",
+    "no_internet_title": "No internet connection!",
+    "no_internet_message": "Please check your internet connection and try again."
   },
   "messages": {
     "delete_account": "Do you want to DELETE your account?",
+    "delete_action_title": "Delete Action",
     "delete_request": "Are you sure you want to delete this request?",
     "delete_certificate": "Are you sure you want to delete this Credential?",
     "updating_profile": "Updating your profile...",
     "fetching_profile": "Fetching your profile...",
     "fetching_detail": "Fetching Details",
-    "logout": "Are you sure you want to log out?",
+    "logout_title": "Log Out",
+    "logout": "Are you sure you want to log out of your account?",
     "receiving_certificate": "Please wait! we are receiving your Credential this may take around ~10 seconds...",
     "verifying_certificate": "Please wait! we are verifying your Credential this may take around ~10 seconds...",
     "creating_connection": "Please wait! we are creating a connection this may take around ~10 seconds...",
@@ -221,10 +246,21 @@
     "success_verification_request_submit": "Verification request has been submitted successfully",
     "success_verification_request": "Your verification request is fulfilled successfully.",
     "success_connection": "Your connection is created successfully.",
+    "connection_already_exists_title": "Connection Already Exists",
+    "connection_already_exists_message": "Connection with {{organizationName}} has already been created",
+    "connection_fail_title": "Request Connection Failed",
+    "connection_fail_message": "Failed to request connection. Please try again.",
     "success_certificate": "You have received a Credential successfully.",
     "success_certificate_deletion": "Credential is deleted successfully",
     "failed_certificate_deletion": "Failed to delete Credential.",
-    "success_claim_credential": "Request for Credential has been submitted. It will be delivered shortly."
+    "success_claim_credential": "Request for Credential has been submitted. It will be delivered shortly.",
+    "delete_connection_title": "Delete Connection",
+    "delete_connection_message": "Are you sure you want to delete this Connection?",
+    "credential_exit": "You cannot delete this Connection because it has associated Credentials.",
+    "action_exit": "You cannot delete this Connection because it has associated Actions.",
+    "delete_connection_success": "Connection deleted successfully.",
+    "delete_connection_fail": "Failed to delete Connection.",
+    "please_wait": "Please wait..."
   },
   "success": {
     "updated_password": "Password has been updated successfully",

@@ -28,7 +28,7 @@ export const fetchCredentials = createAsyncThunk(
         let cred = credArr[i];
 
         let credentialFromCurrentState = Object.values(credentials).find(
-          (x) => x?.credentialId == cred.credentialId
+          x => x?.credentialId == cred.credentialId
         );
 
         let qrCode = undefined;
@@ -39,7 +39,7 @@ export const fetchCredentials = createAsyncThunk(
 
         // Finding connection from store.
         let item: IConnectionObject | undefined = Object.values(connections).find(
-          (c) => c?.connectionId == cred.connectionId
+          c => c?.connectionId == cred.connectionId
         );
 
         let obj = {
@@ -56,12 +56,12 @@ export const fetchCredentials = createAsyncThunk(
                 cred.values['Vaccine Name'].length != 0 &&
                 cred.values['Dose'] != undefined &&
                 cred.values['Dose'].length != 0
-                ? 'COVIDpass (Vaccination)'
-                : 'Digital Certificate',
+              ? 'COVIDpass (Vaccination)'
+              : 'Digital Certificate',
         };
         credObj.credentials.push(obj);
       }
-
+      console.log('Fetched Credentials: ', credObj.credentials);
       return credObj;
     } catch (e: any) {
       throw e;
@@ -84,7 +84,7 @@ export const addCredential = createAsyncThunk(
 
     // Finding connection from store.
     let item: IConnectionObject | undefined = Object.values(connections).find(
-      (c) => c?.connectionId == cred.connectionId
+      c => c?.connectionId == cred.connectionId
     );
 
     let obj = {
@@ -100,8 +100,8 @@ export const addCredential = createAsyncThunk(
             cred.values['Vaccine Name'].length != 0 &&
             cred.values['Dose'] != undefined &&
             cred.values['Dose'].length != 0
-            ? 'COVIDpass (Vaccination)'
-            : 'Digital Certificate',
+          ? 'COVIDpass (Vaccination)'
+          : 'Digital Certificate',
     };
 
     credObj.credentials.push(obj);
@@ -119,7 +119,7 @@ export const removeCredentials = createAsyncThunk(
       let { credential } = getState() as RootState;
       let credObj = credential.entities;
 
-      let cred = Object.values(credObj).find((x) => x?.credentialId == credentialId);
+      let cred = Object.values(credObj).find(x => x?.credentialId == credentialId);
 
       // Delete credentials API call
       await CredentialAPI.delete_credential(credentialId, cred?.correlationId);
@@ -147,14 +147,14 @@ export const compressCredentials = createAsyncThunk(
       let currentState = getState() as RootState;
       const credentials = currentState.credential.entities;
 
-      let credObj = Object.values(credentials).find((x) => x?.threadId == threadId);
+      let credObj = Object.values(credentials).find(x => x?.threadId == threadId);
 
       // Return if credObj is undefined.
       if (!credObj) {
         return { success: true };
       }
 
-      // Return if QR is not undefined 
+      // Return if QR is not undefined
       if (credObj.qrCode !== undefined) {
         return { success: true };
       }

@@ -6,7 +6,6 @@
 #import <React/RCTRootView.h>
 
 #import "RNNotifications.h"
-#import <RNSplashScreen.h>
 #import <React/RCTLinkingManager.h>
 
 @implementation AppDelegate
@@ -27,7 +26,6 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   // Set the splash screen to show by default.
-  [RNSplashScreen show];
   return YES;
 }
 

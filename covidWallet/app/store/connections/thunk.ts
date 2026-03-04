@@ -4,14 +4,18 @@ import { RootState } from '..';
 import { ConnectionAPI } from '../../gateways';
 import { IActionObject } from '../actions/interface';
 
-export const fetchConnections = createAsyncThunk('connection/fetchConnections', async () => {
-  try {
-    const response = await ConnectionAPI.get_all_connections();
-    return response.data;
-  } catch (e: any) {
-    throw e;
+export const fetchAcceptConnectionList = createAsyncThunk(
+  'connection/fetchConnections',
+  async () => {
+    try {
+      const response = await ConnectionAPI.get_all_connections();
+      console.log('fetchConnections response', response.data);
+      return response.data;
+    } catch (e: any) {
+      throw e;
+    }
   }
-});
+);
 
 export const acceptConnection = createAsyncThunk(
   'connection/acceptConnection',
@@ -39,7 +43,7 @@ export const acceptMultipleConnection = createAsyncThunk(
   }
 );
 
-export const fetchConnectionList = createAsyncThunk(
+export const fetchAllConnectionList = createAsyncThunk(
   'connection/fetchConnectionList',
   async (countryCode: string | undefined) => {
     try {

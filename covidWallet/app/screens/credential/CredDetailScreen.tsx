@@ -1,5 +1,13 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Dimensions, View, Text, Alert, Platform } from 'react-native';
+import {
+  Dimensions,
+  View,
+  Text,
+  Alert,
+  Platform,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import QRCode from 'react-native-qrcode-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -16,7 +24,7 @@ import {
   _showAlert,
 } from '../../helpers';
 import { AppDispatch, RootState, useAppDispatch, useAppSelector } from '../../store';
-import { selectCredentialsStatus, selectSingleCredential } from '../../store/credentials/selectors';
+import { deleteCredentialStatus, selectSingleCredential } from '../../store/credentials/selectors';
 
 import OverlayLoader from '../../components/OverlayLoader';
 import CredQRModal from './components/CredQRModal';
@@ -26,6 +34,10 @@ import usePreventScreenshot from '../../hooks/usePreventScreenshot';
 import { compressCredentials, removeCredentials } from '../../store/credentials/thunk';
 import { selectNetworkStatus } from '../../store/app/selectors';
 import { ICredentialObject, ICredentialObjectValues } from '../../store/credentials/interface';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AppTooltip from '../../components/tooltip/AppTooltip';
+import useAppTooltip from '../../hooks/useAppTooltip';
+import { AppTooltipKeys } from '../../helpers/AppTooltipKeys';
 
 interface IProps {
   route: any;
@@ -45,7 +57,7 @@ const CredDetailScreen = (props: IProps) => {
 
   // Selectors
   const { t } = useTranslation();
-  const credentialStatus = useAppSelector(selectCredentialsStatus);
+  const credentialStatus = useAppSelector(deleteCredentialStatus);
   const networkStatus = useAppSelector(selectNetworkStatus);
 
   // States
@@ -53,18 +65,19 @@ const CredDetailScreen = (props: IProps) => {
   const [isGenerating, setGenerating] = useState(data?.qrCode === undefined ? true : false);
   const [isGeneratingPDF, setGeneratingPDF] = useState(false);
 
-  // Hooks
-  // Prevent screenshot
-  usePreventScreenshot({ navigation: props.navigation });
+  const { activeStep, onNext, onSkip } = useAppTooltip({
+    tooltipKey: AppTooltipKeys.CREDENTIAL_DETAIL_SCREEN,
+    totalSteps: 3,
+  });
 
   // Useeffects
   useEffect(() => {
-    if (credentialStatus === 'succeeded') {
+    if (credentialStatus === 'success') {
       let message: string = t('messages.success_certificate_deletion');
       showMessage('ZADA Wallet', message);
       props.navigation.goBack();
     }
-    if (credentialStatus === 'failed') {
+    if (credentialStatus === 'error') {
       let message: string = t('messages.failed_certificate_deletion');
       showMessage('ZADA Wallet', message);
     }
@@ -78,48 +91,11 @@ const CredDetailScreen = (props: IProps) => {
     }
   }, [showQRModal, data?.qrCode]);
 
-  // Setting header Icons
-  useLayoutEffect(() => {
-    props.navigation.setOptions({
-      headerRight: () => (
-        <View style={{ flexDirection: 'row' }}>
-          <MaterialIcons
-            onPress={() => createAndSharePDF(true)}
-            style={styles.headerRightIcon}
-            size={25}
-            name="download"
-          />
-          <MaterialIcons
-            onPress={() => createAndSharePDF(false)}
-            style={styles.headerRightIcon}
-            size={25}
-            name="share"
-          />
-          <MaterialIcons
-            onPress={() =>
-              credentialStatus === 'idle'
-                ? showAskDialog(
-                    'Are you sure?',
-                    t('messages.delete_certificate'),
-                    onSuccess,
-                    () => {}
-                  )
-                : {}
-            }
-            style={styles.headerRightIcon}
-            size={25}
-            name="delete"
-          />
-        </View>
-      ),
-    });
-  }, [networkStatus]);
-
   // Make and Share PDF
   const createAndSharePDF = async (isDownload: boolean = false) => {
     // Return if internet is unavailable
     if (networkStatus === 'disconnected') {
-      showNetworkMessage();
+      _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
       return;
     }
     setGeneratingPDF(true);
@@ -173,15 +149,18 @@ const CredDetailScreen = (props: IProps) => {
         },
         credentialDetails
       );
-      // Share PDF
+
       if (isDownload && Platform.OS === 'android') {
-        const result = await downloadFile(htmlStr, data.type ?? 'Credential');
-        setGeneratingPDF(false);
-        Alert.alert(
-          'Download Success',
-          "PDF downloaded successfully! You can find it in your device's Downloads folder.",
-          [{ text: 'OK' }]
-        );
+        try {
+          const result = await downloadFile(htmlStr, data.type ?? 'Credential');
+          if (result?.success) {
+            Alert.alert('Download Success', result.message, [{ text: 'OK' }]);
+          }
+        } catch (err: any) {
+          Alert.alert('Error', err.message);
+        } finally {
+          setGeneratingPDF(false);
+        }
       } else {
         await sharePDF(htmlStr, data.type ?? 'Credential');
       }
@@ -194,21 +173,74 @@ const CredDetailScreen = (props: IProps) => {
   const openQRModal = async (bool: boolean) => {
     if (networkStatus === 'disconnected') {
       if (data?.qrCode === undefined) {
-        showNetworkMessage();
+        _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
         return;
       }
     }
     setShowQRModal(bool);
   };
 
-  async function onSuccess() {
+  const onDelete = () => {
+    if (networkStatus === 'disconnected') {
+      _showAlert(t('errors.no_internet_title'), t('errors.no_internet_message'));
+      return;
+    }
+    showAskDialog('Are you sure?', t('messages.delete_certificate'), onConfirmDelete, () => {});
+  };
+
+  const onConfirmDelete = async () => {
     dispatch(removeCredentials(data.credentialId));
-  }
+  };
 
   return (
-    <View style={styles.mainContainer}>
-      {/* hidden QRCODE */}
-      <View style={{ position: 'absolute', top: '5%', left: '5%' }}>
+    <SafeAreaView style={styles.mainContainer}>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => props.navigation.goBack()} style={styles.backButton}>
+          <MaterialIcons name="arrow-back" size={28} color={BLACK_COLOR} />
+        </TouchableOpacity>
+
+        <Text style={styles.headerTitle}>{t('common.credential_detail')}</Text>
+
+        <View style={styles.headerRightActions}>
+          <AppTooltip
+            isVisible={activeStep === 1}
+            message={t('tooltips.download')}
+            onNext={onNext}
+            onSkip={onSkip}
+            placement="bottom"
+            spacing={-60}>
+            <TouchableOpacity onPress={() => createAndSharePDF(true)}>
+              <MaterialIcons name="download" size={26} style={styles.headerIcon} />
+            </TouchableOpacity>
+          </AppTooltip>
+
+          <AppTooltip
+            isVisible={activeStep === 2}
+            message={t('tooltips.share')}
+            onNext={onNext}
+            onSkip={onSkip}
+            placement="bottom"
+            spacing={-60}>
+            <TouchableOpacity onPress={() => createAndSharePDF(false)}>
+              <MaterialIcons name="share" size={26} style={styles.headerIcon} />
+            </TouchableOpacity>
+          </AppTooltip>
+
+          <AppTooltip
+            isVisible={activeStep === 3}
+            message={t('tooltips.delete')}
+            onNext={onNext}
+            onSkip={onSkip}
+            isLastStep={true}
+            placement="bottom"
+            spacing={-60}>
+            <TouchableOpacity onPress={onDelete}>
+              <MaterialIcons name="delete" size={26} style={styles.headerIcon} />
+            </TouchableOpacity>
+          </AppTooltip>
+        </View>
+      </View>
+      <View style={styles.hiddenQR}>
         {data.qrCode !== undefined && (
           <ViewShot ref={viewShotRef} options={{ fileName: 'QRCode', format: 'png', quality: 0.9 }}>
             <QRCode
@@ -221,7 +253,7 @@ const CredDetailScreen = (props: IProps) => {
         )}
       </View>
       <View style={styles.innerContainer}>
-        {credentialStatus === 'pending' && (
+        {credentialStatus === 'loading' && (
           <OverlayLoader text={t('messages.deleting_certificate')} />
         )}
 
@@ -266,16 +298,33 @@ const CredDetailScreen = (props: IProps) => {
           mainStyle={{}}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   mainContainer: {
     backgroundColor: BACKGROUND_COLOR,
     flex: 1,
     padding: 10,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    height: 56,
+    backgroundColor: BACKGROUND_COLOR,
+  },
+  backButton: { paddingLeft: 0, paddingRight: 8 },
+  headerTitle: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: '600',
+    color: BLACK_COLOR,
+    marginLeft: 10,
+  },
+  headerRightActions: { flexDirection: 'row', alignItems: 'center' },
+  headerIcon: { padding: 8, color: BLACK_COLOR },
   topContainer: {
     margin: 8,
   },
@@ -290,5 +339,6 @@ const styles = {
     paddingRight: 15,
     color: BLACK_COLOR,
   },
-};
+  hiddenQR: { position: 'absolute', opacity: 0, pointerEvents: 'none' },
+});
 export default CredDetailScreen;

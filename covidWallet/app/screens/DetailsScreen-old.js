@@ -1,12 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  Image,
-  Text,
-  Dimensions,
-  Platform,
-} from 'react-native';
+import { StyleSheet, View, Image, Text, Dimensions, Platform } from 'react-native';
 import {
   BLACK_COLOR,
   GRAY_COLOR,
@@ -14,13 +7,10 @@ import {
   WHITE_COLOR,
   BACKGROUND_COLOR,
 } from '../theme/Colors';
-import ViewShot from "react-native-view-shot";
+import ViewShot from 'react-native-view-shot';
 import { themeStyles } from '../theme/Styles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {
-  delete_credential,
-  generate_credential_qr,
-} from '../gateways/credentials';
+import { delete_credential, generate_credential_qr } from '../gateways/credentials';
 import QRCode from 'react-native-qrcode-svg';
 import { showMessage, showAskDialog, _showAlert } from '../helpers/Toast';
 import { deleteCredentialByCredId, getItem, saveItem } from '../helpers/Storage';
@@ -36,7 +26,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
 import { get_local_date_time, get_local_issue_date, parse_date_time } from '../helpers/time';
 import { useAppDispatch, useAppSelector } from '../store';
-import { selectCredentialsStatus } from '../store/credentials/selectors';
+import { fetchCredentialsStatus } from '../store/credentials/selectors';
 import { removeCredentials } from '../store/credentials/thunk';
 import DetailCard from './credential/components/DetailCard';
 
@@ -46,7 +36,7 @@ function DetailsScreen(props) {
   const dispatch = useAppDispatch();
 
   // Selectors
-  const credentialStatus = useAppSelector(selectCredentialsStatus);
+  const credentialStatus = useAppSelector(fetchCredentialsStatus);
 
   // Refs
   const viewShotRef = useRef(null);
@@ -114,17 +104,16 @@ function DetailsScreen(props) {
     }
 
     // Ordering data
-    const orderedData = Object.keys(jsonData.values).sort().reduce(
-      (obj, key) => {
+    const orderedData = Object.keys(jsonData.values)
+      .sort()
+      .reduce((obj, key) => {
         obj[key] = jsonData.values[key];
         return obj;
-      },
-      {}
-    );
+      }, {});
 
     let credentialDetails = Object.keys(orderedData).map((key, index) => {
       let value = orderedData[key];
-      value = parse_date_time(value)
+      value = parse_date_time(value);
 
       return `<div class="pair-items">
               <b class="text-space" id="iizaq">${key}:</b>
@@ -399,8 +388,7 @@ function DetailsScreen(props) {
 
     const shareOptions = {
       title: 'Certificate',
-      url:
-        Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath,
+      url: Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath,
     };
 
     try {
@@ -419,7 +407,7 @@ function DetailsScreen(props) {
       'Are you sure?',
       'Are you sure you want to delete this certificate?',
       onSuccess,
-      () => { },
+      () => {}
     );
   }
 
@@ -449,9 +437,7 @@ function DetailsScreen(props) {
         let credentials = JSON.parse(await getItem(ConstantsList.CREDENTIALS));
 
         // Find this credential and update it with QR
-        let index = credentials.findIndex(
-          (item) => item.credentialId == credentialId,
-        );
+        let index = credentials.findIndex(item => item.credentialId == credentialId);
         credentials[index].qrCode = QR;
         await saveItem(ConstantsList.CREDENTIALS, JSON.stringify(credentials));
 
@@ -484,8 +470,8 @@ function DetailsScreen(props) {
   return (
     <View style={[themeStyles.mainContainer]}>
       {/* hidden QRCODE */}
-      <View style={{ position: "absolute", top: '5%', left: '5%' }}>
-        <ViewShot ref={viewShotRef} options={{ fileName: "QRCode", format: "png", quality: 0.9 }}>
+      <View style={{ position: 'absolute', top: '5%', left: '5%' }}>
+        <ViewShot ref={viewShotRef} options={{ fileName: 'QRCode', format: 'png', quality: 0.9 }}>
           <QRCode
             value={data.qrCode}
             backgroundColor={BACKGROUND_COLOR}
@@ -495,15 +481,11 @@ function DetailsScreen(props) {
         </ViewShot>
       </View>
       <View style={styles.innerContainer}>
-        {credentialStatus === 'pending' && (
-          <OverlayLoader text="Deleting credential..." />
-        )}
+        {credentialStatus === 'pending' && <OverlayLoader text="Deleting credential..." />}
 
         {isGenerating && <OverlayLoader text="Generating credential QR..." />}
 
-        {isGeneratingPDF && (
-          <OverlayLoader text="Generating credential PDF..." />
-        )}
+        {isGeneratingPDF && <OverlayLoader text="Generating credential PDF..." />}
 
         {data.qrCode !== undefined && (
           <CredQRModal
@@ -519,18 +501,18 @@ function DetailsScreen(props) {
           <View style={styles.topContainer}>
             <DetailCard
               item={data}
-              issue_date={data.values['Issue Time']
-                ? get_local_issue_date(data.values['Issue Time'])
-                : undefined}
+              issue_date={
+                data.values['Issue Time']
+                  ? get_local_issue_date(data.values['Issue Time'])
+                  : undefined
+              }
               organizationName={data.organizationName}
               setShowQRModal={setShowQRModal}
             />
           </View>
         ) : (
           <View style={{ margin: 15 }}>
-            <Text style={styles._noQr}>
-              You do not have QR of your credential.
-            </Text>
+            <Text style={styles._noQr}>You do not have QR of your credential.</Text>
             <SimpleButton
               onPress={generateQrCode}
               width={Dimensions.get('window').width * 0.32}

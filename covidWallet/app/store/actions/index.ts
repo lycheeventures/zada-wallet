@@ -6,7 +6,7 @@ import { fetchActions } from './thunk';
 
 // State initialization
 export const ActionState: IActionState = {
-  status: 'loading',
+  status: 'initial',
   error: {
     code: undefined,
     message: undefined,
@@ -30,24 +30,23 @@ export const slice = createSlice({
       return ActionAdapter.getInitialState(ActionState);
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // FetchActions
     builder.addCase(fetchActions.pending, (state, action) => {
       // Handle the fetch result by inserting the actions here
-      if (state.status == 'idle') {
-        state.status = 'loading';
-      }
+      if (state.status === 'loading') return;
+      state.status = 'loading';
     });
     builder.addCase(fetchActions.fulfilled, (state, action) => {
       // Handle the fetch result by inserting the actions here
       if (action.payload.success) {
         ActionAdapter.upsertMany(state, action.payload.actions);
-        state.status = 'idle';
+        state.status = 'success';
       }
     });
     builder.addCase(fetchActions.rejected, (state, action) => {
       // Handle the rejected result
-      state.status = 'failed';
+      state.status = 'error';
       state.error = action?.error;
     });
   },

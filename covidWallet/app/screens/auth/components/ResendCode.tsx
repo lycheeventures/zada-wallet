@@ -10,6 +10,7 @@ import { _showAlert } from '../../../helpers';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../../navigation/types';
 import { OTP_CHANNEL } from '../../../store/auth/OtpChannel';
+import { ZohoSalesIQOpenChat } from '../../../components/Chat/utils';
 
 interface INProps {
   navigation: NativeStackNavigationProp<AuthStackParamList>;
@@ -70,8 +71,6 @@ const ResendCode = (props: INProps) => {
       {!phoneTimeout ? (
         !loading ? (
           <>
-            <Text style={styles.questionText}>Didn't get a code?</Text>
-
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[styles.button, styles.smsButton]}
@@ -82,14 +81,24 @@ const ResendCode = (props: INProps) => {
                   color={AppColors.WHITE}
                   style={styles.icon}
                 />
-                <Text style={styles.buttonText}>Send via SMS</Text>
+                <Text style={styles.buttonText}> {t('VerifyOTPScreen.sms')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.button, styles.whatsappButton]}
                 onPress={() => resendCode(OTP_CHANNEL.WHATSAPP)}>
                 <Icon name="whatsapp" size={18} color={AppColors.WHITE} style={styles.icon} />
-                <Text style={styles.buttonText}>Send via WhatsApp</Text>
+                <Text style={styles.buttonText}> {t('VerifyOTPScreen.wahtsapp')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.questionContainer}>
+              <Text style={styles.questionText}>{t('VerifyOTPScreen.didnt_receive_code')} </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  ZohoSalesIQOpenChat();
+                }}>
+                <Text style={styles.contactLink}>{t('SettingsScreen.contact_us')}</Text>
               </TouchableOpacity>
             </View>
           </>
@@ -97,7 +106,7 @@ const ResendCode = (props: INProps) => {
           <ActivityIndicator color={AppColors.PRIMARY} size="small" style={{ marginLeft: 30 }} />
         )
       ) : (
-        <Text>
+        <Text style={{ padding: 20 }}>
           {t('VerifyOTPScreen.resend_otp')} in{' '}
           <Text style={styles._countdown}>
             {('0' + phoneMins).slice(-2)} : {('0' + phoneSecs).slice(-2)}
@@ -112,10 +121,22 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
   },
+  questionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    marginTop: 20,
+  },
   questionText: {
-    fontSize: 14,
+    fontSize: 16,
     color: AppColors.BLACK,
-    marginBottom: 10,
+  },
+  contactLink: {
+    fontSize: 16,
+    color: AppColors.PRIMARY,
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -127,7 +148,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 140,
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 8,
